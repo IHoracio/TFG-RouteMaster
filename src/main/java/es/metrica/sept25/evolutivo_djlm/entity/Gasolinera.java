@@ -1,4 +1,4 @@
-package es.metrica.sept25.evolutiva_djlm.entity;
+package es.metrica.sept25.evolutivo_djlm.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

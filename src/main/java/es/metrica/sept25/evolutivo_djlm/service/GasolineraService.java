@@ -1,8 +1,8 @@
-package es.metrica.sept25.evolutiva_djlm.service;
+package es.metrica.sept25.evolutivo_djlm.service;
 
 import java.util.List;
 
-import es.metrica.sept25.evolutiva_djlm.entity.Gasolinera;
+import es.metrica.sept25.evolutivo_djlm.entity.Gasolinera;
 
 public interface GasolineraService {
 	void save(Gasolinera person);
