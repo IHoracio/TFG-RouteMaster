@@ -10,7 +10,6 @@ import org.springframework.web.client.RestTemplate;
 import es.metrica.sept25.evolutivo.entity.gasolinera.Provincia;
 
 @Service
-
 public class ProvinciaServiceImpl {
 
 	private static final String API_URL = "https://api.precioil.es/provincias";
