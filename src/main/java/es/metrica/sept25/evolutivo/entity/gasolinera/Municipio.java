@@ -1,11 +1,16 @@
 package es.metrica.sept25.evolutivo.entity.gasolinera;
 
+import es.metrica.sept25.evolutivo.service.ProvinciaService;
+import es.metrica.sept25.evolutivo.service.ProvinciaServiceImpl;
 import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 
-//@Entity
+@Entity
 public class Municipio {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -17,7 +22,9 @@ public class Municipio {
 	@Column(name = "nombre_municipio")
 	String nombreMunicipio;
 
-	Long idProvincia;
+	@ManyToOne
+	@JoinColumn(name = "id_provincia")
+	private Provincia provincia;
 
 	public Municipio() {
 	};
@@ -26,7 +33,8 @@ public class Municipio {
 		super();
 		this.idMunicipio = idMunicipio;
 		this.nombreMunicipio = nombreMunicipio;
-		this.idProvincia = idProvincia;
+		ProvinciaService p = new ProvinciaServiceImpl();
+		this.provincia = p.getProvinciaById(idProvincia).orElseGet(null);
 	}
 
 	public Long getIdMunicipio() {
@@ -45,16 +53,17 @@ public class Municipio {
 		this.nombreMunicipio = nombreMunicipio;
 	}
 
-	public Long getIdProvincia() {
-		return idProvincia;
+	public Provincia getProvincia() {
+		return this.provincia;
 	}
 
-	public void setIdProvincia(Long idProvincia) {
-		this.idProvincia = idProvincia;
+	public void setIdProvincia(Provincia provincia) {
+		this.provincia = provincia;
 	}
 
 	@Override
 	public String toString() {
-		return "Municipio[id=" + this.idMunicipio + ", idProv="+ this.idProvincia + ", nombre=" + this.nombreMunicipio + "]";
+		return "Municipio[id=" + this.idMunicipio + ", idProv=" + this.provincia.getIdProvincia() + ", nombre="
+				+ this.nombreMunicipio + "]";
 	}
 }

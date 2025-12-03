@@ -38,7 +38,7 @@ public class Main {
 		l = l.stream().filter(p -> p.getIdProvincia() < 100).toList();
 		
 		List<Municipio> m = mapper.readValue(municipios, new TypeReference<List<Municipio>>() { });
-		m = m.stream().filter(muni -> muni.getIdProvincia() < 100).toList();
+		m = m.stream().filter(muni -> muni.getProvincia().getIdProvincia() < 100).toList();
 
 		System.out.println("PROVINCIAS ESPAÑOLAS");
 		System.out.println(l);
