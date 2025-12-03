@@ -25,5 +25,12 @@ import io.swagger.v3.oas.annotations.servers.Server;
 	    in = SecuritySchemeIn.HEADER,
 	    paramName = "api_key"
 	)
+	@SecurityScheme(
+	    name = "googleApiKey",
+	    description = "API Key necesaria para Google",
+	    type = SecuritySchemeType.APIKEY,
+	    in = SecuritySchemeIn.HEADER,
+	    paramName = "api_key"
+	)
 	public class OpenApiConfig {}
 
