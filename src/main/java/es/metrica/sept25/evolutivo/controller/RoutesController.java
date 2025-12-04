@@ -17,12 +17,8 @@ import org.springframework.http.ResponseEntity;
 @RestController
 public class RoutesController {
 
-	private final RoutesService routesService;
-
 	@Autowired
-	public RoutesController(RoutesService routesService) {
-		this.routesService = routesService;
-	}
+	private RoutesService routesService;
 
 	@Operation(
 			summary = "Obtiene de un punto A → B la ruta", 

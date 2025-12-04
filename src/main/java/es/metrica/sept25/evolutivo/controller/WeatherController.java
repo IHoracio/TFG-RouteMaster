@@ -1,5 +1,6 @@
 package es.metrica.sept25.evolutivo.controller;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -7,7 +8,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
 import es.metrica.sept25.evolutivo.entity.weather.Weather;
-import es.metrica.sept25.evolutivo.service.WeatherServiceImpl;
+import es.metrica.sept25.evolutivo.service.WeatherService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.servlet.http.HttpServletRequest;
@@ -15,11 +16,8 @@ import jakarta.servlet.http.HttpServletRequest;
 @RestController
 public class WeatherController {
 
-	private WeatherServiceImpl weatherServiceImpl;
-
-	public WeatherController(WeatherServiceImpl weatherServiceImpl) {
-		this.weatherServiceImpl = weatherServiceImpl;
-	}
+	@Autowired
+	private WeatherService weatherService;
 
 	@Operation(summary = "Devuelve el clima para un código postal concreto", description = "Compone un objeto Weather que contiene toda la "
 			+ "información meteorológica para un código postal concreto.")
@@ -31,7 +29,7 @@ public class WeatherController {
 			return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 		if (zipCode.isEmpty())
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-		Weather weather = weatherServiceImpl.getWeatherLink(zipCode, apiKey);
+		Weather weather = weatherService.getWeatherLink(zipCode, apiKey);
 		if (weather == null) {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
