@@ -1,16 +1,19 @@
 package es.metrica.sept25.evolutivo.entity.user;
 
+
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
-import es.metrica.sept25.evolutivo.entity.maps.routes.Coords;
+import es.metrica.sept25.evolutivo.entity.maps.routes.Route;
+import es.metrica.sept25.evolutivo.entity.maps.routes.SavedRoute;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
-import jakarta.persistence.ElementCollection;
-import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
 
@@ -32,7 +35,8 @@ public class User {
 	
 	private Map<String, String> preferences;
 	
-	private Map<String, Coords> routes;
+	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<SavedRoute> savedRoutes;
 	
 	@Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -51,7 +55,8 @@ public class User {
 	}
 
 	public void setPassword(String password) {
-		this.password = password;
+		BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+	    this.password = encoder.encode(password);
 	}
 
 	public String getName() {
@@ -78,11 +83,11 @@ public class User {
 		this.preferences = preferencias;
 	}
 
-	public Map<String, Coords> getRoutes() {
+	public Map<String, Route> getRoutes() {
 		return routes;
 	}
 
-	public void setRoutes(Map<String, Coords> rutas) {
+	public void setRoutes(Map<String, Route> rutas) {
 		this.routes = rutas;
 	}
 
