@@ -1,4 +1,4 @@
-package es.metrica.sept25.evolutivo.service;
+package es.metrica.sept25.evolutivo.service.weather;
 
 import es.metrica.sept25.evolutivo.entity.weather.WeatherLink;
 

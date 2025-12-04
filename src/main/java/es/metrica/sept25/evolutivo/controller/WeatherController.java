@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
 import es.metrica.sept25.evolutivo.entity.weather.WeatherLink;
-import es.metrica.sept25.evolutivo.service.WeatherService;
+import es.metrica.sept25.evolutivo.service.weather.WeatherService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;

@@ -1,4 +1,4 @@
-package es.metrica.sept25.evolutivo.service;
+package es.metrica.sept25.evolutivo.service.weather;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

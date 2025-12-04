@@ -1,4 +1,4 @@
-package es.metrica.sept25.evolutivo.service;
+package es.metrica.sept25.evolutivo.service.maps.geocode;
 
 public interface ReverseGeocodeService {
 

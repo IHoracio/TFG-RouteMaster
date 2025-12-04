@@ -10,8 +10,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import es.metrica.sept25.evolutivo.entity.gasolinera.Municipio;
 import es.metrica.sept25.evolutivo.entity.gasolinera.Provincia;
-import es.metrica.sept25.evolutivo.service.MunicipioService;
-import es.metrica.sept25.evolutivo.service.ProvinciaService;
+import es.metrica.sept25.evolutivo.service.gasolineras.MunicipioService;
+import es.metrica.sept25.evolutivo.service.gasolineras.ProvinciaService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
