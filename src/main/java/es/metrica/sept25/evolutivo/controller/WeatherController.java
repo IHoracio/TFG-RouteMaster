@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.RestController;
 import es.metrica.sept25.evolutivo.entity.weather.Weather;
 import es.metrica.sept25.evolutivo.service.WeatherService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -21,11 +23,15 @@ public class WeatherController {
 
 	@Operation(summary = "Devuelve el clima para un código postal concreto", description = "Compone un objeto Weather que contiene toda la "
 			+ "información meteorológica para un código postal concreto.")
+	@ApiResponses(value = { 
+			@ApiResponse(responseCode = "200", description = "Route found"),
+			@ApiResponse(responseCode = "401", description = "apiKey wasn't found"),
+			@ApiResponse(responseCode = "400", description = "Bad request") })
 	@SecurityRequirement(name = "aemetApiKey")
 	@GetMapping("/checkWeather/{zipCode}")
 	public ResponseEntity<Weather> getWeather(@PathVariable String zipCode, HttpServletRequest request) {
 		String apiKey = request.getHeader("api_key");
-		if (apiKey.isEmpty())
+		if (apiKey == null || apiKey.isEmpty())
 			return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 		if (zipCode.isEmpty())
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
