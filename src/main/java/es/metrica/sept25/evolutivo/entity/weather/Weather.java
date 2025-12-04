@@ -1,4 +1,4 @@
-package es.metrica.sept25.evolutivo.entity;
+package es.metrica.sept25.evolutivo.entity.weather;
 
 public class Weather {
 
@@ -22,9 +22,11 @@ public class Weather {
 	public void setEstado(int estado) {
 		this.estado = estado;
 	}
+
 	public String getDatos() {
 		return datos;
 	}
+
 	public void setDatos(String datos) {
 		this.datos = datos;
 	}

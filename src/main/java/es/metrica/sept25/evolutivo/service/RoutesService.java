@@ -1,8 +1,7 @@
 package es.metrica.sept25.evolutivo.service;
 
-import es.metrica.sept25.evolutivo.entity.routes.Routes;
+import es.metrica.sept25.evolutivo.entity.maps.routes.RouteGroup;
 
 public interface RoutesService {
-	Routes getDirections(String origin, String destination, String language, String apiKey);
-	
+	RouteGroup getDirections(String origin, String destination, String language, String apiKey);
 }

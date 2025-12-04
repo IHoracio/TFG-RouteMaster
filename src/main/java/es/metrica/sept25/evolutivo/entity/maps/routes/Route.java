@@ -1,9 +1,9 @@
-package es.metrica.sept25.evolutivo.entity.routes;
+package es.metrica.sept25.evolutivo.entity.maps.routes;
 
 import java.util.List;
 
 public class Route {
-	
+
 	List<Leg> legs;
 
 	public List<Leg> getLegs() {

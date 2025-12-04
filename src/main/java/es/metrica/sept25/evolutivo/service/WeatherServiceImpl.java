@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import es.metrica.sept25.evolutivo.entity.Weather;
+import es.metrica.sept25.evolutivo.entity.weather.Weather;
 
 @Service
 public class WeatherServiceImpl {
