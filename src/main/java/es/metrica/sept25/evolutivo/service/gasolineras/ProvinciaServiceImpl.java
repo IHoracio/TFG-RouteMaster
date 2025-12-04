@@ -40,7 +40,8 @@ public class ProvinciaServiceImpl implements ProvinciaService {
 			Provincia[] provArr = restTemplate.getForObject(API_URL, Provincia[].class);
 			if (!Objects.isNull(provArr)) {
 				provList = Arrays.asList(provArr);
-				provinciaRepository.saveAllAndFlush(provList.stream().filter(p -> p.getIdProvincia() < 100).collect(Collectors.toList()));
+				provinciaRepository.saveAllAndFlush(
+						provList.stream().filter(p -> p.getIdProvincia() < 100).collect(Collectors.toList()));
 			}
 		}
 

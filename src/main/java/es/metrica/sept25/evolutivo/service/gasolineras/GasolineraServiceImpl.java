@@ -1,4 +1,5 @@
 package es.metrica.sept25.evolutivo.service.gasolineras;
+
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,7 +10,7 @@ import es.metrica.sept25.evolutivo.repository.GasolineraRepository;
 
 @Service
 public class GasolineraServiceImpl implements GasolineraService {
-	
+
 	@Autowired
 	GasolineraRepository gasolineraRepository;
 

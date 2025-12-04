@@ -4,6 +4,11 @@ public class GeocodeResult {
 
 	private Geocode geometry;
 
-    public Geocode getGeometry() { return geometry; }
-    public void setGeometry(Geocode geometry) { this.geometry = geometry; }
+	public Geocode getGeometry() {
+		return geometry;
+	}
+
+	public void setGeometry(Geocode geometry) {
+		this.geometry = geometry;
+	}
 }

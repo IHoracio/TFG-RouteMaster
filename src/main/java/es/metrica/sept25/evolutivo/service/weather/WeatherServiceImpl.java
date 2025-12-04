@@ -23,7 +23,8 @@ public class WeatherServiceImpl implements WeatherService {
     		    .toUriString();
 
 		WeatherLink weather = restTemplate.getForObject(url, WeatherLink.class);
-		System.err.println(weather.getDatos());
+		// @Lorentz muy feo esto 
+		// System.err.println(weather.getDatos());
 		return weather;
 	}
 }

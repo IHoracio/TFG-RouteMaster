@@ -17,7 +17,7 @@ public class Municipio {
 
 	@Column(name = "nombre_municipio")
 	String nombreMunicipio;
-	
+
 	@Column(name = "prov_id")
 	Long idProvincia;
 
@@ -46,7 +46,7 @@ public class Municipio {
 	public void setNombreMunicipio(String nombreMunicipio) {
 		this.nombreMunicipio = nombreMunicipio;
 	}
-	
+
 	public Long getIdProvincia() {
 		return this.idProvincia;
 	}

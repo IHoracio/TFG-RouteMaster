@@ -9,13 +9,13 @@ import es.metrica.sept25.evolutivo.entity.maps.geocode.GeocodeGroup;
 import es.metrica.sept25.evolutivo.entity.maps.routes.Coords;
 
 @Service
-public class GeocodeServiceImpl implements GeocodeService{
+public class GeocodeServiceImpl implements GeocodeService {
 
 	private static final String GEOCODE_URL = "https://maps.googleapis.com/maps/api/geocode/json";
-	
+
 	@Autowired
-    private RestTemplate restTemplate;
-	
+	private RestTemplate restTemplate;
+
 	@Override
 	public Coords getCoordinates(String address, String apiKey) {
 		
@@ -26,10 +26,10 @@ public class GeocodeServiceImpl implements GeocodeService{
                 .toUriString();
 		
 		GeocodeGroup response = restTemplate.getForObject(url, GeocodeGroup.class);
-		
+
 		if (response != null && response.getResults().length > 0) {
 			return response.getResults()[0].getGeometry().getLocation();
-        }
+		}
 		return null;
 	}
 

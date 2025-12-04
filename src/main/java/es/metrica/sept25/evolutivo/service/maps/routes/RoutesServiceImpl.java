@@ -30,20 +30,19 @@ public class RoutesServiceImpl implements RoutesService {
     		    .queryParam("language", language)
     		    .queryParam("key", apiKey);
     	
-    	if(destinations.size() > 1) {
-    		String finalDestination = destinations.getLast();
-    		url.queryParam("destination", finalDestination);
-    		
-    		List<String> intermediateDestinations = IntStream.range(1, destinations.size()-1)
-    				.mapToObj(i -> destinations.get(i))
-    				.toList();
-    		
-    		String waypointsParam = OPTIMIZE + intermediateDestinations.stream()
-    				.collect(Collectors.joining("|"));
-    		
-    		url.queryParam("waypoints", waypointsParam);
-    	}
-        
-        return restTemplate.getForObject(url.toUriString(), RouteGroup.class);
-    }
+		if (destinations.size() > 1) {
+			String finalDestination = destinations.getLast();
+			url.queryParam("destination", finalDestination);
+
+			List<String> intermediateDestinations = IntStream.range(1, destinations.size() - 1)
+					.mapToObj(i -> destinations.get(i)).toList();
+
+			String waypointsParam = OPTIMIZE + intermediateDestinations
+					.stream().collect(Collectors.joining("|"));
+
+			url.queryParam("waypoints", waypointsParam);
+		}
+
+		return restTemplate.getForObject(url.toUriString(), RouteGroup.class);
+	}
 }

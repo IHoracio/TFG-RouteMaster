@@ -12,11 +12,11 @@ public class Gasolinera {
 	private Long id;
 
 	private String ubicacion;
-	
+
 	public Gasolinera(String ubicacion) {
 		this.ubicacion = ubicacion;
 	}
-	
+
 	public String getUbicacion() {
 		return this.ubicacion;
 	}

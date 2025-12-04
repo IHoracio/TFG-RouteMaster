@@ -3,11 +3,12 @@ package es.metrica.sept25.evolutivo.entity.maps.geocode;
 public class GeocodeGroup {
 
 	private GeocodeResult[] results;
-	
-	public GeocodeResult[] getResults() { 
-		return results; 
-		}
-    public void setResults(GeocodeResult[] results) { 
-    	this.results = results; 
-    	}
+
+	public GeocodeResult[] getResults() {
+		return results;
+	}
+
+	public void setResults(GeocodeResult[] results) {
+		this.results = results;
+	}
 }

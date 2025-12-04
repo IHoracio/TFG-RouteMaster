@@ -14,22 +14,22 @@ import jakarta.persistence.ManyToOne;
 public class SavedRoute {
 
 	@Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
 
-    private String name;
+	private String name;
 
-    private String startAddress;
-    private String endAddress;
+	private String startAddress;
+	private String endAddress;
 
-    private int distanceMeters;
-    private int durationSeconds;
-    
-    @ElementCollection
-    private List<Coords> path;
+	private int distanceMeters;
+	private int durationSeconds;
 
-    @ManyToOne
-    private User user;
+	@ElementCollection
+	private List<Coords> path;
+
+	@ManyToOne
+	private User user;
 
 	public Long getId() {
 		return id;
@@ -94,6 +94,5 @@ public class SavedRoute {
 	public void setUser(User user) {
 		this.user = user;
 	}
-    
-    
+
 }

@@ -8,5 +8,6 @@ import es.metrica.sept25.evolutivo.entity.gasolinera.Provincia;
 
 public interface MunicipioService {
 	List<Municipio> getMunicipios();
+
 	Optional<Provincia> getProvinciaForMunicipio(Municipio mun);
 }

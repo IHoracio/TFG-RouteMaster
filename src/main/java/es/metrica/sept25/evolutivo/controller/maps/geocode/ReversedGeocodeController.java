@@ -30,18 +30,21 @@ public class ReversedGeocodeController {
 	})
 	@SecurityRequirement(name = "googleApiKey")
 	@GetMapping("/reverse-geocode")
-	public ResponseEntity<String> getAddress(@RequestParam double lat, @RequestParam double lng, HttpServletRequest request){
-		
+	public ResponseEntity<String> getAddress(
+			@RequestParam double lat, 
+			@RequestParam double lng,
+			HttpServletRequest request) {
+
 		String apiKey = request.getHeader("api_key");
 		if (apiKey == null || apiKey.isEmpty()) {
 			return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 		}
-		
+
 		String address = reverseGeocodeService.getAddress(lat, lng, apiKey);
-		if(address == null) {
+		if (address == null) {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
-		
+
 		return new ResponseEntity<>(address, HttpStatus.OK);
 	}
 }

@@ -28,12 +28,13 @@ public class RoutesController {
 	@Operation(
 			summary = "Obtiene de un punto A → B la ruta", 
 			description = "Devuelve la información esencial de la ruta en coche: "
-					+ "punto de origen y destino o destinos, distancia total, tiempo estimado "
-					+ "y los pasos principales del recorrido, incluyendo las coordenadas de cada tramo.")
+					    + "punto de origen y destino o destinos, distancia total, tiempo estimado "
+					    + "y los pasos principales del recorrido, incluyendo las coordenadas de cada tramo.")
 	@ApiResponses(value = { 
 			@ApiResponse(responseCode = "401", description = "apiKey wasn't found"),
 			@ApiResponse(responseCode = "400", description = "Bad request"),
-			@ApiResponse(responseCode = "200", description = "Route found") })
+			@ApiResponse(responseCode = "200", description = "Route found") 
+			})
 	@SecurityRequirement(name = "googleApiKey")
 	@GetMapping("/routes")
 	public ResponseEntity<RouteGroup> getDirections(

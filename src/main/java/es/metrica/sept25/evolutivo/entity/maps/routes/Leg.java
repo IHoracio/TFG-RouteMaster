@@ -9,7 +9,7 @@ import jakarta.persistence.Transient;
 public class Leg {
 
 	private Distance distance;
-	
+
 	@Transient
 	private Duration duration;
 

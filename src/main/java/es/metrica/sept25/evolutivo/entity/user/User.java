@@ -1,6 +1,5 @@
 package es.metrica.sept25.evolutivo.entity.user;
 
-
 import java.util.List;
 import java.util.Map;
 
@@ -18,15 +17,14 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
-
 @Entity
 @Table(name = "users")
 public class User {
-	
+
 	public enum PrioridadGasolineras {
-	    PRICE,
-	    DISTANCE,
-	    BOTH
+		PRICE, 
+		DISTANCE, 
+		BOTH
 	}
 
 	@Id
@@ -34,16 +32,16 @@ public class User {
 	private String password;
 	private String name;
 	private String surname;
-	
+
 	@ElementCollection
 	private Map<String, String> preferences;
-	
+
 	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<SavedRoute> savedRoutes;
-	
+
 	@Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private PrioridadGasolineras priorityGasstations = PrioridadGasolineras.PRICE;
+	@Column(nullable = false)
+	private PrioridadGasolineras priorityGasstations = PrioridadGasolineras.PRICE;
 
 	public String getMail() {
 		return mail;
@@ -59,7 +57,7 @@ public class User {
 
 	public void setPassword(String password) {
 		BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-	    this.password = encoder.encode(password);
+		this.password = encoder.encode(password);
 	}
 
 	public String getName() {
@@ -86,7 +84,6 @@ public class User {
 		this.preferences = preferencias;
 	}
 
-
 	public List<SavedRoute> getSavedRoutes() {
 		return savedRoutes;
 	}
@@ -102,10 +99,4 @@ public class User {
 	public void setPriorityGasstations(PrioridadGasolineras prioridadGasolineras) {
 		this.priorityGasstations = prioridadGasolineras;
 	}
-	
-	
-	
-	
-	
 }
-

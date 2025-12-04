@@ -30,5 +30,4 @@ public class EstadoCielo {
 		this.descripcion = descripcion;
 	}
 
-
 }

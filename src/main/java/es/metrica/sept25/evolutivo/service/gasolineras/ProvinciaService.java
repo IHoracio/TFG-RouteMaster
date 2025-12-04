@@ -7,6 +7,8 @@ import es.metrica.sept25.evolutivo.entity.gasolinera.Provincia;
 
 public interface ProvinciaService {
 	void save(Provincia provincia);
+
 	List<Provincia> getProvincias();
+
 	Optional<Provincia> getProvinciaById(Long id);
 }

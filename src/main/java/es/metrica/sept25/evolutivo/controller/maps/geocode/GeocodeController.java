@@ -43,6 +43,5 @@ public class GeocodeController {
 		}
 
 		return new ResponseEntity<>(coords, HttpStatus.OK);
-
 	}
 }

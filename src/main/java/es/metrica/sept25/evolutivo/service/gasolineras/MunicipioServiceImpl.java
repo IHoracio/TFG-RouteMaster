@@ -23,7 +23,7 @@ public class MunicipioServiceImpl implements MunicipioService {
 
 	@Autowired
 	private RestTemplate restTemplate;
-	
+
 	@Autowired
 	private ProvinciaService provinciaService;
 
@@ -38,12 +38,9 @@ public class MunicipioServiceImpl implements MunicipioService {
 	public List<Municipio> getMunicipios() {
 		List<Provincia> provList = provinciaService.getProvincias();
 		List<Municipio> munList = municipioRepository.findAll();
-		
-		List<Long> provIds = provList
-				.stream()
-				.map(p -> p.getIdProvincia())
-				.collect(Collectors.toList());
-		
+
+		List<Long> provIds = provList.stream().map(p -> p.getIdProvincia()).collect(Collectors.toList());
+
 		if (Objects.isNull(munList) | munList.isEmpty()) {
 			ArrayList<Municipio> tempList = new ArrayList<>();
 			provIds.forEach(l -> {
@@ -55,7 +52,7 @@ public class MunicipioServiceImpl implements MunicipioService {
 			});
 			return tempList;
 		}
-		
+
 		return munList;
 	}
 
