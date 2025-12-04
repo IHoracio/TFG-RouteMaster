@@ -1,12 +1,10 @@
 package es.metrica.sept25.evolutivo.entity.user;
 
-import java.util.List;
 import java.util.Map;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import es.metrica.sept25.evolutivo.entity.maps.routes.Coords;
-import es.metrica.sept25.evolutivo.entity.maps.routes.Route;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
@@ -21,68 +19,82 @@ import jakarta.persistence.Table;
 public class User {
 	
 	public enum PrioridadGasolineras {
-	    PRECIO,
-	    DISTANCIA,
-	    AMBAS
+	    PRICE,
+	    DISTANCE,
+	    BOTH
 	}
 
 	@Id
-	private String correo;
-	private String contraseña;
-	private String nombre;
-	private String apellidos;
+	private String mail;
+	private String password;
+	private String name;
+	private String surname;
 	
-	private Map<String, String> preferencias;
+	private Map<String, String> preferences;
 	
-	private Map<String, Coords> rutas;
+	private Map<String, Coords> routes;
 	
 	@Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private PrioridadGasolineras prioridadGasolineras = PrioridadGasolineras.PRECIO;
+    private PrioridadGasolineras priorityGasstations = PrioridadGasolineras.PRICE;
+
+	public String getMail() {
+		return mail;
+	}
+
+	public void setMail(String mail) {
+		this.mail = mail;
+	}
+
+	public String getPassword() {
+		return password;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public String getSurname() {
+		return surname;
+	}
+
+	public void setSurname(String surname) {
+		this.surname = surname;
+	}
+
+	public Map<String, String> getPreferences() {
+		return preferences;
+	}
+
+	public void setPreferences(Map<String, String> preferencias) {
+		this.preferences = preferencias;
+	}
+
+	public Map<String, Coords> getRoutes() {
+		return routes;
+	}
+
+	public void setRoutes(Map<String, Coords> rutas) {
+		this.routes = rutas;
+	}
+
+	public PrioridadGasolineras getPriorityGasstations() {
+		return priorityGasstations;
+	}
+
+	public void setPriorityGasstations(PrioridadGasolineras prioridadGasolineras) {
+		this.priorityGasstations = prioridadGasolineras;
+	}
 	
-	public String getCorreo() {
-		return correo;
-	}
-	public void setCorreo(String correo) {
-		this.correo = correo;
-	}
-	public String getConstraseña() {
-		return contraseña;
-	}
-	public void setContraseña(String contraseña) {
-	    BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-	    this.contraseña = encoder.encode(contraseña);
-	}
-	public String getNombre() {
-		return nombre;
-	}
-	public void setNombre(String nombre) {
-		this.nombre = nombre;
-	}
-	public String getApellidos() {
-		return apellidos;
-	}
-	public void setApellidos(String apellidos) {
-		this.apellidos = apellidos;
-	}
-	public Map<String, String> getPreferencias() {
-		return preferencias;
-	}
-	public void setPreferencias(Map<String, String> preferencias) {
-		this.preferencias = preferencias;
-	}
-	public List<Coords> getRutas() {
-		return rutas;
-	}
-	public void setRutas(List<Coords> rutas) {
-		this.rutas = rutas;
-	}
-	public PrioridadGasolineras getPrioridadGasolineras() {
-		return prioridadGasolineras;
-	}
-	public void setPrioridadGasolineras(PrioridadGasolineras prioridadGasolineras) {
-		this.prioridadGasolineras = prioridadGasolineras;
-	}
+	
 	
 	
 	
