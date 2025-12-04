@@ -4,7 +4,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import org.springframework.web.util.UriComponentsBuilder;
-import es.metrica.sept25.evolutivo.entity.reverseGeocode.ReverseGeocodeGroup;
+
+import es.metrica.sept25.evolutivo.entity.maps.reverseGeocode.ReverseGeocodeGroup;
+
 import org.springframework.web.client.RestTemplate;
 
 @Service

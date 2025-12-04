@@ -1,4 +1,4 @@
-package es.metrica.sept25.evolutivo.entity.reverseGeocode;
+package es.metrica.sept25.evolutivo.entity.maps.reverseGeocode;
 
 public class ReverseGeocodeGroup {
 
