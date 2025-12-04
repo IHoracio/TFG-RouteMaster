@@ -83,12 +83,13 @@ public class User {
 		this.preferences = preferencias;
 	}
 
-	public Map<String, Route> getRoutes() {
-		return routes;
+
+	public List<SavedRoute> getSavedRoutes() {
+		return savedRoutes;
 	}
 
-	public void setRoutes(Map<String, Route> rutas) {
-		this.routes = rutas;
+	public void setSavedRoutes(List<SavedRoute> savedRoutes) {
+		this.savedRoutes = savedRoutes;
 	}
 
 	public PrioridadGasolineras getPriorityGasstations() {
