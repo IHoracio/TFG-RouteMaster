@@ -2,41 +2,32 @@ package es.metrica.sept25.evolutivo.entity.weather;
 
 public class Weather {
 
-	private String descripcion;
-	private int estado;
-	private String datos;
-	private String metadatos;
+	private String nombre;
+	private String provincia;
+	private Prediccion prediccion;
 
-	public String getDescripcion() {
-		return descripcion;
+	public String getNombre() {
+		return nombre;
 	}
 
-	public void setDescripcion(String descripcion) {
-		this.descripcion = descripcion;
+	public void setNombre(String nombre) {
+		this.nombre = nombre;
 	}
 
-	public int getEstado() {
-		return estado;
+	public String getProvincia() {
+		return provincia;
 	}
 
-	public void setEstado(int estado) {
-		this.estado = estado;
+	public void setProvincia(String provincia) {
+		this.provincia = provincia;
 	}
 
-	public String getDatos() {
-		return datos;
+	public Prediccion getPrediccion() {
+		return prediccion;
 	}
 
-	public void setDatos(String datos) {
-		this.datos = datos;
-	}
-
-	public String getMetadatos() {
-		return metadatos;
-	}
-
-	public void setMetadatos(String metadatos) {
-		this.metadatos = metadatos;
+	public void setPrediccion(Prediccion prediccion) {
+		this.prediccion = prediccion;
 	}
 
 }

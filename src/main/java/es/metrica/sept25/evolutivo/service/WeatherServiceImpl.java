@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import es.metrica.sept25.evolutivo.entity.weather.Weather;
+import es.metrica.sept25.evolutivo.entity.weather.WeatherLink;
 
 @Service
 public class WeatherServiceImpl implements WeatherService {
@@ -14,13 +14,16 @@ public class WeatherServiceImpl implements WeatherService {
 	@Autowired
 	private RestTemplate restTemplate;
 
-	public Weather getWeatherLink(String zipCode, String apiKey) {
+	public WeatherLink getWeatherLink(String zipCode, String apiKey) {
 		String url = UriComponentsBuilder
     			.fromUriString(API_URL)
     			.path(zipCode)
     		    .queryParam("api_key", apiKey)
     		    .toUriString();
-		return restTemplate.getForObject(url, Weather.class);
+
+		WeatherLink weather = restTemplate.getForObject(url, WeatherLink.class);
+		System.err.println(weather.getDatos());
+		return weather;
 	}
 
 }
