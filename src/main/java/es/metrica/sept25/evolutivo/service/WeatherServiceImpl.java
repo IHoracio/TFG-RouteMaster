@@ -11,6 +11,7 @@ import es.metrica.sept25.evolutivo.entity.weather.WeatherLink;
 public class WeatherServiceImpl implements WeatherService {
 
 	private static final String API_URL = "https://opendata.aemet.es/opendata/api/prediccion/especifica/municipio/diaria/";
+
 	@Autowired
 	private RestTemplate restTemplate;
 
@@ -25,5 +26,4 @@ public class WeatherServiceImpl implements WeatherService {
 		System.err.println(weather.getDatos());
 		return weather;
 	}
-
 }

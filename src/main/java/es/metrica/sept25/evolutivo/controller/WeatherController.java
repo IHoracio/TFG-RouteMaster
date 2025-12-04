@@ -25,18 +25,20 @@ public class WeatherController {
 
 	@Operation(summary = "Devuelve el clima para un código postal concreto", description = "Compone un objeto Weather que contiene toda la "
 			+ "información meteorológica para un código postal concreto.")
-	@ApiResponses(value = { 
-			@ApiResponse(responseCode = "200", description = "Route found"),
+	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Route found"),
 			@ApiResponse(responseCode = "401", description = "apiKey wasn't found"),
 			@ApiResponse(responseCode = "400", description = "Bad request") })
 	@SecurityRequirement(name = "aemetApiKey")
 	@GetMapping("/checkWeather/{zipCode}")
 	public ResponseEntity<WeatherLink> getWeather(@PathVariable String zipCode, HttpServletRequest request) {
 		String apiKey = request.getHeader("api_key");
-		if (apiKey == null || apiKey.isEmpty())
+
+		if (apiKey == null || apiKey.isEmpty()) {
 			return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-		if (zipCode.isEmpty())
+		}
+		if (zipCode.isEmpty()) {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
 		WeatherLink weather = weatherService.getWeatherLink(zipCode, apiKey);
 		if (weather == null) {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);

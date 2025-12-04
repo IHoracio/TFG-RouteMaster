@@ -8,7 +8,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import es.metrica.sept25.evolutivo.entity.gasolinera.Municipio;
 import es.metrica.sept25.evolutivo.entity.gasolinera.Provincia;
+import es.metrica.sept25.evolutivo.service.MunicipioService;
 import es.metrica.sept25.evolutivo.service.ProvinciaService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -22,6 +24,9 @@ public class OilController {
 	@Autowired
 	private ProvinciaService provinciaService;
 
+	@Autowired
+	private MunicipioService municipioService;
+	
 	@Operation(
 			summary = "Devuelve una lista de las provincias españolas",
 			description = "")
@@ -36,6 +41,25 @@ public class OilController {
 			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 		}
 			
-		return new ResponseEntity<>(list, HttpStatus.OK);
+		return new ResponseEntity<List<Provincia>>(list, HttpStatus.OK);
 	}
+	
+
+	@Operation(
+			summary = "Devuelve una mega-lista de municipios con el ID de provincia asociada",
+			description = "")
+	@ApiResponses(value = { 
+			@ApiResponse(responseCode = "200", description = "Provincias recuperadas"), 
+			@ApiResponse(responseCode = "204", description = "No se encontraron provincias") })
+	@GetMapping("/municipios")
+	public ResponseEntity<List<Municipio>> getMunicipios() {
+		List<Municipio> list = municipioService.getMunicipios();
+
+		if (list.isEmpty()) {
+			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+		}
+			
+		return new ResponseEntity<List<Municipio>>(list, HttpStatus.OK);
+	}
+
 }
