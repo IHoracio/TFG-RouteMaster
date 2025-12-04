@@ -1,5 +1,7 @@
 package es.metrica.sept25.evolutivo.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -33,14 +35,14 @@ public class RoutesController {
 	@GetMapping("/routes")
 	public ResponseEntity<RouteGroup> getDirections(
 			@RequestParam(required = false, defaultValue = "Madrid Calle Alcalá y Gran Vía, Madrid") String origin,
-			@RequestParam(required = false, defaultValue = "Segovia") String destination,
+			@RequestParam(required = false, defaultValue = "Segovia") List<String> destinations,
 			@RequestParam(required = false, defaultValue = "es") String language, HttpServletRequest request) {
 
 		String apiKey = request.getHeader("api_key");
 		if (apiKey == null || apiKey.isEmpty()) {
 			return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 		}
-		RouteGroup response = routesService.getDirections(origin, destination, language, apiKey);
+		RouteGroup response = routesService.getDirections(origin, destinations, language, apiKey);
 		if (response == null) {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
