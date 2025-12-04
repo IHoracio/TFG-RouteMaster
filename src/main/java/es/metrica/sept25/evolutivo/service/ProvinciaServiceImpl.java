@@ -2,7 +2,9 @@ package es.metrica.sept25.evolutivo.service;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
@@ -27,17 +29,18 @@ public class ProvinciaServiceImpl implements ProvinciaService {
 		provinciaRepository.save(provincia);
 	}
 
+	@Override
 	@Cacheable("provincias")
 	public List<Provincia> getProvincias() {
 		// Cogemos del repo
 		List<Provincia> provList = provinciaRepository.findAll();
+
 		// Si no tenemos, populamos con las españolas
-		if (provList.isEmpty()) {
-			System.out.println("HERE");
+		if (Objects.isNull(provList) | provList.isEmpty()) {
 			Provincia[] provArr = restTemplate.getForObject(API_URL, Provincia[].class);
-			if (provArr != null) {
+			if (!Objects.isNull(provArr)) {
 				provList = Arrays.asList(provArr);
-				provinciaRepository.saveAll(provList.stream().filter(p -> p.getIdProvincia() < 100).toList());
+				provinciaRepository.saveAllAndFlush(provList.stream().filter(p -> p.getIdProvincia() < 100).collect(Collectors.toList()));
 			}
 		}
 

@@ -1,13 +1,10 @@
 package es.metrica.sept25.evolutivo.entity.gasolinera;
 
-import java.util.List;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
 
 @Entity
 public class Provincia {
@@ -20,9 +17,6 @@ public class Provincia {
 
 	@Column(name = "nombre_provincia")
 	String nombreProvincia;
-	
-	@OneToMany(mappedBy = "provincia")
-	private List<Municipio> municipios;
 
 	public Provincia() {
 	};
@@ -47,14 +41,6 @@ public class Provincia {
 
 	public void setNombreProvincia(String nombreProvincia) {
 		this.nombreProvincia = nombreProvincia;
-	}
-	
-	public List<Municipio> getMunicipios() {
-		return List.copyOf(this.municipios);
-	}
-
-	public void setMunicipios(List<Municipio> municipios) {
-		this.municipios = municipios;
 	}
 
 	@Override

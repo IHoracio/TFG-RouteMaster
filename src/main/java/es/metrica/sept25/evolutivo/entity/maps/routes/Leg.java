@@ -4,9 +4,13 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import jakarta.persistence.Transient;
+
 public class Leg {
 
 	private Distance distance;
+	
+	@Transient
 	private Duration duration;
 
 	@JsonProperty("end_address")
