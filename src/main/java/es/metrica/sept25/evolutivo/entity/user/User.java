@@ -10,6 +10,8 @@ import es.metrica.sept25.evolutivo.entity.maps.routes.Route;
 import es.metrica.sept25.evolutivo.entity.maps.routes.SavedRoute;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
+import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
@@ -17,7 +19,7 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
 
-//@Entity
+@Entity
 @Table(name = "users")
 public class User {
 	
@@ -33,6 +35,7 @@ public class User {
 	private String name;
 	private String surname;
 	
+	@ElementCollection
 	private Map<String, String> preferences;
 	
 	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
