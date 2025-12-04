@@ -1,11 +1,11 @@
-package es.metrica.sept25.evolutivo.service;
+package es.metrica.sept25.evolutivo.service.maps.geocode;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import es.metrica.sept25.evolutivo.entity.geocode.GeocodeGroup;
+import es.metrica.sept25.evolutivo.entity.maps.geocode.GeocodeGroup;
 import es.metrica.sept25.evolutivo.entity.maps.routes.Coords;
 
 @Service

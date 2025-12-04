@@ -1,4 +1,4 @@
-package es.metrica.sept25.evolutivo.controller;
+package es.metrica.sept25.evolutivo.controller.maps.geocode;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import es.metrica.sept25.evolutivo.entity.maps.routes.Coords;
-import es.metrica.sept25.evolutivo.service.GeocodeService;
+import es.metrica.sept25.evolutivo.service.maps.geocode.GeocodeService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;

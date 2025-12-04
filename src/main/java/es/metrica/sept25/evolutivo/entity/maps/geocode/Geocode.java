@@ -1,4 +1,4 @@
-package es.metrica.sept25.evolutivo.entity.geocode;
+package es.metrica.sept25.evolutivo.entity.maps.geocode;
 
 import es.metrica.sept25.evolutivo.entity.maps.routes.Coords;
 

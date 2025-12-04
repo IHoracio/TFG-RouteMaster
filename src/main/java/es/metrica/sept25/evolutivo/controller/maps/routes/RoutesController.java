@@ -1,4 +1,4 @@
-package es.metrica.sept25.evolutivo.controller;
+package es.metrica.sept25.evolutivo.controller.maps.routes;
 
 import java.util.List;
 
@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import es.metrica.sept25.evolutivo.entity.maps.routes.RouteGroup;
-import es.metrica.sept25.evolutivo.service.RoutesService;
+import es.metrica.sept25.evolutivo.service.maps.routes.RoutesService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -28,7 +28,7 @@ public class RoutesController {
 	@Operation(
 			summary = "Obtiene de un punto A → B la ruta", 
 			description = "Devuelve la información esencial de la ruta en coche: "
-					+ "punto de origen y destino, distancia total, tiempo estimado "
+					+ "punto de origen y destino o destinos, distancia total, tiempo estimado "
 					+ "y los pasos principales del recorrido, incluyendo las coordenadas de cada tramo.")
 	@ApiResponses(value = { 
 			@ApiResponse(responseCode = "401", description = "apiKey wasn't found"),
