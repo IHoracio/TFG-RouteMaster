@@ -1,7 +1,9 @@
 package es.metrica.sept25.evolutivo.service.weather;
 
-import es.metrica.sept25.evolutivo.entity.weather.Weather;
+import java.util.List;
+
+import es.metrica.sept25.evolutivo.domain.dto.weather.Weather;
 
 public interface WeatherService {
-	Weather getWeatherLink(String zipCode, String apiKey);
+	List<Weather> getWeatherLink(String zipCode, String apiKey);
 }

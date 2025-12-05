@@ -1,5 +1,7 @@
 package es.metrica.sept25.evolutivo.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -7,13 +9,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
-<<<<<<< Updated upstream
-import es.metrica.sept25.evolutivo.entity.weather.WeatherLink;
+import es.metrica.sept25.evolutivo.domain.dto.weather.Weather;
 import es.metrica.sept25.evolutivo.service.weather.WeatherService;
-=======
-import es.metrica.sept25.evolutivo.entity.weather.Weather;
-import es.metrica.sept25.evolutivo.service.WeatherService;
->>>>>>> Stashed changes
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -35,21 +32,19 @@ public class WeatherController {
 			@ApiResponse(responseCode = "400", description = "Bad request") })
 	@SecurityRequirement(name = "aemetApiKey")
 	@GetMapping("/checkWeather/{zipCode}")
-	public ResponseEntity<Weather> getWeather(@PathVariable String zipCode, HttpServletRequest request) {
+	public ResponseEntity<List<Weather>> getWeather(@PathVariable String zipCode, HttpServletRequest request) {
 		String apiKey = request.getHeader("api_key");
-
 		if (apiKey == null || apiKey.isEmpty()) {
 			return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 		}
 		if (zipCode.isEmpty()) {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
-		Weather weather = weatherService.getWeatherLink(zipCode, apiKey);
+		List<Weather> weather = weatherService.getWeatherLink(zipCode, apiKey);
 		if (weather == null) {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
-
-		return new ResponseEntity<Weather>(weather, HttpStatus.OK);
+		return new ResponseEntity<List<Weather>>(weather, HttpStatus.OK);
 
 	}
 }
