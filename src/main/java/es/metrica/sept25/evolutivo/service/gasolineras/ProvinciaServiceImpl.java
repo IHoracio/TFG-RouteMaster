@@ -11,6 +11,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import es.metrica.sept25.evolutivo.entity.gasolinera.Municipio;
 import es.metrica.sept25.evolutivo.entity.gasolinera.Provincia;
 import es.metrica.sept25.evolutivo.repository.ProvinciaRepository;
 
@@ -49,7 +50,16 @@ public class ProvinciaServiceImpl implements ProvinciaService {
 		return provList;
 	}
 
+	@Override
 	public Optional<Provincia> getProvinciaById(Long id) {
 		return provinciaRepository.findById(id).or(Optional::empty);
+	}
+
+	@Override
+	@Cacheable("provinciaForMuni")
+	public Optional<Provincia> getProvinciaForMunicipio(Municipio mun) {
+		Long provId = mun.getIdProvincia();
+		List<Provincia> provList = getProvincias();
+		return provList.stream().filter(p -> p.getIdProvincia() == provId).findFirst();
 	}
 }
