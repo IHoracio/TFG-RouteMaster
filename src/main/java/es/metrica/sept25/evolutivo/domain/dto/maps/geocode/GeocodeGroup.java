@@ -1,4 +1,4 @@
-package es.metrica.sept25.evolutivo.entity.maps.geocode;
+package es.metrica.sept25.evolutivo.domain.dto.maps.geocode;
 
 public class GeocodeGroup {
 
