@@ -5,7 +5,6 @@ import java.util.Map;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
-import es.metrica.sept25.evolutivo.entity.maps.routes.Route;
 import es.metrica.sept25.evolutivo.entity.maps.routes.SavedRoute;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -25,6 +24,7 @@ public class User {
 		PRICE, 
 		DISTANCE, 
 		BOTH
+
 	}
 
 	@Id

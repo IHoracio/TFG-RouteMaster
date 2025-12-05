@@ -2,10 +2,14 @@ package es.metrica.sept25.evolutivo.entity.weather;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class Dia {
 
+	@JsonProperty("estadoCielo")
 	private List<EstadoCielo> estadoCielo;
 	private List<Temperatura> temperatura;
+	@JsonProperty("humedadRelativa")
 	private List<HumedadRelativa> humedadRelativa;
 	private List<String> fecha;
 
