@@ -41,13 +41,14 @@ public class RoutesController {
 			@RequestParam(required = true, defaultValue = "El Vellon") String origin,
 			@RequestParam(required = true, defaultValue = "El Molar") String destination,
 			@RequestParam(required = false, defaultValue = "") List<String> waypoints,
+			@RequestParam(required = false, defaultValue = "") Boolean optimice,
 			@RequestParam(required = false, defaultValue = "es") String language, HttpServletRequest request) {
 
 		String apiKey = request.getHeader("key");
 		if (apiKey == null || apiKey.isEmpty()) {
 			return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 		}
-		RouteGroup response = routesService.getDirections(origin, destination, waypoints, language, apiKey);
+		RouteGroup response = routesService.getDirections(origin, destination, waypoints, optimice, language, apiKey);
 		
 		if (response == null) {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
