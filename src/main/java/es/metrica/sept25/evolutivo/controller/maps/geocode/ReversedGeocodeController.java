@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -15,6 +16,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
+@RequestMapping("/geocode")
 public class ReversedGeocodeController {
 
 	@Autowired
@@ -29,7 +31,7 @@ public class ReversedGeocodeController {
 			@ApiResponse(responseCode = "200", description = "Coordenadas encontradas") 
 	})
 	@SecurityRequirement(name = "googleApiKey")
-	@GetMapping("/reverse-geocode")
+	@GetMapping("/reverse")
 	public ResponseEntity<String> getAddress(
 			@RequestParam double lat, 
 			@RequestParam double lng,

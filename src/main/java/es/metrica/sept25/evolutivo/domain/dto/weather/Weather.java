@@ -1,10 +1,20 @@
-package es.metrica.sept25.evolutivo.entity.weather;
+package es.metrica.sept25.evolutivo.domain.dto.weather;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Weather {
 
+	@JsonProperty("nombre")
 	private String nombre;
+	@JsonProperty("provincia")
 	private String provincia;
+	@JsonProperty("prediccion")
 	private Prediccion prediccion;
+
+
+	// Getters and Setters
 
 	public String getNombre() {
 		return nombre;
@@ -30,4 +40,10 @@ public class Weather {
 		this.prediccion = prediccion;
 	}
 
+	@Override
+	public String toString() {
+		return "Weather [nombre=" + nombre + ", provincia=" + provincia + ", prediccion=" + prediccion + "]";
+	}
+
 }
+

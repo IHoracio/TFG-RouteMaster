@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
-import es.metrica.sept25.evolutivo.entity.weather.WeatherLink;
+import es.metrica.sept25.evolutivo.domain.dto.weather.Weather;
 import es.metrica.sept25.evolutivo.service.weather.WeatherService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -30,21 +30,19 @@ public class WeatherController {
 			@ApiResponse(responseCode = "400", description = "Bad request") })
 	@SecurityRequirement(name = "aemetApiKey")
 	@GetMapping("/checkWeather/{zipCode}")
-	public ResponseEntity<WeatherLink> getWeather(@PathVariable String zipCode, HttpServletRequest request) {
+	public ResponseEntity<Weather> getWeather(@PathVariable String zipCode, HttpServletRequest request) {
 		String apiKey = request.getHeader("api_key");
-
 		if (apiKey == null || apiKey.isEmpty()) {
 			return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 		}
 		if (zipCode.isEmpty()) {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
-		WeatherLink weather = weatherService.getWeatherLink(zipCode, apiKey);
+		Weather weather = weatherService.getWeather(zipCode, apiKey);
 		if (weather == null) {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
-
-		return new ResponseEntity<WeatherLink>(weather, HttpStatus.OK);
+		return new ResponseEntity<Weather>(weather, HttpStatus.OK);
 
 	}
 }

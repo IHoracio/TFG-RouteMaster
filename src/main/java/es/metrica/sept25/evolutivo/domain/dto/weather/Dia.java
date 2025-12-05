@@ -1,13 +1,15 @@
-package es.metrica.sept25.evolutivo.entity.weather;
+package es.metrica.sept25.evolutivo.domain.dto.weather;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Dia {
 
 	private List<EstadoCielo> estadoCielo;
 	private List<Temperatura> temperatura;
-	private List<HumedadRelativa> humedadRelativa;
-	private List<String> fecha;
+	private String fecha;
 
 	public List<EstadoCielo> getEstadoCielo() {
 		return estadoCielo;
@@ -25,20 +27,19 @@ public class Dia {
 		this.temperatura = temperatura;
 	}
 
-	public List<HumedadRelativa> getHumedadRelativa() {
-		return humedadRelativa;
-	}
-
-	public void setHumedadRelativa(List<HumedadRelativa> humedadRelativa) {
-		this.humedadRelativa = humedadRelativa;
-	}
-
-	public List<String> getFecha() {
+	public String getFecha() {
 		return fecha;
 	}
 
-	public void setFecha(List<String> fecha) {
+	public void setFecha(String fecha) {
 		this.fecha = fecha;
 	}
+
+	@Override
+	public String toString() {
+		return "Dia [estadoCielo=" + estadoCielo + ", temperatura=" + temperatura + ", fecha=" + fecha + "]";
+	}
+	
+
 
 }

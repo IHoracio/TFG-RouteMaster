@@ -1,7 +1,6 @@
-package es.metrica.sept25.evolutivo.entity.weather;
+package es.metrica.sept25.evolutivo.domain.dto.weather;
 
 public class EstadoCielo {
-
 	private String value;
 	private String periodo;
 	private String descripcion;
