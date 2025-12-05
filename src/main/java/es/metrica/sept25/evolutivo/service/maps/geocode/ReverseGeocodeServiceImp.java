@@ -27,7 +27,12 @@ public class ReverseGeocodeServiceImp implements ReverseGeocodeService{
                 .toUriString();
         
         ReverseGeocodeGroup response = restTemplate.getForObject(url, ReverseGeocodeGroup.class);
-        return "";
+        
+        if(response != null && response.getResults().length > 0) {
+        	return response.getResults()[0].getFormatted_address();
+        }
+        
+        return null;
 	}
 
 }
