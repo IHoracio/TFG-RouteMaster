@@ -31,7 +31,7 @@ public class GeocodeController {
 	@GetMapping("geocode")
 	public ResponseEntity<Coords> getCoordinates(@RequestParam String address, HttpServletRequest request) {
 
-		String apiKey = request.getHeader("api_key");
+		String apiKey = request.getHeader("key");
 
 		if (apiKey == null || apiKey.isEmpty()) {
 			return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);

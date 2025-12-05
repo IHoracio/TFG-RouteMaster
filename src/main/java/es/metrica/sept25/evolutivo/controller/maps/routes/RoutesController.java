@@ -38,15 +38,17 @@ public class RoutesController {
 	@SecurityRequirement(name = "googleApiKey")
 	@GetMapping("/routes")
 	public ResponseEntity<RouteGroup> getDirections(
-			@RequestParam(required = false, defaultValue = "Madrid Calle Alcalá y Gran Vía, Madrid") String origin,
-			@RequestParam(required = false, defaultValue = "Segovia") List<String> destinations,
+			@RequestParam(required = true, defaultValue = "El Vellon") String origin,
+			@RequestParam(required = true, defaultValue = "El Molar") String destination,
+			@RequestParam(required = false, defaultValue = "") List<String> waypoints,
 			@RequestParam(required = false, defaultValue = "es") String language, HttpServletRequest request) {
 
-		String apiKey = request.getHeader("api_key");
+		String apiKey = request.getHeader("key");
 		if (apiKey == null || apiKey.isEmpty()) {
 			return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 		}
-		RouteGroup response = routesService.getDirections(origin, destinations, language, apiKey);
+		RouteGroup response = routesService.getDirections(origin, destination, waypoints, language, apiKey);
+		
 		if (response == null) {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
