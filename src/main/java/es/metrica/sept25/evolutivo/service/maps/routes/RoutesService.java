@@ -5,5 +5,5 @@ import java.util.List;
 import es.metrica.sept25.evolutivo.entity.maps.routes.RouteGroup;
 
 public interface RoutesService {
-	RouteGroup getDirections(String origin, String destination, List<String> waypoints, Boolean optimice, String language, String apiKey);
+	RouteGroup getDirections(String origin, String destination, List<String> waypoints, Boolean optimize, String language, String apiKey);
 }

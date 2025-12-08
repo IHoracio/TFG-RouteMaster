@@ -21,22 +21,25 @@ public class RoutesServiceImpl implements RoutesService {
 	@Autowired
 	private RestTemplate restTemplate;
 
-	public RouteGroup getDirections(String origin, String destination, List<String> waypoints, Boolean optimice, String language, String apiKey) {
+	public RouteGroup getDirections(String origin, String destination, List<String> waypoints, Boolean optimize, String language, String apiKey) {
+		origin = origin.replaceAll(" ", "");
+		destination = destination.replaceAll(" ", "");
+		
 		UriComponentsBuilder url = UriComponentsBuilder
 				.fromUriString(API_URL)
-				.queryParam("origin", origin.replaceAll(" ", ""))
+				.queryParam("origin", origin)
 				.queryParam("mode", MODE)
 				.queryParam("language", language)
 				.queryParam("key", apiKey);
 		
-		boolean canOptimice = !waypoints.isEmpty() && optimice != null && optimice;
-		if(!canOptimice) url.queryParam("destination", destination.replaceAll(" ", ""));
+		boolean canOptimize = !waypoints.isEmpty() && optimize != null && optimize;
+		if(!canOptimize) url.queryParam("destination", destination);
 		
 		String result = "";
 		if(!waypoints.isEmpty()) {
 			StringBuilder waypointsValue = new StringBuilder();
 			
-			if(canOptimice) {
+			if(canOptimize) {
 				waypoints.add(destination);
 				waypointsValue.append(OPTIMIZE);
 				url.queryParam("destination", origin);
@@ -48,7 +51,7 @@ public class RoutesServiceImpl implements RoutesService {
 		}
 
 		RouteGroup response = restTemplate.getForObject(result, RouteGroup.class);
-		if(canOptimice) response = deleteLastLeg(response);
+		if(canOptimize) response = deleteLastLeg(response);
 		
 		return response;	
 	}
