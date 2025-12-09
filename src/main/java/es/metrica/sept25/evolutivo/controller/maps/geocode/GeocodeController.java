@@ -34,10 +34,13 @@ public class GeocodeController {
 			@ApiResponse(responseCode = "200", description = "Coordenadas encontradas") 
 	})
 	@SecurityRequirement(name = "googleApiKey")
-	@GetMapping
+
+
+	@GetMapping("/normal")
 	public ResponseEntity<Coords> getCoordinates(
 			@RequestParam String address, 
 			HttpServletRequest request) {
+
 
 		String apiKey = request.getHeader("api_key");
 
