@@ -1,8 +1,17 @@
-package es.metrica.sept25.evolutivo.domain.dto.ine;
+package es.metrica.sept25.evolutivo.entity.ine;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+
+@Entity
 public class INEMunicipio {
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
 	
 	@JsonProperty("Nombre")
     private String nombre;

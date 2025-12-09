@@ -1,5 +1,7 @@
 package es.metrica.sept25.evolutivo.controller.maps.geocode;
 
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -42,11 +44,11 @@ public class ReversedGeocodeController {
 			return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 		}
 
-		String address = reverseGeocodeService.getAddress(lat, lng, apiKey);
-		if (address == null) {
+		Optional<String> address = reverseGeocodeService.getAddress(lat, lng, apiKey);
+		if (address.get() == null) {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 
-		return new ResponseEntity<>(address, HttpStatus.OK);
+		return new ResponseEntity<>(address.get(), HttpStatus.OK);
 	}
 }

@@ -1,6 +1,7 @@
 package es.metrica.sept25.evolutivo.service.maps.geocode;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,7 +23,7 @@ public class GeocodeServiceImpl implements GeocodeService {
 	private RestTemplate restTemplate;
 
 	@Override
-	public Coords getCoordinates(String address, String apiKey) {
+	public Optional<Coords> getCoordinates(String address, String apiKey) {
 		
 		String url = UriComponentsBuilder
                 .fromUriString(GEOCODE_URL)
@@ -34,13 +35,13 @@ public class GeocodeServiceImpl implements GeocodeService {
 
 
 		if (response != null && response.getResults().length > 0) {
-			return response.getResults()[0].getGeometry().getLocation();
+			return Optional.of(response.getResults()[0].getGeometry().getLocation());
         }
-		return null;
+		return Optional.empty();
 	}
 	
 	@Override
-    public String getMunicipio(double lat, double lng, String apiKey) {
+    public Optional<String> getMunicipio(double lat, double lng, String apiKey) {
         String url = UriComponentsBuilder
                 .fromUriString(GEOCODE_URL)
                 .queryParam("latlng", lat + "," + lng)
@@ -56,15 +57,15 @@ public class GeocodeServiceImpl implements GeocodeService {
                 if (comp.getTypes() != null) {
                     List<String> types = comp.getTypes();
                     if (types.contains("locality")) {
-                        return comp.getLong_name();
+                        return Optional.of(comp.getLong_name());
                     }
                     if (types.contains("administrative_area_level_4")) {
-                        return comp.getLong_name();
+                        return Optional.of(comp.getLong_name());
                     }
                 }
             }
         }
-        return null;
+        return Optional.empty();
     }
 
 }

@@ -1,13 +1,13 @@
 package es.metrica.sept25.evolutivo.service.maps.geocode;
 
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import es.metrica.sept25.evolutivo.entity.maps.reverseGeocode.ReverseGeocodeGroup;
-
-import org.springframework.web.client.RestTemplate;
 
 @Service
 public class ReverseGeocodeServiceImp implements ReverseGeocodeService{
@@ -18,7 +18,7 @@ public class ReverseGeocodeServiceImp implements ReverseGeocodeService{
     private RestTemplate restTemplate;
 	
 	@Override
-	public String getAddress(double lat, double lng, String apiKey) {
+	public Optional<String> getAddress(double lat, double lng, String apiKey) {
 		String latlng = lat + "," + lng;
         String url = UriComponentsBuilder
                 .fromUriString(GEOCODE_URL)
@@ -29,10 +29,10 @@ public class ReverseGeocodeServiceImp implements ReverseGeocodeService{
         ReverseGeocodeGroup response = restTemplate.getForObject(url, ReverseGeocodeGroup.class);
         
         if(response != null && response.getResults().length > 0) {
-        	return response.getResults()[0].getFormatted_address();
+        	return Optional.of(response.getResults()[0].getFormatted_address());
         }
         
-        return null;
+        return Optional.empty();
 	}
 
 }

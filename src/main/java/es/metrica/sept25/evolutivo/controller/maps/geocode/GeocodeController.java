@@ -1,5 +1,7 @@
 package es.metrica.sept25.evolutivo.controller.maps.geocode;
 
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -41,12 +43,12 @@ public class GeocodeController {
 			return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 		}
 
-		Coords coords = geocodeService.getCoordinates(address, apiKey);
-		if (coords == null) {
+		Optional<Coords> coords = geocodeService.getCoordinates(address, apiKey);
+		if (coords.get() == null) {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
 
-		return new ResponseEntity<>(coords, HttpStatus.OK);
+		return new ResponseEntity<>(coords.get(), HttpStatus.OK);
 	}
 	
 	@Operation(summary = "Obtiene el municipio de una dirección", description = "Devuelve el municpio del lugar indicado usando la API de Google Geocoding.")
@@ -68,12 +70,12 @@ public class GeocodeController {
 	        return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 	    }
 
-	    String municipio = geocodeService.getMunicipio(lat, lng, apiKey);
+	    Optional<String> municipio = geocodeService.getMunicipio(lat, lng, apiKey);
 
 	    if (municipio == null) {
 	        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 	    }
 
-	    return new ResponseEntity<>(municipio, HttpStatus.OK);
+	    return new ResponseEntity<>(municipio.get(), HttpStatus.OK);
 	}
 }

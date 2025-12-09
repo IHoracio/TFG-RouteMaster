@@ -1,5 +1,7 @@
 package es.metrica.sept25.evolutivo.controller.ine;
 
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,11 +37,11 @@ public class INEController {
             @RequestParam double lat,
             @RequestParam double lng) {
 
-        String codigoINE = ineService.getCodigoINE(lat, lng);
-        if (codigoINE == null) {
+        Optional<String> codigoINE = ineService.getCodigoINE(lat, lng);
+        if (codigoINE.get() == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
-        return new ResponseEntity<>(codigoINE, HttpStatus.OK);
+        return new ResponseEntity<>(codigoINE.get(), HttpStatus.OK);
     }
 }

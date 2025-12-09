@@ -1,52 +1,60 @@
 package es.metrica.sept25.evolutivo.service.ine;
 
+import java.net.URI;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
-import es.metrica.sept25.evolutivo.domain.dto.ine.INEMunicipio;
-import es.metrica.sept25.evolutivo.domain.dto.ine.INEResponse;
+import es.metrica.sept25.evolutivo.entity.ine.INEMunicipio;
+import es.metrica.sept25.evolutivo.repository.INEMunicipioRepository;
 import es.metrica.sept25.evolutivo.service.maps.geocode.GeocodeService;
 
 @Service
 public class INEServiceImp implements INEService {
-	
-	public INEServiceImp() {
-        System.out.println("INEService cargado OK");
-    }
 
 	@Autowired
 	private GeocodeService geocodeService;
 
 	@Autowired
+	private INEMunicipioRepository ineMunicipioRepository;
+
+	@Autowired
 	private RestTemplate restTemplate;
 
-	private static final String INE_URL = "https://servicios.ine.es/wstempus/js/ES/VALORES_VARIABLE/19?page=1";
+	private static final String INE_URL = "http://servicios.ine.es/wstempus/js/ES/VALORES_VARIABLE/19";
+
+	@Value("${evolutivo.api_key_google}")
+	private String API_KEY_GOOGLE;
 
 	@Override
-	public String getCodigoINE(double lat, double lng) {
+	@Cacheable("codigoIne")
+	public Optional<String> getCodigoINE(double lat, double lng) {
 
-		String municipio = geocodeService.getMunicipio(lat, lng, "");
-		System.out.println(municipio);
-		if (municipio == null)
-			return null;
+		Optional<String> municipio = geocodeService.getMunicipio(lat, lng, API_KEY_GOOGLE);
 
-		try {
-			INEResponse response = restTemplate.getForObject(INE_URL, INEResponse.class);
+		if (municipio.isEmpty())
+			return Optional.empty();
 
-			if (response == null || response.getData() == null)
-                return null;
+		if (ineMunicipioRepository.count() == 0) {
+			UriComponentsBuilder url = UriComponentsBuilder.fromUriString(INE_URL).queryParam("page", "1");
+			INEMunicipio[] response = restTemplate.getForObject(url.toUriString(), INEMunicipio[].class);
 
-            for (INEMunicipio m : response.getData()) {
-                if (m.getNombre().equalsIgnoreCase(municipio)) {
-                    return m.getCodigoINE();
-                }
-			}
+			if (response == null)
+				return Optional.empty();
 
-		} catch (Exception e) {
-			e.printStackTrace();
+			List<INEMunicipio> ineMunList = Arrays.asList(response);
+			ineMunicipioRepository.saveAllAndFlush(ineMunList);
 		}
+		List<INEMunicipio> listaGuardada = ineMunicipioRepository.findAll();
 
-		return null;
+		return Optional.of(listaGuardada.stream().filter(m -> m.getNombre().equalsIgnoreCase(municipio.get()))
+				.findFirst().get().getCodigoINE());
 	}
 }
