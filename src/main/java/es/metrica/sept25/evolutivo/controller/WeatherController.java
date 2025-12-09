@@ -1,5 +1,7 @@
 package es.metrica.sept25.evolutivo.controller;
 
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,14 +37,14 @@ public class WeatherController {
 		if (apiKey == null || apiKey.isEmpty()) {
 			return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 		}
-		if (zipCode.isEmpty()) {
+		if (zipCode == null || !zipCode.matches("/d{5}")) {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
-		Weather weather = weatherService.getWeather(zipCode, apiKey);
-		if (weather == null) {
+		Optional<Weather> weather = weatherService.getWeather(zipCode, apiKey);
+		if (weather.isEmpty()) {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
-		return new ResponseEntity<Weather>(weather, HttpStatus.OK);
+		return new ResponseEntity<Weather>(weather.get(), HttpStatus.OK);
 
 	}
 }
