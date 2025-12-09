@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -30,7 +31,7 @@ public class WeatherServiceImpl implements WeatherService {
 	@Autowired
 	private ObjectMapper objectMapper;
 
-	public Weather getWeather(String zipCode, String apiKey) {
+	public Optional<Weather> getWeather(String zipCode, String apiKey) {
 		String url = UriComponentsBuilder
     			.fromUriString(API_URL)
     			.path(zipCode)
@@ -54,12 +55,15 @@ public class WeatherServiceImpl implements WeatherService {
 		return Collections.emptyList();
 	}
 
-	private Weather getFirstWeatherDay(List<Weather> weatherList) {
+	private Optional<Weather> getFirstWeatherDay(List<Weather> weatherList) {
+		if (weatherList.isEmpty())
+			return Optional.empty();
+
 		Weather w = weatherList.getFirst();
 		Prediccion p = w.getPrediccion();
 		Dia firstDay = p.getDia().getFirst();
 		p.setDia(new ArrayList<Dia>(Arrays.asList(firstDay)));
 		w.setPrediccion(p);
-		return w;
+		return Optional.of(w);
 	}
 }
