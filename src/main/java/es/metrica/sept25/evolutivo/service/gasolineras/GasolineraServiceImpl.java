@@ -17,11 +17,11 @@ import es.metrica.sept25.evolutivo.repository.GasolineraRepository;
 
 @Service
 public class GasolineraServiceImpl implements GasolineraService {
-	private static final String API_URL = "https://api.precioil.es/estaciones/municipio/";
+	private static final String API_URL = "https://api.precioil.es/estaciones/";
 
 	@Autowired
 	private RestTemplate restTemplate;
-	
+
 	@Autowired
 	MunicipioService municipioService;
 
@@ -29,14 +29,16 @@ public class GasolineraServiceImpl implements GasolineraService {
 	GasolineraRepository gasolineraRepository;
 
 	@Override
-	public void save(Gasolinera gasolinera) {
-		gasolineraRepository.save(gasolinera);
-	}
+	public List<Gasolinera> getGasolinerasInRadius(Double latitud, Double longitud, Long radio) {
+		List<Gasolinera> foundRadius = new ArrayList<>();
+		if (radio > 0) {
+			Gasolinera[] gasolinerasPorMunId = restTemplate.getForObject(API_URL + munId, Gasolinera[].class);
+			if (Objects.nonNull(gasolinerasPorMunId)) {
+				foundMunicipios.addAll(Arrays.asList(gasolinerasPorMunId));
+			}
+		}
 
-	@Override
-	@Cacheable("gasolinera_id")
-	public Optional<Gasolinera> getGasolineraForId(Long idEstacion) {
-		return Optional.of(restTemplate.getForObject(API_URL + idEstacion, Gasolinera.class));
+		return foundRadius;
 	}
 
 	@Override
@@ -45,12 +47,19 @@ public class GasolineraServiceImpl implements GasolineraService {
 		List<Gasolinera> foundMunicipios = new ArrayList<>();
 		if (municipioOpt.isPresent()) {
 			Long munId = municipioOpt.get().getIdMunicipio();
-			Gasolinera[] gasolinerasPorMunId = restTemplate.getForObject(API_URL + munId, Gasolinera[].class);
+			Gasolinera[] gasolinerasPorMunId = restTemplate.getForObject(API_URL + "municipio/" + munId,
+					Gasolinera[].class);
 			if (Objects.nonNull(gasolinerasPorMunId)) {
 				foundMunicipios.addAll(Arrays.asList(gasolinerasPorMunId));
 			}
 		}
 
 		return foundMunicipios;
+	}
+
+	@Override
+	@Cacheable("gasolinera_id")
+	public Optional<Gasolinera> getGasolineraForId(Long idEstacion) {
+		return Optional.of(restTemplate.getForObject(API_URL + "detalles/" + idEstacion, Gasolinera.class));
 	}
 }
