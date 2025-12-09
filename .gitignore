@@ -31,3 +31,8 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Angular
+angular/node_modules
+angular/npm-debug.log
+angular/yarn-error.log
