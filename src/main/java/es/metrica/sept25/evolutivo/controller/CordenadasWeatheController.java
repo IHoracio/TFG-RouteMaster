@@ -3,50 +3,60 @@ package es.metrica.sept25.evolutivo.controller;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import es.metrica.sept25.evolutivo.domain.dto.weather.Weather;
+import es.metrica.sept25.evolutivo.service.ine.INEService;
 import es.metrica.sept25.evolutivo.service.weather.WeatherService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
 @Tag(name = "Clima")
 @RequestMapping("/checkWeather")
-public class WeatherController {
-
+public class CordenadasWeatheController {
+	
+	@Value("${evolutivo.api_key_aemet}")
+	private String API_KEY_AEMET;
+	
 	@Autowired
 	private WeatherService weatherService;
+	
+	@Autowired
+    private INEService ineService;
 
-	@Operation(summary = "Devuelve el clima para un código postal concreto", description = "Compone un objeto Weather que contiene toda la "
-			+ "información meteorológica para un código postal concreto.")
-	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Route found"),
+	@Operation(summary = "Devuelve el clima para unas coordenadas", 
+			description = "Compone un objeto Weather que contiene toda la "
+			+ "información meteorológica para unas coordenas concretas.")
+	@ApiResponses(value = { 
+			@ApiResponse(responseCode = "200", description = "Route found"),
 			@ApiResponse(responseCode = "401", description = "apiKey wasn't found"),
 			@ApiResponse(responseCode = "400", description = "Bad request") })
-	@SecurityRequirement(name = "aemetApiKey")
-	@GetMapping("/zipCode")
-	public ResponseEntity<Weather> getWeather(@PathVariable String zipCode, HttpServletRequest request) {
-		String apiKey = request.getHeader("api_key");
-		if (apiKey == null || apiKey.isEmpty()) {
+	@GetMapping("/coords")
+	public ResponseEntity<Weather> getWeatherByCoords(
+			@RequestParam double lat,
+            @RequestParam double lng) {
+		
+		if (API_KEY_AEMET == null || API_KEY_AEMET.isEmpty()) {
 			return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 		}
-		if (zipCode == null || !zipCode.matches("/d{5}")) {
-			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-		}
-		Optional<Weather> weather = weatherService.getWeather(zipCode, apiKey);
+		
+		Optional<String> codigoINE = ineService.getCodigoINE(lat, lng);
+        if (codigoINE.get() == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+		Optional<Weather> weather = weatherService.getWeather(codigoINE.get(), API_KEY_AEMET);
 		if (weather.isEmpty()) {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 		return new ResponseEntity<Weather>(weather.get(), HttpStatus.OK);
-
 	}
 }
