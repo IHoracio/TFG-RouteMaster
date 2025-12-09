@@ -25,36 +25,29 @@ public class RoutesServiceImpl implements RoutesService {
 	public Optional<RouteGroup> getDirections(String origin, String destination, List<String> waypoints, boolean optimizeWaypoints, boolean optimizeRoute, String language, String apiKey) {
 		origin = origin.replaceAll(" ", "");
 		destination = destination.replaceAll(" ", "");
-		
+
 		UriComponentsBuilder url = UriComponentsBuilder
 				.fromUriString(API_URL)
-				.queryParam("origin", origin)
 				.queryParam("mode", MODE)
 				.queryParam("language", language)
-				.queryParam("key", apiKey);
+				.queryParam("key", apiKey)
+				.queryParam("origin", origin);
 		
-		boolean canOptimizeRoute = !waypoints.isEmpty() && optimizeRoute;
-		boolean canOptimizeWaypoints = !waypoints.isEmpty() && optimizeWaypoints;
-		if(!canOptimizeRoute) url.queryParam("destination", destination);
+		if(waypoints.isEmpty() || !optimizeRoute) url.queryParam("destination", destination);
 		
 		String result = "";
 		if(!waypoints.isEmpty()) {
-			StringBuilder waypointsValue = new StringBuilder();
-			if(canOptimizeRoute || canOptimizeWaypoints) waypointsValue.append(OPTIMIZE);
-			
-			if(canOptimizeRoute) {
+			if(optimizeWaypoints) result += OPTIMIZE;
+			else if(optimizeRoute) {
 				waypoints.add(destination);
 				url.queryParam("destination", origin);
 			}
-			
-			result = addWaypoints(waypointsValue, waypoints, url);
-		} else {
-			result = url.toUriString();
-		}
+		} 
+		result = getUrl(waypoints, url);
 
 		RouteGroup response = restTemplate.getForObject(result, RouteGroup.class);
-		if(canOptimizeRoute) response = deleteLastLeg(response);
-		
+		if(!waypoints.isEmpty() && optimizeRoute) response = deleteLastLeg(response);
+
 		return Optional.of(response);	
 	}
 
@@ -62,17 +55,16 @@ public class RoutesServiceImpl implements RoutesService {
 		List<Leg> legs = response.getRoutes().getFirst().getLegs();
 		legs.removeLast();
 		response.getRoutes().getFirst().setLegs(legs);
-		
+
 		return response;
 	}
 
-	private String addWaypoints(StringBuilder waypointsValue, List<String> waypoints, UriComponentsBuilder url) {
-		waypointsValue.append(waypoints.stream()
-				.map(s -> s.replaceAll(" ", ""))
-				.collect(Collectors.joining("|")));
+	private String getUrl(List<String> waypoints, UriComponentsBuilder url) {
 		url.queryParam("waypoints", "");
-		
-		return url.toUriString() + waypointsValue.toString();
+
+		return url.toUriString() + waypoints.stream()
+		.map(s -> s.replaceAll(" ", ""))
+		.collect(Collectors.joining("|"));
 	}
 
 }
