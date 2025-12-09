@@ -31,9 +31,11 @@ public class GeocodeController {
 	})
 	@SecurityRequirement(name = "googleApiKey")
 	@GetMapping
-	public ResponseEntity<Coords> getCoordinates(@RequestParam String address, HttpServletRequest request) {
+	public ResponseEntity<Coords> getCoordinates(
+			@RequestParam String address, 
+			HttpServletRequest request) {
 
-		String apiKey = request.getHeader("key");
+		String apiKey = request.getHeader("api_key");
 
 		if (apiKey == null || apiKey.isEmpty()) {
 			return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
@@ -60,7 +62,7 @@ public class GeocodeController {
 	        @RequestParam double lng,
 	        HttpServletRequest request) {
 
-	    String apiKey = request.getHeader("key");
+	    String apiKey = request.getHeader("api_key");
 
 	    if (apiKey == null || apiKey.isEmpty()) {
 	        return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
