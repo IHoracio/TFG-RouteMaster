@@ -1,6 +1,7 @@
 package es.metrica.sept25.evolutivo.service.maps.routes;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +22,7 @@ public class RoutesServiceImpl implements RoutesService {
 	@Autowired
 	private RestTemplate restTemplate;
 
-	public RouteGroup getDirections(String origin, String destination, List<String> waypoints, Boolean optimize, String language, String apiKey) {
+	public Optional<RouteGroup> getDirections(String origin, String destination, List<String> waypoints, boolean optimizeWaypoints, boolean optimizeRoute, String language, String apiKey) {
 		origin = origin.replaceAll(" ", "");
 		destination = destination.replaceAll(" ", "");
 		
@@ -32,16 +33,17 @@ public class RoutesServiceImpl implements RoutesService {
 				.queryParam("language", language)
 				.queryParam("key", apiKey);
 		
-		boolean canOptimize = !waypoints.isEmpty() && optimize != null && optimize;
-		if(!canOptimize) url.queryParam("destination", destination);
+		boolean canOptimizeRoute = !waypoints.isEmpty() && optimizeRoute;
+		boolean canOptimizeWaypoints = !waypoints.isEmpty() && optimizeWaypoints;
+		if(!canOptimizeRoute) url.queryParam("destination", destination);
 		
 		String result = "";
 		if(!waypoints.isEmpty()) {
 			StringBuilder waypointsValue = new StringBuilder();
+			if(canOptimizeRoute || canOptimizeWaypoints) waypointsValue.append(OPTIMIZE);
 			
-			if(canOptimize) {
+			if(canOptimizeRoute) {
 				waypoints.add(destination);
-				waypointsValue.append(OPTIMIZE);
 				url.queryParam("destination", origin);
 			}
 			
@@ -51,9 +53,9 @@ public class RoutesServiceImpl implements RoutesService {
 		}
 
 		RouteGroup response = restTemplate.getForObject(result, RouteGroup.class);
-		if(canOptimize) response = deleteLastLeg(response);
+		if(canOptimizeRoute) response = deleteLastLeg(response);
 		
-		return response;	
+		return Optional.of(response);	
 	}
 
 	private RouteGroup deleteLastLeg(RouteGroup response) {

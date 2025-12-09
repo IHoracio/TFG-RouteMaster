@@ -1,6 +1,7 @@
 package es.metrica.sept25.evolutivo.controller.maps.routes;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -26,10 +27,13 @@ public class RoutesController {
 	private RoutesService routesService;
 
 	@Operation(
-			summary = "Obtiene de un punto A → B la ruta", 
+			summary = "Calcular rutas", 
 			description = "Devuelve la información esencial de la ruta en coche: "
 					    + "punto de origen y destino o destinos, distancia total, tiempo estimado "
-					    + "y los pasos principales del recorrido, incluyendo las coordenadas de cada tramo.")
+					    + "y los pasos principales del recorrido, incluyendo las coordenadas de cada tramo."
+					    + "Se pueden activar dos optimizaciones para la ruta:"
+					    + "1- Te optimiza los puntos intermedios, recolocandolos para tener la ruta mas optima hasta el destino predefinido"
+					    + "2- Te optimiza los puntos intermedios y el destino incluido, por lo que el destino final puede cambiar")
 	@ApiResponses(value = { 
 			@ApiResponse(responseCode = "401", description = "apiKey wasn't found"),
 			@ApiResponse(responseCode = "400", description = "Bad request"),
@@ -41,19 +45,20 @@ public class RoutesController {
 			@RequestParam(required = true, defaultValue = "El Vellon") String origin,
 			@RequestParam(required = true, defaultValue = "El Molar") String destination,
 			@RequestParam(required = false, defaultValue = "") List<String> waypoints,
-			@RequestParam(required = false, defaultValue = "") Boolean optimize,
+			@RequestParam(required = false, defaultValue = "false") boolean optimizeWaypoints,
+			@RequestParam(required = false, defaultValue = "false") boolean optimizeRoute,
 			@RequestParam(required = false, defaultValue = "es") String language, HttpServletRequest request) {
 
 		String apiKey = request.getHeader("key");
 		if (apiKey == null || apiKey.isEmpty()) {
 			return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 		}
-		RouteGroup response = routesService.getDirections(origin, destination, waypoints, optimize, language, apiKey);
+		Optional<RouteGroup> response = routesService.getDirections(origin, destination, waypoints, optimizeWaypoints, optimizeRoute, language, apiKey);
 		
-		if (response == null) {
+		if (response.isEmpty()) {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 
-		return new ResponseEntity<>(response, HttpStatus.OK);
+		return new ResponseEntity<>(response.get(), HttpStatus.OK);
 	}
 }
