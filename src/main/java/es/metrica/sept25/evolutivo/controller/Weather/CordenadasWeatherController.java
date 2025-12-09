@@ -1,4 +1,4 @@
-package es.metrica.sept25.evolutivo.controller;
+package es.metrica.sept25.evolutivo.controller.Weather;
 
 import java.util.Optional;
 
@@ -22,7 +22,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RestController
 @Tag(name = "Clima")
 @RequestMapping("/checkWeather")
-public class CordenadasWeatheController {
+public class CordenadasWeatherController {
 	
 	@Value("${evolutivo.api_key_aemet}")
 	private String API_KEY_AEMET;
