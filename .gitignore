@@ -36,3 +36,4 @@ build/
 angular/node_modules
 angular/npm-debug.log
 angular/yarn-error.log
+angular/src/app/features/pages/map-page/pruebaNoSubir.ts
