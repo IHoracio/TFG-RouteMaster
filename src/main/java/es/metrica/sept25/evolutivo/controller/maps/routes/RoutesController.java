@@ -15,9 +15,7 @@ import es.metrica.sept25.evolutivo.service.maps.routes.RoutesService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
 @Tag(name = "Direcciones")
@@ -35,11 +33,11 @@ public class RoutesController {
 					    + "1- Te optimiza los puntos intermedios, recolocandolos para tener la ruta mas optima hasta el destino predefinido"
 					    + "2- Te optimiza los puntos intermedios y el destino incluido, por lo que el destino final puede cambiar")
 	@ApiResponses(value = { 
-			@ApiResponse(responseCode = "401", description = "apiKey wasn't found"),
+//			@ApiResponse(responseCode = "401", description = "apiKey wasn't found"),
 			@ApiResponse(responseCode = "400", description = "Bad request"),
 			@ApiResponse(responseCode = "200", description = "Route found") 
 			})
-	@SecurityRequirement(name = "googleApiKey")
+//	@SecurityRequirement(name = "googleApiKey")
 	@GetMapping("/routes")
 	public ResponseEntity<RouteGroup> getDirections(
 			@RequestParam(required = true, defaultValue = "El Vellon") String origin,
@@ -47,13 +45,15 @@ public class RoutesController {
 			@RequestParam(required = false, defaultValue = "") List<String> waypoints,
 			@RequestParam(required = false, defaultValue = "false") boolean optimizeWaypoints,
 			@RequestParam(required = false, defaultValue = "false") boolean optimizeRoute,
-			@RequestParam(required = false, defaultValue = "es") String language, HttpServletRequest request) {
+			@RequestParam(required = false, defaultValue = "es") String language
+//			, HttpServletRequest request
+			) {
 
-		String apiKey = request.getHeader("key");
-		if (apiKey == null || apiKey.isEmpty()) {
-			return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-		}
-		Optional<RouteGroup> response = routesService.getDirections(origin, destination, waypoints, optimizeWaypoints, optimizeRoute, language, apiKey);
+//		String apiKey = request.getHeader("key");
+//		if (apiKey == null || apiKey.isEmpty()) {
+//			return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+//		}
+		Optional<RouteGroup> response = routesService.getDirections(origin, destination, waypoints, optimizeWaypoints, optimizeRoute, language);
 		
 		if (response.isEmpty()) {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);

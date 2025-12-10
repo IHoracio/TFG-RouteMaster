@@ -10,5 +10,7 @@ public interface GasolineraService {
 
 	Optional<Gasolinera> getGasolineraForId(Long idEstacion);
 
-	List<Gasolinera> getGasolinerasInRadius(Double latitud, Double longitud, Long radio);
+	List<Gasolinera> getGasolinerasInRadiusCoords(Double latitud, Double longitud, Long radio);
+
+	List<Gasolinera> getGasolinerasInRadiusAddress(String direccion, Long radio);
 }

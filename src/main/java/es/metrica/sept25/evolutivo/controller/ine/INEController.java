@@ -18,7 +18,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 
 
 @RestController
-@Tag(name = "Ine")
+@Tag(name = "INE")
 @RequestMapping("/ine")
 public class INEController {
 
@@ -29,7 +29,7 @@ public class INEController {
             description = "Devuelve el `codigoINE` correspondiente a las coordenadas "
                     + "indicadas usando la API del INE.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "401", description = "apiKey no encontrada"),
+//            @ApiResponse(responseCode = "401", description = "apiKey no encontrada"),
             @ApiResponse(responseCode = "400", description = "Solicitud incorrecta"),
             @ApiResponse(responseCode = "404", description = "Municipio no encontrado"),
             @ApiResponse(responseCode = "200", description = "Código INE encontrado")

@@ -1,12 +1,10 @@
 package es.metrica.sept25.evolutivo.service.ine;
 
-import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -30,14 +28,11 @@ public class INEServiceImp implements INEService {
 
 	private static final String INE_URL = "http://servicios.ine.es/wstempus/js/ES/VALORES_VARIABLE/19";
 
-	@Value("${evolutivo.api_key_google}")
-	private String API_KEY_GOOGLE;
-
 	@Override
 	@Cacheable("codigoIne")
 	public Optional<String> getCodigoINE(double lat, double lng) {
 
-		Optional<String> municipio = geocodeService.getMunicipio(lat, lng, API_KEY_GOOGLE);
+		Optional<String> municipio = geocodeService.getMunicipio(lat, lng);
 
 		if (municipio.isEmpty())
 			return Optional.empty();
@@ -52,6 +47,7 @@ public class INEServiceImp implements INEService {
 			List<INEMunicipio> ineMunList = Arrays.asList(response);
 			ineMunicipioRepository.saveAllAndFlush(ineMunList);
 		}
+
 		List<INEMunicipio> listaGuardada = ineMunicipioRepository.findAll();
 
 		return Optional.of(listaGuardada.stream().filter(m -> m.getNombre().equalsIgnoreCase(municipio.get()))

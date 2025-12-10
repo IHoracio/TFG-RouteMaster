@@ -1,4 +1,4 @@
-package es.metrica.sept25.evolutivo.controller.Weather;
+package es.metrica.sept25.evolutivo.controller.weather;
 
 import java.util.Optional;
 
@@ -22,7 +22,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RestController
 @Tag(name = "Clima")
 @RequestMapping("/checkWeather")
-public class CordenadasWeatherController {
+public class CoordenadasWeatherController {
 	
 	@Value("${evolutivo.api_key_aemet}")
 	private String API_KEY_AEMET;
@@ -35,11 +35,12 @@ public class CordenadasWeatherController {
 
 	@Operation(summary = "Devuelve el clima para unas coordenadas", 
 			description = "Compone un objeto Weather que contiene toda la "
-			+ "información meteorológica para unas coordenas concretas.")
+						+ "información meteorológica para unas coordenas concretas.")
 	@ApiResponses(value = { 
 			@ApiResponse(responseCode = "200", description = "Route found"),
-			@ApiResponse(responseCode = "401", description = "apiKey wasn't found"),
-			@ApiResponse(responseCode = "400", description = "Bad request") })
+			@ApiResponse(responseCode = "400", description = "Bad request"),
+			@ApiResponse(responseCode = "401", description = "apiKey wasn't found") 
+			})
 	@GetMapping("/coords")
 	public ResponseEntity<Weather> getWeatherByCoords(
 			@RequestParam double lat,
@@ -53,7 +54,7 @@ public class CordenadasWeatherController {
         if (codigoINE.get() == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-		Optional<Weather> weather = weatherService.getWeather(codigoINE.get(), API_KEY_AEMET);
+		Optional<Weather> weather = weatherService.getWeather(codigoINE.get());
 		if (weather.isEmpty()) {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}

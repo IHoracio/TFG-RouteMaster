@@ -1,4 +1,4 @@
-package es.metrica.sept25.evolutivo.controller.Weather;
+package es.metrica.sept25.evolutivo.controller.weather;
 
 import java.util.Optional;
 
@@ -15,7 +15,6 @@ import es.metrica.sept25.evolutivo.service.weather.WeatherService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -30,9 +29,9 @@ public class WeatherController {
 	@Operation(summary = "Devuelve el clima para un código postal concreto", description = "Compone un objeto Weather que contiene toda la "
 			+ "información meteorológica para un código postal concreto.")
 	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Route found"),
-			@ApiResponse(responseCode = "401", description = "apiKey wasn't found"),
+//			@ApiResponse(responseCode = "401", description = "apiKey wasn't found"),
 			@ApiResponse(responseCode = "400", description = "Bad request") })
-	@SecurityRequirement(name = "aemetApiKey")
+//	@SecurityRequirement(name = "aemetApiKey")
 	@GetMapping("/zipCode")
 	public ResponseEntity<Weather> getWeather(@PathVariable String zipCode, HttpServletRequest request) {
 		String apiKey = request.getHeader("api_key");
@@ -42,7 +41,7 @@ public class WeatherController {
 		if (zipCode == null || !zipCode.matches("/d{5}")) {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
-		Optional<Weather> weather = weatherService.getWeather(zipCode, apiKey);
+		Optional<Weather> weather = weatherService.getWeather(zipCode);
 		if (weather.isEmpty()) {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}

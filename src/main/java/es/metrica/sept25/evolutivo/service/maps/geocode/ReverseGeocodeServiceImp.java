@@ -3,6 +3,7 @@ package es.metrica.sept25.evolutivo.service.maps.geocode;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -17,13 +18,16 @@ public class ReverseGeocodeServiceImp implements ReverseGeocodeService{
 	@Autowired
     private RestTemplate restTemplate;
 	
+	@Value("${evolutivo.api_key_google}")
+	private String API_KEY_GOOGLE;
+	
 	@Override
-	public Optional<String> getAddress(double lat, double lng, String apiKey) {
+	public Optional<String> getAddress(double lat, double lng) {
 		String latlng = lat + "," + lng;
         String url = UriComponentsBuilder
                 .fromUriString(GEOCODE_URL)
                 .queryParam("latlng", latlng)
-                .queryParam("key", apiKey)
+                .queryParam("key", API_KEY_GOOGLE)
                 .toUriString();
         
         ReverseGeocodeGroup response = restTemplate.getForObject(url, ReverseGeocodeGroup.class);

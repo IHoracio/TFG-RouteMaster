@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -22,50 +23,52 @@ public class GeocodeServiceImpl implements GeocodeService {
 	@Autowired
 	private RestTemplate restTemplate;
 
-	@Override
-	public Optional<Coords> getCoordinates(String address, String apiKey) {
-		
-		String url = UriComponentsBuilder
-                .fromUriString(GEOCODE_URL)
-                .queryParam("address", address)
-                .queryParam("key", apiKey)
-                .toUriString();
-		
-		GeocodeGroup response = restTemplate.getForObject(url, GeocodeGroup.class);
+	@Value("${evolutivo.api_key_google}")
+	private String API_KEY_GOOGLE;
 
+	@Override
+	public Optional<Coords> getCoordinates(String address) {
+
+		String url = UriComponentsBuilder
+				.fromUriString(GEOCODE_URL)
+				.queryParam("address", address)
+				.queryParam("key", API_KEY_GOOGLE)
+				.toUriString();
+
+		GeocodeGroup response = restTemplate.getForObject(url, GeocodeGroup.class);
 
 		if (response != null && response.getResults().length > 0) {
 			return Optional.of(response.getResults()[0].getGeometry().getLocation());
-        }
+		}
 		return Optional.empty();
 	}
-	
+
 	@Override
-    public Optional<String> getMunicipio(double lat, double lng, String apiKey) {
-        String url = UriComponentsBuilder
-                .fromUriString(GEOCODE_URL)
-                .queryParam("latlng", lat + "," + lng)
-                .queryParam("key", apiKey)
-                .toUriString();
+	public Optional<String> getMunicipio(double lat, double lng) {
+		String url = UriComponentsBuilder
+				.fromUriString(GEOCODE_URL)
+				.queryParam("latlng", lat + "," + lng)
+				.queryParam("key", API_KEY_GOOGLE)
+				.toUriString();
 
-        GeocodeGroupAddress response = restTemplate.getForObject(url, GeocodeGroupAddress.class);
+		GeocodeGroupAddress response = restTemplate.getForObject(url, GeocodeGroupAddress.class);
 
-        if (response != null && response.getResults() != null && response.getResults().length > 0) {
-            GeocodeResultAddress result = response.getResults()[0];
+		if (response != null && response.getResults() != null && response.getResults().length > 0) {
+			GeocodeResultAddress result = response.getResults()[0];
 
-            for (AddressComponent comp : result.getAddress_components()) {
-                if (comp.getTypes() != null) {
-                    List<String> types = comp.getTypes();
-                    if (types.contains("locality")) {
-                        return Optional.of(comp.getLong_name());
-                    }
-                    if (types.contains("administrative_area_level_4")) {
-                        return Optional.of(comp.getLong_name());
-                    }
-                }
-            }
-        }
-        return Optional.empty();
-    }
+			for (AddressComponent comp : result.getAddress_components()) {
+				if (comp.getTypes() != null) {
+					List<String> types = comp.getTypes();
+					if (types.contains("locality")) {
+						return Optional.of(comp.getLong_name());
+					}
+					if (types.contains("administrative_area_level_4")) {
+						return Optional.of(comp.getLong_name());
+					}
+				}
+			}
+		}
+		return Optional.empty();
+	}
 
 }
