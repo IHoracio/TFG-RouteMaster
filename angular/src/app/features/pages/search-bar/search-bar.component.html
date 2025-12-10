@@ -2,7 +2,7 @@
 <section>
   <form (ngSubmit)="onSubmit()">
     <p>
-      <label for="origin">Elige el destino:</label>
+      <label for="origin">Elige el origen:</label>
       <input type="text" id="origin" name="origin" [(ngModel)]="originInput" placeholder="¿Desde dónde?" />
     </p>
 
@@ -10,10 +10,13 @@
       <label for="destination">Elige el destino:</label>
       <input type="text" id="destination" name="destination" [(ngModel)]="destinationInput" placeholder="¿A dónde quieres ir?" />
     </p>
-    <button class="primary" type="submit">Search</button>
+    <button class="primary" type="submit">Enviar</button>
+
+
+    {{message}}
+    
   </form>
     
 
-  {{ destinationInput }}
-  {{directions}}
+  
 </section>
