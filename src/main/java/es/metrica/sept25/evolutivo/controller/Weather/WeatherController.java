@@ -1,4 +1,4 @@
-package es.metrica.sept25.evolutivo.controller;
+package es.metrica.sept25.evolutivo.controller.Weather;
 
 import java.util.Optional;
 
@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import es.metrica.sept25.evolutivo.domain.dto.weather.Weather;
@@ -20,6 +21,7 @@ import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
 @Tag(name = "Clima")
+@RequestMapping("/checkWeather")
 public class WeatherController {
 
 	@Autowired
@@ -31,7 +33,7 @@ public class WeatherController {
 			@ApiResponse(responseCode = "401", description = "apiKey wasn't found"),
 			@ApiResponse(responseCode = "400", description = "Bad request") })
 	@SecurityRequirement(name = "aemetApiKey")
-	@GetMapping("/checkWeather/{zipCode}")
+	@GetMapping("/zipCode")
 	public ResponseEntity<Weather> getWeather(@PathVariable String zipCode, HttpServletRequest request) {
 		String apiKey = request.getHeader("api_key");
 		if (apiKey == null || apiKey.isEmpty()) {

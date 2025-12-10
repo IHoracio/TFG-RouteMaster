@@ -30,7 +30,7 @@ import io.swagger.v3.oas.annotations.servers.Server;
 	    description = "API Key necesaria para Google",
 	    type = SecuritySchemeType.APIKEY,
 	    in = SecuritySchemeIn.HEADER,
-	    paramName = "key"
+	    paramName = "api_key"
 	)
 	public class OpenApiConfig {}
 
