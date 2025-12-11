@@ -3,12 +3,12 @@
   <form (ngSubmit)="onSubmit()">
     <p>
       <label for="origin">Elige el origen:</label>
-      <input type="text" id="origin" name="origin" [(ngModel)]="originInput" placeholder="¿Desde dónde?" />
+      <input type="text" id="origin" name="origin" [(ngModel)]="origin" placeholder="¿Desde dónde?" />
     </p>
 
     <p>
       <label for="destination">Elige el destino:</label>
-      <input type="text" id="destination" name="destination" [(ngModel)]="destinationInput" placeholder="¿A dónde quieres ir?" />
+      <input type="text" id="destination" name="destination" [(ngModel)]="destination" placeholder="¿A dónde quieres ir?" />
     </p>
     <button class="primary" type="submit">Enviar</button>
     
@@ -16,5 +16,15 @@
     
     <button (click)="imprimirMensaje()">imprime</button>
 
-  
+
+    @let esPeruano = false;
+    @if (origin == "Peru"){
+      esPeruano = true;
+    }
+    @let esEcuatoriano = false;
+    @if (destination == "Ecuador"){
+      esEcuatoriano = true;
+    }
+
+    {{origin | platziPeruPeruvian: esPeruano: esEcuatoriano}}
 </section>
