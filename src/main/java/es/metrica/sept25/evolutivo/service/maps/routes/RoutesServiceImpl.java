@@ -14,6 +14,11 @@ import es.metrica.sept25.evolutivo.domain.dto.maps.routes.Coords;
 import es.metrica.sept25.evolutivo.domain.dto.maps.routes.Leg;
 import es.metrica.sept25.evolutivo.domain.dto.maps.routes.RouteGroup;
 import es.metrica.sept25.evolutivo.domain.dto.maps.routes.Step;
+import es.metrica.sept25.evolutivo.domain.dto.maps.routes.StepWithWeather;
+import es.metrica.sept25.evolutivo.domain.dto.weather.Dia;
+import es.metrica.sept25.evolutivo.domain.dto.weather.Weather;
+import es.metrica.sept25.evolutivo.service.ine.INEService;
+import es.metrica.sept25.evolutivo.service.weather.WeatherService;
 
 @Service
 public class RoutesServiceImpl implements RoutesService {
@@ -27,10 +32,16 @@ public class RoutesServiceImpl implements RoutesService {
 
 	@Autowired
 	private RestTemplate restTemplate;
+	
+	@Autowired
+	private INEService ineService;
+	
+	@Autowired
+	private WeatherService weatherService;
+
 
 	public Optional<RouteGroup> getDirections(String origin, String destination, List<String> waypoints, boolean optimizeWaypoints, boolean optimizeRoute, String language) {
-		origin = origin.replaceAll(" ", "");
-		destination = destination.replaceAll(" ", "");
+		
 
 		UriComponentsBuilder url = UriComponentsBuilder
 				.fromUriString(API_URL)
@@ -83,6 +94,39 @@ public class RoutesServiceImpl implements RoutesService {
                 .flatMap(leg -> leg.getSteps().stream())
                 .map(Step::getStartLocation)
                 .collect(Collectors.toList());
+    }
+	
+	public List<StepWithWeather> getWeatherForRoute(RouteGroup routeGroup) {
+        return extractRoutePoints(routeGroup).stream()
+                .map(coords -> {
+                    Optional<String> codigoINE = ineService.getCodigoINE(coords.getLat(), coords.getLng());
+                    if (codigoINE.isEmpty()) {
+                        return new StepWithWeather(coords.getLat(), coords.getLng(), "Desconocido", null);
+                    }
+
+                    Optional<Weather> weatherOpt = weatherService.getWeather(codigoINE.get());
+                    if (weatherOpt.isEmpty()) {
+                        return new StepWithWeather(coords.getLat(), coords.getLng(), "Desconocido", null);
+                    }
+                    
+                    Weather weather = weatherOpt.get();
+
+                    Dia dia = weather.getPrediccion().getDia().get(0);
+
+                    String descripcion = "Desconocido";
+                    if (dia.getEstadoCielo() != null && !dia.getEstadoCielo().isEmpty()) {
+                        descripcion = dia.getEstadoCielo().get(0).getDescripcion();
+                    }
+
+                    Double temperatura = null;
+                    if (dia.getTemperatura() != null && !dia.getTemperatura().isEmpty()) {
+                        temperatura = dia.getTemperatura().get(0).getValue();
+                    }
+
+                    return new StepWithWeather(coords.getLat(), coords.getLng(),
+                                               descripcion, temperatura);
+                })
+                .toList();
     }
 
 }
