@@ -15,16 +15,4 @@
   </form>
     
     <button (click)="imprimirMensaje()">imprime</button>
-
-
-    @let esPeruano = false;
-    @if (origin == "Peru"){
-      esPeruano = true;
-    }
-    @let esEcuatoriano = false;
-    @if (destination == "Ecuador"){
-      esEcuatoriano = true;
-    }
-
-    {{origin | platziPeruPeruvian: esPeruano: esEcuatoriano}}
 </section>

@@ -2,12 +2,11 @@ import { Component, Input, NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouteService } from '../../../services/routes/route.service';
 import { RouteGroupResponse } from '../map-page/Utils/google-route.mapper';
-import { PlatziPeruPipe } from './platzi-peru.pipe';
 
 
 @Component({
   selector: 'app-search-bar',
-  imports: [FormsModule, PlatziPeruPipe],
+  imports: [FormsModule],
   templateUrl: './search-bar.component.html',
   styleUrl: './search-bar.component.css'
 })
