@@ -51,7 +51,7 @@ public class CoordenadasWeatherController {
 		}
 		
 		Optional<String> codigoINE = ineService.getCodigoINE(lat, lng);
-        if (codigoINE.get() == null) {
+        if (codigoINE.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 		Optional<Weather> weather = weatherService.getWeather(codigoINE.get());

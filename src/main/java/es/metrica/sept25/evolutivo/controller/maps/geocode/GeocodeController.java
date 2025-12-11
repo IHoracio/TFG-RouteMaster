@@ -40,7 +40,7 @@ public class GeocodeController {
 	public ResponseEntity<Coords> getCoordinates(@RequestParam String address) {
 
 		Optional<Coords> coords = geocodeService.getCoordinates(address);
-		if (coords.get() == null) {
+		if (coords.isEmpty()) {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
 
