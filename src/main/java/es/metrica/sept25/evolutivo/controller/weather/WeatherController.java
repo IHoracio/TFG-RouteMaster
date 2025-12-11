@@ -16,7 +16,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
 @Tag(name = "Clima")
@@ -26,25 +25,27 @@ public class WeatherController {
 	@Autowired
 	private WeatherService weatherService;
 
-	@Operation(summary = "Devuelve el clima para un código postal concreto", description = "Compone un objeto Weather que contiene toda la "
-			+ "información meteorológica para un código postal concreto.")
-	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Route found"),
-//			@ApiResponse(responseCode = "401", description = "apiKey wasn't found"),
-			@ApiResponse(responseCode = "400", description = "Bad request") })
-//	@SecurityRequirement(name = "aemetApiKey")
+	@Operation(
+			summary = "Devuelve el clima para un código postal concreto", 
+			description = "Compone un objeto Weather que contiene toda la " + 
+						  "información meteorológica para un código postal concreto.")
+	@ApiResponses(value = { 
+			@ApiResponse(responseCode = "200", description = "Route found"),
+			@ApiResponse(responseCode = "400", description = "Bad request") 
+			})
 	@GetMapping("/zipCode")
-	public ResponseEntity<Weather> getWeather(@PathVariable String zipCode, HttpServletRequest request) {
-		String apiKey = request.getHeader("api_key");
-		if (apiKey == null || apiKey.isEmpty()) {
-			return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-		}
+	public ResponseEntity<Weather> getWeather(@PathVariable String zipCode) {
+
 		if (zipCode == null || !zipCode.matches("/d{5}")) {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
+
 		Optional<Weather> weather = weatherService.getWeather(zipCode);
+
 		if (weather.isEmpty()) {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
+
 		return new ResponseEntity<Weather>(weather.get(), HttpStatus.OK);
 
 	}

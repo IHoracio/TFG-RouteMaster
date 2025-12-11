@@ -7,7 +7,6 @@ import java.util.Objects;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -34,9 +33,6 @@ public class GasolineraServiceImpl implements GasolineraService {
 
 	@Autowired
 	GasolineraRepository gasolineraRepository;
-
-	@Value("${evolutivo.api_key_google}")
-	private String API_KEY_GOOGLE;
 
 	@Override
 	@Cacheable("gasolinera_id")
