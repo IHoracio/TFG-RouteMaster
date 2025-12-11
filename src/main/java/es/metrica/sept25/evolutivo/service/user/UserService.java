@@ -10,9 +10,9 @@ public interface UserService {
 
     User save(User user);
 
-    Optional<User> getByMail(String mail);
+    Optional<User> getByEmail(String mail);
 
     List<User> getAll();
 
-    void delete(String mail);
+    void deleteByEmail(String mail);
 }

@@ -21,7 +21,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @Tag(name = "User")
-@RequestMapping("/evolutivo/users")
+@RequestMapping("/users")
 public class UserController {
 
     @Autowired
@@ -34,13 +34,20 @@ public class UserController {
     })
     @PostMapping("/create")
     public ResponseEntity<User> createUser(
-            @Parameter(description = "Email del usuario", example = "usuario@example.com") @RequestParam String mail,
-            @Parameter(description = "Contraseña del usuario", example = "password123") @RequestParam String password,
-            @Parameter(description = "Nombre del usuario", example = "Usuario") @RequestParam String name,
-            @Parameter(description = "Apellido del usuario", example = "Prueba") @RequestParam String surname) {
+            @Parameter(description = "Email del usuario", example = "usuario@example.com") 
+            @RequestParam(required = true) String email,
+
+            @Parameter(description = "Contraseña del usuario", example = "password123") 
+            @RequestParam(required = true) String password,
+
+            @Parameter(description = "Nombre del usuario", example = "Usuario") 
+            @RequestParam(required = true) String name,
+
+            @Parameter(description = "Apellido del usuario", example = "Prueba") 
+            @RequestParam(required = true) String surname) {
 
         User user = new User();
-        user.setMail(mail);
+        user.setEmail(email);
         user.setPassword(password);
         user.setName(name);
         user.setSurname(surname);
@@ -57,7 +64,7 @@ public class UserController {
     @GetMapping("/get")
     public ResponseEntity<User> getUser(
             @Parameter(description = "Email del usuario a buscar", example = "usuario@example.com") @RequestParam String mail) {
-        return service.getByMail(mail)
+        return service.getByEmail(mail)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
@@ -70,7 +77,7 @@ public class UserController {
     @DeleteMapping("/delete")
     public ResponseEntity<Void> deleteUser(
             @Parameter(description = "Email del usuario a eliminar", example = "usuario@example.com") @RequestParam String mail) {
-        service.delete(mail);
+        service.deleteByEmail(mail);
         return ResponseEntity.noContent().build();
     }
 
