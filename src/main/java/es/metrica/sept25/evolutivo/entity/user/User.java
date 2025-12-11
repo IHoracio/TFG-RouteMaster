@@ -20,7 +20,6 @@ import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 
 @Entity
-@Builder
 @Table(name = "users")
 public class User {
 

@@ -13,7 +13,7 @@ import es.metrica.sept25.evolutivo.domain.dto.maps.geocode.AddressComponent;
 import es.metrica.sept25.evolutivo.domain.dto.maps.geocode.GeocodeGroup;
 import es.metrica.sept25.evolutivo.domain.dto.maps.geocode.GeocodeGroupAddress;
 import es.metrica.sept25.evolutivo.domain.dto.maps.geocode.GeocodeResultAddress;
-import es.metrica.sept25.evolutivo.entity.maps.routes.Coords;
+import es.metrica.sept25.evolutivo.domain.dto.maps.routes.Coords;
 
 @Service
 public class GeocodeServiceImpl implements GeocodeService {

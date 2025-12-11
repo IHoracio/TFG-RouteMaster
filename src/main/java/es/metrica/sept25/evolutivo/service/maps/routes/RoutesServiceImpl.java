@@ -10,8 +10,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import es.metrica.sept25.evolutivo.entity.maps.routes.Leg;
-import es.metrica.sept25.evolutivo.entity.maps.routes.RouteGroup;
+import es.metrica.sept25.evolutivo.domain.dto.maps.routes.Coords;
+import es.metrica.sept25.evolutivo.domain.dto.maps.routes.Leg;
+import es.metrica.sept25.evolutivo.domain.dto.maps.routes.RouteGroup;
+import es.metrica.sept25.evolutivo.domain.dto.maps.routes.Step;
 
 @Service
 public class RoutesServiceImpl implements RoutesService {
@@ -72,5 +74,15 @@ public class RoutesServiceImpl implements RoutesService {
 		.map(s -> s.replaceAll(" ", ""))
 		.collect(Collectors.joining("|"));
 	}
+	
+	public List<Coords> extractRoutePoints(RouteGroup routeGroup) {
+        if (routeGroup == null ||routeGroup.getRoutes() == null) return List.of();
+
+        return routeGroup.getRoutes().stream()
+                .flatMap(route -> route.getLegs().stream())
+                .flatMap(leg -> leg.getSteps().stream())
+                .map(Step::getStartLocation)
+                .collect(Collectors.toList());
+    }
 
 }

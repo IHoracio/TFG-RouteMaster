@@ -12,9 +12,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import es.metrica.sept25.evolutivo.domain.dto.maps.routes.Coords;
 import es.metrica.sept25.evolutivo.entity.gasolinera.Gasolinera;
 import es.metrica.sept25.evolutivo.entity.gasolinera.Municipio;
-import es.metrica.sept25.evolutivo.entity.maps.routes.Coords;
 import es.metrica.sept25.evolutivo.repository.GasolineraRepository;
 import es.metrica.sept25.evolutivo.service.maps.geocode.GeocodeService;
 
