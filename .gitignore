@@ -40,3 +40,5 @@ angular/yarn-error.log
 
 # SECRETS
 src/main/resources/application-dev.properties
+angular/src/environments
+count_commits_by_contributor.sh
