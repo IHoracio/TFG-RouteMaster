@@ -1,9 +1,9 @@
 package es.metrica.sept25.evolutivo.entity.user;
 
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import es.metrica.sept25.evolutivo.entity.maps.routes.SavedRoute;
 import jakarta.persistence.CascadeType;
@@ -12,11 +12,16 @@ import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
+import lombok.Builder;
 
 @Entity
+@Builder
 @Table(name = "users")
 public class User {
 
@@ -24,12 +29,20 @@ public class User {
 		PRICE, 
 		DISTANCE, 
 		BOTH
-
 	}
 
 	@Id
-	private String mail;
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
+
+	@Column(name = "email", unique = true)
+	private String email;
+	
 	private String password;
+	
+	@Transient
+	private String passwordConfirmation;
+	
 	private String name;
 	private String surname;
 
@@ -41,27 +54,34 @@ public class User {
 
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false)
-	private PrioridadGasolineras priorityGasstations = PrioridadGasolineras.PRICE;
+	private PrioridadGasolineras gasStationPriority = PrioridadGasolineras.PRICE;
 
-	public String getMail() {
-		return mail;
+	public String getEmail() {
+		return this.email;
 	}
 
-	public void setMail(String mail) {
-		this.mail = mail;
+	public void setEmail(String email) {
+		this.email = email;
 	}
 
 	public String getPassword() {
-		return password;
+		return this.password;
 	}
 
 	public void setPassword(String password) {
-		BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-		this.password = encoder.encode(password);
+		this.password = password;
+	}
+
+	public String getPasswordConfirmation() {
+		return this.passwordConfirmation;
+	}
+
+	public void setPasswordConfirmation(String passwordConfirmation) {
+		this.passwordConfirmation = passwordConfirmation;
 	}
 
 	public String getName() {
-		return name;
+		return this.name;
 	}
 
 	public void setName(String name) {
@@ -69,7 +89,7 @@ public class User {
 	}
 
 	public String getSurname() {
-		return surname;
+		return this.surname;
 	}
 
 	public void setSurname(String surname) {
@@ -77,7 +97,7 @@ public class User {
 	}
 
 	public Map<String, String> getPreferences() {
-		return preferences;
+		return new HashMap<String, String>(this.preferences);
 	}
 
 	public void setPreferences(Map<String, String> preferencias) {
@@ -85,18 +105,18 @@ public class User {
 	}
 
 	public List<SavedRoute> getSavedRoutes() {
-		return savedRoutes;
+		return new LinkedList<SavedRoute>(this.savedRoutes);
 	}
 
 	public void setSavedRoutes(List<SavedRoute> savedRoutes) {
 		this.savedRoutes = savedRoutes;
 	}
 
-	public PrioridadGasolineras getPriorityGasstations() {
-		return priorityGasstations;
+	public PrioridadGasolineras getGasStationPriority() {
+		return this.gasStationPriority;
 	}
 
-	public void setPriorityGasstations(PrioridadGasolineras prioridadGasolineras) {
-		this.priorityGasstations = prioridadGasolineras;
+	public void setGasStationPriority(PrioridadGasolineras prioridadGasolineras) {
+		this.gasStationPriority = prioridadGasolineras;
 	}
 }

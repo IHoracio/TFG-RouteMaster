@@ -39,16 +39,11 @@ public class CoordenadasWeatherController {
 	@ApiResponses(value = { 
 			@ApiResponse(responseCode = "200", description = "Route found"),
 			@ApiResponse(responseCode = "400", description = "Bad request"),
-			@ApiResponse(responseCode = "401", description = "apiKey wasn't found") 
 			})
 	@GetMapping("/coords")
 	public ResponseEntity<Weather> getWeatherByCoords(
 			@RequestParam double lat,
             @RequestParam double lng) {
-		
-		if (API_KEY_AEMET == null || API_KEY_AEMET.isEmpty()) {
-			return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-		}
 		
 		Optional<String> codigoINE = ineService.getCodigoINE(lat, lng);
         if (codigoINE.isEmpty()) {
