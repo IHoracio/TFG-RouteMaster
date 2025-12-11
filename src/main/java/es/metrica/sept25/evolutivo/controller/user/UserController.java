@@ -46,12 +46,11 @@ public class UserController {
             @Parameter(description = "Apellido del usuario", example = "Prueba") 
             @RequestParam(required = true) String surname) {
 
-    	User user = User.builder()
-    			.email(email)
-    			.password(password)
-    			.name(name)
-    			.surname(surname)
-    			.build();
+        User user = new User();
+        user.setEmail(email);
+        user.setPassword(password);
+        user.setName(name);
+        user.setSurname(surname);
 
         User saved = service.save(user);
         return ResponseEntity.ok(saved);
