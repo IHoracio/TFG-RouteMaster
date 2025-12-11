@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import es.metrica.sept25.evolutivo.domain.dto.weather.Weather;
@@ -15,6 +16,7 @@ import es.metrica.sept25.evolutivo.service.weather.WeatherService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -33,11 +35,8 @@ public class WeatherController {
 			@ApiResponse(responseCode = "400", description = "Bad request") })
 //	@SecurityRequirement(name = "aemetApiKey")
 	@GetMapping("/zipCode")
-	public ResponseEntity<Weather> getWeather(@PathVariable String zipCode, HttpServletRequest request) {
-		String apiKey = request.getHeader("api_key");
-		if (apiKey == null || apiKey.isEmpty()) {
-			return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-		}
+	public ResponseEntity<Weather> getWeather(@RequestParam String zipCode) {
+
 		if (zipCode == null || !zipCode.matches("/d{5}")) {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}

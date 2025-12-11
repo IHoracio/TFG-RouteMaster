@@ -38,7 +38,7 @@ public class ReversedGeocodeController {
 	public ResponseEntity<String> getAddress(@RequestParam double lat, @RequestParam double lng) {
 
 		Optional<String> address = reverseGeocodeService.getAddress(lat, lng);
-		if (address.get() == null) {
+		if (address.isEmpty()) {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 

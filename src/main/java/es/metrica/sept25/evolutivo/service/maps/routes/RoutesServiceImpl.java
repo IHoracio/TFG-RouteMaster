@@ -20,7 +20,7 @@ public class RoutesServiceImpl implements RoutesService {
 	private static final String MODE = "driving";
 	private static final String OPTIMIZE = "optimize:true|";
 	
-	@Value("${evolutivo.api_key_google")
+	@Value("${evolutivo.api_key_google}")
 	private String API_KEY_GOOGLE;
 
 	@Autowired
@@ -37,6 +37,7 @@ public class RoutesServiceImpl implements RoutesService {
 				.queryParam("key", API_KEY_GOOGLE)
 				.queryParam("origin", origin);
 		
+		
 		if(waypoints.isEmpty() || !optimizeRoute) url.queryParam("destination", destination);
 		
 		String result = "";
@@ -52,6 +53,7 @@ public class RoutesServiceImpl implements RoutesService {
 		RouteGroup response = restTemplate.getForObject(result, RouteGroup.class);
 		if(!waypoints.isEmpty() && optimizeRoute) response = deleteLastLeg(response);
 
+		System.err.println(result);
 		return Optional.of(response);	
 	}
 
