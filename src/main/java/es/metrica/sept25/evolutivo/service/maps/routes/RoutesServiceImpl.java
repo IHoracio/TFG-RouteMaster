@@ -41,7 +41,8 @@ public class RoutesServiceImpl implements RoutesService {
 
 
 	public Optional<RouteGroup> getDirections(String origin, String destination, List<String> waypoints, boolean optimizeWaypoints, boolean optimizeRoute, String language) {
-		
+		origin = origin.replaceAll(" ", "");
+		destination = destination.replaceAll(" ", "");
 
 		UriComponentsBuilder url = UriComponentsBuilder
 				.fromUriString(API_URL)

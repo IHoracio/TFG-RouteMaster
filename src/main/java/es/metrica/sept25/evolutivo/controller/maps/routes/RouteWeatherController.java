@@ -31,9 +31,6 @@ public class RouteWeatherController {
 			@RequestParam(required = false, defaultValue = "false") boolean optimizeRoute,
 			@RequestParam(required = false, defaultValue = "es") String language) {
 
-		origin = origin.replace(" ", "");
-		destination = destination.replace(" ", "");
-
 		Optional<RouteGroup> routeGroupOpt = routesService.getDirections(origin, destination, waypoints,
 				optimizeWaypoints, optimizeRoute, language);
 
