@@ -2,6 +2,7 @@ package es.metrica.sept25.evolutivo.entity.maps.routes;
 
 import java.util.List;
 
+import es.metrica.sept25.evolutivo.domain.dto.maps.routes.Coords;
 import es.metrica.sept25.evolutivo.entity.user.User;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;

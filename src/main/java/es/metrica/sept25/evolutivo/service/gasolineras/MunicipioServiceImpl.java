@@ -30,11 +30,11 @@ public class MunicipioServiceImpl implements MunicipioService {
 	@Autowired
 	MunicipioRepository municipioRepository;
 
-	@Override
-	@Cacheable("municipios")
 	/**
 	 * NO USAR SALVO ESTRICTAMENTE NECESARIO
 	 */
+	@Override
+	@Cacheable("municipios")
 	public List<Municipio> getMunicipios() {
 		List<Provincia> provList = provinciaService.getProvincias();
 		List<Municipio> munList = municipioRepository.findAll();
@@ -57,11 +57,20 @@ public class MunicipioServiceImpl implements MunicipioService {
 	}
 
 	@Override
-	@Cacheable("municipio")
-	public Optional<Provincia> getProvinciaForMunicipio(Municipio mun) {
-		Long provId = mun.getIdProvincia();
-		List<Provincia> provList = provinciaService.getProvincias();
-		return provList.stream().filter(p -> p.getIdProvincia() == provId).findFirst();
+	@Cacheable("municipio_id")
+	public Optional<Municipio> getMunicipioFromId(Long idMunicipio) {
+		List<Municipio> munList = getMunicipios();
+		return munList.stream()
+				.filter(m -> m.getIdMunicipio() == idMunicipio)
+				.findFirst();
 	}
 
+	@Override
+	@Cacheable("municipio_str")
+	public Optional<Municipio> getMunicipioFromString(String munStr) {
+		List<Municipio> munList = getMunicipios();
+		return munList.stream()
+				.filter(m -> m.getNombreMunicipio().toLowerCase().equals(munStr.toLowerCase()))
+				.findFirst();
+	}
 }
