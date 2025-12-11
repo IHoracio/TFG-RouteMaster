@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import es.metrica.sept25.evolutivo.domain.dto.maps.routes.RouteGroup;
 import es.metrica.sept25.evolutivo.domain.dto.maps.routes.StepWithWeather;
-import es.metrica.sept25.evolutivo.service.maps.routes.RoutesServiceImpl;
+import es.metrica.sept25.evolutivo.service.maps.routes.RoutesService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
@@ -20,7 +20,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 public class RouteWeatherController {
 
 	@Autowired
-	private RoutesServiceImpl routesService;
+	private RoutesService routesService;
 
 	@GetMapping("/routes/weather")
 	public ResponseEntity<List<StepWithWeather>> getRouteWeather(

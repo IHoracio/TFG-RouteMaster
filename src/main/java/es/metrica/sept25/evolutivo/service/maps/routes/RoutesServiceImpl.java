@@ -14,9 +14,12 @@ import es.metrica.sept25.evolutivo.domain.dto.maps.routes.Coords;
 import es.metrica.sept25.evolutivo.domain.dto.maps.routes.Leg;
 import es.metrica.sept25.evolutivo.domain.dto.maps.routes.RouteGroup;
 import es.metrica.sept25.evolutivo.domain.dto.maps.routes.Step;
+import es.metrica.sept25.evolutivo.domain.dto.maps.routes.StepWithStations;
 import es.metrica.sept25.evolutivo.domain.dto.maps.routes.StepWithWeather;
 import es.metrica.sept25.evolutivo.domain.dto.weather.Dia;
 import es.metrica.sept25.evolutivo.domain.dto.weather.Weather;
+import es.metrica.sept25.evolutivo.entity.gasolinera.Gasolinera;
+import es.metrica.sept25.evolutivo.service.gasolineras.GasolineraService;
 import es.metrica.sept25.evolutivo.service.ine.INEService;
 import es.metrica.sept25.evolutivo.service.weather.WeatherService;
 
@@ -26,52 +29,55 @@ public class RoutesServiceImpl implements RoutesService {
 	private static final String API_URL = "https://maps.googleapis.com/maps/api/directions/json";
 	private static final String MODE = "driving";
 	private static final String OPTIMIZE = "optimize:true|";
-	
+
 	@Value("${evolutivo.api_key_google}")
 	private String API_KEY_GOOGLE;
 
 	@Autowired
 	private RestTemplate restTemplate;
-	
+
 	@Autowired
 	private INEService ineService;
-	
+
+	@Autowired
+	GasolineraService gasolineraService;
+
 	@Autowired
 	private WeatherService weatherService;
 
-
-	public Optional<RouteGroup> getDirections(String origin, String destination, List<String> waypoints, boolean optimizeWaypoints, boolean optimizeRoute, String language) {
+	@Override
+	public Optional<RouteGroup> getDirections(String origin, String destination, List<String> waypoints,
+			boolean optimizeWaypoints, boolean optimizeRoute, String language) {
 		origin = origin.replaceAll(" ", "");
 		destination = destination.replaceAll(" ", "");
 
-		UriComponentsBuilder url = UriComponentsBuilder
-				.fromUriString(API_URL)
-				.queryParam("mode", MODE)
-				.queryParam("language", language)
-				.queryParam("key", API_KEY_GOOGLE)
-				.queryParam("origin", origin);
-		
-		
-		if(waypoints.isEmpty() || !optimizeRoute) url.queryParam("destination", destination);
-		
+		UriComponentsBuilder url = UriComponentsBuilder.fromUriString(API_URL).queryParam("mode", MODE)
+				.queryParam("language", language).queryParam("key", API_KEY_GOOGLE).queryParam("origin", origin);
+
+		if (waypoints.isEmpty() || !optimizeRoute)
+			url.queryParam("destination", destination);
+
 		String result = "";
-		if(!waypoints.isEmpty()) {
-			if(optimizeWaypoints) result += OPTIMIZE;
-			else if(optimizeRoute) {
+		if (!waypoints.isEmpty()) {
+			if (optimizeWaypoints)
+				result += OPTIMIZE;
+			else if (optimizeRoute) {
 				waypoints.add(destination);
 				url.queryParam("destination", origin);
 			}
-		} 
+		}
 		result = getUrl(waypoints, url);
 
 		RouteGroup response = restTemplate.getForObject(result, RouteGroup.class);
-		if(!waypoints.isEmpty() && optimizeRoute) response = deleteLastLeg(response);
+		if (!waypoints.isEmpty() && optimizeRoute)
+			response = deleteLastLeg(response);
 
 		System.err.println(result);
-		return Optional.of(response);	
+		return Optional.of(response);
 	}
 
-	private RouteGroup deleteLastLeg(RouteGroup response) {
+	@Override
+	public RouteGroup deleteLastLeg(RouteGroup response) {
 		List<Leg> legs = response.getRoutes().getFirst().getLegs();
 		legs.removeLast();
 		response.getRoutes().getFirst().setLegs(legs);
@@ -79,55 +85,62 @@ public class RoutesServiceImpl implements RoutesService {
 		return response;
 	}
 
-	private String getUrl(List<String> waypoints, UriComponentsBuilder url) {
+	@Override
+	public String getUrl(List<String> waypoints, UriComponentsBuilder url) {
 		url.queryParam("waypoints", "");
 
-		return url.toUriString() + waypoints.stream()
-		.map(s -> s.replaceAll(" ", ""))
-		.collect(Collectors.joining("|"));
+		return url.toUriString() + waypoints.stream().map(s -> s.replaceAll(" ", "")).collect(Collectors.joining("|"));
 	}
-	
+
+	@Override
 	public List<Coords> extractRoutePoints(RouteGroup routeGroup) {
-        if (routeGroup == null ||routeGroup.getRoutes() == null) return List.of();
+		if (routeGroup == null || routeGroup.getRoutes() == null)
+			return List.of();
 
-        return routeGroup.getRoutes().stream()
-                .flatMap(route -> route.getLegs().stream())
-                .flatMap(leg -> leg.getSteps().stream())
-                .map(Step::getStartLocation)
-                .collect(Collectors.toList());
-    }
-	
+		return routeGroup.getRoutes().stream().flatMap(route -> route.getLegs().stream())
+				.flatMap(leg -> leg.getSteps().stream()).map(Step::getStartLocation).collect(Collectors.toList());
+	}
+
+	@Override
 	public List<StepWithWeather> getWeatherForRoute(RouteGroup routeGroup) {
-        return extractRoutePoints(routeGroup).stream()
-                .map(coords -> {
-                    Optional<String> codigoINE = ineService.getCodigoINE(coords.getLat(), coords.getLng());
-                    if (codigoINE.isEmpty()) {
-                        return new StepWithWeather(coords.getLat(), coords.getLng(), "Desconocido", null);
-                    }
+		return extractRoutePoints(routeGroup).stream().map(coords -> {
+			Optional<String> codigoINE = ineService.getCodigoINE(coords.getLat(), coords.getLng());
+			if (codigoINE.isEmpty()) {
+				return new StepWithWeather(coords.getLat(), coords.getLng(), "Desconocido", null);
+			}
 
-                    Optional<Weather> weatherOpt = weatherService.getWeather(codigoINE.get());
-                    if (weatherOpt.isEmpty()) {
-                        return new StepWithWeather(coords.getLat(), coords.getLng(), "Desconocido", null);
-                    }
-                    
-                    Weather weather = weatherOpt.get();
+			Optional<Weather> weatherOpt = weatherService.getWeather(codigoINE.get());
+			if (weatherOpt.isEmpty()) {
+				return new StepWithWeather(coords.getLat(), coords.getLng(), "Desconocido", null);
+			}
 
-                    Dia dia = weather.getPrediccion().getDia().get(0);
+			Weather weather = weatherOpt.get();
 
-                    String descripcion = "Desconocido";
-                    if (dia.getEstadoCielo() != null && !dia.getEstadoCielo().isEmpty()) {
-                        descripcion = dia.getEstadoCielo().get(0).getDescripcion();
-                    }
+			Dia dia = weather.getPrediccion().getDia().get(0);
 
-                    Double temperatura = null;
-                    if (dia.getTemperatura() != null && !dia.getTemperatura().isEmpty()) {
-                        temperatura = dia.getTemperatura().get(0).getValue();
-                    }
+			String descripcion = "Desconocido";
+			if (dia.getEstadoCielo() != null && !dia.getEstadoCielo().isEmpty()) {
+				descripcion = dia.getEstadoCielo().get(0).getDescripcion();
+			}
 
-                    return new StepWithWeather(coords.getLat(), coords.getLng(),
-                                               descripcion, temperatura);
-                })
-                .toList();
-    }
+			Double temperatura = null;
+			if (dia.getTemperatura() != null && !dia.getTemperatura().isEmpty()) {
+				temperatura = dia.getTemperatura().get(0).getValue();
+			}
+
+			return new StepWithWeather(coords.getLat(), coords.getLng(), descripcion, temperatura);
+		}).toList();
+	}
+
+	@Override
+	public List<StepWithStations> getGasStationsForRoute(RouteGroup routeGroup, Long radius) {
+		return extractRoutePoints(routeGroup).stream().map(
+				coords -> {
+					List<Gasolinera> stationsPerPoint = gasolineraService
+							.getGasolinerasInRadiusCoords(coords.getLat(), coords.getLng(), radius);
+					return new StepWithStations(coords.getLat(), coords.getLng(), stationsPerPoint);	
+				})
+				.toList();
+	}
 
 }
