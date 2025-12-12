@@ -20,7 +20,7 @@ export class MapPageComponent {
   constructor(private mapComm: MapCommunicationService) {}
   
 
-  async ngAfterViewInit(): Promise<void> {
+  async ngOnInit(): Promise<void> {
     await this.initMap();
   }
 
@@ -47,5 +47,6 @@ export class MapPageComponent {
 
   public drawRoute(coords: Coords[]){
     console.log("Me han llegado !!!!!");
+    console.log(coords)
   }
 }

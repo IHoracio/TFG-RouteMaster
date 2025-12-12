@@ -21,6 +21,7 @@ export class MapCommunicationService {
 
   sendRoute(coords: Coords[]): void {
     console.log("Estoy en el serviece");
+    console.log(coords)
     this.mapPageInstance?.drawRoute(coords);
   }
 
