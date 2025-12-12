@@ -3,17 +3,19 @@ import { FormsModule } from '@angular/forms';
 import { RouteService } from '../../../services/routes/route.service';
 import { extractAllCoords, RouteGroupResponse } from '../map-page/Utils/google-route.mapper';
 import { Coords } from '../map-page/Utils/google-route.mapper';
+import { MapCommunicationService } from '../../../services/map/map-communication.service';
+import { MapPageComponent } from '../map-page/map-page.component';
 
 @Component({
   selector: 'app-search-bar',
-  imports: [FormsModule],
+  imports: [FormsModule, MapPageComponent],
   templateUrl: './search-bar.component.html',
   styleUrl: './search-bar.component.css'
 })
 export class SearchBarComponent {
 
 
-  constructor(private routeService: RouteService) {
+  constructor(private routeService: RouteService, private mapCommunication: MapCommunicationService) {
   }
 
   origin: string = ""
@@ -23,7 +25,8 @@ export class SearchBarComponent {
     routes: []
   };
 
-  coords: Coords [] = []
+  private coords: Coords [] = []
+  
 
   onSubmit() {
     console.log(this.origin, this.destination)
@@ -34,6 +37,7 @@ export class SearchBarComponent {
 
   guardameLasCoordenadasPapi(){
     this.coords =  extractAllCoords(this.message)
+    this.giveCoords()
   }
 
   imprimirMensaje() {
@@ -41,6 +45,8 @@ export class SearchBarComponent {
     console.log(this.coords)
   }
 
-  
+  giveCoords(){
+    this.mapCommunication.sendRoute(this.coords)
+  }
 
 }
