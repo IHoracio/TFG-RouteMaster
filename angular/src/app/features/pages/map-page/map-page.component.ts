@@ -47,5 +47,6 @@ export class MapPageComponent {
 
   public drawRoute(coords: Coords[]){
     console.log("Me han llegado !!!!!");
+    console.log(coords)
   }
 }
