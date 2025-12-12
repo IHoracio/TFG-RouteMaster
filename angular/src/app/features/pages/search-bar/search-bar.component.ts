@@ -1,6 +1,7 @@
-import { Component, Input, NgModule} from '@angular/core';
+import { Component, Input, NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouteService } from '../../../services/routes/route.service';
+import { RouteGroupResponse } from '../map-page/Utils/google-route.mapper';
 
 
 @Component({
@@ -11,23 +12,24 @@ import { RouteService } from '../../../services/routes/route.service';
 })
 export class SearchBarComponent {
 
-  directions: {origin:string, destination:string}
-  
-  constructor(private routeService: RouteService){
-    this.directions = {origin:"Madrid", destination:"Madrid"}
+
+  constructor(private routeService: RouteService) {
   }
 
-  originInput: string = ""
-  destinationInput:string = ""
+  origin: string = ""
+  destination: string = ""
 
-  message: string = '';
-  onSubmit(){
-    this.directions.destination = this.destinationInput
-    this.directions.origin = this.originInput;
+  esPeruano:boolean = true;
 
-    console.log( this.directions.origin, this.directions.destination)
+  message: RouteGroupResponse = {
+    routes: []
+  };
+  onSubmit() {
+    this.routeService.calculateRoute(this.origin, this.destination)
+      .subscribe(data => this.message = JSON.parse(data));
+  }
 
-    this.routeService.calculateCoordinates(this.directions.origin, this.directions.destination)
-    .subscribe(data => this.message = data);
+  imprimirMensaje() {
+    console.log(JSON.stringify(this.message));
   }
 }

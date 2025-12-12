@@ -1,0 +1,55 @@
+package es.metrica.sept25.evolutivo.controller.weather;
+
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import es.metrica.sept25.evolutivo.domain.dto.weather.Weather;
+import es.metrica.sept25.evolutivo.service.weather.WeatherService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
+@RestController
+@Tag(name = "Clima")
+@RequestMapping("/checkWeather")
+public class WeatherController {
+
+	@Autowired
+	private WeatherService weatherService;
+
+	@Operation(
+			summary = "Devuelve el clima para un código postal concreto", 
+			description = "Compone un objeto Weather que contiene toda la " + 
+						  "información meteorológica para un código postal concreto.")
+	@ApiResponses(value = { 
+			@ApiResponse(responseCode = "200", description = "Route found"),
+			@ApiResponse(responseCode = "400", description = "Bad request") 
+			})
+	@GetMapping("/zipCode")
+
+	public ResponseEntity<Weather> getWeather(@RequestParam(required = true) 
+	String zipCode) {
+
+		if (zipCode == null || !zipCode.matches("\\d{5}")) {
+			System.out.println("1");
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+
+		Optional<Weather> weather = weatherService.getWeather(zipCode);
+
+		if (weather.isEmpty()) {
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+
+		return new ResponseEntity<Weather>(weather.get(), HttpStatus.OK);
+
+	}
+}

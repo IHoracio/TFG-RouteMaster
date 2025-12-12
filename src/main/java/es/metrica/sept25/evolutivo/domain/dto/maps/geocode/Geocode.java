@@ -1,6 +1,6 @@
 package es.metrica.sept25.evolutivo.domain.dto.maps.geocode;
 
-import es.metrica.sept25.evolutivo.entity.maps.routes.Coords;
+import es.metrica.sept25.evolutivo.domain.dto.maps.routes.Coords;
 
 public class Geocode {
 

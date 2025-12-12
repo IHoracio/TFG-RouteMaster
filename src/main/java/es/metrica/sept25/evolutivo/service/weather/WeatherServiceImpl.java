@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -28,14 +29,18 @@ public class WeatherServiceImpl implements WeatherService {
 
 	@Autowired
 	private RestTemplate restTemplate;
+
 	@Autowired
 	private ObjectMapper objectMapper;
+	
+	@Value("${evolutivo.api_key_aemet}")
+	private String API_KEY_AEMET;
 
-	public Optional<Weather> getWeather(String zipCode, String apiKey) {
+	public Optional<Weather> getWeather(String zipCode) {
 		String url = UriComponentsBuilder
     			.fromUriString(API_URL)
     			.path(zipCode)
-    		    .queryParam("api_key", apiKey)
+    		    .queryParam("api_key", API_KEY_AEMET)
     		    .toUriString();
 
 		WeatherLink weather = restTemplate.getForObject(url, WeatherLink.class);

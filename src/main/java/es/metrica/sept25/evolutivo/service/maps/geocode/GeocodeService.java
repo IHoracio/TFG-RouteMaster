@@ -1,8 +1,10 @@
 package es.metrica.sept25.evolutivo.service.maps.geocode;
 
-import es.metrica.sept25.evolutivo.entity.maps.routes.Coords;
+import java.util.Optional;
+
+import es.metrica.sept25.evolutivo.domain.dto.maps.routes.Coords;
 
 public interface GeocodeService {
-	Coords getCoordinates(String address, String apiKey);
-	String getMunicipio(double lat, double lng, String apiKey);
+	Optional<Coords> getCoordinates(String address);
+	Optional<String> getMunicipio(double lat, double lng);
 }

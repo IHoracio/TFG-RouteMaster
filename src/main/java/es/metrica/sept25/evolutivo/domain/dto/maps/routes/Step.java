@@ -1,4 +1,4 @@
-package es.metrica.sept25.evolutivo.entity.maps.routes;
+package es.metrica.sept25.evolutivo.domain.dto.maps.routes;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

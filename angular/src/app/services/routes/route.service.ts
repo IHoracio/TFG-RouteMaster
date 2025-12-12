@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { HttpParams } from '@angular/common/http';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -11,9 +12,9 @@ export class RouteService {
   private apiUrl = 'http://localhost:8080/routes';
   constructor(private http: HttpClient) {}
 
-  calculateCoordinates(origin: string, destination: string): Observable<string> {
+  calculateRoute(origin: string, destination: string): Observable<string> {
     const headers = new HttpHeaders()
-    .set('key', "AIzaSyBygK3kyABotk12DqMLyUjZoK3WLS4-l7E");
+    .set('key', environment.googleMapsApiKey);
 
     const parameters = new HttpParams()
       .set('origin', origin)
