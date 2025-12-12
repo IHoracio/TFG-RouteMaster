@@ -18,7 +18,10 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
-@Tag(name = "Geocode")
+@Tag(name = "Geocode", description = "Conjunto de endpoints que emplean la API"
+								   + "de Geocoding de Google Maps para hacer"
+		                           + "traslaciones de coordenadas a direcciones"
+		                           + "y viceversa.")
 @RequestMapping("/geocode")
 public class GeocodeController {
 
@@ -27,15 +30,13 @@ public class GeocodeController {
 
 	@Operation(
 			summary = "Obtiene las coordenadas de una dirección", 
-			description = "Devuelve las coordenadas (latitud y longitud) del lugar "
-					    + "indicado usando la API de Google Geocoding."
+			description = "Devuelve las coordenadas (latitud y longitud) de la ubicación "
+					    + "proporcionada usando la API de Google Geocoding."
 			)
 	@ApiResponses(value = { 
-//			@ApiResponse(responseCode = "401", description = "apiKey no encontrada"),
-			@ApiResponse(responseCode = "400", description = "Solicitud incorrecta"),
-			@ApiResponse(responseCode = "200", description = "Coordenadas encontradas") 
+			@ApiResponse(responseCode = "200", description = "Coordenadas encontradas"),
+			@ApiResponse(responseCode = "404", description = "Solicitud incorrecta: no se pudo efectuar la traslación")
 	})
-//	@SecurityRequirement(name = "googleApiKey")
 	@GetMapping("/normal")
 	public ResponseEntity<Coords> getCoordinates(@RequestParam String address) {
 
@@ -49,14 +50,13 @@ public class GeocodeController {
 	
 	@Operation(
 			summary = "Obtiene el municipio de una dirección", 
-			description = "Devuelve el municpio del lugar indicado usando la API de Google Geocoding."
+			description = "Devuelve el municipio del las coordenadas indicadas usando la "
+					    + "API de Google Geocoding."
 			)
 	@ApiResponses(value = { 
-//			@ApiResponse(responseCode = "401", description = "apiKey no encontrada"),
-			@ApiResponse(responseCode = "400", description = "Solicitud incorrecta"),
-			@ApiResponse(responseCode = "200", description = "Coordenadas encontradas") 
+			@ApiResponse(responseCode = "200", description = "Coordenadas encontradas"),
+			@ApiResponse(responseCode = "404", description = "Solicitud incorrecta: no se pudo efectuar la traslación")
 	})
-//	@SecurityRequirement(name = "googleApiKey")
 	@GetMapping("/municipio")
 	public ResponseEntity<String> getMunicipio(@RequestParam double lat, @RequestParam double lng) {
 
