@@ -1,13 +1,13 @@
 package es.metrica.sept25.evolutivo.domain.dto.maps.routes;
 
-public class StepWithWeather {
+public class CoordsWithWeather {
 
 	private double lat;
 	private double lng;
 	private String weatherDescription;
 	private Double temperature;
 
-	public StepWithWeather(double lat, double lng, String weatherDescription, Double temperature) {
+	public CoordsWithWeather(double lat, double lng, String weatherDescription, Double temperature) {
 		this.lat = lat;
 		this.lng = lng;
 		this.weatherDescription = weatherDescription;

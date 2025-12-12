@@ -5,12 +5,12 @@ import java.util.List;
 
 import es.metrica.sept25.evolutivo.entity.gasolinera.Gasolinera;
 
-public class StepWithStations {
+public class CoordsWithStations {
 	private double lat;
 	private double lng;
 	private List<Gasolinera> stations;
 
-	public StepWithStations(double lat, double lng, List<Gasolinera> stations) {
+	public CoordsWithStations(double lat, double lng, List<Gasolinera> stations) {
 		this.lat = lat;
 		this.lng = lng;
 		this.stations = new LinkedList<Gasolinera>(stations);

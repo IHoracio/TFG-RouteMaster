@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import es.metrica.sept25.evolutivo.domain.dto.maps.routes.RouteGroup;
-import es.metrica.sept25.evolutivo.domain.dto.maps.routes.StepWithWeather;
+import es.metrica.sept25.evolutivo.domain.dto.maps.routes.CoordsWithWeather;
 import es.metrica.sept25.evolutivo.service.maps.routes.RoutesService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
@@ -23,7 +23,7 @@ public class RouteWeatherController {
 	private RoutesService routesService;
 
 	@GetMapping("/routes/weather")
-	public ResponseEntity<List<StepWithWeather>> getRouteWeather(
+	public ResponseEntity<List<CoordsWithWeather>> getRouteWeather(
 			@RequestParam(required = true, defaultValue = "El Vellon") String origin,
 			@RequestParam(required = true, defaultValue = "El Molar") String destination,
 			@RequestParam(required = false, defaultValue = "") List<String> waypoints,
@@ -38,7 +38,7 @@ public class RouteWeatherController {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 
-		List<StepWithWeather> stepsWithWeather = routesService.getWeatherForRoute(routeGroupOpt.get());
+		List<CoordsWithWeather> stepsWithWeather = routesService.getWeatherForRoute(routeGroupOpt.get());
 		return new ResponseEntity<>(stepsWithWeather, HttpStatus.OK);
 	}
 }
