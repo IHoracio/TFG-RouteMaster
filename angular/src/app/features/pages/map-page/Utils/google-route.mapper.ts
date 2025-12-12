@@ -26,6 +26,8 @@ export interface Step {
 
 export function extractAllCoords(routeGroupResponse: RouteGroupResponse): Coords[] {
   const coordsList: Coords[] = [];
+  console.log("HOLLAAAAA")
+  console.log(JSON.stringify(routeGroupResponse))
   if (routeGroupResponse == null || !Array.isArray(routeGroupResponse.routes)) return coordsList;
 
   for (const route of routeGroupResponse.routes) {
