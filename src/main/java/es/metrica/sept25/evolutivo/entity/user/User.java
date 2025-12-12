@@ -45,10 +45,10 @@ public class User {
 	private String surname;
 
 	@ElementCollection
-	private Map<String, String> preferences;
+	private Map<String, String> preferences = new HashMap<String, String>(Map.of("Tema","Claro"));
 
 	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<SavedRoute> savedRoutes;
+	private List<SavedRoute> savedRoutes = new LinkedList<SavedRoute>();
 
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false)

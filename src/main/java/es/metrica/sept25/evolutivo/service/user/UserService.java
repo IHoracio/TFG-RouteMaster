@@ -15,4 +15,6 @@ public interface UserService {
     List<User> getAll();
 
     void deleteByEmail(String mail);
+
+	User createUser(String name, String surname, String password, String email);
 }
