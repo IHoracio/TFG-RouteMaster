@@ -42,13 +42,15 @@ export class SearchBarComponent {
   }
 
   guardameLasCoordenadasPapi(){
-    this.coords =  extractAllCoords(this.message)
+    this.routeService.calculateCoords(this.message)
+      .subscribe(data => this.coords = JSON.parse(data))
+
     this.giveCoords()
   }
 
   imprimirMensaje() {
     console.log(JSON.stringify(this.message));
-    console.log(this.coords)
+    console.log("COOOODERENADAS", this.coords)
   }
 
   giveCoords(){
