@@ -4,10 +4,11 @@ import { RouteService } from '../../../services/routes/route.service';
 import { extractAllCoords, RouteGroupResponse } from '../map-page/Utils/google-route.mapper';
 import { Coords } from '../map-page/Utils/google-route.mapper';
 import { MapCommunicationService } from '../../../services/map/map-communication.service';
+import { MapPageComponent } from '../map-page/map-page.component';
 
 @Component({
   selector: 'app-search-bar',
-  imports: [FormsModule],
+  imports: [FormsModule, MapPageComponent],
   templateUrl: './search-bar.component.html',
   styleUrl: './search-bar.component.css'
 })

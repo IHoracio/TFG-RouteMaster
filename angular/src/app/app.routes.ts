@@ -6,5 +6,5 @@ import { LandingPageComponent } from './core/layout/landing-page/landing-page.co
 export const routes: Routes = [
     {path: "", component: LandingPageComponent},
     {path: "search", component: SearchBarComponent},
-    {path: "map", component: MapPageComponent}
+    /*{path: "map", component: MapPageComponent}*/
 ];

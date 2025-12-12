@@ -20,7 +20,7 @@ export class MapPageComponent {
   constructor(private mapComm: MapCommunicationService) {}
   
 
-  async ngAfterViewInit(): Promise<void> {
+  async ngOnInit(): Promise<void> {
     await this.initMap();
   }
 
