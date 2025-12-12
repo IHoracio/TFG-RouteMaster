@@ -11,6 +11,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import es.metrica.sept25.evolutivo.entity.gasolinera.Municipio;
 import es.metrica.sept25.evolutivo.entity.gasolinera.Provincia;
 import es.metrica.sept25.evolutivo.repository.ProvinciaRepository;
 
@@ -36,9 +37,9 @@ public class ProvinciaServiceImpl implements ProvinciaService {
 		List<Provincia> provList = provinciaRepository.findAll();
 
 		// Si no tenemos, populamos con las españolas
-		if (Objects.isNull(provList) | provList.isEmpty()) {
+		if (Objects.isNull(provList) || provList.isEmpty()) {
 			Provincia[] provArr = restTemplate.getForObject(API_URL, Provincia[].class);
-			if (!Objects.isNull(provArr)) {
+			if (!(Objects.isNull(provArr))) {
 				provList = Arrays.asList(provArr);
 				provinciaRepository.saveAllAndFlush(
 						provList.stream().filter(p -> p.getIdProvincia() < 100).collect(Collectors.toList()));
@@ -49,7 +50,16 @@ public class ProvinciaServiceImpl implements ProvinciaService {
 		return provList;
 	}
 
+	@Override
 	public Optional<Provincia> getProvinciaById(Long id) {
-		return provinciaRepository.findById(id).or(Optional::empty);
+		return provinciaRepository.findById(id);
+	}
+
+	@Override
+	@Cacheable("provinciaForMuni")
+	public Optional<Provincia> getProvinciaForMunicipio(Municipio mun) {
+		Long provId = mun.getIdProvincia();
+		List<Provincia> provList = getProvincias();
+		return provList.stream().filter(p -> p.getIdProvincia() == provId).findFirst();
 	}
 }

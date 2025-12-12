@@ -36,4 +36,9 @@ build/
 angular/node_modules
 angular/npm-debug.log
 angular/yarn-error.log
-angular/src/app/features/pages/map-page/pruebaNoSubir.ts
+
+
+# SECRETS
+src/main/resources/application-dev.properties
+angular/src/environments
+count_commits_by_contributor.sh
