@@ -1,14 +1,14 @@
 package es.metrica.sept25.evolutivo.domain.dto.weather;
 
 public class Temperatura {
-	private Integer value;
+	private Double value;
 	private Integer periodo;
 
-	public Integer getValue() {
+	public Double getValue() {
 		return value;
 	}
 
-	public void setValue(Integer value) {
+	public void setValue(Double value) {
 		this.value = value;
 	}
 

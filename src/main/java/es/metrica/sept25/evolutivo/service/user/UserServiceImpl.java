@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import es.metrica.sept25.evolutivo.entity.user.User;
 import es.metrica.sept25.evolutivo.repository.UserRepository;
@@ -39,10 +40,27 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
+	@Transactional
 	public void deleteByEmail(String email) {
 		Optional<User> user = getByEmail(email);
 		if (user.isPresent()) {
 			userRepository.deleteByEmail(email);
 		}
+	}
+	@Override
+	@Transactional
+	public User createUser(String nombre, String apellido, String password, String email) {
+
+	    if (userRepository.findByEmail(email).isPresent()) {
+	        throw new RuntimeException("El usuario ya existe");
+	    }
+
+	    User user = new User();
+	    user.setName(nombre);
+	    user.setSurname(apellido);
+	    user.setPassword(password);
+	    user.setEmail(email);
+
+	    return save(user);
 	}
 }
