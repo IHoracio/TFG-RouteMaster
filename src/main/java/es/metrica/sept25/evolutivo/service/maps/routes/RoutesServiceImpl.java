@@ -157,5 +157,21 @@ public class RoutesServiceImpl implements RoutesService {
 				})
 				.toList();
 	}
+	
+	@Override
+	public List<Coords> getLegCoords(RouteGroup routeGroup) {
+		List<Coords> legCoords = routeGroup.getRoutes().stream()
+				.flatMap(route -> route.getLegs().stream())
+				.flatMap(leg -> {
+					Coords startLoc = leg.getStartLocation();
+					Coords endLoc = leg.getEndLocation();
+					List<Coords> legList = List.of(startLoc, endLoc);
+					return legList.stream();
+				})
+				.distinct()
+				.collect(Collectors.toList());
+
+		return legCoords;
+	}
 
 }

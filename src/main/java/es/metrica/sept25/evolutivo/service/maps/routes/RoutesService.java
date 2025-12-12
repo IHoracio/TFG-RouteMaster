@@ -23,4 +23,6 @@ public interface RoutesService {
 	List<CoordsWithWeather> getWeatherForRoute(RouteGroup routeGroup);
 
 	List<Coords> extractRoutePoints(RouteGroup routeGroup);
+
+	List<Coords> getLegCoords(RouteGroup routeGroup);
 }

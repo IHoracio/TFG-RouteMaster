@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import es.metrica.sept25.evolutivo.domain.dto.maps.routes.Coords;
 import es.metrica.sept25.evolutivo.domain.dto.maps.routes.RouteGroup;
 import es.metrica.sept25.evolutivo.service.maps.routes.RoutesService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -60,5 +61,61 @@ public class RoutesController {
 		}
 
 		return new ResponseEntity<>(response.get(), HttpStatus.OK);
+	}
+
+	@Operation(
+			summary = "Lista de coordenadas de los pasos de una ruta", 
+			description = "")
+	@ApiResponses(value = { 
+			@ApiResponse(responseCode = "200", description = "Coordinates for route"),
+			@ApiResponse(responseCode = "400", description = "Bad request")
+			})
+	@GetMapping("/route/stepCoords")
+	public ResponseEntity<List<Coords>> getCoordsForRoute(
+			@RequestParam(required = true, defaultValue = "El Vellon") String origin,
+			@RequestParam(required = true, defaultValue = "El Molar") String destination,
+			@RequestParam(required = false, defaultValue = "") List<String> waypoints,
+			@RequestParam(required = false, defaultValue = "false") boolean optimizeWaypoints,
+			@RequestParam(required = false, defaultValue = "false") boolean optimizeRoute,
+			@RequestParam(required = false, defaultValue = "es") String language
+			) {
+
+		Optional<RouteGroup> response = routesService.getDirections(origin, destination, waypoints, optimizeWaypoints, optimizeRoute, language);
+		
+		if (response.isEmpty()) {
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+		
+		List<Coords> coordsList = routesService.extractRoutePoints(response.get());
+		
+		return new ResponseEntity<>(coordsList, HttpStatus.OK);
+	}
+
+	@Operation(
+			summary = "Lista de coordenadas de los \"legs\" de una ruta", 
+			description = "")
+	@ApiResponses(value = { 
+			@ApiResponse(responseCode = "200", description = "Coordinates for route"),
+			@ApiResponse(responseCode = "400", description = "Bad request")
+			})
+	@GetMapping("/route/legCoords")
+	public ResponseEntity<List<Coords>> getLegCoordsForRoute(
+			@RequestParam(required = true, defaultValue = "El Vellon") String origin,
+			@RequestParam(required = true, defaultValue = "El Molar") String destination,
+			@RequestParam(required = false, defaultValue = "") List<String> waypoints,
+			@RequestParam(required = false, defaultValue = "false") boolean optimizeWaypoints,
+			@RequestParam(required = false, defaultValue = "false") boolean optimizeRoute,
+			@RequestParam(required = false, defaultValue = "es") String language
+			) {
+
+		Optional<RouteGroup> response = routesService.getDirections(origin, destination, waypoints, optimizeWaypoints, optimizeRoute, language);
+		
+		if (response.isEmpty()) {
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+		
+		List<Coords> coordsList = routesService.getLegCoords(response.get());
+		
+		return new ResponseEntity<>(coordsList, HttpStatus.OK);
 	}
 }
