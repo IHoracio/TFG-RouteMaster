@@ -25,4 +25,8 @@ public interface RoutesService {
 	List<Coords> extractRoutePoints(RouteGroup routeGroup);
 
 	List<Coords> getLegCoords(RouteGroup routeGroup);
+	
+	List<Coords> extractRoutePolylinePoints(RouteGroup routeGroup);
+	
+	List<Coords> decodePolyline(String polylinePoints);
 }

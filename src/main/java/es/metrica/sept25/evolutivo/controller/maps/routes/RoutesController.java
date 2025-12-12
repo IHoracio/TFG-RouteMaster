@@ -89,6 +89,34 @@ public class RoutesController {
 		
 		return new ResponseEntity<>(coordsList, HttpStatus.OK);
 	}
+	
+	@Operation(
+			summary = "Lista de coordenadas de los pasos de una ruta", 
+			description = "Devuelve una lista de coordenadas para cada uno de los pasos su polyline, de la ruta dada.")
+	@ApiResponses(value = { 
+			@ApiResponse(responseCode = "200", description = "Pasos encontrados para la ruta dada."),
+			@ApiResponse(responseCode = "404", description = "Solicitud errónea: no se pudieron calcular los pasos de la ruta.")
+			})
+	@GetMapping("/route/polylineCords")
+	public ResponseEntity<List<Coords>> getPolylineCoordsForRoute(
+			@RequestParam(required = true, defaultValue = "El Vellon") String origin,
+			@RequestParam(required = true, defaultValue = "El Molar") String destination,
+			@RequestParam(required = false, defaultValue = "") List<String> waypoints,
+			@RequestParam(required = false, defaultValue = "false") boolean optimizeWaypoints,
+			@RequestParam(required = false, defaultValue = "false") boolean optimizeRoute,
+			@RequestParam(required = false, defaultValue = "es") String language
+			) {
+
+		Optional<RouteGroup> response = routesService.getDirections(origin, destination, waypoints, optimizeWaypoints, optimizeRoute, language);
+		
+		if (response.isEmpty()) {
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
+		
+		List<Coords> coordsList = routesService.extractRoutePolylinePoints(response.get());
+		
+		return new ResponseEntity<>(coordsList, HttpStatus.OK);
+	}
 
 	@Operation(
 			summary = "Lista de coordenadas de los \"legs\" de una ruta", 

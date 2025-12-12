@@ -6,6 +6,7 @@ public class Step {
 
 	@JsonProperty("start_location")
 	private Coords startLocation;
+	private Polyline polyline;
 
 	public Coords getStartLocation() {
 		return startLocation;
@@ -15,4 +16,12 @@ public class Step {
 		this.startLocation = startLocation;
 	}
 
+	public Polyline getPolyline() {
+		return polyline;
+	}
+
+	public void setPolyline(Polyline polyline) {
+		this.polyline = polyline;
+	}
+	
 }

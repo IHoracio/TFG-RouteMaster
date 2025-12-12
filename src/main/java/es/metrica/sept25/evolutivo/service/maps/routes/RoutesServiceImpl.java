@@ -12,6 +12,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import com.google.maps.model.EncodedPolyline;
+import com.google.maps.model.LatLng;
+
 import es.metrica.sept25.evolutivo.domain.dto.maps.routes.Coords;
 import es.metrica.sept25.evolutivo.domain.dto.maps.routes.CoordsWithStations;
 import es.metrica.sept25.evolutivo.domain.dto.maps.routes.CoordsWithWeather;
@@ -104,6 +107,29 @@ public class RoutesServiceImpl implements RoutesService {
 				.flatMap(route -> route.getLegs().stream())
 				.flatMap(leg -> leg.getSteps().stream())
 				.map(Step::getStartLocation)
+				.collect(Collectors.toList());
+	}
+	
+	@Override
+	public List<Coords> extractRoutePolylinePoints(RouteGroup routeGroup) {
+		if (routeGroup == null || routeGroup.getRoutes() == null)
+			return List.of();
+		
+		return routeGroup.getRoutes().stream()
+				.flatMap(route -> route.getLegs().stream())
+				.flatMap(leg -> leg.getSteps().stream())
+				.map(step -> decodePolyline(step.getPolyline().getPoints()))
+				.flatMap(coordsList -> coordsList.stream())
+				.collect(Collectors.toList());
+	}
+
+	@Override
+	public List<Coords> decodePolyline(String polylinePoints) {
+		EncodedPolyline polyline = new EncodedPolyline(polylinePoints);
+		List<LatLng> latLngs = polyline.decodePath();
+		
+		return latLngs.stream()
+				.map(latLng -> new Coords(latLng.lat, latLng.lng))
 				.collect(Collectors.toList());
 	}
 
