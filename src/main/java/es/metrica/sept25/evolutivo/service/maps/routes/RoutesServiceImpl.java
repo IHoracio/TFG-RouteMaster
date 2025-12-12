@@ -1,6 +1,8 @@
 package es.metrica.sept25.evolutivo.service.maps.routes;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -11,12 +13,14 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import es.metrica.sept25.evolutivo.domain.dto.maps.routes.Coords;
+import es.metrica.sept25.evolutivo.domain.dto.maps.routes.CoordsWithStations;
+import es.metrica.sept25.evolutivo.domain.dto.maps.routes.CoordsWithWeather;
 import es.metrica.sept25.evolutivo.domain.dto.maps.routes.Leg;
 import es.metrica.sept25.evolutivo.domain.dto.maps.routes.RouteGroup;
 import es.metrica.sept25.evolutivo.domain.dto.maps.routes.Step;
-import es.metrica.sept25.evolutivo.domain.dto.maps.routes.CoordsWithStations;
-import es.metrica.sept25.evolutivo.domain.dto.maps.routes.CoordsWithWeather;
 import es.metrica.sept25.evolutivo.domain.dto.weather.Dia;
+import es.metrica.sept25.evolutivo.domain.dto.weather.EstadoCielo;
+import es.metrica.sept25.evolutivo.domain.dto.weather.Temperatura;
 import es.metrica.sept25.evolutivo.domain.dto.weather.Weather;
 import es.metrica.sept25.evolutivo.entity.gasolinera.Gasolinera;
 import es.metrica.sept25.evolutivo.service.gasolineras.GasolineraService;
@@ -108,29 +112,38 @@ public class RoutesServiceImpl implements RoutesService {
 		return extractRoutePoints(routeGroup).stream().map(coords -> {
 			Optional<String> codigoINE = ineService.getCodigoINE(coords.getLat(), coords.getLng());
 			if (codigoINE.isEmpty()) {
-				return new CoordsWithWeather(coords.getLat(), coords.getLng(), "Desconocido", null);
+				return new CoordsWithWeather(coords.getLat(), coords.getLng(), new HashMap<>(), new HashMap<>());
 			}
 
 			Optional<Weather> weatherOpt = weatherService.getWeather(codigoINE.get());
 			if (weatherOpt.isEmpty()) {
-				return new CoordsWithWeather(coords.getLat(), coords.getLng(), "Desconocido", null);
+				return new CoordsWithWeather(coords.getLat(), coords.getLng(), new HashMap<>(), new HashMap<>());
 			}
 
 			Weather weather = weatherOpt.get();
 
 			Dia dia = weather.getPrediccion().getDia().get(0);
 
-			String descripcion = "Desconocido";
-			if (dia.getEstadoCielo() != null && !dia.getEstadoCielo().isEmpty()) {
-				descripcion = dia.getEstadoCielo().get(0).getDescripcion();
-			}
+			Map<Integer, String> mapaDescripciones = new HashMap<>();
+	        if (dia.getEstadoCielo() != null && !dia.getEstadoCielo().isEmpty()) {
+	            for (EstadoCielo estado : dia.getEstadoCielo()) {
+	                mapaDescripciones.put(estado.getPeriodo(), estado.getDescripcion());
+	            }
+	        }
 
-			Double temperatura = null;
+			Map<Integer, Double> mapaTemperaturas = new HashMap<>();
+
 			if (dia.getTemperatura() != null && !dia.getTemperatura().isEmpty()) {
-				temperatura = dia.getTemperatura().get(0).getValue();
+			    for (Temperatura temp : dia.getTemperatura()) {
+			        mapaTemperaturas.put(temp.getPeriodo(), temp.getValue());
+			    }
 			}
+//			Double temperatura = null;
+//			if (dia.getTemperatura() != null && !dia.getTemperatura().isEmpty()) {
+//				temperatura = dia.getTemperatura().get(0).getValue();
+//			}
 
-			return new CoordsWithWeather(coords.getLat(), coords.getLng(), descripcion, temperatura);
+			return new CoordsWithWeather(coords.getLat(), coords.getLng(), mapaDescripciones, mapaTemperaturas);
 		}).toList();
 	}
 

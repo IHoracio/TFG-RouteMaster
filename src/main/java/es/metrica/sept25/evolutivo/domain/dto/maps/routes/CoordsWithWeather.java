@@ -1,17 +1,19 @@
 package es.metrica.sept25.evolutivo.domain.dto.maps.routes;
 
+import java.util.Map;
+
 public class CoordsWithWeather {
 
 	private double lat;
 	private double lng;
-	private String weatherDescription;
-	private Double temperature;
+	 private Map<Integer, String> weatherDescription;
+	private Map<Integer, Double> temperatures;
 
-	public CoordsWithWeather(double lat, double lng, String weatherDescription, Double temperature) {
+	public CoordsWithWeather(double lat, double lng, Map<Integer, String> weatherDescription, Map<Integer, Double> temperatures) {
 		this.lat = lat;
 		this.lng = lng;
 		this.weatherDescription = weatherDescription;
-		this.temperature = temperature;
+		this.temperatures = temperatures;
 	}
 
 	public double getLat() {
@@ -30,19 +32,21 @@ public class CoordsWithWeather {
 		this.lng = lng;
 	}
 
-	public String getWeatherDescription() {
+	public Map<Integer, String> getWeatherDescription() {
 		return weatherDescription;
 	}
 
-	public void setWeatherDescription(String weatherDescription) {
+	public void setWeatherDescription(Map<Integer, String> weatherDescription) {
 		this.weatherDescription = weatherDescription;
 	}
 
-	public Double getTemperature() {
-		return temperature;
+	public Map<Integer, Double> getTemperatures() {
+		return temperatures;
 	}
 
-	public void setTemperature(Double temperature) {
-		this.temperature = temperature;
+	public void setTemperatures(Map<Integer, Double> temperatures) {
+		this.temperatures = temperatures;
 	}
+
+	
 }
