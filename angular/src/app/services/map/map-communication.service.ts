@@ -20,8 +20,8 @@ export class MapCommunicationService {
   constructor() {}
 
   sendRoute(coords: Coords[]): void {
-    console.log("Estoy en el serviece");
-    console.log(coords)
+    console.log(coords);
+    this.mapPageInstance?.clearRoute();
     this.mapPageInstance?.drawRoute(coords);
   }
 
