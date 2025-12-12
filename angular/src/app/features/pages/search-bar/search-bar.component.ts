@@ -19,12 +19,11 @@ export class SearchBarComponent {
   origin: string = ""
   destination: string = ""
 
-  esPeruano:boolean = true;
-
   message: RouteGroupResponse = {
     routes: []
   };
   onSubmit() {
+    console.log(this.origin, this.destination)
     this.routeService.calculateRoute(this.origin, this.destination)
       .subscribe(data => this.message = JSON.parse(data));
   }
