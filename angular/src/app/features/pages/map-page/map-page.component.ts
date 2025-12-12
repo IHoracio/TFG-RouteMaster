@@ -6,6 +6,7 @@ import {
 import { setOptions, importLibrary } from '@googlemaps/js-api-loader';
 import { Coords } from './Utils/google-route.mapper';
 import { MapCommunicationService } from '../../../services/map/map-communication.service';
+import { environment } from '../../../../environments/environment';
 
 
 @Component({

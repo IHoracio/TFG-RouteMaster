@@ -1,3 +1,7 @@
+export interface Coords { lat: number; lng: number; }
+export interface Distance { text: string; value: number; }
+export interface Duration { text: string; value: number; }
+
 export interface RouteGroupResponse {
   routes?: Route[];
 }
@@ -20,21 +24,8 @@ export interface Step {
   start_location?: Coords;
 }
 
-export interface Coords { 
-  lat: number; lng: number; 
-}
-
-export interface Distance { 
-  text: string; value: number; 
-}
-export interface Duration { 
-  text: string; value: number; 
-}
-
 export function extractAllCoords(routeGroupResponse: RouteGroupResponse): Coords[] {
   const coordsList: Coords[] = [];
-  console.log("HOLLAAAAA")
-  console.log(JSON.stringify(routeGroupResponse))
   if (routeGroupResponse == null || !Array.isArray(routeGroupResponse.routes)) return coordsList;
 
   for (const route of routeGroupResponse.routes) {
