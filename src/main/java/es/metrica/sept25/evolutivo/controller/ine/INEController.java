@@ -18,21 +18,24 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 
 
 @RestController
-@Tag(name = "INE")
+@Tag(name = "INE", description = "Endpoints que se comunican con la lista de municipios"
+							   + "y sus códigos en los datos del INE.")
 @RequestMapping("/ine")
 public class INEController {
 
     @Autowired
     private INEService ineService;
 
-    @Operation(summary = "Obtiene el código INE de un municipio",
+    @Operation(
+    		summary = "Obtiene el código INE de un municipio",
             description = "Devuelve el `codigoINE` correspondiente a las coordenadas "
-                    + "indicadas usando la API del INE.")
+						+ "indicadas usando la API del INE (200 - OK). Devuelve 404 si"
+						+ "el formato de latitud y longitud son incorrectos o si no hay" 
+						+ "código para esas coordenadas."
+			  )
     @ApiResponses(value = {
-//            @ApiResponse(responseCode = "401", description = "apiKey no encontrada"),
-            @ApiResponse(responseCode = "400", description = "Solicitud incorrecta"),
-            @ApiResponse(responseCode = "404", description = "Municipio no encontrado"),
-            @ApiResponse(responseCode = "200", description = "Código INE encontrado")
+            @ApiResponse(responseCode = "200", description = "Código INE encontrado"),
+            @ApiResponse(responseCode = "404", description = "Municipio no encontrado")
     })
     @GetMapping("/codigo")
     public ResponseEntity<String> getCodigoINE(

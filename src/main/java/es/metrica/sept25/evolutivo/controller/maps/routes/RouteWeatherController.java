@@ -10,9 +10,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import es.metrica.sept25.evolutivo.domain.dto.maps.routes.RouteGroup;
 import es.metrica.sept25.evolutivo.domain.dto.maps.routes.CoordsWithWeather;
+import es.metrica.sept25.evolutivo.domain.dto.maps.routes.RouteGroup;
 import es.metrica.sept25.evolutivo.service.maps.routes.RoutesService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
@@ -22,6 +25,15 @@ public class RouteWeatherController {
 	@Autowired
 	private RoutesService routesService;
 
+
+	@Operation(
+			summary = "Lista de coordenadas y gasolineras en un radio de los pasos de una ruta", 
+			description = "Devuelve una lista de coordenadas para cada uno de los pasos de la ruta dada, "
+					+ "con una lista del clima por horas para cada punto.")
+	@ApiResponses(value = { 
+			@ApiResponse(responseCode = "200", description = "Pasos encontrados para la ruta dada."),
+			@ApiResponse(responseCode = "404", description = "Solicitud errónea: no se pudieron calcular los pasos de la ruta.")
+			})
 	@GetMapping("/routes/weather")
 	public ResponseEntity<List<CoordsWithWeather>> getRouteWeather(
 			@RequestParam(required = true, defaultValue = "El Vellon") String origin,
