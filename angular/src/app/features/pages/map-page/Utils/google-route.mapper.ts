@@ -1,5 +1,28 @@
-import { RouteGroupResponse } from "../../../../Dto/maps-dtos";
-import { Coords } from "../../../../Dto/maps-dtos";
+export interface Coords { lat?: number; lng?: number; }
+export interface Distance { text: string; value: number; }
+export interface Duration { text: string; value: number; }
+
+export interface RouteGroupResponse {
+  routes?: Route[];
+}
+
+export interface Route {
+  legs?: Leg[];
+}
+
+export interface Leg {
+  distance?: Distance;
+  duration?: Duration;
+  end_address?: string;
+  end_location?: Coords;
+  start_address?: string;
+  start_location?: Coords;
+  steps?: Step[];
+}
+
+export interface Step {
+  start_location?: Coords;
+}
 
 export function extractAllCoords(routeGroupResponse: RouteGroupResponse): Coords[] {
   const coordsList: Coords[] = [];

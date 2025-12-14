@@ -69,7 +69,7 @@ public class RoutesController {
 			@ApiResponse(responseCode = "200", description = "Pasos encontrados para la ruta dada."),
 			@ApiResponse(responseCode = "404", description = "Solicitud errónea: no se pudieron calcular los pasos de la ruta.")
 			})
-	@GetMapping("/route/stepCoords")
+	@GetMapping("/routes/stepCoords")
 	public ResponseEntity<List<Coords>> getCoordsForRoute(
 			@RequestParam(required = true, defaultValue = "El Vellon") String origin,
 			@RequestParam(required = true, defaultValue = "El Molar") String destination,
@@ -79,7 +79,8 @@ public class RoutesController {
 			@RequestParam(required = false, defaultValue = "es") String language
 			) {
 
-		Optional<RouteGroup> response = routesService.getDirections(origin, destination, waypoints, optimizeWaypoints, optimizeRoute, language);
+		Optional<RouteGroup> response = routesService.getDirections(origin, destination, waypoints, optimizeWaypoints,
+				optimizeRoute, language);
 		
 		if (response.isEmpty()) {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -127,7 +128,7 @@ public class RoutesController {
 			@ApiResponse(responseCode = "200", description = "Pasos encontrados para la ruta dada."),
 			@ApiResponse(responseCode = "404", description = "Solicitud errónea: no se pudieron calcular los pasos de la ruta.")
 			})
-	@GetMapping("/route/legCoords")
+	@GetMapping("/routes/legCoords")
 	public ResponseEntity<List<Coords>> getLegCoordsForRoute(
 			@RequestParam(required = true, defaultValue = "El Vellon") String origin,
 			@RequestParam(required = true, defaultValue = "El Molar") String destination,
