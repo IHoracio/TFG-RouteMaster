@@ -1,6 +1,6 @@
-import { Coords } from "../../../../Dto/maps-dtos";
 
-//export interface Coords { lat?: number; lng?: number; }
+
+export interface Coords { lat: number; lng: number; }
 export interface Distance { text: string; value: number; }
 export interface Duration { text: string; value: number; }
 
