@@ -3,9 +3,10 @@ import {
   OnDestroy
 } from '@angular/core';
 import { setOptions, importLibrary } from '@googlemaps/js-api-loader';
-import { Coords } from './Utils/google-route.mapper';
+
 import { MapCommunicationService } from '../../../services/map/map-communication.service';
 import { environment } from '../../../../environments/environment';
+import { Coords } from '../../../Dto/maps-dtos';
 
 @Component({
   selector: 'app-map-page',

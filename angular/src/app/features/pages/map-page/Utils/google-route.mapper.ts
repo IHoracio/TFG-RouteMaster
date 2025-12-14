@@ -1,4 +1,5 @@
-import { Coords, RouteGroupResponse } from "../../../../Dto/maps-dtos";
+import { RouteGroupResponse } from "../../../../Dto/maps-dtos";
+import { Coords } from "../../../../Dto/maps-dtos";
 
 export function extractAllCoords(routeGroupResponse: RouteGroupResponse): Coords[] {
   const coordsList: Coords[] = [];
