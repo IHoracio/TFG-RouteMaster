@@ -25,25 +25,22 @@ export class SearchBarComponent {
     destination : "",
     optimizeRoute : false
   }
-
-
   message: RouteGroupResponse = {
     routes: []
   };
-
-  private coords: Coords [] = []
+  private coords: Coords = {}
   
 
   onSubmit() {
     console.log(this.routeFormResponse)
 
     this.routeService.calculateRoute(this.routeFormResponse)
-      .subscribe(data => this.message = JSON.parse(data));
+      .subscribe(data => this.message = data);
   }
 
   guardameLasCoordenadasPapi(){
-    this.routeService.calculateCoords(this.message)
-      .subscribe(data => this.coords = JSON.parse(data))
+    this.routeService.calculateCoords(this.routeFormResponse)
+      .subscribe(data => this.coords = data)
 
     this.giveCoords()
   }
@@ -54,7 +51,7 @@ export class SearchBarComponent {
   }
 
   giveCoords(){
-    this.mapCommunication.sendRoute(this.coords)
+    //this.mapCommunication.sendRoute(this.coords)
   }
 
 }
