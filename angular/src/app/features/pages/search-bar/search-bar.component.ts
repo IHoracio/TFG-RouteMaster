@@ -1,7 +1,7 @@
 import { Component, Input, NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouteService } from '../../../services/routes/route.service';
-import { RouteGroupResponse,  } from '../map-page/Utils/google-route.mapper';
+import { extractAllCoords, RouteGroupResponse,  } from '../map-page/Utils/google-route.mapper';
 import { Coords } from '../../../Dto/maps-dtos';
 import { RouteFormResponse } from '../map-page/Utils/route-form-response';
 import { MapPageComponent } from '../map-page/map-page.component';
@@ -40,8 +40,7 @@ export class SearchBarComponent {
   }
 
     guardarCoordenadas(){
-    this.routeService.calculateCoords(this.routeFormResponse)
-      .subscribe(data => this.coords = data)
+    this.coords = extractAllCoords(this.message)
 
     this.giveCoords()
   }
