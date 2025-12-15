@@ -16,19 +16,17 @@ export class SearchBarService {
     let message: RouteGroupResponse = {
     routes: []
     };
-
-
-
+    let cadena: string = ""
     this.routeService.calculateRoute(routeFormResponse)
-      .subscribe(data => message = data);
+      .subscribe(data => cadena = data);
 
-
-
-    this.guardarCoordenadas(routeFormResponse);
+    console.log(cadena)
+    this.saveCoordinates(routeFormResponse);
+    //console.log(message)
     return message;
   }
 
-  guardarCoordenadas(routeFormResponse: RouteFormResponse){
+  saveCoordinates(routeFormResponse: RouteFormResponse){
     let coords: Coords[] = []
 
     this.routeService.calculateCoords(routeFormResponse)
@@ -39,10 +37,10 @@ export class SearchBarService {
       this.giveCoords(coords)
     })
 
-    this.imprimirMensaje(routeFormResponse, coords)
+    this.printMessage(routeFormResponse, coords)
   }
 
-  imprimirMensaje(message: RouteFormResponse, coords: Coords[]) {
+  printMessage(message: RouteFormResponse, coords: Coords[]) {
     console.log(JSON.stringify(message));
     console.log(coords)
   }

@@ -15,15 +15,17 @@ export class RouteService {
   private apiUrl = 'http://localhost:8080/routes';
   constructor(private http: HttpClient) {}
 
-  calculateRoute(routeFormResponse: RouteFormResponse): Observable<RouteGroupResponse> {
+  calculateRoute(routeFormResponse: RouteFormResponse): Observable<string> {
     const headers = new HttpHeaders()
     .set('key', environment.googleMapsApiKey);
-
-    const parameters = new HttpParams()
+    let waypointsString = routeFormResponse.waypoints.join('|');
+    let parameters = new HttpParams()
       .set('origin', routeFormResponse.origin)
       .set('destination', routeFormResponse.destination)
-
-    return this.http.get(this.apiUrl, {headers: headers, params: parameters, responseType: 'json' });
+      .set('waypoints', waypointsString)
+      
+    parameters = this.assignWaypoints(parameters, routeFormResponse.waypoints)
+    return this.http.get(this.apiUrl, {headers: headers, params: parameters, responseType: 'text' });
   }
 
 
@@ -31,11 +33,19 @@ export class RouteService {
     const headers = new HttpHeaders()
     .set('key', environment.googleMapsApiKey);
 
-    const parameters = new HttpParams()
+    let parameters = new HttpParams()
       .set('origin', routeFormResponse.origin)
       .set('destination', routeFormResponse.destination)
-
-
+    
+      
+    parameters = this.assignWaypoints(parameters, routeFormResponse.waypoints)
     return this.http.get(this.apiUrl + "/stepCoords", {headers: headers, params: parameters, responseType: 'text' });
+  }
+
+  assignWaypoints(parameters: HttpParams, waypoints: string[]){
+    waypoints.forEach((waypoint)=>{
+      parameters.set('waypoints', waypoint[0])
+    })
+    return parameters;
   }
 }
