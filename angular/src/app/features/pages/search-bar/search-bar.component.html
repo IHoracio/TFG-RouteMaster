@@ -20,6 +20,15 @@
       [(ngModel)]="routeFormResponse.waypoints[i]"
     />
   </div>
+    <button type="button" (click)="deleteWaypoint()">Eliminar punto intermedio</button>
+
+    <p>
+      <label for="optimizeRoute">¿Quieres optimizar los puntos intermedios??</label>
+      <select [(ngModel)]="routeFormResponse.optimizeWaypoints" name="optimizeWaypoints" id="optimizeWaypoints">
+        <option [value]="false">No</option>
+        <option [value]="true">Sí</option>
+      </select>
+    </p>
 
     <p>
       <label for="optimizeRoute">¿Quieres optimizar la ruta?</label>
@@ -32,7 +41,6 @@
 
 
     <button class="primary" type="submit">Enviar</button>
-    
     
   </form>
     

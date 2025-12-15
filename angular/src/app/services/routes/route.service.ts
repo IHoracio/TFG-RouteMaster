@@ -23,8 +23,10 @@ export class RouteService {
       .set('origin', routeFormResponse.origin)
       .set('destination', routeFormResponse.destination)
       .set('waypoints', waypointsString)
+      .set('optimizeWaypoints', routeFormResponse.optimizeWaypoints)
+      .set('optimizeRoute', routeFormResponse.optimizeRoute)
       
-    parameters = this.assignWaypoints(parameters, routeFormResponse.waypoints)
+
     return this.http.get(this.apiUrl, {headers: headers, params: parameters, responseType: 'text' });
   }
 
@@ -36,16 +38,6 @@ export class RouteService {
     let parameters = new HttpParams()
       .set('origin', routeFormResponse.origin)
       .set('destination', routeFormResponse.destination)
-    
-      
-    parameters = this.assignWaypoints(parameters, routeFormResponse.waypoints)
     return this.http.get(this.apiUrl + "/stepCoords", {headers: headers, params: parameters, responseType: 'text' });
-  }
-
-  assignWaypoints(parameters: HttpParams, waypoints: string[]){
-    waypoints.forEach((waypoint)=>{
-      parameters.set('waypoints', waypoint[0])
-    })
-    return parameters;
   }
 }

@@ -1,6 +1,7 @@
 export interface RouteFormResponse {
     origin: string,
     destination: string,
+    waypoints: string [],
+    optimizeWaypoints: boolean,
     optimizeRoute: boolean
-    waypoints: string []
 }

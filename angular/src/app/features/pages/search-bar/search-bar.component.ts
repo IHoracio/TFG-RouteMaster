@@ -24,12 +24,16 @@ export class SearchBarComponent {
   routeFormResponse: RouteFormResponse = {
     origin : "",
     destination : "",
-    optimizeRoute : false,
-    waypoints: []
+    waypoints: [],
+    optimizeWaypoints: false,
+    optimizeRoute : false
   }
   addWaypoint(){
     this.routeFormResponse.waypoints.push('')
     console.log(this.routeFormResponse)
+  }
+  deleteWaypoint(){
+    this.routeFormResponse.waypoints.pop()
   }
   message: RouteGroupResponse = {
       routes: []
