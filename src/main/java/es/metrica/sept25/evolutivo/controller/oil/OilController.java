@@ -30,7 +30,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 				+ "de Precioil. Los municipios y provincias proporcionados "
 				+ "provienen también de dicha API."
 )
-@RequestMapping("/oil")
+@RequestMapping("/api/oil")
 public class OilController {
 
 	@Autowired

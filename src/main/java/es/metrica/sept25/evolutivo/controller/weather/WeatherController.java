@@ -23,7 +23,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 	description = "Conjunto de endpoints que operan sobre la API de"
 				+ "la AEMET para sacar datos del clima en diversas formas."
 	)
-@RequestMapping("/checkWeather")
+@RequestMapping("/api/checkWeather")
 public class WeatherController {
 
 	@Autowired
