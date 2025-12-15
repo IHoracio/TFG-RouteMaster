@@ -23,7 +23,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @Tag(name = "User", description = "Endpoints CRUD para la gestión de los usuarios")
-@RequestMapping("/users")
+@RequestMapping("/api/users")
 public class UserController {
 
 	@Autowired

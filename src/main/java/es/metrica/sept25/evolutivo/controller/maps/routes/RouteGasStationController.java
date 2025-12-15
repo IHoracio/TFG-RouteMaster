@@ -35,7 +35,7 @@ public class RouteGasStationController {
 			@ApiResponse(responseCode = "200", description = "Pasos encontrados para la ruta dada."),
 			@ApiResponse(responseCode = "404", description = "Solicitud errónea: no se pudieron calcular los pasos de la ruta.")
 			})
-	@GetMapping("/routes/gasStations")
+	@GetMapping("/api/routes/gasStations")
 	public ResponseEntity<List<CoordsWithStations>> getGasolineras(
 			@Parameter(example = "El Vellon") @RequestParam(required = true) String origin,
 			@Parameter(example = "El Molar") @RequestParam(required = true) String destination,
