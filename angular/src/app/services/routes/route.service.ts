@@ -4,7 +4,9 @@ import { Observable } from 'rxjs';
 import { HttpParams } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
 import { RouteFormResponse } from '../../features/pages/map-page/Utils/route-form-response';
-import { Coords, RouteGroupResponse } from '../../features/pages/map-page/Utils/google-route.mapper';
+import { RouteGroupResponse } from '../../features/pages/map-page/Utils/google-route.mapper';
+import { Coords } from '../../Dto/maps-dtos';
+
 
 @Injectable({
   providedIn: 'root'
@@ -26,7 +28,7 @@ export class RouteService {
   }
 
 
-  calculateCoords(routeFormResponse: RouteFormResponse): Observable<Coords> {
+  calculateCoords(routeFormResponse: RouteFormResponse): Observable<string> {
     const headers = new HttpHeaders()
     .set('key', environment.googleMapsApiKey);
 
@@ -35,6 +37,6 @@ export class RouteService {
       .set('destination', routeFormResponse.destination)
 
 
-    return this.http.get(this.apiUrl + "/stepCoords", {headers: headers, params: parameters, responseType: 'json' });
+    return this.http.get(this.apiUrl + "/stepCoords", {headers: headers, params: parameters, responseType: 'text' });
   }
 }

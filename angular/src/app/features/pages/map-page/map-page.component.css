@@ -1,7 +1,28 @@
-.map { width: 50%; height: 75%;}
+:host {
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+}
+
 .map-container {
   width: 100%;
-  height: 600px;
+}
+
+.map {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  max-height: 600px;
+  min-height: 300px;
   border-radius: 6px;
   overflow: hidden;
+  position: relative;
+  background: #f6f6f6;
 }
+
+#map,
+.map-canvas {
+  width: 100%;
+  height: 100%;
+}
+
+

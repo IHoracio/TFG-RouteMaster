@@ -30,12 +30,9 @@ public class GeocodeServiceImpl implements GeocodeService {
 	public Optional<Coords> getCoordinates(String address) {
 
 		address = normalizarMunicipioParaGeocode(address);
-		
-		String url = UriComponentsBuilder
-				.fromUriString(GEOCODE_URL)
-				.queryParam("address", address)
-				.queryParam("key", API_KEY_GOOGLE)
-				.toUriString();
+
+		String url = UriComponentsBuilder.fromUriString(GEOCODE_URL).queryParam("address", address)
+				.queryParam("key", API_KEY_GOOGLE).toUriString();
 
 		GeocodeGroup response = restTemplate.getForObject(url, GeocodeGroup.class);
 
@@ -47,11 +44,9 @@ public class GeocodeServiceImpl implements GeocodeService {
 
 	@Override
 	public Optional<String> getMunicipio(double lat, double lng) {
-		String url = UriComponentsBuilder
-				.fromUriString(GEOCODE_URL)
+		String url = UriComponentsBuilder.fromUriString(GEOCODE_URL)
 				.queryParam("latlng", lat + "," + lng)
-				.queryParam("key", API_KEY_GOOGLE)
-				.toUriString();
+				.queryParam("key", API_KEY_GOOGLE).toUriString();
 
 		GeocodeGroupAddress response = restTemplate.getForObject(url, GeocodeGroupAddress.class);
 
@@ -62,32 +57,53 @@ public class GeocodeServiceImpl implements GeocodeService {
 				if (comp.getTypes() != null) {
 					List<String> types = comp.getTypes();
 					if (types.contains("locality")) {
-						return Optional.of(comp.getLong_name());
+						String municipioNormalizado = formatearMunicipioParaINE(comp.getLong_name());
+						return Optional.of(municipioNormalizado);
 					}
 					if (types.contains("administrative_area_level_4")) {
-						return Optional.of(comp.getLong_name());
+						String municipioNormalizado = formatearMunicipioParaINE(comp.getLong_name());
+						return Optional.of(municipioNormalizado);
 					}
 				}
 			}
 		}
 		return Optional.empty();
 	}
-	
+
 	public String normalizarMunicipioParaGeocode(String municipio) {
-	    if (municipio == null) return "";
+		if (municipio == null)
+			return "";
 
-	    municipio = municipio.trim();
+		municipio = municipio.trim();
 
-	    if (municipio.toLowerCase().startsWith("el ")) {
-	        municipio = municipio.substring(3) + ", El";
-	    } else if (municipio.toLowerCase().startsWith("la ")) {
-	        municipio = municipio.substring(3);
-	    } else if (municipio.toLowerCase().startsWith("los ")) {
-	        municipio = municipio.substring(4);
-	    } else if (municipio.toLowerCase().startsWith("las ")) {
-	        municipio = municipio.substring(4);
-	    }
-	    return municipio;
+		if (municipio.toLowerCase().startsWith("el ")) {
+			municipio = municipio.substring(3);
+		} else if (municipio.toLowerCase().startsWith("la ")) {
+			municipio = municipio.substring(3);
+		} else if (municipio.toLowerCase().startsWith("los ")) {
+			municipio = municipio.substring(4);
+		} else if (municipio.toLowerCase().startsWith("las ")) {
+			municipio = municipio.substring(4);
+		}
+		return municipio;
+	}
+
+	public String formatearMunicipioParaINE(String municipio) {
+		if (municipio == null || municipio.isBlank())
+			return "";
+
+		municipio = municipio.trim();
+
+		String[] articulos = { "El", "La", "Los", "Las" };
+
+		for (String articulo : articulos) {
+			if (municipio.toLowerCase().startsWith(articulo.toLowerCase() + " ")) {
+				String nombrePrincipal = municipio.substring(articulo.length()).trim();
+				return nombrePrincipal + ", " + articulo;
+			}
+		}
+
+		return municipio;
 	}
 
 }

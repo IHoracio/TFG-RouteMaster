@@ -18,25 +18,30 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
-@Tag(name = "Clima")
+@Tag(
+	name = "Clima", 
+	description = "Conjunto de endpoints que operan sobre la API de"
+				+ "la AEMET para sacar datos del clima en diversas formas."
+	)
 @RequestMapping("/checkWeather")
 public class WeatherController {
 
 	@Autowired
 	private WeatherService weatherService;
 
+	// TODO: Cambiar de zipCode a otro nombre
 	@Operation(
 			summary = "Devuelve el clima para un código postal concreto", 
 			description = "Compone un objeto Weather que contiene toda la " + 
-						  "información meteorológica para un código postal concreto.")
+						  "información meteorológica para un código de zona concreto."
+			)
 	@ApiResponses(value = { 
-			@ApiResponse(responseCode = "200", description = "Route found"),
-			@ApiResponse(responseCode = "400", description = "Bad request") 
-			})
+			@ApiResponse(responseCode = "200", description = "Clima encontrado"),
+			@ApiResponse(responseCode = "400", description = "Bad request: datos malformados"),
+			@ApiResponse(responseCode = "404", description = "No se encontró el clima para ese código de AEMET") 
+	})
 	@GetMapping("/zipCode")
-
-	public ResponseEntity<Weather> getWeather(@RequestParam(required = true) 
-	String zipCode) {
+	public ResponseEntity<Weather> getWeather(@RequestParam(required = true) String zipCode) {
 
 		if (zipCode == null || !zipCode.matches("\\d{5}")) {
 			System.out.println("1");
@@ -46,7 +51,7 @@ public class WeatherController {
 		Optional<Weather> weather = weatherService.getWeather(zipCode);
 
 		if (weather.isEmpty()) {
-			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
 
 		return new ResponseEntity<Weather>(weather.get(), HttpStatus.OK);

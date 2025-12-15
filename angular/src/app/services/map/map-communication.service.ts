@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
-import { Coords } from '../../features/pages/map-page/Utils/google-route.mapper';
+
 import { MapPageComponent } from '../../features/pages/map-page/map-page.component';
+import { Coords } from '../../Dto/maps-dtos';
 
 @Injectable({
   providedIn: 'root'
@@ -20,8 +21,8 @@ export class MapCommunicationService {
   constructor() {}
 
   sendRoute(coords: Coords[]): void {
-    console.log("Estoy en el serviece");
-    console.log(coords)
+    console.log(coords);
+    this.mapPageInstance?.clearRoute();
     this.mapPageInstance?.drawRoute(coords);
   }
 

@@ -37,9 +37,10 @@ public class CoordenadasWeatherController {
 			description = "Compone un objeto Weather que contiene toda la "
 						+ "información meteorológica para unas coordenas concretas.")
 	@ApiResponses(value = { 
-			@ApiResponse(responseCode = "200", description = "Route found"),
-			@ApiResponse(responseCode = "400", description = "Bad request"),
-			})
+			@ApiResponse(responseCode = "200", description = "Clima encontrado"),
+			@ApiResponse(responseCode = "400", description = "Bad request: datos malformados"),
+			@ApiResponse(responseCode = "404", description = "No se encontró el clima para esas coordenadas") 
+	})
 	@GetMapping("/coords")
 	public ResponseEntity<Weather> getWeatherByCoords(
 			@RequestParam double lat,
@@ -49,6 +50,7 @@ public class CoordenadasWeatherController {
         if (codigoINE.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
+
 		Optional<Weather> weather = weatherService.getWeather(codigoINE.get());
 		if (weather.isEmpty()) {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);

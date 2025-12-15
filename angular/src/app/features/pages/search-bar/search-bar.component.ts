@@ -1,11 +1,12 @@
 import { Component, Input, NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouteService } from '../../../services/routes/route.service';
-import { extractAllCoords, RouteGroupResponse } from '../map-page/Utils/google-route.mapper';
-import { Coords } from '../map-page/Utils/google-route.mapper';
-import { MapCommunicationService } from '../../../services/map/map-communication.service';
-import { MapPageComponent } from '../map-page/map-page.component';
+import { Coords, RouteGroupResponse } from '../map-page/Utils/google-route.mapper';
+
 import { RouteFormResponse } from '../map-page/Utils/route-form-response';
+import { MapPageComponent } from '../map-page/map-page.component';
+import { MapCommunicationService } from '../../../services/map/map-communication.service';
+
 
 @Component({
   selector: 'app-search-bar',
@@ -28,7 +29,7 @@ export class SearchBarComponent {
   message: RouteGroupResponse = {
     routes: []
   };
-  private coords: Coords = {}
+  private coords: Coords[] = []
   
 
   onSubmit() {
@@ -36,22 +37,29 @@ export class SearchBarComponent {
 
     this.routeService.calculateRoute(this.routeFormResponse)
       .subscribe(data => this.message = data);
+
+      this.guardarCoordenadas();
   }
 
-  guardameLasCoordenadasPapi(){
-    this.routeService.calculateCoords(this.routeFormResponse)
-      .subscribe(data => this.coords = data)
+  guardarCoordenadas(){
+    this.coords = []
 
-    this.giveCoords()
+    this.routeService.calculateCoords(this.routeFormResponse)
+    .subscribe(data => {
+      const parsedData = JSON.parse(data);
+
+      this.coords = parsedData;
+      this.giveCoords()
+    })
   }
 
   imprimirMensaje() {
     console.log(JSON.stringify(this.message));
-    console.log("COOOODERENADAS", this.coords)
+    console.log(this.coords)
   }
 
   giveCoords(){
-    //this.mapCommunication.sendRoute(this.coords)
+    this.mapCommunication.sendRoute(this.coords)
   }
 
 }
