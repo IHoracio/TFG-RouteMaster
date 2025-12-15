@@ -1,65 +1,54 @@
 import { Component, Input, NgModule } from '@angular/core';
-import { FormsModule } from '@angular/forms';
-import { RouteService } from '../../../services/routes/route.service';
-import { Coords, RouteGroupResponse } from '../map-page/Utils/google-route.mapper';
-
+import { FormGroup, FormsModule, FormArray, FormControl } from '@angular/forms';
 import { RouteFormResponse } from '../map-page/Utils/route-form-response';
 import { MapPageComponent } from '../map-page/map-page.component';
-import { MapCommunicationService } from '../../../services/map/map-communication.service';
+import { SearchBarService } from '../../../services/search-bar/search-bar.service';
+import { NgFor } from '@angular/common';
+import { RouteService } from '../../../services/routes/route.service';
+import { RouteGroupResponse } from '../../../Dto/maps-dtos';
+
 
 
 @Component({
   selector: 'app-search-bar',
-  imports: [FormsModule, MapPageComponent],
+  imports: [FormsModule, MapPageComponent, NgFor],
   templateUrl: './search-bar.component.html',
   styleUrl: './search-bar.component.css'
 })
 export class SearchBarComponent {
 
-
-  constructor(private routeService: RouteService, private mapCommunication: MapCommunicationService) {
+  constructor(private searchBarService: SearchBarService, private routeService: RouteService) {
     
   }
 
   routeFormResponse: RouteFormResponse = {
     origin : "",
     destination : "",
+    waypoints: [],
+    optimizeWaypoints: false,
     optimizeRoute : false
   }
-  message: RouteGroupResponse = {
-    routes: []
-  };
-  private coords: Coords[] = []
-  
-
-  onSubmit() {
+  addWaypoint(){
+    this.routeFormResponse.waypoints.push('')
     console.log(this.routeFormResponse)
-
-    this.routeService.calculateRoute(this.routeFormResponse)
-      .subscribe(data => this.message = data);
-
-      this.guardarCoordenadas();
   }
-
-  guardarCoordenadas(){
-    this.coords = []
-
-    this.routeService.calculateCoords(this.routeFormResponse)
-    .subscribe(data => {
-      const parsedData = JSON.parse(data);
-
-      this.coords = parsedData;
-      this.giveCoords()
-    })
+  deleteWaypoint(){
+    this.routeFormResponse.waypoints.pop()
   }
+  message: RouteGroupResponse = {
+      routes: []
+  };
+  onSubmit() {
+      console.log(this.routeFormResponse)
+      this.routeService.calculateRoute(this.routeFormResponse)
+        .subscribe(data => {
+          this.message = JSON.parse(data)
+          console.log(this.message)
+        });
+      this.searchBarService.saveCoordinates(this.routeFormResponse);
+    }
 
-  imprimirMensaje() {
-    console.log(JSON.stringify(this.message));
-    console.log(this.coords)
-  }
-
-  giveCoords(){
-    this.mapCommunication.sendRoute(this.coords)
-  }
-
+  trackByIndex(index: number) {
+  return index;
+}
 }

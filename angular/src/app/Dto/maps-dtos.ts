@@ -17,6 +17,7 @@ export interface Leg {
 }
 
 export interface Step {
+  polyline?: Polyline
   start_location?: Coords;
 }
 
