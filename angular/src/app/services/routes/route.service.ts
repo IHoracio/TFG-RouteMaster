@@ -4,8 +4,7 @@ import { Observable } from 'rxjs';
 import { HttpParams } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
 import { RouteFormResponse } from '../../features/pages/map-page/Utils/route-form-response';
-import { RouteGroupResponse } from '../../features/pages/map-page/Utils/google-route.mapper';
-import { Coords } from '../../Dto/maps-dtos';
+import { RouteGroupResponse } from '../../Dto/maps-dtos';
 
 
 @Injectable({

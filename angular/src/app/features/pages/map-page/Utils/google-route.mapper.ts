@@ -1,5 +1,5 @@
 
-
+/*
 export interface Coords { lat: number; lng: number; }
 export interface Distance { text: string; value: number; }
 export interface Duration { text: string; value: number; }
@@ -54,3 +54,4 @@ function isValidCoord(coords: any): coords is Coords {
   typeof coords.lat === 'number' && 
   typeof coords.lng === 'number';
 }
+*/
