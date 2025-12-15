@@ -65,10 +65,11 @@ public class RoutesServiceImpl implements RoutesService {
 			url.queryParam("destination", destination);
 
 		String result = "";
-		if (!waypoints.isEmpty()) {
-			if (optimizeWaypoints)
-				result += OPTIMIZE;
-			else if (optimizeRoute) {
+		if (!waypoints.isEmpty() && 
+				optimizeWaypoints || optimizeRoute) {
+			result += OPTIMIZE;
+
+			if (optimizeRoute) {
 				waypoints.add(destination);
 				url.queryParam("destination", origin);
 			}
