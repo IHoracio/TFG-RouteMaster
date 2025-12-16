@@ -175,14 +175,19 @@ public class RoutesServiceImpl implements RoutesService {
 	}
 
 	@Override
-	public List<CoordsWithStations> getGasStationsForRoute(RouteGroup routeGroup, Long radius) {
-		return extractRoutePoints(routeGroup).stream().map(
-				coords -> {
-					List<Gasolinera> stationsPerPoint = gasolineraService
-							.getGasolinerasInRadiusCoords(coords.getLat(), coords.getLng(), radius);
-					return new CoordsWithStations(coords.getLat(), coords.getLng(), stationsPerPoint);	
-				})
+	public CoordsWithStations getGasStationsForRoute(RouteGroup routeGroup, Long radius) {
+		List<Coords> coords = extractRoutePoints(routeGroup);
+		
+		List<Gasolinera> stationsForRoute = coords.stream().flatMap(
+				coord ->
+				{ 
+					List<Gasolinera> g = gasolineraService.getGasolinerasInRadiusCoords(coord.getLat(), coord.getLng(), radius);
+					return g.stream();
+				 })
+				.distinct()
 				.toList();
+		
+		return new CoordsWithStations(coords, stationsForRoute);
 	}
 	
 	@Override

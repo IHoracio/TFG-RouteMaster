@@ -4,7 +4,6 @@ import java.util.List;
 
 import es.metrica.sept25.evolutivo.entity.user.User;
 import jakarta.persistence.CascadeType;
-import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -56,7 +55,6 @@ public class SavedRoute {
 	public void setPuntos(List<Point> puntos) {
 		this.puntos = puntos;
 	}
-
 
 	public User getUser() {
 		return user;

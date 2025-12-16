@@ -36,7 +36,7 @@ public class RouteGasStationController {
 			@ApiResponse(responseCode = "404", description = "Solicitud errónea: no se pudieron calcular los pasos de la ruta.")
 			})
 	@GetMapping("/api/routes/gasStations")
-	public ResponseEntity<List<CoordsWithStations>> getGasolineras(
+	public ResponseEntity<CoordsWithStations> getGasolineras(
 			@Parameter(example = "El Vellon") @RequestParam(required = true) String origin,
 			@Parameter(example = "El Molar") @RequestParam(required = true) String destination,
 			@RequestParam(required = false, defaultValue = "") List<String> waypoints,
@@ -52,7 +52,7 @@ public class RouteGasStationController {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 
-		List<CoordsWithStations> coordsWithStations = routesService.getGasStationsForRoute(routeGroupOpt.get(), radius);
+		CoordsWithStations coordsWithStations = routesService.getGasStationsForRoute(routeGroupOpt.get(), radius);
 
 		return new ResponseEntity<>(coordsWithStations, HttpStatus.OK);
 	}
