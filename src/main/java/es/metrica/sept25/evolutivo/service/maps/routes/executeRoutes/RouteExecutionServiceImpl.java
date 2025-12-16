@@ -6,7 +6,10 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+
+import es.metrica.sept25.evolutivo.domain.dto.maps.routes.Leg;
 import es.metrica.sept25.evolutivo.domain.dto.maps.routes.RouteGroup;
+import es.metrica.sept25.evolutivo.domain.dto.maps.routes.Step;
 import es.metrica.sept25.evolutivo.domain.dto.maps.routes.executionRoutes.RouteExecutionDTO;
 import es.metrica.sept25.evolutivo.domain.dto.maps.routes.savedRoutes.PointDTO;
 import es.metrica.sept25.evolutivo.domain.dto.maps.routes.savedRoutes.SavedRouteDTO;
@@ -56,17 +59,17 @@ public class RouteExecutionServiceImpl implements RouteExecutionService{
 	        }
 
 	        RouteGroup routeGroup = routeGroupOpt.get();
-	        var leg = routeGroup.getRoutes().get(0).getLegs().get(0);
+	        Leg leg = routeGroup.getRoutes().get(0).getLegs().get(0);
 
 	        RouteExecutionDTO dto = new RouteExecutionDTO();
 	        dto.setDistanceMeters(leg.getDistance().getValue());
 	        dto.setDurationSeconds(leg.getDuration().getValue());
 
-	        StringBuilder polylineBuilder = new StringBuilder();
-	        for (var step : leg.getSteps()) {
-	            polylineBuilder.append(step.getPolyline().getPoints());
-	        }
-	        dto.setPolyline(polylineBuilder.toString());
+	        List<String> polylines = leg.getSteps().stream()
+	                .map(step -> step.getPolyline().getPoints())
+	                .toList();
+
+	        dto.setPolylines(polylines);
 
 	        return Optional.of(dto);
 	    }

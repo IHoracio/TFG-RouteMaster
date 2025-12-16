@@ -26,11 +26,12 @@ public class SavedRoute {
     @OrderColumn(name = "order_index")
     private List<Point> puntos;
 
-    @Embedded
-    private RoutePreferences preferences;
-
     @ManyToOne
     private User user;
+    
+    private boolean optimizeWaypoints;
+    private boolean optimizeRoute;
+    private String language;
 
 	public Long getId() {
 		return id;
@@ -56,13 +57,6 @@ public class SavedRoute {
 		this.puntos = puntos;
 	}
 
-	public RoutePreferences getPreferences() {
-		return preferences;
-	}
-
-	public void setPreferences(RoutePreferences preferences) {
-		this.preferences = preferences;
-	}
 
 	public User getUser() {
 		return user;
@@ -72,6 +66,27 @@ public class SavedRoute {
 		this.user = user;
 	}
 
+	public boolean isOptimizeWaypoints() {
+		return optimizeWaypoints;
+	}
 
-    
+	public void setOptimizeWaypoints(boolean optimizeWaypoints) {
+		this.optimizeWaypoints = optimizeWaypoints;
+	}
+
+	public boolean isOptimizeRoute() {
+		return optimizeRoute;
+	}
+
+	public void setOptimizeRoute(boolean optimizeRoute) {
+		this.optimizeRoute = optimizeRoute;
+	}
+
+	public String getLanguage() {
+		return language;
+	}
+
+	public void setLanguage(String language) {
+		this.language = language;
+	}
 }
