@@ -18,12 +18,23 @@ export class MapCommunicationService {
     return true;
   }
 
+  unregisterMapPage(instance: MapPageComponent): void {
+    if (this.mapPageInstance === instance) {
+      this.mapPageInstance = null;
+    }
+  }
+
   constructor() {}
 
   sendRoute(coords: Coords[]): void {
-    console.log(coords);
+  
     this.mapPageInstance?.clearRoute();
     this.mapPageInstance?.drawRoute(coords);
+  }
+
+  sendPoints(coords: Coords[]): void {
+
+    this.mapPageInstance?.drawPoints(coords);
   }
 
 }
