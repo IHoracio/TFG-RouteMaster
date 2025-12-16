@@ -50,6 +50,9 @@ export class MapPageComponent {
       tilt: 45,
       mapTypeControl: true,
       fullscreenControl: true,
+      disableDefaultUI: true,
+      streetViewControl: false,
+      zoomControl: false,
       mapId: environment.googleMapsMapId
     };
 
