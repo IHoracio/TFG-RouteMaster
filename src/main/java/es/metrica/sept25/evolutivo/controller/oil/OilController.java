@@ -26,11 +26,11 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RestController
 @Tag(
 	name = "Gasolineras", 
-	description = "Conjunto de endpoints relacionados con la API"
-				+ "de Precioil. Los municipios y provincias proporcionados"
+	description = "Conjunto de endpoints relacionados con la API "
+				+ "de Precioil. Los municipios y provincias proporcionados "
 				+ "provienen también de dicha API."
 )
-@RequestMapping("/oil")
+@RequestMapping("/api/oil")
 public class OilController {
 
 	@Autowired
@@ -43,28 +43,32 @@ public class OilController {
 	private GasolineraService gasolineraService;
 
 	@Operation(summary = "Devuelve una lista de las provincias españolas", description = "")
-	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Provincias recuperadas"),
-			@ApiResponse(responseCode = "204", description = "No se encontraron provincias") })
+	@ApiResponses(value = { 
+			@ApiResponse(responseCode = "200", description = "Provincias recuperadas"),
+			@ApiResponse(responseCode = "404", description = "No se encontraron provincias") 
+			})
 	@GetMapping("/provincias")
 	public ResponseEntity<List<Provincia>> getProvincias() {
 		List<Provincia> list = provinciaService.getProvincias();
 
 		if (list.isEmpty()) {
-			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
 
 		return new ResponseEntity<List<Provincia>>(list, HttpStatus.OK);
 	}
 
 	@Operation(summary = "Devuelve una mega-lista de municipios con el ID de provincia asociada", description = "Query a ejecutar una vez por base de datos. Se auto-cachea.")
-	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Provincias recuperadas"),
-			@ApiResponse(responseCode = "204", description = "No se encontraron provincias") })
+	@ApiResponses(value = { 
+			@ApiResponse(responseCode = "200", description = "Provincias recuperadas"),
+			@ApiResponse(responseCode = "404", description = "No se encontraron provincias") 
+			})
 	@GetMapping("/municipios")
 	public ResponseEntity<List<Municipio>> getMunicipios() {
 		List<Municipio> list = municipioService.getMunicipios();
 
 		if (list.isEmpty()) {
-			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
 
 		return new ResponseEntity<List<Municipio>>(list, HttpStatus.OK);
@@ -75,27 +79,29 @@ public class OilController {
 			description = "")
 	@ApiResponses(value = { 
 			@ApiResponse(responseCode = "200", description = "Gasolinera encontrada"), 
-			@ApiResponse(responseCode = "204", description = "No se encontró la gasolinera indicada") })
+			@ApiResponse(responseCode = "404", description = "No se encontró la gasolinera indicada") })
 	@GetMapping("/gasolineras/{municipio}")
 	public ResponseEntity<List<Gasolinera>> getGasolinerasForMunicipio(@PathVariable String municipio) {
 		List<Gasolinera> gasolinera = gasolineraService.getGasolinerasForMunicipio(municipio);
 
 		if (gasolinera.isEmpty()) {
-			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
 			
 		return new ResponseEntity<List<Gasolinera>>(gasolinera, HttpStatus.OK);
 	}
 
 	@Operation(summary = "Devuelve una gasolinera dado un ID", description = "")
-	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Gasolinera encontrada"),
-			@ApiResponse(responseCode = "204", description = "No se encontró la gasolinera indicada") })
+	@ApiResponses(value = { 
+			@ApiResponse(responseCode = "200", description = "Gasolinera encontrada"),
+			@ApiResponse(responseCode = "404", description = "No se encontró la gasolinera indicada") 
+			})
 	@GetMapping("/id/{idEstacion}")
 	public ResponseEntity<Gasolinera> getGasolineraForId(@PathVariable Long idEstacion) {
 		Optional<Gasolinera> gasolinera = gasolineraService.getGasolineraForId(idEstacion);
 
 		if (gasolinera.isEmpty()) {
-			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
 
 		return new ResponseEntity<Gasolinera>(gasolinera.get(), HttpStatus.OK);
@@ -109,7 +115,7 @@ public class OilController {
 			)
 	@ApiResponses(value = { 
 			@ApiResponse(responseCode = "200", description = "Gasolineras encontradas"), 
-			@ApiResponse(responseCode = "204", description = "No se encontraron gasolineras en ese radio") })
+			@ApiResponse(responseCode = "404", description = "No se encontraron gasolineras en ese radio") })
 	@GetMapping("/gasolineras/radio/address")
 	public ResponseEntity<List<Gasolinera>> getGasolinerasInRadiusAddress(
 			@RequestParam(required = true, defaultValue = "Calle Gran Via 1 Madrid Madrid") String direccion,
@@ -117,7 +123,7 @@ public class OilController {
 		List<Gasolinera> gasolinera = gasolineraService.getGasolinerasInRadiusAddress(direccion, radio);
 
 		if (gasolinera.isEmpty()) {
-			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
 			
 		return new ResponseEntity<List<Gasolinera>>(gasolinera, HttpStatus.OK);
@@ -130,7 +136,7 @@ public class OilController {
 					)
 	@ApiResponses(value = { 
 			@ApiResponse(responseCode = "200", description = "Gasolineras encontradas"), 
-			@ApiResponse(responseCode = "204", description = "No se encontraron gasolineras en ese radio") })
+			@ApiResponse(responseCode = "404", description = "No se encontraron gasolineras en ese radio") })
 	@GetMapping("/gasolineras/radio/coords")
 	public ResponseEntity<List<Gasolinera>> getGasolinerasInRadius(
 			@RequestParam(required = true, defaultValue = "40.4167279") Double latitud, 
@@ -139,7 +145,7 @@ public class OilController {
 		List<Gasolinera> gasolinera = gasolineraService.getGasolinerasInRadiusCoords(latitud, longitud, radio);
 
 		if (gasolinera.isEmpty()) {
-			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
 			
 		return new ResponseEntity<List<Gasolinera>>(gasolinera, HttpStatus.OK);

@@ -7,15 +7,14 @@ import java.util.Objects;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import es.metrica.sept25.evolutivo.domain.dto.maps.routes.Coords;
 import es.metrica.sept25.evolutivo.entity.gasolinera.Gasolinera;
 import es.metrica.sept25.evolutivo.entity.gasolinera.Municipio;
-import es.metrica.sept25.evolutivo.entity.maps.routes.Coords;
 import es.metrica.sept25.evolutivo.repository.GasolineraRepository;
 import es.metrica.sept25.evolutivo.service.maps.geocode.GeocodeService;
 
@@ -34,9 +33,6 @@ public class GasolineraServiceImpl implements GasolineraService {
 
 	@Autowired
 	GasolineraRepository gasolineraRepository;
-
-	@Value("${evolutivo.api_key_google}")
-	private String API_KEY_GOOGLE;
 
 	@Override
 	@Cacheable("gasolinera_id")

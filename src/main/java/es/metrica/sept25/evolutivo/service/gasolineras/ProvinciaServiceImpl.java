@@ -37,9 +37,9 @@ public class ProvinciaServiceImpl implements ProvinciaService {
 		List<Provincia> provList = provinciaRepository.findAll();
 
 		// Si no tenemos, populamos con las españolas
-		if (Objects.isNull(provList) | provList.isEmpty()) {
+		if (Objects.isNull(provList) || provList.isEmpty()) {
 			Provincia[] provArr = restTemplate.getForObject(API_URL, Provincia[].class);
-			if (!Objects.isNull(provArr)) {
+			if (!(Objects.isNull(provArr))) {
 				provList = Arrays.asList(provArr);
 				provinciaRepository.saveAllAndFlush(
 						provList.stream().filter(p -> p.getIdProvincia() < 100).collect(Collectors.toList()));
@@ -52,7 +52,7 @@ public class ProvinciaServiceImpl implements ProvinciaService {
 
 	@Override
 	public Optional<Provincia> getProvinciaById(Long id) {
-		return provinciaRepository.findById(id).or(Optional::empty);
+		return provinciaRepository.findById(id);
 	}
 
 	@Override

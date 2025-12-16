@@ -21,7 +21,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @Tag(name = "Clima")
-@RequestMapping("/checkWeather")
+@RequestMapping("/api/checkWeather")
 public class CoordenadasWeatherController {
 	
 	@Value("${evolutivo.api_key_aemet}")
@@ -37,23 +37,20 @@ public class CoordenadasWeatherController {
 			description = "Compone un objeto Weather que contiene toda la "
 						+ "información meteorológica para unas coordenas concretas.")
 	@ApiResponses(value = { 
-			@ApiResponse(responseCode = "200", description = "Route found"),
-			@ApiResponse(responseCode = "400", description = "Bad request"),
-			@ApiResponse(responseCode = "401", description = "apiKey wasn't found") 
-			})
+			@ApiResponse(responseCode = "200", description = "Clima encontrado"),
+			@ApiResponse(responseCode = "400", description = "Bad request: datos malformados"),
+			@ApiResponse(responseCode = "404", description = "No se encontró el clima para esas coordenadas") 
+	})
 	@GetMapping("/coords")
 	public ResponseEntity<Weather> getWeatherByCoords(
 			@RequestParam double lat,
             @RequestParam double lng) {
 		
-		if (API_KEY_AEMET == null || API_KEY_AEMET.isEmpty()) {
-			return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-		}
-		
 		Optional<String> codigoINE = ineService.getCodigoINE(lat, lng);
-        if (codigoINE.get() == null) {
+        if (codigoINE.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
+
 		Optional<Weather> weather = weatherService.getWeather(codigoINE.get());
 		if (weather.isEmpty()) {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);

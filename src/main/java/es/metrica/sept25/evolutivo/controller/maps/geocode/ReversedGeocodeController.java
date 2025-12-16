@@ -18,7 +18,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @Tag(name = "Geocode")
-@RequestMapping("/geocode")
+@RequestMapping("/api/geocode")
 public class ReversedGeocodeController {
 
 	@Autowired
@@ -26,20 +26,19 @@ public class ReversedGeocodeController {
 
 	@Operation(
 			summary = "Obtiene la dirección de unas cordenadas", 
-			description = "Devuelve el `formatted_address` correspondiente a la latitud y longitud "
-						+ "indicadas usando la API de Google Geocoding.")
+			description = "Devuelve el `formatted_address` (formato estándar de Google) "
+					    + "correspondiente a la latitud y longitud indicadas usando "
+					    + "la API de Google de Geocoding.")
 	@ApiResponses(value = {
-//			@ApiResponse(responseCode = "401", description = "apiKey no encontrada"),
-			@ApiResponse(responseCode = "400", description = "Solicitud incorrecta"),
-			@ApiResponse(responseCode = "200", description = "Coordenadas encontradas") 
-			})
-//	@SecurityRequirement(name = "googleApiKey")
+			@ApiResponse(responseCode = "200", description = "Dirección encontrada"),
+			@ApiResponse(responseCode = "404", description = "Solicitud incorrecta: no se pudo efectuar la traslación")
+	})
 	@GetMapping("/reverse")
 	public ResponseEntity<String> getAddress(@RequestParam double lat, @RequestParam double lng) {
 
 		Optional<String> address = reverseGeocodeService.getAddress(lat, lng);
-		if (address.get() == null) {
-			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		if (address.isEmpty()) {
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
 
 		return new ResponseEntity<>(address.get(), HttpStatus.OK);

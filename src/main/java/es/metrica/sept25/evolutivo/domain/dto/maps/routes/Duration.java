@@ -1,6 +1,6 @@
-package es.metrica.sept25.evolutivo.entity.maps.routes;
+package es.metrica.sept25.evolutivo.domain.dto.maps.routes;
 
-public class Distance {
+public class Duration {
 
 	private String text;
 	private Long value;

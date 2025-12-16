@@ -2,7 +2,7 @@ package es.metrica.sept25.evolutivo.domain.dto.weather;
 
 public class EstadoCielo {
 	private String value;
-	private String periodo;
+	private Integer periodo;
 	private String descripcion;
 
 	public String getValue() {
@@ -13,11 +13,11 @@ public class EstadoCielo {
 		this.value = value;
 	}
 
-	public String getPeriodo() {
+	public Integer getPeriodo() {
 		return periodo;
 	}
 
-	public void setPeriodo(String periodo) {
+	public void setPeriodo(Integer periodo) {
 		this.periodo = periodo;
 	}
 

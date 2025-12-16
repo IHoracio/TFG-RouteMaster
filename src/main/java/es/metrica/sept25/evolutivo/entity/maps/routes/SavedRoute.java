@@ -3,33 +3,34 @@ package es.metrica.sept25.evolutivo.entity.maps.routes;
 import java.util.List;
 
 import es.metrica.sept25.evolutivo.entity.user.User;
-import jakarta.persistence.ElementCollection;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OrderColumn;
 
 @Entity
 public class SavedRoute {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-	private String name;
+    private String name;
 
-	private String startAddress;
-	private String endAddress;
+    @OneToMany(mappedBy = "savedRoute", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderColumn(name = "order_index")
+    private List<Point> puntos;
 
-	private int distanceMeters;
-	private int durationSeconds;
+    @Embedded
+    private RoutePreferences preferences;
 
-	@ElementCollection
-	private List<Coords> path;
-
-	@ManyToOne
-	private User user;
+    @ManyToOne
+    private User user;
 
 	public Long getId() {
 		return id;
@@ -47,44 +48,20 @@ public class SavedRoute {
 		this.name = name;
 	}
 
-	public String getStartAddress() {
-		return startAddress;
+	public List<Point> getPuntos() {
+		return puntos;
 	}
 
-	public void setStartAddress(String startAddress) {
-		this.startAddress = startAddress;
+	public void setPuntos(List<Point> puntos) {
+		this.puntos = puntos;
 	}
 
-	public String getEndAddress() {
-		return endAddress;
+	public RoutePreferences getPreferences() {
+		return preferences;
 	}
 
-	public void setEndAddress(String endAddress) {
-		this.endAddress = endAddress;
-	}
-
-	public int getDistanceMeters() {
-		return distanceMeters;
-	}
-
-	public void setDistanceMeters(int distanceMeters) {
-		this.distanceMeters = distanceMeters;
-	}
-
-	public int getDurationSeconds() {
-		return durationSeconds;
-	}
-
-	public void setDurationSeconds(int durationSeconds) {
-		this.durationSeconds = durationSeconds;
-	}
-
-	public List<Coords> getPath() {
-		return path;
-	}
-
-	public void setPath(List<Coords> path) {
-		this.path = path;
+	public void setPreferences(RoutePreferences preferences) {
+		this.preferences = preferences;
 	}
 
 	public User getUser() {
@@ -95,4 +72,6 @@ public class SavedRoute {
 		this.user = user;
 	}
 
+
+    
 }
