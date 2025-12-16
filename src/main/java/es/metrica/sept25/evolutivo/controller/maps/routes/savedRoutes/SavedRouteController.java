@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -24,7 +25,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
-@Tag(name = "Guardar Ruta")
+@Tag(name = "Ruta", description = "Endpoints que guardan, recuperan, ejecutan y borran una ruta")
+@RequestMapping("/api/ruta")
 public class SavedRouteController {
 
 	@Autowired
@@ -67,7 +69,7 @@ public class SavedRouteController {
 	@ApiResponses({ @ApiResponse(responseCode = "204", description = "Ruta eliminada"),
 			@ApiResponse(responseCode = "404", description = "Ruta no encontrada"),
 			@ApiResponse(responseCode = "403", description = "No autorizada") })
-	@DeleteMapping("/{id}")
+	@DeleteMapping("/delete/{id}")
 	public ResponseEntity<Void> deleteRoute(@PathVariable Long id, @RequestParam String email) {
 		User user = userService.getByEmail(email).orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
