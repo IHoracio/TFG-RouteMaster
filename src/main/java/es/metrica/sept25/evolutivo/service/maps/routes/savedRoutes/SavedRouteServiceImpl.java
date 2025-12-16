@@ -1,6 +1,7 @@
 package es.metrica.sept25.evolutivo.service.maps.routes.savedRoutes;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -59,11 +60,10 @@ public class SavedRouteServiceImpl implements SavedRouteService {
 		repository.delete(route);
 	}
 
-	public SavedRouteDTO getSavedRoute(Long id) {
-		SavedRoute route = repository.findById(id)
-				.orElseThrow(() -> new RuntimeException("Ruta no encontrada"));
+	public Optional<SavedRouteDTO> getSavedRoute(Long id) {
+		Optional<SavedRoute> route = repository.findById(id);
 
-		return mapToDTO(route);
+		return route.isPresent() ? Optional.of(mapToDTO(route.get())) : Optional.empty();
 	}
 
 	private SavedRouteDTO mapToDTO(SavedRoute route) {

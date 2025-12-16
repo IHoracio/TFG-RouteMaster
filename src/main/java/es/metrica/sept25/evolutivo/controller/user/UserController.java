@@ -63,18 +63,18 @@ public class UserController {
 				.orElse(ResponseEntity.notFound().build());
 	}
 
-	@Operation(summary = "Eliminar un usuario por mail")
+	@Operation(summary = "Eliminar un usuario por email")
 	@ApiResponses(value = { 
 			@ApiResponse(responseCode = "204", description = "Usuario eliminado correctamente"),
 			@ApiResponse(responseCode = "404", description = "Usuario no encontrado") 
 			})
 	@DeleteMapping("/delete")
-	public ResponseEntity<String> deleteUser(@RequestParam String mail) {
+	public ResponseEntity<String> deleteUser(@RequestParam String email) {
 
-		Optional<User> userOpt = service.getByEmail(mail);
+		Optional<User> userOpt = service.getByEmail(email);
 
 		if (userOpt.isPresent()) {
-			service.deleteByEmail(mail);
+			service.deleteByEmail(email);
 			return ResponseEntity.ok("Usuario eliminado correctamente");
 		}
 

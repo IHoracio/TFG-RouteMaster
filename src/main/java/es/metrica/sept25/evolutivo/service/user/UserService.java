@@ -6,8 +6,6 @@ import java.util.Optional;
 import es.metrica.sept25.evolutivo.entity.user.User;
 
 public interface UserService {
-
-
     User save(User user);
 
     Optional<User> getByEmail(String mail);

@@ -22,8 +22,14 @@ public class RouteExecutionServiceImpl implements RouteExecutionService{
 	    @Autowired
 	    private RoutesService routesService;
 
-	    public RouteExecutionDTO executeSavedRoute(Long id) {
-	        SavedRouteDTO savedRoute = savedRouteService.getSavedRoute(id);
+	    public Optional<RouteExecutionDTO> executeSavedRoute(Long id) {
+	        Optional<SavedRouteDTO> savedRouteOpt = savedRouteService.getSavedRoute(id);
+	        
+	        if (savedRouteOpt.isEmpty()) {
+	        	return Optional.empty();
+	        }
+	        
+	        SavedRouteDTO savedRoute = savedRouteOpt.get();
 
 	        if (savedRoute.getPuntos().isEmpty()) {
 	            throw new RuntimeException("La ruta no tiene puntos");
@@ -62,6 +68,6 @@ public class RouteExecutionServiceImpl implements RouteExecutionService{
 	        }
 	        dto.setPolyline(polylineBuilder.toString());
 
-	        return dto;
+	        return Optional.of(dto);
 	    }
 }

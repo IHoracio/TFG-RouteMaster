@@ -36,12 +36,15 @@ public class SavedRouteController {
 	private UserService userService;
 
 	@Operation(summary = "Guarda una ruta calculada")
-	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Ruta guardada correctamente"),
-			@ApiResponse(responseCode = "404", description = "Usuario no encontrado") })
+	@ApiResponses(value = { 
+		@ApiResponse(responseCode = "200", description = "Ruta guardada correctamente"),
+		@ApiResponse(responseCode = "404", description = "Usuario no encontrado") 
+	})
 	@PostMapping("/save")
 	public ResponseEntity<SavedRouteDTO> saveRoute(@RequestParam String name, @RequestBody List<PointDTO> puntos,
 			@RequestParam String email) {
 		Optional<User> userOpt = userService.getByEmail(email);
+
 		if (userOpt.isEmpty()) {
 			return ResponseEntity.status(404).build();
 		}
@@ -53,27 +56,37 @@ public class SavedRouteController {
 	}
 
 	@Operation(summary = "Obtiene una ruta guardada por su ID")
-	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Ruta encontrada"),
-			@ApiResponse(responseCode = "404", description = "Ruta no encontrada") })
-	@GetMapping("/getRoute/{id}")
+	@ApiResponses(value = { 
+		@ApiResponse(responseCode = "200", description = "Ruta encontrada"),
+		@ApiResponse(responseCode = "404", description = "Ruta no encontrada") 
+	})
+	@GetMapping("/get/{id}")
 	public ResponseEntity<SavedRouteDTO> getSavedRoute(@PathVariable Long id) {
-		try {
-			SavedRouteDTO routeDTO = savedRouteService.getSavedRoute(id);
-			return ResponseEntity.ok(routeDTO);
-		} catch (RuntimeException e) {
+		Optional<SavedRouteDTO> routeDTO = savedRouteService.getSavedRoute(id);
+
+		if (routeDTO.isEmpty()) {
 			return ResponseEntity.notFound().build();
 		}
+
+		return ResponseEntity.ok(routeDTO.get());
 	}
 
 	@Operation(summary = "Elimina una ruta guardada")
-	@ApiResponses({ @ApiResponse(responseCode = "204", description = "Ruta eliminada"),
-			@ApiResponse(responseCode = "404", description = "Ruta no encontrada"),
-			@ApiResponse(responseCode = "403", description = "No autorizada") })
+	@ApiResponses(value = { 
+		@ApiResponse(responseCode = "204", description = "Ruta eliminada con éxito"),
+		@ApiResponse(responseCode = "404", description = "Ruta no encontrada."),
+		@ApiResponse(responseCode = "403", description = "No autorizada") 
+	})
 	@DeleteMapping("/delete/{id}")
 	public ResponseEntity<Void> deleteRoute(@PathVariable Long id, @RequestParam String email) {
-		User user = userService.getByEmail(email).orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
-		savedRouteService.deleteRoute(id, user);
+		Optional<User> user = userService.getByEmail(email);
+
+		if (user.isEmpty()) {
+			return ResponseEntity.notFound().build();
+		}
+
+		savedRouteService.deleteRoute(id, user.get());
 		return ResponseEntity.noContent().build();
 	}
 }

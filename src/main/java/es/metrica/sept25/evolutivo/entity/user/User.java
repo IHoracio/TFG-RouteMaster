@@ -5,6 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import es.metrica.sept25.evolutivo.entity.gasolinera.Gasolinera;
 import es.metrica.sept25.evolutivo.entity.maps.routes.SavedRoute;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -49,6 +50,9 @@ public class User {
 
 	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<SavedRoute> savedRoutes = new LinkedList<SavedRoute>();
+	
+	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<Gasolinera> favouriteGasStations = new LinkedList<Gasolinera>();
 
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false)
@@ -116,6 +120,14 @@ public class User {
 
 	public void setSavedRoutes(List<SavedRoute> savedRoutes) {
 		this.savedRoutes = savedRoutes;
+	}
+
+	public List<Gasolinera> getFavouriteGasStations() {
+		return new LinkedList<Gasolinera>(this.favouriteGasStations);
+	}
+
+	public void setFavouriteGasStations(List<Gasolinera> favouriteGasStations) {
+		this.favouriteGasStations = favouriteGasStations;
 	}
 
 	public PrioridadGasolineras getGasStationPriority() {
