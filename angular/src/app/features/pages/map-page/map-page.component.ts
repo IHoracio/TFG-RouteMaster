@@ -41,6 +41,7 @@ export class MapPageComponent {
     });
 
     const mapsLib = (await importLibrary('maps')) as unknown as any;
+    (await importLibrary('marker')) as unknown as any;
 
     const { Map } = mapsLib;
 
@@ -138,18 +139,23 @@ public drawPoints(coords: Coords[]): void {
     const cy = size / 2;
     const r = Math.max(1, Math.round((size / 2) - stroke - 1));
 
-    const circle = `
+    const circleSvg = `
       <svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" xmlns="http://www.w3.org/2000/svg">
         <circle cx="${cx}" cy="${cy}" r="${r}" fill="${color}" stroke="#ffffff" stroke-width="${stroke}"/>
       </svg>
     `;
 
+    const parsed = new DOMParser().parseFromString(circleSvg, 'image/svg+xml').documentElement;
+      parsed.style.position = 'absolute';
+      parsed.style.left = '0';
+      parsed.style.top = '0';
+      parsed.style.transform = 'translate(-50%, -50%)';
+      parsed.style.transformOrigin = 'center center';
     const advancedMarker = new google.maps.marker.AdvancedMarkerElement({
       map: this.map,
       position: {lat: c.lat, lng: c.lng},
-      content: new DOMParser().parseFromString(circle, 'image/svg+xml').documentElement,
-    })
-
+      content: parsed,
+    });
     this.waypoints.push(advancedMarker);
 
     if (isStart) this.startMarker = advancedMarker;
