@@ -100,7 +100,7 @@ public class RoutesController {
 			@ApiResponse(responseCode = "200", description = "Pasos encontrados para la ruta dada."),
 			@ApiResponse(responseCode = "404", description = "Solicitud errónea: no se pudieron calcular los pasos de la ruta.")
 			})
-	@GetMapping("/routes/polylineCords")
+	@GetMapping("/routes/polylineCoords")
 	public ResponseEntity<List<Coords>> getPolylineCoordsForRoute(
 			@RequestParam(required = true, defaultValue = "El Vellon") String origin,
 			@RequestParam(required = true, defaultValue = "El Molar") String destination,

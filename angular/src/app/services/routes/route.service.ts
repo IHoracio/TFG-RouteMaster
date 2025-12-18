@@ -12,7 +12,7 @@ import { RouteGroupResponse } from '../../Dto/maps-dtos';
 })
 export class RouteService {
 
-  private apiUrl = 'http://localhost:8080/routes';
+  private apiUrl = 'http://localhost:8080/api/routes';
   constructor(private http: HttpClient) {}
 
   calculateRoute(routeFormResponse: RouteFormResponse): Observable<string> {
@@ -38,6 +38,6 @@ export class RouteService {
     let parameters = new HttpParams()
       .set('origin', routeFormResponse.origin)
       .set('destination', routeFormResponse.destination)
-    return this.http.get(this.apiUrl + "/stepCoords", {headers: headers, params: parameters, responseType: 'text' });
+    return this.http.get(this.apiUrl + "/polylineCoords", {headers: headers, params: parameters, responseType: 'text' });
   }
 }
