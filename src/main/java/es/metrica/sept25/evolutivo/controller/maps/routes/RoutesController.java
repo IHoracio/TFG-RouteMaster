@@ -22,10 +22,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RestController
 @Tag(
 	name = "Direcciones", 
-	description = "Conjunto de endpoints que se aprovechan de la API de Routes de"
-				+ "Google Maps para calcular rutas, puntos de ruta y otros datos"
-				+ "relacionados con la creación de rutas, el clima y las gasolineras"
-				+ " en un trayecto."
+	description = "Conjunto de endpoints que se aprovechan de la API de Routes de "
+				+ "Google Maps para calcular rutas, puntos de ruta y otros datos "
+				+ "relacionados con la creación de rutas, el clima y las gasolineras "
+				+ "en un trayecto."
 	)
 @RequestMapping("/api")
 public class RoutesController {

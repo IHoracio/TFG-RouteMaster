@@ -18,9 +18,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
-@Tag(name = "Geocode", description = "Conjunto de endpoints que emplean la API"
-								   + "de Geocoding de Google Maps para hacer"
-		                           + "traslaciones de coordenadas a direcciones"
+@Tag(name = "Geocode", description = "Conjunto de endpoints que emplean la API "
+								   + "de Geocoding de Google Maps para hacer "
+		                           + "traslaciones de coordenadas a direcciones "
 		                           + "y viceversa.")
 @RequestMapping("/api/geocode")
 public class GeocodeController {

@@ -48,9 +48,9 @@ public class SavedRouteServiceImpl implements SavedRouteService {
 		SavedRoute saved = repository.save(route);
 
 		SavedRouteDTO dto = new SavedRouteDTO();
-		dto.setId(saved.getId());
+		dto.setRouteId(saved.getRouteId());
 		dto.setName(saved.getName());
-		dto.setPuntos(puntosDTO);
+		dto.setPoints(puntosDTO);
 		return dto;
 	}
 
@@ -83,10 +83,10 @@ public class SavedRouteServiceImpl implements SavedRouteService {
 
 	private SavedRouteDTO mapToDTO(SavedRoute route) {
 		SavedRouteDTO dto = new SavedRouteDTO();
-		dto.setId(route.getId());
+		dto.setRouteId(route.getRouteId());
 		dto.setName(route.getName());
 
-		dto.setPuntos(route.getPuntos().stream().map(p -> {
+		dto.setPoints(route.getPuntos().stream().map(p -> {
 			PointDTO pdto = new PointDTO();
 			pdto.setType(p.getType().name());
 			pdto.setAddress(p.getAddress());

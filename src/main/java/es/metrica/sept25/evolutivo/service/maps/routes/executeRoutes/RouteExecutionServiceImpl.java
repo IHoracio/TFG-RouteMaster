@@ -32,13 +32,13 @@ public class RouteExecutionServiceImpl implements RouteExecutionService{
 	        
 	        SavedRouteDTO savedRoute = savedRouteOpt.get();
 
-	        if (savedRoute.getPuntos().isEmpty()) {
+	        if (savedRoute.getPoints().isEmpty()) {
 	            return Optional.empty();
 	        }
 
-	        PointDTO inicio = savedRoute.getPuntos().get(0);
-	        PointDTO fin = savedRoute.getPuntos().get(savedRoute.getPuntos().size() - 1);
-	        List<String> intermedios = savedRoute.getPuntos().subList(1, savedRoute.getPuntos().size() - 1)
+	        PointDTO inicio = savedRoute.getPoints().get(0);
+	        PointDTO fin = savedRoute.getPoints().get(savedRoute.getPoints().size() - 1);
+	        List<String> intermedios = savedRoute.getPoints().subList(1, savedRoute.getPoints().size() - 1)
 	                                               .stream()
 	                                               .map(PointDTO::getAddress)
 	                                               .toList();
