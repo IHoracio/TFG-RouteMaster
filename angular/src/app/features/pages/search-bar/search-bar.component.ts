@@ -30,7 +30,6 @@ export class SearchBarComponent {
   }
   addWaypoint(){
     this.routeFormResponse.waypoints.push('')
-    console.log(this.routeFormResponse)
   }
   deleteWaypoint(){
     this.routeFormResponse.waypoints.pop()
@@ -38,16 +37,10 @@ export class SearchBarComponent {
   message: RouteGroupResponse = {
       routes: []
   };
-  onSubmit() {
-      console.log(this.routeFormResponse)
-      this.routeService.calculateRoute(this.routeFormResponse)
-        .subscribe(data => {
-          this.message = JSON.parse(data)
-          console.log(this.message)
-        });
-      this.searchBarService.saveCoordinates(this.routeFormResponse);
-    }
 
+  onSubmit() {
+      this.searchBarService.onSubmit(this.routeFormResponse)
+    }
   trackByIndex(index: number) {
   return index;
 }

@@ -11,19 +11,25 @@ export class SearchBarService {
 
   constructor(private routeService: RouteService, private mapCommunication: MapCommunicationService) { }
 
-  onSubmit(routeFormResponse: RouteFormResponse): RouteGroupResponse {
-    console.log(routeFormResponse)
+  onSubmit(routeFormResponse: RouteFormResponse) {
+    /*console.log(routeFormResponse)
     let message: RouteGroupResponse = {
     routes: []
     };
     let cadena: string = ""
     this.routeService.calculateRoute(routeFormResponse)
-      .subscribe(data => cadena = data);
-
-    console.log(cadena)
-    this.saveCoordinates(routeFormResponse);
-    //console.log(message)
-    return message;
+      .subscribe(data => {
+        message = JSON.parse(data)
+        console.log(message)
+        
+      })
+      */
+      this.saveCoordinates(routeFormResponse);
+      setTimeout(() => {
+        console.log('sleep');
+        this.saveWaypointCoordinates(routeFormResponse);
+      }, 1000);
+      
   }
 
   saveCoordinates(routeFormResponse: RouteFormResponse){
@@ -36,16 +42,23 @@ export class SearchBarService {
       coords = parsedData;
       this.giveCoords(coords)
     })
-
-    this.printMessage(routeFormResponse, coords)
   }
+  saveWaypointCoordinates(routeFormResponse: RouteFormResponse){
+    let coords: Coords[] = []
 
-  printMessage(message: RouteFormResponse, coords: Coords[]) {
-    console.log(JSON.stringify(message));
-    console.log(coords)
+    this.routeService.calculateLegCoords(routeFormResponse)
+    .subscribe(data => {
+      const parsedData = JSON.parse(data);
+      coords = parsedData;
+      this.giveWaypointCoords(coords)
+    })
+    
   }
-
   giveCoords(coords: Coords[]){
     this.mapCommunication.sendRoute(coords)
+  }
+  giveWaypointCoords(coords: Coords[]){
+    console.log("coordenadas give waypointCoords", coords)
+    this.mapCommunication.sendPoints(coords);
   }
 }

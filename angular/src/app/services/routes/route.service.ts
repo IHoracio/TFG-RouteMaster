@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 import { HttpParams } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
 import { RouteFormResponse } from '../../features/pages/map-page/Utils/route-form-response';
-import { RouteGroupResponse } from '../../Dto/maps-dtos';
+import { Coords, RouteGroupResponse } from '../../Dto/maps-dtos';
 
 
 @Injectable({
@@ -16,8 +16,8 @@ export class RouteService {
   constructor(private http: HttpClient) {}
 
   calculateRoute(routeFormResponse: RouteFormResponse): Observable<string> {
-    const headers = new HttpHeaders()
-    .set('key', environment.googleMapsApiKey);
+    const headers = new HttpHeaders().set('key', environment.googleMapsMapId);
+
     let waypointsString = routeFormResponse.waypoints.join('|');
     let parameters = new HttpParams()
       .set('origin', routeFormResponse.origin)
@@ -32,12 +32,29 @@ export class RouteService {
 
 
   calculateCoords(routeFormResponse: RouteFormResponse): Observable<string> {
-    const headers = new HttpHeaders()
-    .set('key', environment.googleMapsApiKey);
+    const headers = new HttpHeaders().set('key', environment.googleMapsMapId);
 
+    let waypointsString = routeFormResponse.waypoints.join('|');
     let parameters = new HttpParams()
       .set('origin', routeFormResponse.origin)
       .set('destination', routeFormResponse.destination)
+      .set('waypoints', waypointsString)
+      .set('optimizeWaypoints', routeFormResponse.optimizeWaypoints)
+      .set('optimizeRoute', routeFormResponse.optimizeRoute)
     return this.http.get(this.apiUrl + "/polylineCoords", {headers: headers, params: parameters, responseType: 'text' });
+  }
+
+  calculateLegCoords(routeFormResponse: RouteFormResponse): Observable<string>{
+    const headers = new HttpHeaders().set('key', environment.googleMapsMapId);
+
+    let waypointsString = routeFormResponse.waypoints.join('|');
+    let parameters = new HttpParams()
+      .set('origin', routeFormResponse.origin)
+      .set('destination', routeFormResponse.destination)
+      .set('waypoints', waypointsString)
+      .set('optimizeWaypoints', routeFormResponse.optimizeWaypoints)
+      .set('optimizeRoute', routeFormResponse.optimizeRoute)
+
+    return this.http.get(this.apiUrl + "/legCoords", {headers: headers, params: parameters, responseType: 'text' });
   }
 }
