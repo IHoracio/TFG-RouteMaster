@@ -27,11 +27,11 @@ public class RouteWeatherController {
 
 
 	@Operation(
-			summary = "Lista de coordenadas y gasolineras en un radio de los pasos de una ruta", 
+			summary = "Lista de coordenadas y el clima para cada set de coordenadas (los pasos de una ruta).", 
 			description = "Devuelve una lista de coordenadas para cada uno de los pasos de la ruta dada, "
 					+ "con una lista del clima por horas para cada punto.")
 	@ApiResponses(value = { 
-			@ApiResponse(responseCode = "200", description = "Pasos encontrados para la ruta dada."),
+			@ApiResponse(responseCode = "200", description = "Pasos y clima encontrados para la ruta dada."),
 			@ApiResponse(responseCode = "404", description = "Solicitud errónea: no se pudieron calcular los pasos de la ruta.")
 			})
 	@GetMapping("/api/routes/weather")

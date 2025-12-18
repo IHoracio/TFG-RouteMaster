@@ -1,5 +1,7 @@
 package es.metrica.sept25.evolutivo.controller.maps.routes.executeRoutes;
 
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,15 +30,15 @@ public class RouteExecutionController {
         @ApiResponse(responseCode = "200", description = "Ruta ejecutada correctamente"),
         @ApiResponse(responseCode = "404", description = "Ruta no encontrada")
     })
-    @GetMapping("/executeSavedRoute")
-    public ResponseEntity<RouteExecutionDTO> executeSavedRoute(
-            @RequestParam Long id) {
+    @GetMapping("/execute")
+    public ResponseEntity<RouteExecutionDTO> executeSavedRoute(@RequestParam Long id) {
 
-        try {
-            RouteExecutionDTO dto = routeExecutionService.executeSavedRoute(id);
-            return new ResponseEntity<>(dto, HttpStatus.OK);
-        } catch (RuntimeException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+    	Optional<RouteExecutionDTO> dto = routeExecutionService.executeSavedRoute(id);
+
+    	if (dto.isEmpty()) {
+    		return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    	}
+
+    	return new ResponseEntity<>(dto.get(), HttpStatus.OK);
     }
 }

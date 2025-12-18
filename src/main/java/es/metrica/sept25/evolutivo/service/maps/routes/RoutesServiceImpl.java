@@ -16,7 +16,6 @@ import com.google.maps.model.EncodedPolyline;
 import com.google.maps.model.LatLng;
 
 import es.metrica.sept25.evolutivo.domain.dto.maps.routes.Coords;
-import es.metrica.sept25.evolutivo.domain.dto.maps.routes.CoordsWithStations;
 import es.metrica.sept25.evolutivo.domain.dto.maps.routes.CoordsWithWeather;
 import es.metrica.sept25.evolutivo.domain.dto.maps.routes.Leg;
 import es.metrica.sept25.evolutivo.domain.dto.maps.routes.RouteGroup;
@@ -175,14 +174,26 @@ public class RoutesServiceImpl implements RoutesService {
 	}
 
 	@Override
-	public List<CoordsWithStations> getGasStationsForRoute(RouteGroup routeGroup, Long radius) {
-		return extractRoutePoints(routeGroup).stream().map(
-				coords -> {
-					List<Gasolinera> stationsPerPoint = gasolineraService
-							.getGasolinerasInRadiusCoords(coords.getLat(), coords.getLng(), radius);
-					return new CoordsWithStations(coords.getLat(), coords.getLng(), stationsPerPoint);	
+	public List<Coords> getGasStationsCoordsForRoute(RouteGroup routeGroup, Long radius) {
+		List<Coords> coords = extractRoutePoints(routeGroup);
+		
+		List<Coords> stationsForRoute = coords.stream().flatMap(
+				coord ->
+				{ 
+					List<Gasolinera> g = gasolineraService.getGasolinerasInRadiusCoords(coord.getLat(), coord.getLng(), radius);
+					return g.stream();
+				 })
+				.peek(g -> {
+					System.out.println(g.getDireccion());
+					System.out.println(g.getLatitud() + "|" + g.getLongitud());
 				})
+				.map(station -> {
+					return new Coords(station.getLatitud(), station.getLongitud());
+				})
+				.distinct()
 				.toList();
+		
+		return stationsForRoute;
 	}
 	
 	@Override
