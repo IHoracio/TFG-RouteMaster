@@ -22,7 +22,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 								   + "de Geocoding de Google Maps para hacer"
 		                           + "traslaciones de coordenadas a direcciones"
 		                           + "y viceversa.")
-@RequestMapping("/geocode")
+@RequestMapping("/api/geocode")
 public class GeocodeController {
 
 	@Autowired

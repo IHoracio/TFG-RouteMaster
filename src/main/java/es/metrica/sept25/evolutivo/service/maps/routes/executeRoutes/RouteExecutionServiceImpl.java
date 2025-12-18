@@ -1,0 +1,67 @@
+package es.metrica.sept25.evolutivo.service.maps.routes.executeRoutes;
+
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import es.metrica.sept25.evolutivo.domain.dto.maps.routes.RouteGroup;
+import es.metrica.sept25.evolutivo.domain.dto.maps.routes.executionRoutes.RouteExecutionDTO;
+import es.metrica.sept25.evolutivo.domain.dto.maps.routes.savedRoutes.PointDTO;
+import es.metrica.sept25.evolutivo.domain.dto.maps.routes.savedRoutes.SavedRouteDTO;
+import es.metrica.sept25.evolutivo.service.maps.routes.RoutesService;
+import es.metrica.sept25.evolutivo.service.maps.routes.savedRoutes.SavedRouteService;
+
+@Service
+public class RouteExecutionServiceImpl implements RouteExecutionService{
+
+	 @Autowired
+	    private SavedRouteService savedRouteService;
+
+	    @Autowired
+	    private RoutesService routesService;
+
+	    public RouteExecutionDTO executeSavedRoute(Long id) {
+	        SavedRouteDTO savedRoute = savedRouteService.getSavedRoute(id);
+
+	        if (savedRoute.getPuntos().isEmpty()) {
+	            throw new RuntimeException("La ruta no tiene puntos");
+	        }
+
+	        PointDTO inicio = savedRoute.getPuntos().get(0);
+	        PointDTO fin = savedRoute.getPuntos().get(savedRoute.getPuntos().size() - 1);
+	        List<String> intermedios = savedRoute.getPuntos().subList(1, savedRoute.getPuntos().size() - 1)
+	                                               .stream()
+	                                               .map(PointDTO::getAddress)
+	                                               .toList();
+
+	        Optional<RouteGroup> routeGroupOpt = routesService.getDirections(
+	                inicio.getAddress(),
+	                fin.getAddress(),
+	                intermedios,
+	                false,
+	                false,
+	                "es"
+	        );
+
+	        if (routeGroupOpt.isEmpty()) {
+	            throw new RuntimeException("No se pudo calcular la ruta");
+	        }
+
+	        RouteGroup routeGroup = routeGroupOpt.get();
+	        var leg = routeGroup.getRoutes().get(0).getLegs().get(0);
+
+	        RouteExecutionDTO dto = new RouteExecutionDTO();
+	        dto.setDistanceMeters(leg.getDistance().getValue());
+	        dto.setDurationSeconds(leg.getDuration().getValue());
+
+	        StringBuilder polylineBuilder = new StringBuilder();
+	        for (var step : leg.getSteps()) {
+	            polylineBuilder.append(step.getPolyline().getPoints());
+	        }
+	        dto.setPolyline(polylineBuilder.toString());
+
+	        return dto;
+	    }
+}
