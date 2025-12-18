@@ -31,7 +31,7 @@ export class RouteService {
   }
 
 
-  calculateCoords(routeFormResponse: RouteFormResponse): Observable<string> {
+  calculatePolylineCoords(routeFormResponse: RouteFormResponse): Observable<string> {
     const headers = new HttpHeaders().set('key', environment.googleMapsMapId);
 
     let waypointsString = routeFormResponse.waypoints.join('|');
@@ -44,7 +44,7 @@ export class RouteService {
     return this.http.get(this.apiUrl + "/polylineCoords", {headers: headers, params: parameters, responseType: 'text' });
   }
 
-  calculateLegCoords(routeFormResponse: RouteFormResponse): Observable<string>{
+  calculatePointCoords(routeFormResponse: RouteFormResponse): Observable<string>{
     const headers = new HttpHeaders().set('key', environment.googleMapsMapId);
 
     let waypointsString = routeFormResponse.waypoints.join('|');
@@ -56,5 +56,20 @@ export class RouteService {
       .set('optimizeRoute', routeFormResponse.optimizeRoute)
 
     return this.http.get(this.apiUrl + "/legCoords", {headers: headers, params: parameters, responseType: 'text' });
+  }
+
+  calculateGasStations(routeFormResponse: RouteFormResponse): Observable<string>{
+    const headers = new HttpHeaders().set('key', environment.googleMapsMapId);
+
+    let waypointsString = routeFormResponse.waypoints.join('|');
+    let parameters = new HttpParams()
+      .set('origin', routeFormResponse.origin)
+      .set('destination', routeFormResponse.destination)
+      .set('waypoints', waypointsString)
+      .set('optimizeWaypoints', routeFormResponse.optimizeWaypoints)
+      .set('optimizeRoute', routeFormResponse.optimizeRoute)
+      .set('radius', 5)
+
+    return this.http.get(this.apiUrl + "/gasStations", {headers: headers, params: parameters, responseType: 'text' });
   }
 }

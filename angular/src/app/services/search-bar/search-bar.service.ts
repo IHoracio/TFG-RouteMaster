@@ -24,18 +24,18 @@ export class SearchBarService {
         
       })
       */
-      this.saveCoordinates(routeFormResponse);
-      setTimeout(() => {
-        console.log('sleep');
-        this.saveWaypointCoordinates(routeFormResponse);
-      }, 1000);
-      
+     this.initializer(routeFormResponse)
+  }
+  async initializer(routeFormResponse: RouteFormResponse){
+    await this.saveCoordinates(routeFormResponse);
+    this.saveWaypointCoordinates(routeFormResponse)
+    this.saveGasStationsCoordinates(routeFormResponse)
   }
 
   saveCoordinates(routeFormResponse: RouteFormResponse){
     let coords: Coords[] = []
 
-    this.routeService.calculateCoords(routeFormResponse)
+    this.routeService.calculatePolylineCoords(routeFormResponse)
     .subscribe(data => {
       const parsedData = JSON.parse(data);
 
@@ -46,7 +46,7 @@ export class SearchBarService {
   saveWaypointCoordinates(routeFormResponse: RouteFormResponse){
     let coords: Coords[] = []
 
-    this.routeService.calculateLegCoords(routeFormResponse)
+    this.routeService.calculatePointCoords(routeFormResponse)
     .subscribe(data => {
       const parsedData = JSON.parse(data);
       coords = parsedData;
@@ -54,11 +54,26 @@ export class SearchBarService {
     })
     
   }
+  saveGasStationsCoordinates(routeFormResponse: RouteFormResponse){
+    let coords: Coords[] = []
+    this.routeService.calculateGasStations(routeFormResponse)
+    .subscribe(data => {
+      console.log("gasolinera", data)
+      const parsedData = JSON.parse(data);
+      coords = parsedData;
+      console.log(coords)
+      this.giveGasStationCoords(coords)
+    })
+    
+  }
+
   giveCoords(coords: Coords[]){
     this.mapCommunication.sendRoute(coords)
   }
   giveWaypointCoords(coords: Coords[]){
-    console.log("coordenadas give waypointCoords", coords)
     this.mapCommunication.sendPoints(coords);
+  }
+  giveGasStationCoords(coords: Coords[]){
+    this.mapCommunication.sendGasStations(coords)
   }
 }

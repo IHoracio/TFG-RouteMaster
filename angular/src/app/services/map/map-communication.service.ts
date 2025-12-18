@@ -33,7 +33,6 @@ export class MapCommunicationService {
   }
 
   sendPoints(coords: Coords[]): void {
-    console.log("coordenadas sendPoints", coords)
     this.mapPageInstance?.drawPoints(coords);
   }
 
