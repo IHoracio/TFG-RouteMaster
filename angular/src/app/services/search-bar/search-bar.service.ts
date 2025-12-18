@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, TemplateRef } from '@angular/core';
 import { RouteFormResponse } from '../../features/pages/map-page/Utils/route-form-response';
 import { RouteService } from '../routes/route.service';
 import { Coords, RouteGroupResponse } from '../../Dto/maps-dtos';
@@ -24,11 +24,10 @@ export class SearchBarService {
         
       })
       */
-     this.initializer(routeFormResponse)
-  }
-  async initializer(routeFormResponse: RouteFormResponse){
-    await this.saveCoordinates(routeFormResponse);
-    this.saveWaypointCoordinates(routeFormResponse)
+     this.saveCoordinates(routeFormResponse)
+     setTimeout(()=>{
+        this.saveWaypointCoordinates(routeFormResponse)    
+     }, 1000)
     this.saveGasStationsCoordinates(routeFormResponse)
   }
 
