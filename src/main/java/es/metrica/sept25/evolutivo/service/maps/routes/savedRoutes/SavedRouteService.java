@@ -11,7 +11,8 @@ public interface SavedRouteService {
 
 	Optional<SavedRouteDTO> getSavedRoute(Long id);
 
-	SavedRouteDTO saveRoute(String name, List<PointDTO> puntosDTO, User user);
-	
+	SavedRouteDTO saveRoute(String name, List<PointDTO> puntosDTO, User user, boolean optimizeWaypoints,
+			boolean optimizeRoute, String language);
+
 	void deleteRoute(Long id, User user);
 }

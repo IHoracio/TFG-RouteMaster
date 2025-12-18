@@ -1,15 +1,17 @@
 package es.metrica.sept25.evolutivo.domain.dto.maps.routes.executionRoutes;
 
+import java.util.List;
+
 public class RouteExecutionDTO {
 
-	private String polyline;
+	private List<String> polylines;
     private long distanceMeters;
     private long durationSeconds;
-	public String getPolyline() {
-		return polyline;
+	public List<String> getPolylines() {
+		return polylines;
 	}
-	public void setPolyline(String polyline) {
-		this.polyline = polyline;
+	public void setPolylines(List<String> polylines) {
+		this.polylines = polylines;
 	}
 	public long getDistanceMeters() {
 		return distanceMeters;

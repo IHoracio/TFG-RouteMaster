@@ -8,11 +8,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import es.metrica.sept25.evolutivo.entity.maps.routes.RoutePreferences;
 import es.metrica.sept25.evolutivo.entity.user.User;
 import es.metrica.sept25.evolutivo.service.user.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -96,5 +99,52 @@ public class UserController {
 		}
 
 		return ResponseEntity.ok(usuarios);
+	}
+	
+	@PutMapping("/{id}/preferences")
+	public ResponseEntity<Void> updatePreferences(
+			@RequestParam String email,
+	        @RequestParam List<String> preferredBrands,
+	        @RequestParam int radioKm,
+	        @RequestParam String fuelType,
+	        @RequestParam double maxPrice,
+	        @RequestParam RoutePreferences.MapViewType mapView
+	) {
+	    Optional<User> userOpt = service.getByEmail(email);
+
+	    if (userOpt.isEmpty()) {
+	        return ResponseEntity.notFound().build();
+	    }
+
+	    service.updateRoutePreferences(
+	        userOpt.get(), 
+	        preferredBrands, 
+	        radioKm, 
+	        fuelType, 
+	        maxPrice, 
+	        mapView
+	    );
+
+	    return ResponseEntity.ok().build();
+	}
+	
+	@PutMapping("/{id}/preferences/user")
+	public ResponseEntity<Void> updateUserPreferences(
+			@RequestParam String email,
+	        @RequestParam String theme,
+	        @RequestParam String language
+	) {
+	    Optional<User> userOpt = service.getByEmail(email);
+	    if (userOpt.isEmpty()) {
+	        return ResponseEntity.notFound().build();
+	    }
+
+	    service.updateUserPreferences(
+	        userOpt.get(),
+	        theme,
+	        language
+	    );
+
+	    return ResponseEntity.ok().build();
 	}
 }

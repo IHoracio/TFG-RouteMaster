@@ -8,8 +8,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import es.metrica.sept25.evolutivo.domain.dto.maps.routes.savedRoutes.PointDTO;
+import es.metrica.sept25.evolutivo.domain.dto.maps.routes.savedRoutes.RoutePreferencesDTO;
 import es.metrica.sept25.evolutivo.domain.dto.maps.routes.savedRoutes.SavedRouteDTO;
 import es.metrica.sept25.evolutivo.entity.maps.routes.Point;
+import es.metrica.sept25.evolutivo.entity.maps.routes.RoutePreferences;
 import es.metrica.sept25.evolutivo.entity.maps.routes.SavedRoute;
 import es.metrica.sept25.evolutivo.entity.user.User;
 import es.metrica.sept25.evolutivo.repository.SavedRouteRepository;
@@ -22,11 +24,19 @@ public class SavedRouteServiceImpl implements SavedRouteService {
 
 	@Override
 	@Transactional
-	public SavedRouteDTO saveRoute(String name, List<PointDTO> puntosDTO, User user) {
+	public SavedRouteDTO saveRoute(String name, 
+	        List<PointDTO> puntosDTO, 
+	        User user,
+	        boolean optimizeWaypoints,
+	        boolean optimizeRoute,
+	        String language) {
 		SavedRoute route = new SavedRoute();
 		route.setName(name);
 		route.setUser(user);
-
+		route.setOptimizeWaypoints(optimizeWaypoints);
+	    route.setOptimizeRoute(optimizeRoute);
+	    route.setLanguage(language);
+		
 		List<Point> puntos = puntosDTO.stream().map(dto -> {
 			Point point = new Point();
 			point.setAddress(dto.getAddress());

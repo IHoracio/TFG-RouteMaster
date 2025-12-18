@@ -1,5 +1,6 @@
 package es.metrica.sept25.evolutivo.controller.maps.routes.savedRoutes;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -36,13 +37,15 @@ public class SavedRouteController {
 	private UserService userService;
 
 	@Operation(summary = "Guarda una ruta calculada")
-	@ApiResponses(value = { 
-		@ApiResponse(responseCode = "200", description = "Ruta guardada correctamente"),
-		@ApiResponse(responseCode = "404", description = "Usuario no encontrado") 
-	})
+	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Ruta guardada correctamente"),
+			@ApiResponse(responseCode = "404", description = "Usuario no encontrado") })
 	@PostMapping("/save")
-	public ResponseEntity<SavedRouteDTO> saveRoute(@RequestParam String name, @RequestBody List<PointDTO> puntos,
-			@RequestParam String email) {
+	public ResponseEntity<SavedRouteDTO> saveRoute(@RequestParam String name,
+			@RequestParam(required = true) String origin, @RequestParam(required = true) String destination,
+			@RequestParam(required = false, defaultValue = "") List<String> waypoints,
+			@RequestParam(required = false, defaultValue = "false") boolean optimizeWaypoints,
+			@RequestParam(required = false, defaultValue = "false") boolean optimizeRoute,
+			@RequestParam(required = false, defaultValue = "es") String language, @RequestParam String email) {
 		Optional<User> userOpt = userService.getByEmail(email);
 
 		if (userOpt.isEmpty()) {
@@ -51,15 +54,35 @@ public class SavedRouteController {
 
 		User user = userOpt.get();
 
-		SavedRouteDTO saved = savedRouteService.saveRoute(name, puntos, user);
+		List<PointDTO> puntos = new ArrayList<>();
+
+		PointDTO originPoint = new PointDTO();
+		originPoint.setAddress(origin);
+		originPoint.setType("ORIGIN");
+		puntos.add(originPoint);
+
+		if (waypoints != null) {
+			for (String wp : waypoints) {
+				PointDTO wpPoint = new PointDTO();
+				wpPoint.setAddress(wp);
+				wpPoint.setType("WAYPOINT");
+				puntos.add(wpPoint);
+			}
+		}
+
+		PointDTO destinationPoint = new PointDTO();
+		destinationPoint.setAddress(destination);
+		destinationPoint.setType("DESTINATION");
+		puntos.add(destinationPoint);
+
+		SavedRouteDTO saved = savedRouteService.saveRoute(name, puntos, user, optimizeWaypoints, optimizeRoute,
+				language);
 		return ResponseEntity.ok(saved);
 	}
 
 	@Operation(summary = "Obtiene una ruta guardada por su ID")
-	@ApiResponses(value = { 
-		@ApiResponse(responseCode = "200", description = "Ruta encontrada"),
-		@ApiResponse(responseCode = "404", description = "Ruta no encontrada") 
-	})
+	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Ruta encontrada"),
+			@ApiResponse(responseCode = "404", description = "Ruta no encontrada") })
 	@GetMapping("/get/{id}")
 	public ResponseEntity<SavedRouteDTO> getSavedRoute(@PathVariable Long id) {
 		Optional<SavedRouteDTO> routeDTO = savedRouteService.getSavedRoute(id);
@@ -72,11 +95,9 @@ public class SavedRouteController {
 	}
 
 	@Operation(summary = "Elimina una ruta guardada")
-	@ApiResponses(value = { 
-		@ApiResponse(responseCode = "204", description = "Ruta eliminada con éxito"),
-		@ApiResponse(responseCode = "404", description = "Ruta no encontrada."),
-		@ApiResponse(responseCode = "403", description = "No autorizada") 
-	})
+	@ApiResponses(value = { @ApiResponse(responseCode = "204", description = "Ruta eliminada con éxito"),
+			@ApiResponse(responseCode = "404", description = "Ruta no encontrada."),
+			@ApiResponse(responseCode = "403", description = "No autorizada") })
 	@DeleteMapping("/delete/{id}")
 	public ResponseEntity<Void> deleteRoute(@PathVariable Long id, @RequestParam String email) {
 

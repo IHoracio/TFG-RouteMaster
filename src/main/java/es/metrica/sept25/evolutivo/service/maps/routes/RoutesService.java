@@ -16,7 +16,7 @@ public interface RoutesService {
 	Optional<RouteGroup> getDirections(String origin, String destination, List<String> waypoints,
 			boolean optimizeWaypoints, boolean optimizeRoute, String language);
 
-	List<CoordsWithStations> getGasStationsForRoute(RouteGroup routeGroup, Long radius);
+	CoordsWithStations getGasStationsForRoute(RouteGroup routeGroup, Long radius);
 
 	String getUrl(List<String> waypoints, UriComponentsBuilder url);
 
