@@ -6,10 +6,8 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-
 import es.metrica.sept25.evolutivo.domain.dto.maps.routes.Leg;
 import es.metrica.sept25.evolutivo.domain.dto.maps.routes.RouteGroup;
-import es.metrica.sept25.evolutivo.domain.dto.maps.routes.Step;
 import es.metrica.sept25.evolutivo.domain.dto.maps.routes.executionRoutes.RouteExecutionDTO;
 import es.metrica.sept25.evolutivo.domain.dto.maps.routes.savedRoutes.PointDTO;
 import es.metrica.sept25.evolutivo.domain.dto.maps.routes.savedRoutes.SavedRouteDTO;
@@ -35,7 +33,7 @@ public class RouteExecutionServiceImpl implements RouteExecutionService{
 	        SavedRouteDTO savedRoute = savedRouteOpt.get();
 
 	        if (savedRoute.getPuntos().isEmpty()) {
-	            throw new RuntimeException("La ruta no tiene puntos");
+	            return Optional.empty();
 	        }
 
 	        PointDTO inicio = savedRoute.getPuntos().get(0);
@@ -55,7 +53,7 @@ public class RouteExecutionServiceImpl implements RouteExecutionService{
 	        );
 
 	        if (routeGroupOpt.isEmpty()) {
-	            throw new RuntimeException("No se pudo calcular la ruta");
+	            return Optional.empty();
 	        }
 
 	        RouteGroup routeGroup = routeGroupOpt.get();

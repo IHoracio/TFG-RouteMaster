@@ -8,10 +8,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import es.metrica.sept25.evolutivo.domain.dto.maps.routes.savedRoutes.PointDTO;
-import es.metrica.sept25.evolutivo.domain.dto.maps.routes.savedRoutes.RoutePreferencesDTO;
 import es.metrica.sept25.evolutivo.domain.dto.maps.routes.savedRoutes.SavedRouteDTO;
 import es.metrica.sept25.evolutivo.entity.maps.routes.Point;
-import es.metrica.sept25.evolutivo.entity.maps.routes.RoutePreferences;
 import es.metrica.sept25.evolutivo.entity.maps.routes.SavedRoute;
 import es.metrica.sept25.evolutivo.entity.user.User;
 import es.metrica.sept25.evolutivo.repository.SavedRouteRepository;
@@ -60,14 +58,21 @@ public class SavedRouteServiceImpl implements SavedRouteService {
 	@Transactional
 	public void deleteRoute(Long id, User user) {
 
-		SavedRoute route = repository.findById(id)
-				.orElseThrow(() -> new RuntimeException("Ruta no encontrada"));
-
-		if (!route.getUser().getId().equals(user.getId())) {
-			throw new RuntimeException("No puedes borrar una ruta que no es tuya");
+		Optional<SavedRoute> route = repository.findById(id);
+		
+		if (route.isEmpty()) {
+			System.err.println("No existe una ruta con el ID " + id.toString());
+			return;
 		}
 
-		repository.delete(route);
+		if (!route.get().getUser().getId().equals(user.getId())) {
+			System.err.println("El usuario " + user.toString() + 
+					"intentó borrar una ruta con ID: " + id.toString()
+					+ " que no era suya.");
+			return;
+		}
+
+		repository.delete(route.get());
 	}
 
 	public Optional<SavedRouteDTO> getSavedRoute(Long id) {

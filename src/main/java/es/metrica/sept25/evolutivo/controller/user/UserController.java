@@ -8,7 +8,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -35,29 +34,37 @@ public class UserController {
 	// TODO: MEJORAR RESPUESTA DE ESTE ENDPOINT
 	@Operation(summary = "Crear un nuevo usuario")
 	@ApiResponses(value = { 
-			@ApiResponse(responseCode = "200", description = "Usuario creado correctamente"),
-			@ApiResponse(responseCode = "400", description = "Datos inválidos") 
-			})
+		@ApiResponse(responseCode = "200", description = "Usuario creado correctamente"),
+		@ApiResponse(responseCode = "400", description = "Datos inválidos") 
+	})
 	@PostMapping("/create")
 	public ResponseEntity<User> createUser(
-			@Parameter(description = "Email del usuario", example = "usuario@example.com") @RequestParam(required = true) String email,
+			@Parameter(description = "Email del usuario", example = "usuario@example.com") 
+			@RequestParam(required = true) String email,
 
-			@Parameter(description = "Contraseña del usuario", example = "password123") @RequestParam(required = true) String password,
+			@Parameter(description = "Contraseña del usuario", example = "password123") 
+			@RequestParam(required = true) String password,
 
-			@Parameter(description = "Nombre del usuario", example = "Usuario") @RequestParam(required = true) String name,
+			@Parameter(description = "Nombre del usuario", example = "Usuario") 
+			@RequestParam(required = true) String name,
 
-			@Parameter(description = "Apellido del usuario", example = "Prueba") @RequestParam(required = true) String surname) {
+			@Parameter(description = "Apellido del usuario", example = "Prueba") 
+			@RequestParam(required = true) String surname) {
 
-		User user = service.createUser(name, surname, password, email);
+		Optional<User> user = service.createUser(name, surname, password, email);
 
-		return ResponseEntity.ok(user);
+		if (user.isEmpty()) {
+			return ResponseEntity.badRequest().build();
+		}
+
+		return ResponseEntity.ok(user.get());
 	}
 
 	@Operation(summary = "Obtener un usuario por mail")
 	@ApiResponses(value = { 
 		@ApiResponse(responseCode = "200", description = "Usuario encontrado"),
 		@ApiResponse(responseCode = "404", description = "Usuario no encontrado") 
-		})
+	})
 	@GetMapping("/get")
 	public ResponseEntity<User> getUser(
 			@Parameter(description = "Email del usuario a buscar", example = "usuario@example.com") @RequestParam String mail) {
@@ -68,9 +75,9 @@ public class UserController {
 
 	@Operation(summary = "Eliminar un usuario por email")
 	@ApiResponses(value = { 
-			@ApiResponse(responseCode = "204", description = "Usuario eliminado correctamente"),
-			@ApiResponse(responseCode = "404", description = "Usuario no encontrado") 
-			})
+		@ApiResponse(responseCode = "204", description = "Usuario eliminado correctamente"),
+		@ApiResponse(responseCode = "404", description = "Usuario no encontrado") 
+	})
 	@DeleteMapping("/delete")
 	public ResponseEntity<String> deleteUser(@RequestParam String email) {
 
@@ -84,12 +91,15 @@ public class UserController {
 		return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuario no encontrado");
 	}
 
-	@Operation(summary = "Listar todos los usuarios", 
-			description = "Devuelve la lista de usuarios registrados. Si no "
-						+ "hay usuarios devuelve un 204: No Content.")
+	@Operation(
+		summary = "Listar todos los usuarios", 
+		description = "Devuelve la lista de usuarios registrados. Si no "
+					+ "hay usuarios devuelve un 204: No Content."
+	)
 	@ApiResponses(value = { 
-			@ApiResponse(responseCode = "200", description = "Lista de usuarios devuelta correctamente"), 
-			@ApiResponse(responseCode = "404", description = "No se encontraron usuarios registrados") })
+		@ApiResponse(responseCode = "200", description = "Lista de usuarios devuelta correctamente"), 
+		@ApiResponse(responseCode = "404", description = "No se encontraron usuarios registrados") 
+	})
 	@GetMapping("/all")
 	public ResponseEntity<List<User>> getAllUsers() {
 		List<User> usuarios = service.getAll();

@@ -15,7 +15,7 @@ public interface UserService {
 
     void deleteByEmail(String mail);
 
-	User createUser(String name, String surname, String password, String email);
+	Optional<User> createUser(String name, String surname, String password, String email);
 
 	void updateRoutePreferences(User user, List<String> preferredBrands, int radioKm, String fuelType, double maxPrice,
 			MapViewType mapView);

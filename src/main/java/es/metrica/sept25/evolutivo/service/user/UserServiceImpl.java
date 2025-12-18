@@ -52,10 +52,10 @@ public class UserServiceImpl implements UserService {
 	
 	@Override
 	@Transactional
-	public User createUser(String nombre, String apellido, String password, String email) {
+	public Optional<User> createUser(String nombre, String apellido, String password, String email) {
 
 	    if (userRepository.findByEmail(email).isPresent()) {
-	        throw new RuntimeException("El usuario ya existe");
+	        return Optional.empty();
 	    }
 
 	    User user = new User();
@@ -79,7 +79,7 @@ public class UserServiceImpl implements UserService {
 
         user.setUserPreferences(defaultPrefs);
 
-	    return save(user);
+	    return Optional.of(save(user));
 	}
 	
 	@Override
