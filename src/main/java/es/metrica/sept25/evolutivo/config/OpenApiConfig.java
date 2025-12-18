@@ -20,7 +20,7 @@ import io.swagger.v3.oas.annotations.servers.Server;
 	)
 	@SecurityScheme(
 	    name = "aemetApiKey",
-	    description = "API Key necesaria para AEMET",
+		description = "API Key necesaria para AEMET",
 	    type = SecuritySchemeType.APIKEY,
 	    in = SecuritySchemeIn.HEADER,
 	    paramName = "api_key"

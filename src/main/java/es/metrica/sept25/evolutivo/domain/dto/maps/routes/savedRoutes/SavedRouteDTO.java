@@ -1,37 +1,44 @@
 package es.metrica.sept25.evolutivo.domain.dto.maps.routes.savedRoutes;
 
 import java.util.List;
+import java.util.UUID;
 
 public class SavedRouteDTO {
 
-	private Long id;
-    private String name;
-    private List<PointDTO> points;
-    private RoutePreferencesDTO preferences;
-	public Long getId() {
-		return id;
+	private UUID routeId;
+	private String name;
+	private List<PointDTO> points;
+	private RoutePreferencesDTO preferences;
+
+	public UUID getRouteId() {
+		return routeId;
 	}
-	public void setId(Long id) {
-		this.id = id;
+
+	public void setRouteId(UUID routeId) {
+		this.routeId = routeId;
 	}
+
 	public String getName() {
 		return name;
 	}
+
 	public void setName(String name) {
 		this.name = name;
 	}
-	public List<PointDTO> getPuntos() {
+
+	public List<PointDTO> getPoints() {
 		return points;
 	}
-	public void setPuntos(List<PointDTO> puntos) {
-		this.points = puntos;
+
+	public void setPoints(List<PointDTO> points) {
+		this.points = points;
 	}
+
 	public RoutePreferencesDTO getPreferences() {
 		return preferences;
 	}
+
 	public void setPreferences(RoutePreferencesDTO preferences) {
 		this.preferences = preferences;
 	}
-    
-    
 }

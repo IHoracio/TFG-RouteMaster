@@ -20,7 +20,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RestController
 @Tag(
 	name = "Clima", 
-	description = "Conjunto de endpoints que operan sobre la API de"
+	description = "Conjunto de endpoints que operan sobre la API de "
 				+ "la AEMET para sacar datos del clima en diversas formas."
 	)
 @RequestMapping("/api/checkWeather")
