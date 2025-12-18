@@ -37,4 +37,9 @@ export class MapCommunicationService {
     this.mapPageInstance?.drawPoints(coords);
   }
 
+  sendGasStations(coords: Coords[]): void {
+
+    this.mapPageInstance?.markGasStations(coords);
+  }
+
 }

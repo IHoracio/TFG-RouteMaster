@@ -20,6 +20,7 @@ export class MapPageComponent {
   private startMarker?: any;
   private endMarker?: any;
   private waypoints: any[] = [];
+  private gasStationsMarkers: any[] = [];
 
   constructor(private mapComm: MapCommunicationService) {}
 
@@ -40,7 +41,6 @@ export class MapPageComponent {
     });
 
     const mapsLib = (await importLibrary('maps')) as unknown as any;
-    const markerLib = (await importLibrary('marker')) as unknown as any;
 
     const { Map } = mapsLib;
 
@@ -60,7 +60,6 @@ export class MapPageComponent {
       document.getElementById('map') as HTMLElement,
       mapOptions
     );
-
     this.mapComm.registerMapPage(this);
   }
 
@@ -102,6 +101,13 @@ export class MapPageComponent {
         wp.map = null; 
       });
       this.waypoints = [];
+    }
+
+    if (this.gasStationsMarkers && this.gasStationsMarkers.length) {
+      this.gasStationsMarkers.forEach(marker => {
+        marker.map = null;
+      })
+      this.gasStationsMarkers = [];
     }
   
     if (this.startMarker) {
@@ -149,6 +155,42 @@ public drawPoints(coords: Coords[]): void {
     if (isStart) this.startMarker = advancedMarker;
     if (isEnd) this.endMarker = advancedMarker;
   });
+}
+
+public markGasStations(gasStationsCoords: Coords[]): void {
+  if(!this.map) {
+    console.warn('Map not initialized');
+    return;
+  }
+
+  if(!gasStationsCoords || gasStationsCoords.length === 0) return;
+
+  const size = 36;
+  const gasStationPointSvg = `
+      <svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 24 24">
+        <path d="M12 2C8 2 5 5 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-4-3-7-7-7z"
+              fill="#EA4335" stroke="#ffffff" stroke-width="1.2"/>
+        <circle cx="12" cy="9" r="2.3" fill="#ffffff"/>
+      </svg>
+    `;
+  
+  gasStationsCoords.forEach(c => {
+      const container = document.createElement('div');
+      container.innerHTML = gasStationPointSvg;
+      container.style.width = '36px';
+      container.style.height = '36px';
+      container.style.display = 'block';
+      container.style.transform = 'translateY(-6px)';
+
+      const marker = new google.maps.marker.AdvancedMarkerElement({
+        map: this.map,
+        position: { lat: c.lat, lng: c.lng },
+        content: container,
+        title: (c as any).name || 'Gasolinera'
+      });
+      this.gasStationsMarkers.push(marker);
+  });
+
 }
 
 }
