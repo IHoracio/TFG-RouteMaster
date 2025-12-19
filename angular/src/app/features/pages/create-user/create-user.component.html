@@ -1,0 +1,24 @@
+
+<form [formGroup]="form" (ngSubmit)="onSubmit()">
+
+    <div>
+        <span class="asterisk">*</span>
+        <label for="email">Introduzca el email.</label>
+        <input type="text" name="email" id="email" formControlName="email">
+    </div>
+    
+    <div *ngIf="hasError('email', 'required')">
+        <p style="color: red">El email es obligatorio</p>
+    </div>
+
+    <div>
+        <span class="asterisk">*</span>
+        <label for="password">Introduzca la contraseña.</label>
+        <input type="password" name="password" id="password" formControlName="password">
+    </div>
+    <div *ngIf="hasError('password', 'required')">
+        <p style="color: red">La contraseña es obligatoria!</p>
+    </div>
+
+    <input type="submit" [disabled]="form.invalid"/>
+</form>

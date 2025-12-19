@@ -1,6 +1,6 @@
 import { Component, Input, NgModule } from '@angular/core';
 import { FormGroup, FormsModule, FormArray, FormControl } from '@angular/forms';
-import { RouteFormResponse } from '../map-page/Utils/route-form-response';
+import { RouteFormResponse } from '../../../Dto/route-form-response';
 import { MapPageComponent } from '../map-page/map-page.component';
 import { SearchBarService } from '../../../services/search-bar/search-bar.service';
 import { NgFor } from '@angular/common';
