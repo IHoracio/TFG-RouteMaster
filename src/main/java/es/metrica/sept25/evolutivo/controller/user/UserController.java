@@ -10,10 +10,12 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import es.metrica.sept25.evolutivo.domain.dto.user.UserDTO;
 import es.metrica.sept25.evolutivo.entity.maps.routes.RoutePreferences;
 import es.metrica.sept25.evolutivo.entity.user.User;
 import es.metrica.sept25.evolutivo.service.user.UserService;
@@ -39,7 +41,7 @@ public class UserController {
 	})
 	@PostMapping("/create")
 	public ResponseEntity<User> createUser(
-			@Parameter(description = "Email del usuario", example = "usuario@example.com") 
+			/*@Parameter(description = "Email del usuario", example = "usuario@example.com") 
 			@RequestParam(required = true) String email,
 
 			@Parameter(description = "Contraseña del usuario", example = "password123") 
@@ -49,14 +51,17 @@ public class UserController {
 			@RequestParam(required = true) String name,
 
 			@Parameter(description = "Apellido del usuario", example = "Prueba") 
-			@RequestParam(required = true) String surname) {
+			@RequestParam(required = true) String surname*/ @RequestBody(required = true) UserDTO userDTO) {
 
-		Optional<User> user = service.createUser(name, surname, password, email);
-
+//		System.err.printf("[%s] [%s] [%s] [%s]\n", email, password, name, surname);
+//		Optional<User> user = service.createUser(name, surname, password, email);
+		System.err.println(userDTO.toString());
+		Optional<User> user = service.createUser(userDTO);
 		if (user.isEmpty()) {
 			return ResponseEntity.badRequest().build();
 		}
 
+		System.err.println(user.toString());
 		return ResponseEntity.ok(user.get());
 	}
 
