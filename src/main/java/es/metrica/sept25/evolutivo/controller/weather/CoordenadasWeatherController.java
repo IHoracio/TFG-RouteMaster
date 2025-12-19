@@ -21,7 +21,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @Tag(name = "Clima")
-@RequestMapping("/api/checkWeather")
+@RequestMapping("/api/weather")
 public class CoordenadasWeatherController {
 	
 	@Value("${evolutivo.api_key_aemet}")
@@ -55,6 +55,7 @@ public class CoordenadasWeatherController {
 		if (weather.isEmpty()) {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
+
 		return new ResponseEntity<Weather>(weather.get(), HttpStatus.OK);
 	}
 }
