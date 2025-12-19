@@ -4,32 +4,23 @@ import java.util.Map;
 
 public class CoordsWithWeather {
 
-	private double lat;
-	private double lng;
-	 private Map<Integer, String> weatherDescription;
+	private String address;
+	private Map<Integer, String> weatherDescription;
 	private Map<Integer, Double> temperatures;
 
-	public CoordsWithWeather(double lat, double lng, Map<Integer, String> weatherDescription, Map<Integer, Double> temperatures) {
-		this.lat = lat;
-		this.lng = lng;
+	public CoordsWithWeather(String address, Map<Integer, String> weatherDescription,
+			Map<Integer, Double> temperatures) {
+		this.address = address;
 		this.weatherDescription = weatherDescription;
 		this.temperatures = temperatures;
 	}
 
-	public double getLat() {
-		return lat;
+	public String getAddress() {
+		return address;
 	}
 
-	public void setLat(double lat) {
-		this.lat = lat;
-	}
-
-	public double getLng() {
-		return lng;
-	}
-
-	public void setLng(double lng) {
-		this.lng = lng;
+	public void setAddress(String address) {
+		this.address = address;
 	}
 
 	public Map<Integer, String> getWeatherDescription() {
@@ -48,5 +39,4 @@ public class CoordsWithWeather {
 		this.temperatures = temperatures;
 	}
 
-	
 }

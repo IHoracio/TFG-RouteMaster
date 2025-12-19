@@ -27,6 +27,7 @@ import es.metrica.sept25.evolutivo.domain.dto.weather.Weather;
 import es.metrica.sept25.evolutivo.entity.gasolinera.Gasolinera;
 import es.metrica.sept25.evolutivo.service.gasolineras.GasolineraService;
 import es.metrica.sept25.evolutivo.service.ine.INEService;
+import es.metrica.sept25.evolutivo.service.maps.geocode.ReverseGeocodeService;
 import es.metrica.sept25.evolutivo.service.weather.WeatherService;
 
 @Service
@@ -50,6 +51,9 @@ public class RoutesServiceImpl implements RoutesService {
 
 	@Autowired
 	private WeatherService weatherService;
+	
+	@Autowired
+	private ReverseGeocodeService reverseGeocodeService;
 
 	@Override
 	public Optional<RouteGroup> getDirections(String origin, String destination, List<String> waypoints,
@@ -136,14 +140,19 @@ public class RoutesServiceImpl implements RoutesService {
 	@Override
 	public List<CoordsWithWeather> getWeatherForRoute(RouteGroup routeGroup) {
 		return extractRoutePoints(routeGroup).stream().map(coords -> {
+			
+			String address = reverseGeocodeService
+	                .getAddress(coords.getLat(), coords.getLng())
+	                .orElse("Ubicación desconocida");
+			
 			Optional<String> codigoINE = ineService.getCodigoINE(coords.getLat(), coords.getLng());
 			if (codigoINE.isEmpty()) {
-				return new CoordsWithWeather(coords.getLat(), coords.getLng(), new HashMap<>(), new HashMap<>());
+				return new CoordsWithWeather(address, new HashMap<>(), new HashMap<>());
 			}
 
 			Optional<Weather> weatherOpt = weatherService.getWeather(codigoINE.get());
 			if (weatherOpt.isEmpty()) {
-				return new CoordsWithWeather(coords.getLat(), coords.getLng(), new HashMap<>(), new HashMap<>());
+				return new CoordsWithWeather(address, new HashMap<>(), new HashMap<>());
 			}
 
 			Weather weather = weatherOpt.get();
@@ -164,12 +173,8 @@ public class RoutesServiceImpl implements RoutesService {
 			        mapaTemperaturas.put(temp.getPeriodo(), temp.getValue());
 			    }
 			}
-//			Double temperatura = null;
-//			if (dia.getTemperatura() != null && !dia.getTemperatura().isEmpty()) {
-//				temperatura = dia.getTemperatura().get(0).getValue();
-//			}
 
-			return new CoordsWithWeather(coords.getLat(), coords.getLng(), mapaDescripciones, mapaTemperaturas);
+			return new CoordsWithWeather(address, mapaDescripciones, mapaTemperaturas);
 		}).toList();
 	}
 

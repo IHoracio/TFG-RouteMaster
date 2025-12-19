@@ -36,10 +36,10 @@ public class WeatherServiceImpl implements WeatherService {
 	@Value("${evolutivo.api_key_aemet}")
 	private String API_KEY_AEMET;
 
-	public Optional<Weather> getWeather(String zipCode) {
+	public Optional<Weather> getWeather(String code) {
 		String url = UriComponentsBuilder
     			.fromUriString(API_URL)
-    			.path(zipCode)
+    			.path(code)
     		    .queryParam("api_key", API_KEY_AEMET)
     		    .toUriString();
 
