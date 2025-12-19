@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { FormsModule, ReactiveFormsModule, FormGroup, FormControl, Validators, FormBuilder } from '@angular/forms';
 import { User } from '../../../Dto/user';
 import { NgIf } from '@angular/common';
+import { UserService } from '../../../services/user/user.service';
 
 @Component({
   selector: 'app-create-user',
@@ -13,7 +14,14 @@ export class CreateUserComponent {
 
   form: FormGroup;
 
-  constructor(private formBuilder: FormBuilder) {
+  user: User = {
+    email: "",
+    password: "",
+    name: "",
+    surname: ""
+  }
+
+  constructor(private formBuilder: FormBuilder, private userService: UserService) {
     this.form = formBuilder.group({
       email: ['',
         [
@@ -26,8 +34,7 @@ export class CreateUserComponent {
         Validators.pattern(/(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*\W)/)
       ]],
       confirmPassword: ['', [
-        Validators.required,
-        //this.passwordMatchValidator
+        Validators.required
       ]],
       name: ['', [
         Validators.required
@@ -35,8 +42,14 @@ export class CreateUserComponent {
       surname: ['', [
         Validators.required
       ]]
-    })
+    }, {validator: this.passwordMatchValidator})
   }
+
+  get email() { return this.form.get('email'); }
+  get password() { return this.form.get('password'); }
+  get confirmPassword() { return this.form.get('confirmPassword'); }
+  get name() { return this.form.get('name'); }
+  get surname() { return this.form.get('surname'); }
 
   passwordMatchValidator(form: FormGroup) {
     const password = form.get('password')?.value;
@@ -46,25 +59,33 @@ export class CreateUserComponent {
     }
     return null;
   }
-  user: User = {
-    email: "",
-    password: "",
-    name: "",
-    surname: ""
-  }
-
+  
   hasError(controlName: string, errorName: string) {
         return (
             this.form.get(controlName)?.hasError(errorName) &&
             this.form.get(controlName)?.touched
         );
   }
-
+  userSent: User = {
+    email: "",
+    password: "",
+    name: "",
+    surname: ""
+  }
   onSubmit() {
     if(this.form.valid){
-      console.log(this.form.value)
+      this.user.email = this.email?.value;
+      this.user.password = this.password?.value;
+      this.user.name = this.name?.value;
+      this.user.surname = this.surname?.value;
+
+      console.log(this.user)
+      this.userService.calculateRoute(this.user).subscribe(response => {
+          this.userSent = response;
+          console.log(this.userSent)
+      });
     } else{
-      alert("hay errores!!!")
+      console.log("El formulario tiene errores.")
     }
    }
 }
