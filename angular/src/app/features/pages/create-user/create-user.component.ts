@@ -25,14 +25,19 @@ export class CreateUserComponent {
         Validators.minLength(8),
         Validators.pattern(/(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*\W)/)
       ]],
+      confirmPassword: ['', [
+        Validators.required,
+        //this.passwordMatchValidator
+      ]],
       name: ['', [
-        //Validators.required
+        Validators.required
       ]],
       surname: ['', [
-        //Validators.required
+        Validators.required
       ]]
-    }, /*{validator: this.passwordMatchValidator}*/)
+    })
   }
+
   passwordMatchValidator(form: FormGroup) {
     const password = form.get('password')?.value;
     const confirmPassword = form.get('confirmPassword')?.value;

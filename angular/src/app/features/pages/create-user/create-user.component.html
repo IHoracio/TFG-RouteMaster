@@ -1,24 +1,79 @@
-
 <form [formGroup]="form" (ngSubmit)="onSubmit()">
 
-    <div>
-        <span class="asterisk">*</span>
-        <label for="email">Introduzca el email.</label>
-        <input type="text" name="email" id="email" formControlName="email">
-    </div>
-    
+
+  <!--EMAIL FIELD-->
+  <div>
+    <span class="asterisk">*</span>
+    <label for="email">Introduzca el email.</label>
+    <input type="email" name="email" id="email" formControlName="email">
+
+
+    <!--Error messages-->
     <div *ngIf="hasError('email', 'required')">
-        <p style="color: red">El email es obligatorio</p>
+      <p class="error">El email es obligatorio</p>
     </div>
+    <div *ngIf="hasError('email', 'pattern')">
+      <p class="error">El formato es incorrecto.</p>
+    </div>
+  </div>
 
-    <div>
-        <span class="asterisk">*</span>
-        <label for="password">Introduzca la contraseña.</label>
-        <input type="password" name="password" id="password" formControlName="password">
-    </div>
+
+  <!--PASSWORD FIELD-->
+  <div>
+    <span class="asterisk">*</span>
+    <label for="password">Introduzca la contraseña.</label>
+    <input type="password" name="password" id="password" formControlName="password">
+
+    <!--Error messages-->
     <div *ngIf="hasError('password', 'required')">
-        <p style="color: red">La contraseña es obligatoria!</p>
+      <p class="error">La contraseña es obligatoria.</p>
     </div>
 
-    <input type="submit" [disabled]="form.invalid"/>
+    <div *ngIf="hasError('password', 'minLength')">
+      <p class="error">La contraseña debe tener mínimo 8 caracteres.</p>
+    </div>
+    <div *ngIf="hasError('password', 'pattern')">
+      <p class="error">La contraseña debe tener al menos un número, una mayuscula, una minúscula y un símbolo.</p>
+    </div>
+  </div>
+
+  <!--CONFIRM PASSWORD FIELD-->
+  <div>
+    <span class="asterisk">*</span>
+    <label for="confirmPassword">Confirma la contraseña.</label>
+    <input type="password" name="confirmPassword" id="confirmPassword" formControlName="confirmPassword">
+
+    <!--Error messages-->
+    <div *ngIf="hasError('confirmPassword', 'required')">
+      <p class="error">La confirmación de contraseña es obligatoria.</p>
+    </div>
+  </div>
+
+  <!--NAME FIELD-->
+  <div>
+    <span class="asterisk">*</span>
+    <label for="name">Introduzca su nombre.</label>
+    <input type="text" name="name" id="name" formControlName="name">
+
+    <!--Error messages-->
+    <div *ngIf="hasError('name', 'required')">
+      <p class="error">El nombre es obligatorio.</p>
+    </div>
+  </div>
+
+  <!--NAME FIELD-->
+  <div>
+    <span class="asterisk">*</span>
+    <label for="surname">Introduzca su apellido.</label>
+    <input type="text" name="surname" id="surname" formControlName="surname">
+
+    <!--Error messages-->
+    <div *ngIf="hasError('surname', 'required')">
+      <p class="error">El nombre es obligatorio.</p>
+    </div>
+  </div>
+
+
+
+  <input type="submit" [disabled]="form.invalid" />
 </form>
