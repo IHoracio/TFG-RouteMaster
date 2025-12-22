@@ -4,25 +4,17 @@
   width: 100%;
 }
 
-.map-container {
-  width: 100%;
-}
-
-.map {
-  width: 100%;
-  aspect-ratio: 16 / 9;
-  max-height: 600px;
-  min-height: 300px;
-  border-radius: 6px;
-  overflow: hidden;
+/* Wrapper principal del mapa (el host usará map?.getDiv() para insertar overlay/tab) */
+.map-wrapper {
   position: relative;
-  background: #f6f6f6;
+  width: 100%;
+  height: 600px; /* ajusta según tu layout; puedes usar 70vh por ejemplo */
+  overflow: hidden;
 }
 
-#map,
-.map-canvas {
+/* El mapa ocupa todo el wrapper */
+#map, .map-canvas {
   width: 100%;
   height: 100%;
+  display: block;
 }
-
-
