@@ -77,7 +77,15 @@
     </div>
   </div>
 
+   <!-- Mostrar mensaje de éxito -->
+  <div *ngIf="message" class="success">
+    {{ message }}
+  </div>
 
+  <!-- Mostrar mensaje de error -->
+  <div *ngIf="error" class="error">
+    {{ error }}
+  </div>
 
   <input type="submit" [disabled]="form.invalid" />
 </form>

@@ -72,6 +72,8 @@ export class CreateUserComponent {
     name: "",
     surname: ""
   }
+  message: string = "";
+  error: string = "";
   onSubmit() {
     if(this.form.valid){
       this.user.email = this.email?.value;
@@ -83,6 +85,12 @@ export class CreateUserComponent {
       this.userService.calculateRoute(this.user).subscribe(response => {
           this.userSent = response;
           console.log(this.userSent)
+          this.message = "Usuario creado con éxito."
+          this.error = "";
+      }, (err)=>{
+          this.error = "Ha occurido un error con los datos introducidos."
+          this.message = ""
+          console.log(err)
       });
     } else{
       console.log("El formulario tiene errores.")
