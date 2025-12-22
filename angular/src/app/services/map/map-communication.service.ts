@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 
 import { MapPageComponent } from '../../features/pages/map-page/map-page.component';
 import { Coords } from '../../Dto/maps-dtos';
+import { WeatherRoute } from '../../Dto/weather-dtos';
 
 @Injectable({
   providedIn: 'root'
@@ -40,6 +41,11 @@ export class MapCommunicationService {
   sendGasStations(coords: Coords[]): void {
 
     this.mapPageInstance?.markGasStations(coords);
+  }
+
+  sendWeather(weather: WeatherRoute): void {
+
+    this.mapPageInstance?.setWeatherData(weather);
   }
 
 }
