@@ -6,9 +6,8 @@ import java.util.Optional;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import es.metrica.sept25.evolutivo.domain.dto.maps.routes.Coords;
-import es.metrica.sept25.evolutivo.domain.dto.maps.routes.RouteGroup;
-import es.metrica.sept25.evolutivo.domain.dto.maps.routes.CoordsWithStations;
 import es.metrica.sept25.evolutivo.domain.dto.maps.routes.CoordsWithWeather;
+import es.metrica.sept25.evolutivo.domain.dto.maps.routes.RouteGroup;
 
 public interface RoutesService {
 	RouteGroup deleteLastLeg(RouteGroup response);
@@ -16,7 +15,7 @@ public interface RoutesService {
 	Optional<RouteGroup> getDirections(String origin, String destination, List<String> waypoints,
 			boolean optimizeWaypoints, boolean optimizeRoute, String language);
 
-	List<CoordsWithStations> getGasStationsForRoute(RouteGroup routeGroup, Long radius);
+	List<Coords> getGasStationsCoordsForRoute(RouteGroup routeGroup, Long radius);
 
 	String getUrl(List<String> waypoints, UriComponentsBuilder url);
 

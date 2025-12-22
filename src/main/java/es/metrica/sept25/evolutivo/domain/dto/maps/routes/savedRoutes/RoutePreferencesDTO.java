@@ -2,23 +2,25 @@ package es.metrica.sept25.evolutivo.domain.dto.maps.routes.savedRoutes;
 
 import java.util.List;
 
+import es.metrica.sept25.evolutivo.entity.maps.routes.RoutePreferences;
+
 public class RoutePreferencesDTO {
 
 	private List<String> preferredBrands;
-    private int radioKm;
+    private Integer radioKm;
     private String fuelType;
     private Double maxPrice;
-    private String mapView;
+    private RoutePreferences.MapViewType mapView;
 	public List<String> getPreferredBrands() {
 		return preferredBrands;
 	}
 	public void setPreferredBrands(List<String> preferredBrands) {
 		this.preferredBrands = preferredBrands;
 	}
-	public int getRadioKm() {
+	public Integer getRadioKm() {
 		return radioKm;
 	}
-	public void setRadioKm(int radioKm) {
+	public void setRadioKm(Integer radioKm) {
 		this.radioKm = radioKm;
 	}
 	public String getFuelType() {
@@ -33,10 +35,10 @@ public class RoutePreferencesDTO {
 	public void setMaxPrice(Double maxPrice) {
 		this.maxPrice = maxPrice;
 	}
-	public String getMapView() {
+	public RoutePreferences.MapViewType getMapView() {
 		return mapView;
 	}
-	public void setMapView(String mapView) {
+	public void setMapView(RoutePreferences.MapViewType mapView) {
 		this.mapView = mapView;
 	}
     

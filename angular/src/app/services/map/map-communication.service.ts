@@ -34,7 +34,6 @@ export class MapCommunicationService {
   }
 
   sendPoints(coords: Coords[]): void {
-
     this.mapPageInstance?.drawPoints(coords);
   }
 

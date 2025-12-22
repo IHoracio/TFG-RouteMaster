@@ -1,0 +1,13 @@
+.error{
+    color: red;
+    font-weight: bold;
+}
+.asterisk {
+    color: red;
+    font-weight: bold;
+    margin-right: 5px;
+}
+.success{
+    color: green;
+    font-weight: bold;
+}

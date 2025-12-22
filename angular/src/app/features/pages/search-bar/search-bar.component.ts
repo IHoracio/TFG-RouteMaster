@@ -1,6 +1,6 @@
 import { Component, Input, NgModule } from '@angular/core';
 import { FormGroup, FormsModule, FormArray, FormControl } from '@angular/forms';
-import { RouteFormResponse } from '../map-page/Utils/route-form-response';
+import { RouteFormResponse } from '../../../Dto/route-form-response';
 import { MapPageComponent } from '../map-page/map-page.component';
 import { SearchBarService } from '../../../services/search-bar/search-bar.service';
 import { NgFor } from '@angular/common';
@@ -30,7 +30,6 @@ export class SearchBarComponent {
   }
   addWaypoint(){
     this.routeFormResponse.waypoints.push('')
-    console.log(this.routeFormResponse)
   }
   deleteWaypoint(){
     this.routeFormResponse.waypoints.pop()
@@ -38,16 +37,10 @@ export class SearchBarComponent {
   message: RouteGroupResponse = {
       routes: []
   };
-  onSubmit() {
-      console.log(this.routeFormResponse)
-      this.routeService.calculateRoute(this.routeFormResponse)
-        .subscribe(data => {
-          this.message = JSON.parse(data)
-          console.log(this.message)
-        });
-      this.searchBarService.saveCoordinates(this.routeFormResponse);
-    }
 
+  onSubmit() {
+      this.searchBarService.onSubmit(this.routeFormResponse)
+    }
   trackByIndex(index: number) {
   return index;
 }

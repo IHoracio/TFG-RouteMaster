@@ -9,6 +9,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -72,7 +73,15 @@ public class GasolineraServiceImpl implements GasolineraService {
 				.queryParam("radio", radio)
 				.toUriString();
 
-		Gasolinera[] gasolinerasPorRadio = restTemplate.getForObject(urlRadio, Gasolinera[].class);
+		Gasolinera[] gasolinerasPorRadio;
+		try {
+			gasolinerasPorRadio = restTemplate.getForObject(urlRadio, Gasolinera[].class);
+		} catch (HttpClientErrorException.NotFound e) {
+			System.err.println("No se han encontrado gasolineras en radio " + radio
+					+ " de las coordenadas: [" + latitud + " | " + longitud + "]");
+			return foundRadius;
+		}
+
 		if (Objects.nonNull(gasolinerasPorRadio)) {
 			foundRadius.addAll(Arrays.asList(gasolinerasPorRadio));
 		}
@@ -101,7 +110,15 @@ public class GasolineraServiceImpl implements GasolineraService {
 				.queryParam("radio", radio)
 				.toUriString();
 		
-		Gasolinera[] gasolinerasPorRadio = restTemplate.getForObject(urlRadio, Gasolinera[].class);
+		Gasolinera[] gasolinerasPorRadio;
+		try {
+			gasolinerasPorRadio = restTemplate.getForObject(urlRadio, Gasolinera[].class);
+		} catch (HttpClientErrorException.NotFound e) {
+			System.err.println("No se han encontrado gasolineras en radio " + radio
+					+ " de la dirección " + direccion);
+			return foundRadius;
+		}
+
 		if (Objects.nonNull(gasolinerasPorRadio)) {
 			foundRadius.addAll(Arrays.asList(gasolinerasPorRadio));
 		}

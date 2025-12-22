@@ -6,22 +6,16 @@ import java.util.List;
 import es.metrica.sept25.evolutivo.entity.gasolinera.Gasolinera;
 
 public class CoordsWithStations {
-	private double lat;
-	private double lng;
+	private List<Coords> coordsList;
 	private List<Gasolinera> stations;
 
-	public CoordsWithStations(double lat, double lng, List<Gasolinera> stations) {
-		this.lat = lat;
-		this.lng = lng;
+	public CoordsWithStations(List<Coords> coordsList, List<Gasolinera> stations) {
+		this.coordsList = coordsList;
 		this.stations = new LinkedList<Gasolinera>(stations);
 	}
 
-	public double getLat() {
-		return this.lat;
-	}
-
-	public double getLng() {
-		return this.lng;
+	public List<Coords> getCoordsList() {
+		return new LinkedList<Coords>(this.coordsList);
 	}
 
 	public List<Gasolinera> getStations() {

@@ -18,7 +18,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 
 
 @RestController
-@Tag(name = "INE", description = "Endpoints que se comunican con la lista de municipios"
+@Tag(name = "INE", description = "Endpoints que se comunican con la lista de municipios "
 							   + "y sus códigos en los datos del INE.")
 @RequestMapping("/api/ine")
 public class INEController {

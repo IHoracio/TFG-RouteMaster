@@ -1,6 +1,7 @@
 package es.metrica.sept25.evolutivo.service.maps.routes.savedRoutes;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,11 +22,19 @@ public class SavedRouteServiceImpl implements SavedRouteService {
 
 	@Override
 	@Transactional
-	public SavedRouteDTO saveRoute(String name, List<PointDTO> puntosDTO, User user) {
+	public SavedRouteDTO saveRoute(String name, 
+	        List<PointDTO> puntosDTO, 
+	        User user,
+	        boolean optimizeWaypoints,
+	        boolean optimizeRoute,
+	        String language) {
 		SavedRoute route = new SavedRoute();
 		route.setName(name);
 		route.setUser(user);
-
+		route.setOptimizeWaypoints(optimizeWaypoints);
+	    route.setOptimizeRoute(optimizeRoute);
+	    route.setLanguage(language);
+		
 		List<Point> puntos = puntosDTO.stream().map(dto -> {
 			Point point = new Point();
 			point.setAddress(dto.getAddress());
@@ -39,9 +48,9 @@ public class SavedRouteServiceImpl implements SavedRouteService {
 		SavedRoute saved = repository.save(route);
 
 		SavedRouteDTO dto = new SavedRouteDTO();
-		dto.setId(saved.getId());
+		dto.setRouteId(saved.getRouteId());
 		dto.setName(saved.getName());
-		dto.setPuntos(puntosDTO);
+		dto.setPoints(puntosDTO);
 		return dto;
 	}
 
@@ -49,29 +58,35 @@ public class SavedRouteServiceImpl implements SavedRouteService {
 	@Transactional
 	public void deleteRoute(Long id, User user) {
 
-		SavedRoute route = repository.findById(id)
-				.orElseThrow(() -> new RuntimeException("Ruta no encontrada"));
-
-		if (!route.getUser().getId().equals(user.getId())) {
-			throw new RuntimeException("No puedes borrar una ruta que no es tuya");
+		Optional<SavedRoute> route = repository.findById(id);
+		
+		if (route.isEmpty()) {
+			System.err.println("No existe una ruta con el ID " + id.toString());
+			return;
 		}
 
-		repository.delete(route);
+		if (!route.get().getUser().getId().equals(user.getId())) {
+			System.err.println("El usuario " + user.toString() + 
+					"intentó borrar una ruta con ID: " + id.toString()
+					+ " que no era suya.");
+			return;
+		}
+
+		repository.delete(route.get());
 	}
 
-	public SavedRouteDTO getSavedRoute(Long id) {
-		SavedRoute route = repository.findById(id)
-				.orElseThrow(() -> new RuntimeException("Ruta no encontrada"));
+	public Optional<SavedRouteDTO> getSavedRoute(Long id) {
+		Optional<SavedRoute> route = repository.findById(id);
 
-		return mapToDTO(route);
+		return route.isPresent() ? Optional.of(mapToDTO(route.get())) : Optional.empty();
 	}
 
 	private SavedRouteDTO mapToDTO(SavedRoute route) {
 		SavedRouteDTO dto = new SavedRouteDTO();
-		dto.setId(route.getId());
+		dto.setRouteId(route.getRouteId());
 		dto.setName(route.getName());
 
-		dto.setPuntos(route.getPuntos().stream().map(p -> {
+		dto.setPoints(route.getPuntos().stream().map(p -> {
 			PointDTO pdto = new PointDTO();
 			pdto.setType(p.getType().name());
 			pdto.setAddress(p.getAddress());

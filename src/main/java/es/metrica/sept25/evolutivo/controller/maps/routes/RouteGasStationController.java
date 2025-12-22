@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import es.metrica.sept25.evolutivo.domain.dto.maps.routes.CoordsWithStations;
+import es.metrica.sept25.evolutivo.domain.dto.maps.routes.Coords;
 import es.metrica.sept25.evolutivo.domain.dto.maps.routes.RouteGroup;
 import es.metrica.sept25.evolutivo.service.maps.routes.RoutesService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -28,15 +28,16 @@ public class RouteGasStationController {
 	
 
 	@Operation(
-			summary = "Lista de coordenadas y gasolineras en un radio de los pasos de una ruta", 
-			description = "Devuelve una lista de coordenadas para cada uno de los pasos de la ruta dada,"
-					+ "con una lista de las gasolineras en un radio de dicho punto para cada una.")
+			summary = "Lista de coordenadas de las gasolineras en un radio de los pasos de una ruta", 
+			description = "Devuelve una lista de coordenadas para cada uno de las gasolineras encontradas"
+					+ "un radio de cada punto de la ruta.")
 	@ApiResponses(value = { 
 			@ApiResponse(responseCode = "200", description = "Pasos encontrados para la ruta dada."),
+			@ApiResponse(responseCode = "204", description = "Solicitud errónea: no se pudieron calcular los pasos de la ruta."),
 			@ApiResponse(responseCode = "404", description = "Solicitud errónea: no se pudieron calcular los pasos de la ruta.")
 			})
 	@GetMapping("/api/routes/gasStations")
-	public ResponseEntity<List<CoordsWithStations>> getGasolineras(
+	public ResponseEntity<List<Coords>> getGasolineras(
 			@Parameter(example = "El Vellon") @RequestParam(required = true) String origin,
 			@Parameter(example = "El Molar") @RequestParam(required = true) String destination,
 			@RequestParam(required = false, defaultValue = "") List<String> waypoints,
@@ -52,8 +53,8 @@ public class RouteGasStationController {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 
-		List<CoordsWithStations> coordsWithStations = routesService.getGasStationsForRoute(routeGroupOpt.get(), radius);
+		List<Coords> coordsForStations = routesService.getGasStationsCoordsForRoute(routeGroupOpt.get(), radius);
 
-		return new ResponseEntity<>(coordsWithStations, HttpStatus.OK);
+		return new ResponseEntity<>(coordsForStations, HttpStatus.OK);
 	}
 }

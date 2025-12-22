@@ -1,5 +1,7 @@
 package es.metrica.sept25.evolutivo.entity.gasolinera;
 
+import java.util.Objects;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.persistence.Entity;
@@ -347,4 +349,46 @@ public class Gasolinera {
 				+ precioDieselPremiumMedia + ", precioDieselB=" + precioDieselB + ", precioDieselBMedia="
 				+ precioDieselBMedia + ", precioGlp=" + precioGlp + ", precioGlpMedia=" + precioGlpMedia + "]";
 	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(codPostal, direccion, horario, id, idEstacion, idMunicipio, lastUpdate, latitud, localidad,
+				longitud, marca, nombreEstacion, precioDiesel, precioDieselB, precioDieselBMedia, precioDieselMedia,
+				precioDieselPremium, precioDieselPremiumMedia, precioGasolina95, precioGasolina95Media,
+				precioGasolina98, precioGasolina98Media, precioGlp, precioGlpMedia, provincia, provinciaDistrito,
+				tipoVenta);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Gasolinera other = (Gasolinera) obj;
+		return Objects.equals(codPostal, other.codPostal) && Objects.equals(direccion, other.direccion)
+				&& Objects.equals(horario, other.horario) && Objects.equals(id, other.id)
+				&& Objects.equals(idEstacion, other.idEstacion) && Objects.equals(idMunicipio, other.idMunicipio)
+				&& Objects.equals(lastUpdate, other.lastUpdate) && Objects.equals(latitud, other.latitud)
+				&& Objects.equals(localidad, other.localidad) && Objects.equals(longitud, other.longitud)
+				&& Objects.equals(marca, other.marca) && Objects.equals(nombreEstacion, other.nombreEstacion)
+				&& Objects.equals(precioDiesel, other.precioDiesel)
+				&& Objects.equals(precioDieselMedia, other.precioDieselMedia)
+				&& Objects.equals(precioDieselB, other.precioDieselB)
+				&& Objects.equals(precioDieselBMedia, other.precioDieselBMedia)
+				&& Objects.equals(precioDieselPremium, other.precioDieselPremium)
+				&& Objects.equals(precioDieselPremiumMedia, other.precioDieselPremiumMedia)
+				&& Objects.equals(precioGasolina95, other.precioGasolina95)
+				&& Objects.equals(precioGasolina95Media, other.precioGasolina95Media)
+				&& Objects.equals(precioGasolina98, other.precioGasolina98)
+				&& Objects.equals(precioGasolina98Media, other.precioGasolina98Media)
+				&& Objects.equals(precioGlp, other.precioGlp) && Objects.equals(precioGlpMedia, other.precioGlpMedia)
+				&& Objects.equals(provincia, other.provincia)
+				&& Objects.equals(provinciaDistrito, other.provinciaDistrito)
+				&& Objects.equals(tipoVenta, other.tipoVenta);
+	}
+	
+	
 }
