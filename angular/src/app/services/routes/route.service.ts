@@ -3,7 +3,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { HttpParams } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
-import { RouteFormResponse } from '../../features/pages/map-page/Utils/route-form-response';
+import { RouteFormResponse } from '../../Dto/route-form-response';
 import { Coords, RouteGroupResponse } from '../../Dto/maps-dtos';
 
 
