@@ -37,7 +37,7 @@ export class MapPageComponent implements OnDestroy {
 
   private async initMap(): Promise<void> {
     setOptions({
-      key: environment.googleMapsMapId,
+      key: environment.googleMapsApiKey,
       v: 'weekly'
     });
 
