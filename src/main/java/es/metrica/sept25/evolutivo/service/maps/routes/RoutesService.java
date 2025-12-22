@@ -17,7 +17,7 @@ public interface RoutesService {
 
 	List<Coords> getGasStationsCoordsForRoute(RouteGroup routeGroup, Long radius);
 
-	String getUrl(List<String> waypoints, UriComponentsBuilder url);
+	String getUrl(List<Coords> waypoints, UriComponentsBuilder url);
 
 	List<CoordsWithWeather> getWeatherForRoute(RouteGroup routeGroup);
 

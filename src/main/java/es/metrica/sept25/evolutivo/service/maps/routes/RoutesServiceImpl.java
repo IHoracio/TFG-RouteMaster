@@ -1,9 +1,12 @@
 package es.metrica.sept25.evolutivo.service.maps.routes;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +30,7 @@ import es.metrica.sept25.evolutivo.domain.dto.weather.Weather;
 import es.metrica.sept25.evolutivo.entity.gasolinera.Gasolinera;
 import es.metrica.sept25.evolutivo.service.gasolineras.GasolineraService;
 import es.metrica.sept25.evolutivo.service.ine.INEService;
+import es.metrica.sept25.evolutivo.service.maps.geocode.GeocodeService;
 import es.metrica.sept25.evolutivo.service.maps.geocode.ReverseGeocodeService;
 import es.metrica.sept25.evolutivo.service.weather.WeatherService;
 
@@ -54,18 +58,43 @@ public class RoutesServiceImpl implements RoutesService {
 	
 	@Autowired
 	private ReverseGeocodeService reverseGeocodeService;
+	
+	@Autowired
+	private GeocodeService geocodeService;
 
 	@Override
 	public Optional<RouteGroup> getDirections(String origin, String destination, List<String> waypoints,
 			boolean optimizeWaypoints, boolean optimizeRoute, String language) {
-		origin = origin.replaceAll(" ", "");
-		destination = destination.replaceAll(" ", "");
-
+		Set<String> invalidDirections = new HashSet<String>();
+		
+		Optional<Coords> originCoords = geocodeService.getCoordinates(origin);
+		if(originCoords.isEmpty()) invalidDirections.add(origin);
+		
+		Optional<Coords> destinationCoords = geocodeService.getCoordinates(destination);
+		if(destinationCoords.isEmpty()) invalidDirections.add(destination);
+		
+	    List<Coords> waypointsCoords = new ArrayList<>();
+		
+		if(!waypoints.isEmpty()) {
+			for(String waypoint : waypoints) {
+				Optional<Coords> waypointCoords = geocodeService.getCoordinates(waypoint);
+				
+				if(waypointCoords.isEmpty()) invalidDirections.add(waypoint);
+				else waypointsCoords.add(waypointCoords.get());
+			}
+		}
+		
+		if(!invalidDirections.isEmpty()) {
+			
+			System.err.println("Direcciones invalidas: " + invalidDirections.toString());
+			return Optional.empty();
+		}
+		
 		UriComponentsBuilder url = UriComponentsBuilder.fromUriString(API_URL).queryParam("mode", MODE)
-				.queryParam("language", language).queryParam("key", API_KEY_GOOGLE).queryParam("origin", origin);
+				.queryParam("language", language).queryParam("key", API_KEY_GOOGLE).queryParam("origin", originCoords.get().toString());
 
-		if (waypoints.isEmpty() || !optimizeRoute)
-			url.queryParam("destination", destination);
+		if (!optimizeRoute)
+			url.queryParam("destination", destinationCoords.get().toString());
 
 		String result = "";
 		if (!waypoints.isEmpty() && 
@@ -73,11 +102,11 @@ public class RoutesServiceImpl implements RoutesService {
 			result += OPTIMIZE;
 
 			if (optimizeRoute) {
-				waypoints.add(destination);
-				url.queryParam("destination", origin);
+				waypointsCoords.add(destinationCoords.get());
+				url.queryParam("destination", originCoords.get().toString());
 			}
 		}
-		result = getUrl(waypoints, url);
+		result = getUrl(waypointsCoords, url);
 
 		RouteGroup response = restTemplate.getForObject(result, RouteGroup.class);
 		if (!waypoints.isEmpty() && optimizeRoute)
@@ -96,10 +125,10 @@ public class RoutesServiceImpl implements RoutesService {
 	}
 
 	@Override
-	public String getUrl(List<String> waypoints, UriComponentsBuilder url) {
+	public String getUrl(List<Coords> waypoints, UriComponentsBuilder url) {
 		url.queryParam("waypoints", "");
 
-		return url.toUriString() + waypoints.stream().map(s -> s.replaceAll(" ", "")).collect(Collectors.joining("|"));
+		return url.toUriString() + waypoints.stream().map(coord -> coord.toString()).collect(Collectors.joining("|"));
 	}
 
 	@Override
