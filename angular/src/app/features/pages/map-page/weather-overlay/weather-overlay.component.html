@@ -1,0 +1,73 @@
+<div class="weather-overlay" role="region" aria-label="Weather route overlay">
+  <header class="wo-header">
+    <div class="wo-title">Información meteorológica de la ruta</div>
+    <div class="wo-actions">
+      <button class="btn close" (click)="close.emit()" aria-label="Cerrar overlay">✕</button>
+    </div>
+  </header>
+
+  <ng-container *ngIf="data?.wheatherData as items; else empty">
+    <ng-container *ngIf="currentHour$ | async as currentHourStr">
+      <div class="wo-body">
+        <div *ngFor="let wd of items; let i = index" class="wo-entry">
+          <div class="wo-entry-top">
+            <div class="wo-entry-index">{{ i + 1 }}</div>
+            <div class="wo-entry-main">
+              <div class="wo-entry-address" title="{{ wd.address }}">{{ wd.address }}</div>
+            </div>
+          </div>
+
+          <div class="wo-summary-compact">
+            <div class="wo-desc" *ngIf="getForHour(wd.weatherDescription, currentHourStr) as desc; else noDescCompact">
+              {{ desc }}
+            </div>
+            <ng-template #noDescCompact>
+              <div class="wo-desc wo-empty-value">(sin descripción)</div>
+            </ng-template>
+
+            <div class="wo-temp" *ngIf="hasForHour(wd.temperatures, currentHourStr); else noTempCompact">
+              {{ getForHour(wd.temperatures, currentHourStr) }}°C
+            </div>
+            <ng-template #noTempCompact>
+              <div class="wo-temp wo-empty-value">(sin temperatura)</div>
+            </ng-template>
+          </div>
+
+          <details class="wo-details">
+            <summary class="wo-summary">Ver horario completo</summary>
+
+            <div class="wo-content">
+              <div class="wo-current-hour-line">Hora actual: <strong>{{ currentHourStr }}:00</strong></div>
+
+              <h4 class="wo-section-title">Descripción por hora</h4>
+              <ul class="wo-hour-list">
+                <li
+                  *ngFor="let entry of hourEntries(wd.weatherDescription); trackBy: trackByHour"
+                  [class.wo-hour-current]="entry[0] === currentHourStr"
+                >
+                  <span class="hour-key">{{ entry[0] }}:00</span>
+                  <span class="hour-val">{{ entry[1] }}</span>
+                </li>
+              </ul>
+
+              <h4 class="wo-section-title">Temperaturas por hora</h4>
+              <ul class="wo-hour-list">
+                <li
+                  *ngFor="let entry of hourEntries(wd.temperatures); trackBy: trackByHour"
+                  [class.wo-hour-current]="entry[0] === currentHourStr"
+                >
+                  <span class="hour-key">{{ entry[0] }}:00</span>
+                  <span class="hour-val">{{ entry[1] }}°C</span>
+                </li>
+              </ul>
+            </div>
+          </details>
+        </div>
+      </div>
+    </ng-container>
+  </ng-container>
+
+  <ng-template #empty>
+    <div class="wo-empty">No hay datos meteorológicos disponibles.</div>
+  </ng-template>
+</div>
