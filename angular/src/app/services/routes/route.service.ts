@@ -72,4 +72,17 @@ export class RouteService {
 
     return this.http.get(this.apiUrl + "/gasStations", {headers: headers, params: parameters, responseType: 'text' });
   }
+
+  calculateWeatherRoute(routeFormResponse: RouteFormResponse): Observable<string>{
+    const headers = new HttpHeaders().set('key', environment.googleMapsMapId);
+    let waypointsString = routeFormResponse.waypoints.join('|');
+    let parameters = new HttpParams()
+      .set('origin', routeFormResponse.origin)
+      .set('destination', routeFormResponse.destination)
+      .set('waypoints', waypointsString)
+      .set('optimizeWaypoints', routeFormResponse.optimizeWaypoints)
+      .set('optimizeRoute', routeFormResponse.optimizeRoute)
+
+    return this.http.get(this.apiUrl + "/weather", {headers: headers, params: parameters, responseType: 'text' });
+  }
 }
