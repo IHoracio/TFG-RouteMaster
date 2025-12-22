@@ -29,7 +29,8 @@ public class GeocodeServiceImpl implements GeocodeService {
 	@Override
 	public Optional<Coords> getCoordinates(String address) {
 
-		address = normalizarMunicipioParaGeocode(address);
+		address = address.replaceAll(" ", "");
+//		address = normalizarMunicipioParaGeocode(address);
 
 		String url = UriComponentsBuilder.fromUriString(GEOCODE_URL).queryParam("address", address)
 				.queryParam("key", API_KEY_GOOGLE).toUriString();
@@ -70,23 +71,24 @@ public class GeocodeServiceImpl implements GeocodeService {
 		return Optional.empty();
 	}
 
-	public String normalizarMunicipioParaGeocode(String municipio) {
-		if (municipio == null)
-			return "";
-
-		municipio = municipio.trim();
-
-		if (municipio.toLowerCase().startsWith("el ")) {
-			municipio = municipio.substring(3);
-		} else if (municipio.toLowerCase().startsWith("la ")) {
-			municipio = municipio.substring(3);
-		} else if (municipio.toLowerCase().startsWith("los ")) {
-			municipio = municipio.substring(4);
-		} else if (municipio.toLowerCase().startsWith("las ")) {
-			municipio = municipio.substring(4);
-		}
-		return municipio;
-	}
+//	public String normalizarMunicipioParaGeocode(String municipio) {
+//		if (municipio == null)
+//			return "";
+//
+//		municipio = municipio.trim();
+//		municipio = municipio.replaceAll(" ", "");
+//
+//		if (municipio.toLowerCase().startsWith("el ")) {
+//			municipio = municipio.substring(3);
+//		} else if (municipio.toLowerCase().startsWith("la ")) {
+//			municipio = municipio.substring(3);
+//		} else if (municipio.toLowerCase().startsWith("los ")) {
+//			municipio = municipio.substring(4);
+//		} else if (municipio.toLowerCase().startsWith("las ")) {
+//			municipio = municipio.substring(4);
+//		}
+//		return municipio;
+//	}
 
 	public String formatearMunicipioParaINE(String municipio) {
 		if (municipio == null || municipio.isBlank())
