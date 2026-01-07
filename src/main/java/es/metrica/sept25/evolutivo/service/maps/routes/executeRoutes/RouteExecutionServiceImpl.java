@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import es.metrica.sept25.evolutivo.domain.dto.maps.routes.Leg;
@@ -17,58 +18,61 @@ import es.metrica.sept25.evolutivo.service.maps.routes.savedRoutes.SavedRouteSer
 @Service
 public class RouteExecutionServiceImpl implements RouteExecutionService{
 
-	 @Autowired
-	    private SavedRouteService savedRouteService;
+	@Autowired
+	private SavedRouteService savedRouteService;
 
-	    @Autowired
-	    private RoutesService routesService;
+	@Autowired
+	private RoutesService routesService;
 
-	    public Optional<RouteExecutionDTO> executeSavedRoute(Long id) {
-	        Optional<SavedRouteDTO> savedRouteOpt = savedRouteService.getSavedRoute(id);
-	        
-	        if (savedRouteOpt.isEmpty()) {
-	        	return Optional.empty();
-	        }
-	        
-	        SavedRouteDTO savedRoute = savedRouteOpt.get();
 
-	        if (savedRoute.getPoints().isEmpty()) {
-	            return Optional.empty();
-	        }
+	@Override
+	@Cacheable("execSavedRoute")
+	public Optional<RouteExecutionDTO> executeSavedRoute(Long id) {
+		Optional<SavedRouteDTO> savedRouteOpt = savedRouteService.getSavedRoute(id);
 
-	        PointDTO inicio = savedRoute.getPoints().get(0);
-	        PointDTO fin = savedRoute.getPoints().get(savedRoute.getPoints().size() - 1);
-	        List<String> intermedios = savedRoute.getPoints().subList(1, savedRoute.getPoints().size() - 1)
-	                                               .stream()
-	                                               .map(PointDTO::getAddress)
-	                                               .toList();
+		if (savedRouteOpt.isEmpty()) {
+			return Optional.empty();
+		}
 
-	        Optional<RouteGroup> routeGroupOpt = routesService.getDirections(
-	                inicio.getAddress(),
-	                fin.getAddress(),
-	                intermedios,
-	                false,
-	                false,
-	                "es"
-	        );
+		SavedRouteDTO savedRoute = savedRouteOpt.get();
 
-	        if (routeGroupOpt.isEmpty()) {
-	            return Optional.empty();
-	        }
+		if (savedRoute.getPoints().isEmpty()) {
+			return Optional.empty();
+		}
 
-	        RouteGroup routeGroup = routeGroupOpt.get();
-	        Leg leg = routeGroup.getRoutes().get(0).getLegs().get(0);
+		PointDTO inicio = savedRoute.getPoints().get(0);
+		PointDTO fin = savedRoute.getPoints().get(savedRoute.getPoints().size() - 1);
+		List<String> intermedios = savedRoute.getPoints().subList(1, savedRoute.getPoints().size() - 1)
+				.stream()
+				.map(PointDTO::getAddress)
+				.toList();
 
-	        RouteExecutionDTO dto = new RouteExecutionDTO();
-	        dto.setDistanceMeters(leg.getDistance().getValue());
-	        dto.setDurationSeconds(leg.getDuration().getValue());
+		Optional<RouteGroup> routeGroupOpt = routesService.getDirections(
+				inicio.getAddress(),
+				fin.getAddress(),
+				intermedios,
+				false,
+				false,
+				"es"
+				);
 
-	        List<String> polylines = leg.getSteps().stream()
-	                .map(step -> step.getPolyline().getPoints())
-	                .toList();
+		if (routeGroupOpt.isEmpty()) {
+			return Optional.empty();
+		}
 
-	        dto.setPolylines(polylines);
+		RouteGroup routeGroup = routeGroupOpt.get();
+		Leg leg = routeGroup.getRoutes().get(0).getLegs().get(0);
 
-	        return Optional.of(dto);
-	    }
+		RouteExecutionDTO dto = new RouteExecutionDTO();
+		dto.setDistanceMeters(leg.getDistance().getValue());
+		dto.setDurationSeconds(leg.getDuration().getValue());
+
+		List<String> polylines = leg.getSteps().stream()
+				.map(step -> step.getPolyline().getPoints())
+				.toList();
+
+		dto.setPolylines(polylines);
+
+		return Optional.of(dto);
+	}
 }

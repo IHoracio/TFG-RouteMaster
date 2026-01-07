@@ -217,6 +217,7 @@ public class RoutesServiceImpl implements RoutesService {
 					List<Gasolinera> g = gasolineraService.getGasolinerasInRadiusCoords(coord.getLat(), coord.getLng(), radius);
 					return g.stream();
 				 })
+				// TODO: Substitute with Logger
 				.peek(g -> {
 					System.out.println(g.getDireccion());
 					System.out.println(g.getLatitud() + "|" + g.getLongitud());

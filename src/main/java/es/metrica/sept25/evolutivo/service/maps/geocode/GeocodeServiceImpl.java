@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -27,6 +28,7 @@ public class GeocodeServiceImpl implements GeocodeService {
 	private String API_KEY_GOOGLE;
 
 	@Override
+	@Cacheable("getCoordsFromAddress")
 	public Optional<Coords> getCoordinates(String address) {
 
 		address = address.replaceAll(" ", "");
@@ -44,6 +46,7 @@ public class GeocodeServiceImpl implements GeocodeService {
 	}
 
 	@Override
+	@Cacheable("getMunFromCoords")
 	public Optional<String> getMunicipio(double lat, double lng) {
 		String url = UriComponentsBuilder.fromUriString(GEOCODE_URL)
 				.queryParam("latlng", lat + "," + lng)
@@ -90,7 +93,7 @@ public class GeocodeServiceImpl implements GeocodeService {
 //		return municipio;
 //	}
 
-	public String formatearMunicipioParaINE(String municipio) {
+	private String formatearMunicipioParaINE(String municipio) {
 		if (municipio == null || municipio.isBlank())
 			return "";
 

@@ -7,8 +7,12 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.resilience.annotation.Retryable;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -36,6 +40,13 @@ public class WeatherServiceImpl implements WeatherService {
 	@Value("${evolutivo.api_key_aemet}")
 	private String API_KEY_AEMET;
 
+	@Retryable(
+			maxRetries = 60,
+			delay = 1000,
+			multiplier = 1.5,
+			value = HttpClientErrorException.TooManyRequests.class
+			)
+	@Cacheable(value = "weather", cacheManager = "climateCacheManager")
 	public Optional<Weather> getWeather(String code) {
 		String url = UriComponentsBuilder
     			.fromUriString(API_URL)
@@ -47,6 +58,14 @@ public class WeatherServiceImpl implements WeatherService {
 		return getFirstWeatherDay(getWeatherData(weather.getDatos()));
 	}
 
+	@Retryable(
+			maxRetries = 60,
+			delay = 1000,
+			multiplier = 1.5,
+			value = HttpClientErrorException.TooManyRequests.class
+			)
+	@Qualifier("climateCacheManager")
+	@Cacheable(value = "weatherData",  cacheManager = "climateCacheManager")
 	private List<Weather> getWeatherData(String url) {
 		String json = restTemplate.getForObject(url, String.class);
 		try {

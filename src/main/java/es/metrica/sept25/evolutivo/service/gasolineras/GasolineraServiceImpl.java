@@ -36,13 +36,14 @@ public class GasolineraServiceImpl implements GasolineraService {
 	GasolineraRepository gasolineraRepository;
 
 	@Override
-	@Cacheable("gasolinera_id")
+	@Cacheable(value = "gasolinera_id", cacheManager = "gasCacheManager")
 	public Optional<Gasolinera> getGasolineraForId(Long idEstacion) {
 		return Optional.of(restTemplate.getForObject(API_URL + "detalles/" + idEstacion, 
 				Gasolinera.class));
 	}
 
 	@Override
+	@Cacheable(value = "getGasStationsForMunStr", cacheManager = "gasCacheManager")
 	public List<Gasolinera> getGasolinerasForMunicipio(String municipio) {
 		Optional<Municipio> municipioOpt = municipioService.getMunicipioFromString(municipio);
 		List<Gasolinera> foundMunicipios = new ArrayList<>();
@@ -59,6 +60,7 @@ public class GasolineraServiceImpl implements GasolineraService {
 	}
 
 	@Override
+	@Cacheable(value = "getGasStationsInRadiusCoords", cacheManager = "gasCacheManager")
 	public List<Gasolinera> getGasolinerasInRadiusCoords(Double latitud, Double longitud, Long radio) {
 		List<Gasolinera> foundRadius = new ArrayList<>();
 
@@ -90,6 +92,7 @@ public class GasolineraServiceImpl implements GasolineraService {
 	}
 	
 	@Override
+	@Cacheable(value = "getGasStationsInRadiusAddress", cacheManager = "gasCacheManager")
 	public List<Gasolinera> getGasolinerasInRadiusAddress(String direccion, Long radio) {
 		List<Gasolinera> foundRadius = new ArrayList<>();
 
