@@ -3,6 +3,7 @@
 
   <app-weather-overlay-host
     [mapDiv]="map?.getDiv() ?? null"
-    [weatherData]="weatherRoute">
+    [weatherRoute]="weatherRoute()"
+    [createdRoute]="createdRoute()">
   </app-weather-overlay-host>
 </div>

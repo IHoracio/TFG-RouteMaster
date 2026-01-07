@@ -1,20 +1,19 @@
 import {
   Component,
-  Input,
-  Output,
-  EventEmitter,
-  OnChanges,
-  SimpleChanges,
+  input,
+  output,
   OnDestroy,
   EnvironmentInjector,
   ApplicationRef,
   ComponentRef,
   Renderer2,
   createComponent,
-  inject
+  effect,
+  inject,
+  OutputRefSubscription
 } from '@angular/core';
-import { Subscription } from 'rxjs';
 import { WeatherOverlayComponent } from '../weather-overlay.component';
+import { WeatherData } from '../../../../../Dto/weather-dtos';
 
 @Component({
   selector: 'app-weather-overlay-host',
@@ -22,17 +21,18 @@ import { WeatherOverlayComponent } from '../weather-overlay.component';
   standalone: true,
   styleUrls: ['./weather-overlay-host.component.css']
 })
-export class WeatherOverlayHostComponent implements OnChanges, OnDestroy {
-  @Input() mapDiv: HTMLElement | null = null;
-  @Input() weatherData: any | null = null;
-  @Output() visibleChange = new EventEmitter<boolean>();
+export class WeatherOverlayHostComponent implements OnDestroy {
+  mapDiv = input<HTMLElement | null>(null);
+  weatherRoute = input<WeatherData[] | null>(null);
+  createdRoute = input<boolean>(false);
+  visibleChange = output<void>();
 
   private overlayRef: ComponentRef<WeatherOverlayComponent> | null = null;
-  private overlayCloseSub: Subscription | null = null;
+  private overlayCloseSub: OutputRefSubscription | null = null;
   private hostDiv: HTMLElement | null = null;
   private tabEl: HTMLElement | null = null;
 
-  private latestData: any | null = null;
+  private latestData: WeatherData[] | null = null;
   private visible = false;
 
   private readonly environmentInjector = inject(EnvironmentInjector);
@@ -47,14 +47,16 @@ export class WeatherOverlayHostComponent implements OnChanges, OnDestroy {
     '[aria-label*="pantalla completa"]'
   ];
 
-  ngOnChanges(changes: SimpleChanges): void {
-    if (changes['weatherData']) {
-      this.latestData = this.weatherData ?? null;
+  constructor() {
+    effect(() => {
+      this.latestData = this.weatherRoute() ?? null;
       this.ensureMountedIfPossible();
-    }
-    if (changes['mapDiv']) {
+    });
+
+    effect(() => {
+      this.mapDiv();
       this.ensureMountedIfPossible();
-    }
+    });
   }
 
   ngOnDestroy(): void {
@@ -63,12 +65,11 @@ export class WeatherOverlayHostComponent implements OnChanges, OnDestroy {
     this.removeTab();
   }
 
-  // ---------------- core: attach/destroy overlay ----------------
-
   private async ensureMountedIfPossible(): Promise<void> {
-    if (!this.mapDiv) return;
+    const mapDiv = this.mapDiv();
+    if (!mapDiv) return;
 
-    const ready = await this.waitForElementConnected(this.mapDiv, 1500);
+    const ready = await this.waitForElementConnected(mapDiv, 1500);
     if (!ready) return;
 
     const parent = this.resolveTargetParent();
@@ -76,7 +77,6 @@ export class WeatherOverlayHostComponent implements OnChanges, OnDestroy {
 
     this.ensureTabInParent(parent);
 
-    // si ya existe y está en el mismo parent, reaplico estado
     if (this.hostDiv && this.hostDiv.parentElement === parent && this.overlayRef) {
       this.applyData();
       this.applyVisibility();
@@ -97,7 +97,7 @@ export class WeatherOverlayHostComponent implements OnChanges, OnDestroy {
     if (fsEl) return fsEl;
     const mapWrapper = document.getElementById('map') as HTMLElement | null;
     if (mapWrapper?.parentElement) return mapWrapper.parentElement;
-    return this.mapDiv;
+    return this.mapDiv();
   }
 
   private recreateOverlayInParent(targetParent: HTMLElement): Promise<void> {
@@ -117,7 +117,7 @@ export class WeatherOverlayHostComponent implements OnChanges, OnDestroy {
     this.overlayCloseSub = this.overlayRef.instance.close.subscribe(() => {
       this.visible = false;
       this.applyVisibility();
-      this.visibleChange.emit(false);
+      this.visibleChange.emit();
     });
 
     this.applyData();
@@ -149,37 +149,27 @@ export class WeatherOverlayHostComponent implements OnChanges, OnDestroy {
     this.hostDiv = null;
   }
 
-  // ---------------- apply data / visibility ----------------
-
   private applyData(): void {
     if (!this.overlayRef) return;
-    const raw = this.latestData ?? this.weatherData;
+    const raw = this.latestData ?? this.weatherRoute();
 
     if (raw === null) {
-      try {
-        this.overlayRef.instance.data = null;
-        this.overlayRef.changeDetectorRef.detectChanges();
-      } catch (e) {
-        console.warn('[WeatherOverlayHost] could not set data=null, destroying overlay', e);
-        this.destroyOverlay();
-        return;
-      }
+      this.overlayRef.setInput('data', null);
+      this.overlayRef.changeDetectorRef.detectChanges();
       this.latestData = null;
 
       if (this.hostDiv) this.hostDiv.style.display = '';
-      if (this.tabEl) this.tabEl.style.display = 'none';
+      if (this.tabEl) this.tabEl.style.display = this.visible ? 'none' : '';
 
-      this.visible = false;
-      this.visibleChange.emit(false);
-
+      this.visible = this.createdRoute();
+      this.visibleChange.emit();
       return;
     }
+
     if (raw === undefined || raw === null) return;
 
-    const normalized = Array.isArray(raw) ? { wheatherData: raw } : (raw?.wheatherData ? raw : { wheatherData: raw });
-    this.overlayRef.instance.data = normalized;
-    try { this.overlayRef.changeDetectorRef.detectChanges(); } catch { }
-
+    this.overlayRef.setInput('data', raw);
+    this.overlayRef.changeDetectorRef.detectChanges();
     this.latestData = null;
   }
 
@@ -192,8 +182,6 @@ export class WeatherOverlayHostComponent implements OnChanges, OnDestroy {
     this.hostDiv.style.display = visible ? '' : 'none';
     if (this.tabEl) this.tabEl.style.display = visible ? 'none' : '';
   }
-
-  // ---------------- overlay management ----------------
 
   private ensureTabInParent(targetParent: HTMLElement): void {
     if (!this.tabEl) {
@@ -208,7 +196,7 @@ export class WeatherOverlayHostComponent implements OnChanges, OnDestroy {
         const tp = this.resolveTargetParent() ?? targetParent;
         await this.recreateOverlayInParent(tp);
         this.applyVisibility();
-        this.visibleChange.emit(true);
+        this.visibleChange.emit();
         this.schedulePosition(40);
       });
     }
@@ -228,14 +216,12 @@ export class WeatherOverlayHostComponent implements OnChanges, OnDestroy {
     }
   }
 
-  // ---------------- positioning ----------------
-
   private schedulePosition(delay = 100): void {
     setTimeout(() => this.positionLeftOfFullscreenControl(), delay);
   }
 
   private positionLeftOfFullscreenControl(): void {
-    const wrapper = this.hostDiv?.parentElement ?? this.mapDiv;
+    const wrapper = this.hostDiv?.parentElement ?? this.mapDiv();
     if (!wrapper || !this.hostDiv) return;
 
     let fsEl: HTMLElement | null = null;
@@ -272,8 +258,6 @@ export class WeatherOverlayHostComponent implements OnChanges, OnDestroy {
     }
   }
 
-  // ---------------- listeners ----------------
-
   private startListeners(): void {
     this.stopListeners();
     document.addEventListener('fullscreenchange', this.onFullScreenChangeHandler);
@@ -296,8 +280,6 @@ export class WeatherOverlayHostComponent implements OnChanges, OnDestroy {
   };
 
   private onWindowResizeHandler = () => this.schedulePosition(80);
-
-  // ---------------- utilities ----------------
 
   private waitForElementConnected(element: HTMLElement | null, timeout = 2000): Promise<boolean> {
     return new Promise(resolve => {

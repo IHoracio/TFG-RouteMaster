@@ -1,4 +1,4 @@
-import { Component, OnDestroy } from '@angular/core';
+import { Component, OnDestroy, signal } from '@angular/core';
 import { setOptions, importLibrary } from '@googlemaps/js-api-loader';
 
 import { MapCommunicationService } from '../../../services/map/map-communication.service';
@@ -6,7 +6,7 @@ import { environment } from '../../../../environments/environment';
 import { Coords } from '../../../Dto/maps-dtos';
 import { CommonModule } from '@angular/common';
 import { WeatherOverlayHostComponent } from './weather-overlay/weather-overlay-host/weather-overlay-host.component';
-import { WeatherRoute } from '../../../Dto/weather-dtos';
+import { WeatherData } from '../../../Dto/weather-dtos';
 
 @Component({
   selector: 'app-map-page',
@@ -22,7 +22,8 @@ export class MapPageComponent implements OnDestroy {
   private endMarker?: any;
   private waypoints: any[] = [];
   private gasStationsMarkers: any[] = [];
-  public weatherRoute: any | null = null;
+  protected weatherRoute = signal<WeatherData[] | null>(null);
+  protected createdRoute = signal<boolean>(false);
 
   constructor(private mapComm: MapCommunicationService) { }
 
@@ -37,7 +38,7 @@ export class MapPageComponent implements OnDestroy {
 
   private async initMap(): Promise<void> {
     setOptions({
-      key: environment.googleMapsMapId,
+      key: environment.googleMapsApiKey,
       v: 'weekly'
     });
 
@@ -71,6 +72,7 @@ export class MapPageComponent implements OnDestroy {
       return;
     }
 
+    this.createdRoute.set(true);
     const path: google.maps.LatLngLiteral[] = coords;
 
     if (!this.routePolyline) {
@@ -111,8 +113,8 @@ export class MapPageComponent implements OnDestroy {
       this.gasStationsMarkers = [];
     }
 
-    if (this.weatherRoute) {
-      this.weatherRoute = null;
+    if (this.weatherRoute()) {
+      this.weatherRoute.update(() => null);
     }
 
     if (this.startMarker) {
@@ -123,6 +125,8 @@ export class MapPageComponent implements OnDestroy {
       this.endMarker.map = null;
       this.endMarker = undefined;
     }
+
+    this.createdRoute.set(false);
   }
 
   public drawPoints(coords: Coords[]): void {
@@ -201,8 +205,8 @@ export class MapPageComponent implements OnDestroy {
 
   }
 
-  public setWeatherData(data: WeatherRoute): void {
-    this.weatherRoute = data;
+  public setWeatherData(data: WeatherData[] | null): void {
+    this.weatherRoute.update(() => data);
   }
 
 }
