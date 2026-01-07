@@ -1,0 +1,24 @@
+.user-page {
+  padding: 20px;
+  font-family: Arial, sans-serif;
+}
+
+.user-content {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+}
+
+.user-info-section {
+  flex: 1;
+}
+
+.user-preferences-section {
+  flex: 1;
+}
+
+@media (max-width: 768px) {
+  .user-content {
+    flex-direction: column;
+  }
+}
