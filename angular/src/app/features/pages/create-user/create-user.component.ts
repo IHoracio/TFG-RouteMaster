@@ -82,7 +82,7 @@ export class CreateUserComponent {
       this.user.surname = this.surname?.value;
 
       console.log(this.user)
-      this.userService.calculateRoute(this.user).subscribe(response => {
+      this.userService.saveUser(this.user).subscribe(response => {
           this.userSent = response;
           console.log(this.userSent)
           this.message = "Usuario creado con éxito."

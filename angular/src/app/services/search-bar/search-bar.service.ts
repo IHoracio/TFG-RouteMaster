@@ -3,7 +3,8 @@ import { RouteFormResponse } from '../../Dto/route-form-response';
 import { RouteService } from '../routes/route.service';
 import { Coords, RouteGroupResponse } from '../../Dto/maps-dtos';
 import { MapCommunicationService } from '../map/map-communication.service';
-import { WeatherRoute } from '../../Dto/weather-dtos';
+import { WeatherData } from '../../Dto/weather-dtos';
+
 
 @Injectable({
   providedIn: 'root'
@@ -56,7 +57,7 @@ export class SearchBarService {
   }
 
   saveWeatherRoute(routeFormResponse: RouteFormResponse){
-    let weather: WeatherRoute
+    let weather: WeatherData []
 
     this.routeService.calculateWeatherRoute(routeFormResponse).subscribe(data =>{
       weather = JSON.parse(data);
@@ -75,7 +76,7 @@ export class SearchBarService {
   giveGasStationCoords(coords: Coords[]){
     this.mapCommunication.sendGasStations(coords)
   }
-  giveWeatherCoords(weather: WeatherRoute){
+  giveWeatherCoords(weather: WeatherData []){
     this.mapCommunication.sendWeather(weather);
   }
 }

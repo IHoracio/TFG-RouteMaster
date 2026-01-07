@@ -10,7 +10,7 @@ export class UserService {
 
   private apiUrl = 'http://localhost:8080/api/users/create';
   constructor(private http: HttpClient) {}
-  calculateRoute(user: User): Observable<User> {
+  saveUser(user: User): Observable<User> {
     const headers = new HttpHeaders({
       'Content-Type': 'application/json',
     });
