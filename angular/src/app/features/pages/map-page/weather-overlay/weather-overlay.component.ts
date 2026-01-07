@@ -1,7 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
-import { Observable, timer, map } from 'rxjs';
-import { WeatherRoute, WeatherData } from '../../../../Dto/weather-dtos';
+import { ChangeDetectionStrategy, Component, input, output, computed, signal, effect } from '@angular/core';
+import { WeatherData } from '../../../../Dto/weather-dtos';
 
 @Component({
   selector: 'app-weather-overlay',
@@ -12,57 +11,34 @@ import { WeatherRoute, WeatherData } from '../../../../Dto/weather-dtos';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class WeatherOverlayComponent {
-  private _data: WeatherRoute | null = null;
+  data = input<WeatherData[] | null>();
+  close = output<void>();
 
-  @Output() close = new EventEmitter<void>();
+  currentHour = signal<number>(new Date().getHours());
+  currentHourStr = computed(() => this.currentHour().toString());
 
-  @Input()
-  set data(value: WeatherRoute | null) {
-    this._data = value ? this.normalizeWeatherRoute(value) : null;
-  }
-  get data(): WeatherRoute | null {
-    return this._data;
-  }
-
-  public currentHour$: Observable<string> = timer(0, 60_000).pipe(
-    map(() => String(new Date().getHours()))
-  );
-
-  private normalizeWeatherRoute(route: WeatherRoute): WeatherRoute {
-    const copy: WeatherRoute = { ...route, wheatherData: [] };
-    if (Array.isArray(route.wheatherData)) {
-      copy.wheatherData = route.wheatherData.map(wd => ({
-        ...wd,
-        weatherDescription: this.toMap(wd.weatherDescription),
-        temperatures: this.toMap(wd.temperatures)
-      })) as WeatherData[];
-    }
-    return copy;
+  constructor() {
+    effect(() => {
+      const timer = setInterval(() => {
+        this.currentHour.set(new Date().getHours());
+      }, 60_000);
+      return () => clearInterval(timer);
+    });
   }
 
-  private toMap(maybe: any): Map<string, any> | null {
-    if (!maybe) return null;
-    if (maybe instanceof Map) return maybe;
-    if (typeof maybe === 'object') return new Map(Object.entries(maybe));
-    return null;
+  hourEntries(obj: { [key: string]: any } | null): Array<[string, any]> {
+    if (!obj) return [];
+    return Object.entries(obj);
   }
 
-  hourEntries(mapLike: Map<string, any> | null): Array<[string, any]> {
-    if (!mapLike) return [];
-    return Array.from(mapLike.entries());
+  getForHour(obj: { [key: string]: any } | null, hourStr: string | null): any | null {
+    if (!obj || hourStr == null) return null;
+    return obj.hasOwnProperty(hourStr) ? obj[hourStr] : null;
   }
 
-  getForHour(mapOrNull: Map<string, any> | null, hourStr: string | null): any | null {
-    if (!mapOrNull || hourStr == null) return null;
-    return mapOrNull.has(hourStr) ? mapOrNull.get(hourStr) : null;
+  hasForHour(obj: { [key: string]: any } | null, hourStr: string | null): boolean {
+    if (!obj || hourStr == null) return false;
+    return obj.hasOwnProperty(hourStr);
   }
 
-  hasForHour(mapOrNull: Map<string, any> | null, hourStr: string | null): boolean {
-    if (!mapOrNull || hourStr == null) return false;
-    return mapOrNull.has(hourStr);
-  }
-
-  trackByHour(_index: number, item: [string, any]): string {
-    return item[0];
-  }
 }

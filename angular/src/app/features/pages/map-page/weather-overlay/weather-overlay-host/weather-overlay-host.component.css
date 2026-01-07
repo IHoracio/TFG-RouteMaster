@@ -1,8 +1,7 @@
-/* Contenedor si existe */
 .weather-overlay-host__container {
   position: absolute !important;
   top: 0 !important;
-  right: 60px !important; /* ajusta si quieres más/menos separación respecto al botón fullscreen */
+  right: 60px !important;
   z-index: 11000 !important;
   transition: right .12s ease, top .08s ease, opacity .12s ease, visibility .12s !important;
   opacity: 1 !important;
@@ -10,20 +9,19 @@
   pointer-events: auto !important;
 }
 
-/* Botón meteorológico: mismo tamaño/forma que el botón que pasaste */
 .weather-tab-container {
   position: absolute !important;
-  top: 0 !important;               /* mantenerlo al mismo nivel vertical que el otro botón */
-  right: 64px !important;          /* a la izquierda del botón en right:0 (ver nota) */
+  top: 0 !important;
+  right: 64px !important;
   z-index: 10990 !important;
   width: 40px !important;
   height: 40px !important;
-  margin: 10px !important;         /* coincide con margin del primer botón */
-  padding: 0 !important;           /* mismo padding que el primer botón */
-  background: #fff !important;     /* fondo blanco */
+  margin: 10px !important;
+  padding: 0 !important;
+  background: #fff !important;
   border: 0 !important;
-  border-radius: 2px !important;   /* misma forma */
-  box-shadow: rgba(0,0,0,0.3) 0 1px 4px -1px !important; /* misma sombra */
+  border-radius: 2px !important;
+  box-shadow: rgba(0,0,0,0.3) 0 1px 4px -1px !important;
   cursor: pointer !important;
   overflow: hidden !important;
   display: flex !important;
@@ -32,17 +30,15 @@
   user-select: none !important;
   -webkit-appearance: none !important;
   appearance: none !important;
-  transform: none !important;      /* evita transformaciones inesperadas */
+  transform: none !important;
 }
 
-/* Forzar también cuando el elemento recibe estilos inline (p. ej. después del click) */
 .weather-tab-container[style] {
   top: 0 !important;
   right: 60px !important;
   margin: 10px !important;
 }
 
-/* Icono dentro del botón */
 .weather-tab-container > span,
 .weather-tab-container .weather-icon,
 .weather-tab-container img {
@@ -54,7 +50,6 @@
   display: inline-block !important;
 }
 
-/* Opcional: eliminar outline/offset al hacer focus (si no lo necesitas) */
 .weather-tab-container:focus {
   outline: none !important;
   box-shadow: rgba(0,0,0,0.3) 0 1px 4px -1px !important;
