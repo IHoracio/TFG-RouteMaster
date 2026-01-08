@@ -1,9 +1,11 @@
 <div class="map-wrapper">
   <div id="map" class="map-canvas" aria-label="Mapa"></div>
 
-  <app-weather-overlay-host
-    [mapDiv]="map?.getDiv() ?? null"
-    [weatherRoute]="weatherRoute()"
-    [createdRoute]="createdRoute()">
-  </app-weather-overlay-host>
+  @if (showWeather()) {
+    <app-weather-overlay-host
+      [mapDiv]="map?.getDiv() ?? null"
+      [weatherRoute]="weatherRoute()"
+      [createdRoute]="createdRoute()">
+    </app-weather-overlay-host>
+  }
 </div>
