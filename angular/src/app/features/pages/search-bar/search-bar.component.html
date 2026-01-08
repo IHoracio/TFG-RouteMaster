@@ -2,44 +2,50 @@
   <form (ngSubmit)="onSubmit()" #form="ngForm">
     <p>
       <label for="origin">Elige el origen:</label>
-      <input type="text" id="origin" name="origin" [(ngModel)]="routeFormResponse.origin" placeholder="¿Desde dónde?" 
-      required
-      #originField="ngModel" />
+      <input type="text" id="origin" name="origin" [(ngModel)]="routeFormResponse.origin" placeholder="¿Desde dónde?"
+        required #originField="ngModel" />
 
       @if(originField && originField.touched){
-        <div class="error">
-          @if(originField.errors?.['required']){
-            Tienes que introducir un origen.
-          }
-        </div>
+    <div class="error">
+      @if(originField.errors?.['required']){
+      Tienes que introducir un origen.
       }
+    </div>
+    }
     </p>
 
+
+    <p>
+      <select name="destinationType" id="destinationType" [(ngModel)]="destinationType">
+        <option value="">¿Qué quieres introducir?</option>
+        <option value="coordinates">Destino</option>
+        <option value="favoriteGasStations">Gasolinera favorita</option>
+      </select>
+    </p>
+
+    @if(destinationType === "coordinates"){
     <p>
       <label for="destination">Elige el destino:</label>
-      <input type="text" id="destination" name="destination" [(ngModel)]="routeFormResponse.destination" placeholder="¿A dónde quieres ir?"
-        required
-        #destinationField="ngModel" />
+      <input type="text" id="destination" name="destination" [(ngModel)]="routeFormResponse.destination"
+        placeholder="¿A dónde quieres ir?" required #destinationField="ngModel" />
 
       @if(destinationField && destinationField.touched){
         <div class="error">
           @if(destinationField.errors?.['required']){
-            Tienes que introducir un destino.
+          Tienes que introducir un destino.
           }
         </div>
-      }
+        }
     </p>
+    }
+
 
     <button type="button" (click)="addWaypoint()">Añadir punto intermedio</button>
 
 
-  <div *ngFor="let waypoint of routeFormResponse.waypoints; let i = index; trackBy: trackByIndex">
-      <input
-      type="text"
-      [name]="'waypoint' + i"
-      [(ngModel)]="routeFormResponse.waypoints[i]"
-    />
-  </div>
+    <div *ngFor="let waypoint of routeFormResponse.waypoints; let i = index; trackBy: trackByIndex">
+      <input type="text" [name]="'waypoint' + i" [(ngModel)]="routeFormResponse.waypoints[i]" />
+    </div>
     <button type="button" (click)="deleteWaypoint()">Eliminar punto intermedio</button>
 
     <p>
@@ -55,21 +61,21 @@
       <select [(ngModel)]="routeFormResponse.optimizeRoute" name="optimizeRoute" id="optimizeRoute">
         <option [value]="false">No</option>
         <option [value]="true">Sí</option>
-  </select>
+      </select>
     </p>
 
 
 
     <button type="submit" [disabled]="!form.valid">Enviar</button>
-    
+
   </form>
-    
-  
-    
-    <!--<button (click)="guardarCoordenadas()">Guardar coordenadas</button>-->
-    <!--<button (click)="imprimirMensaje()">imprime</button>-->
-    
-    <app-map-page></app-map-page>
+
+
+
+  <!--<button (click)="guardarCoordenadas()">Guardar coordenadas</button>-->
+  <!--<button (click)="imprimirMensaje()">imprime</button>-->
+
+  <app-map-page></app-map-page>
 
 
 </section>

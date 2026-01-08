@@ -20,7 +20,7 @@ export class SearchBarComponent {
   constructor(private searchBarService: SearchBarService, private routeService: RouteService) {
     
   }
-
+  destinationType: string = "";
   routeFormResponse: RouteFormResponse = {
     origin : "",
     destination : "",

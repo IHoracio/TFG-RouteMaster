@@ -67,6 +67,7 @@ export class SearchBarService {
   }
 
 
+
   giveCoords(coords: Coords[]){
     this.mapCommunication.sendRoute(coords)
   }
