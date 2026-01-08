@@ -85,4 +85,5 @@ export class RouteService {
 
     return this.http.get(this.apiUrl + "/weather", {headers: headers, params: parameters, responseType: 'text' });
   }
+
 }

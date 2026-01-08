@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { FormsModule, ReactiveFormsModule, FormGroup, FormControl, Validators, FormBuilder } from '@angular/forms';
-import { User } from '../../../Dto/user';
+import { User } from '../../../Dto/user-dtos';
 import { NgIf } from '@angular/common';
 import { UserService } from '../../../services/user/user.service';
 
