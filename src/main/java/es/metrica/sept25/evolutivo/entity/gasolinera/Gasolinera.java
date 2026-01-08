@@ -92,6 +92,10 @@ public class Gasolinera {
 	@Transient
 	@JsonProperty("GLP_media")
 	private Double precioGlpMedia;
+	
+	public Gasolinera() {
+		
+	}
 
 	public Gasolinera(Long idEstacion, String nombreEstacion, String marca, String horario, String lastUpdate,
 			Double longitud, Double latitud, String direccion, String localidad, Long idMunicipio, Long codPostal,

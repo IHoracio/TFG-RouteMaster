@@ -1,18 +1,27 @@
 package es.metrica.sept25.evolutivo.service.user;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import es.metrica.sept25.evolutivo.domain.dto.gasolineras.SavedGasStationDTO;
+import es.metrica.sept25.evolutivo.domain.dto.gasolineras.UserSavedGasStationDto;
 import es.metrica.sept25.evolutivo.domain.dto.user.UserDTO;
+import es.metrica.sept25.evolutivo.entity.gasolinera.Gasolinera;
+import es.metrica.sept25.evolutivo.entity.gasolinera.UserSavedGasStation;
 import es.metrica.sept25.evolutivo.entity.maps.routes.RoutePreferences;
+import es.metrica.sept25.evolutivo.entity.maps.routes.RoutePreferences.Brands;
 import es.metrica.sept25.evolutivo.entity.user.User;
 import es.metrica.sept25.evolutivo.entity.user.UserPreferences;
+import es.metrica.sept25.evolutivo.repository.GasolineraRepository;
 import es.metrica.sept25.evolutivo.repository.UserRepository;
+import es.metrica.sept25.evolutivo.service.gasolineras.GasolineraService;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -22,6 +31,12 @@ public class UserServiceImpl implements UserService {
 
 	@Autowired
 	private PasswordEncoder passwordEncoder;
+	
+	@Autowired
+	private GasolineraRepository gasolineraRepository;
+	
+	@Autowired
+	private GasolineraService gasolineraService;
 
 	@Override
 	public User save(User user) {
@@ -66,7 +81,8 @@ public class UserServiceImpl implements UserService {
 		user.setEmail(userDTO.getEmail());
 	    
 	    RoutePreferences prefs = new RoutePreferences();
-        prefs.setPreferredBrands(List.of("REPSOL", "CEPSA"));
+	    
+	    prefs.setPreferredBrands(List.of(Brands.REPSOL, Brands.CEPSA));
         prefs.setRadioKm(5);
         prefs.setFuelType("GASOLINE");
         prefs.setMaxPrice(1.50);
@@ -87,7 +103,7 @@ public class UserServiceImpl implements UserService {
 	@Transactional
 	public void updateRoutePreferences(
 	        User user,
-	        List<String> preferredBrands,
+	        List<RoutePreferences.Brands> preferredBrands,
 	        int radioKm,
 	        String fuelType,
 	        double maxPrice,
@@ -105,6 +121,7 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user);
     }
 	
+	@Override
 	@Transactional
 	public void updateUserPreferences(
 	        User user,
@@ -117,5 +134,75 @@ public class UserServiceImpl implements UserService {
 
 	    user.setUserPreferences(prefs);
 	    userRepository.save(user);
+	}
+	
+	@Override
+	@Transactional
+	public void removeGasStation(String email, String alias) {
+
+	    Optional<User> user = userRepository.findByEmail(email);
+	    
+	    user.get().getSavedGasStations().removeIf(sg -> sg.getAlias().equalsIgnoreCase(alias));
+
+	    userRepository.save(user.get());
+	}
+	
+	@Override
+	@Transactional
+	public List<UserSavedGasStationDto> getSavedGasStations(String email) {
+
+		return userRepository.findByEmail(email)
+	            .map(user -> user.getSavedGasStations().stream()
+	                    .map(sg -> {
+	                        Gasolinera g = sg.getGasolinera();
+	                        return new UserSavedGasStationDto(
+	                                sg.getAlias(),
+	                                g.getIdEstacion(),
+	                                g.getNombreEstacion(),
+	                                g.getMarca()
+	                        );
+	                    })
+	                    .toList()
+	            )
+	            .orElse(List.of());
+	}
+	
+	@Override
+	@Transactional
+	public Optional<String> saveGasStation(String email, String alias, Long idEstacion) {
+
+	    Optional<User> user = userRepository.findByEmail(email);
+	    if (user.isEmpty()) {
+	        return Optional.of("Usuario no encontrado");
+	    }
+
+	    
+	    Optional<Gasolinera> gasolinera = gasolineraRepository.findByIdEstacion(idEstacion);
+	    
+	    if (gasolinera.isEmpty()) {
+	        gasolinera = gasolineraService.getGasolineraForId(idEstacion);
+	        gasolinera.ifPresent(gasolineraRepository::save);
+	    }
+	    
+	    if (gasolinera.isEmpty()) {
+	        return Optional.of("Gasolinera no encontrada");
+	    }
+	    
+	    boolean exists = user.get().getSavedGasStations().stream()
+	        .anyMatch(g -> g.getAlias().equalsIgnoreCase(alias));
+
+	    if (exists) {
+	        return Optional.of("Alias ya existente");
+	    }
+
+	    UserSavedGasStation saved = new UserSavedGasStation();
+	    saved.setAlias(alias);
+	    saved.setUser(user.get());
+	    saved.setGasolinera(gasolinera.get());
+
+	    user.get().getSavedGasStations().add(saved);
+	    userRepository.save(user.get());
+	    
+	    return Optional.empty();
 	}
 }

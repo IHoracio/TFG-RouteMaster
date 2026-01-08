@@ -3,11 +3,13 @@ package es.metrica.sept25.evolutivo.service.maps.routes;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -168,45 +170,101 @@ public class RoutesServiceImpl implements RoutesService {
 
 	@Override
 	public List<CoordsWithWeather> getWeatherForRoute(RouteGroup routeGroup) {
-		return extractRoutePoints(routeGroup).stream().map(coords -> {
-			
-			String address = reverseGeocodeService
-	                .getAddress(coords.getLat(), coords.getLng())
-	                .orElse("Ubicación desconocida");
-			
-			Optional<String> codigoINE = ineService.getCodigoINE(coords.getLat(), coords.getLng());
-			if (codigoINE.isEmpty()) {
-				return new CoordsWithWeather(address, new HashMap<>(), new HashMap<>());
-			}
 
-			Optional<Weather> weatherOpt = weatherService.getWeather(codigoINE.get());
-			if (weatherOpt.isEmpty()) {
-				return new CoordsWithWeather(address, new HashMap<>(), new HashMap<>());
-			}
+	    List<Coords> allPoints = extractRoutePolylinePoints(routeGroup);
 
-			Weather weather = weatherOpt.get();
+	    if (allPoints.isEmpty()) {
+	        return List.of();
+	    }
 
-			Dia dia = weather.getPrediccion().getDia().get(0);
+	    long totalMeters = routeGroup.getRoutes().get(0).getLegs().stream()
+	            .mapToLong(leg -> leg.getDistance().getValue())
+	            .sum();
 
-			Map<Integer, String> mapaDescripciones = new HashMap<>();
-	        if (dia.getEstadoCielo() != null && !dia.getEstadoCielo().isEmpty()) {
-	            for (EstadoCielo estado : dia.getEstadoCielo()) {
-	                mapaDescripciones.put(estado.getPeriodo(), estado.getDescripcion());
-	            }
-	        }
+	    int maxCalls = calculateMaxCalls(totalMeters);
 
-			Map<Integer, Double> mapaTemperaturas = new HashMap<>();
+	    int step = Math.max(
+	            1,
+	            (int) Math.ceil((double) allPoints.size() / maxCalls)
+	    );
 
-			if (dia.getTemperatura() != null && !dia.getTemperatura().isEmpty()) {
-			    for (Temperatura temp : dia.getTemperatura()) {
-			        mapaTemperaturas.put(temp.getPeriodo(), temp.getValue());
-			    }
-			}
+	    List<Coords> sampledPoints = IntStream.range(0, allPoints.size())
+	            .filter(i -> i % step == 0 || i == allPoints.size() - 1)
+	            .mapToObj(allPoints::get)
+	            .toList();
 
-			return new CoordsWithWeather(address, mapaDescripciones, mapaTemperaturas);
-		}).toList();
+	    Map<String, Coords> coordsPorMunicipio = new LinkedHashMap<>();
+
+	    for (Coords coords : sampledPoints) {
+	        Optional<String> codigoINE =
+	                ineService.getCodigoINE(coords.getLat(), coords.getLng());
+
+	        codigoINE.ifPresent(code ->
+	                coordsPorMunicipio.putIfAbsent(code, coords)
+	        );
+	    }
+
+	    return coordsPorMunicipio.entrySet().stream()
+	            .map(entry -> {
+
+	                String codigoINE = entry.getKey();
+	                Coords coords = entry.getValue();
+
+	                String address = reverseGeocodeService
+	                        .getAddress(coords.getLat(), coords.getLng())
+	                        .orElse("Ubicación desconocida");
+
+	                Optional<Weather> weatherOpt =
+	                        weatherService.getWeather(codigoINE);
+
+	                if (weatherOpt.isEmpty()) {
+	                    return new CoordsWithWeather(
+	                            address,
+	                            new HashMap<>(),
+	                            new HashMap<>()
+	                    );
+	                }
+
+	                Weather weather = weatherOpt.get();
+	                Dia dia = weather.getPrediccion().getDia().get(0);
+
+	                Map<Integer, String> mapaDescripciones = new HashMap<>();
+	                if (dia.getEstadoCielo() != null) {
+	                    for (EstadoCielo estado : dia.getEstadoCielo()) {
+	                        mapaDescripciones.put(
+	                                estado.getPeriodo(),
+	                                estado.getDescripcion()
+	                        );
+	                    }
+	                }
+
+	                Map<Integer, Double> mapaTemperaturas = new HashMap<>();
+	                if (dia.getTemperatura() != null) {
+	                    for (Temperatura temp : dia.getTemperatura()) {
+	                        mapaTemperaturas.put(
+	                                temp.getPeriodo(),
+	                                temp.getValue()
+	                        );
+	                    }
+	                }
+
+	                return new CoordsWithWeather(
+	                        address,
+	                        mapaDescripciones,
+	                        mapaTemperaturas
+	                );
+	            })
+	            .toList();
 	}
 
+	private int calculateMaxCalls(long meters) {
+
+        if (meters <= 5_000) return 2;
+        if (meters <= 20_000) return 4;
+        if (meters <= 100_000) return 8;
+        return 14;
+    }
+	
 	@Override
 	public List<Coords> getGasStationsCoordsForRoute(RouteGroup routeGroup, Long radius) {
 		List<Coords> coords = extractRoutePoints(routeGroup);

@@ -15,8 +15,27 @@ public class RoutePreferences  {
 	    SCHEMATIC
 	}
 	
+	public enum Brands {
+	    REPSOL,
+	    CEPSA,
+	    BP,
+	    SHELL,
+	    GALP,
+	    AVIA,
+	    PETRONOR,
+	    TOTAL,
+	    CARREFOUR,
+	    DIA,
+	    ALDI,
+	    EROSKI,
+	    HNOS_RODRIGUEZ,
+	    PETROPRIX,
+	    
+	}
+	
 	@ElementCollection
-    private List<String> preferredBrands;
+	@Enumerated(EnumType.STRING)
+    private List<Brands> preferredBrands;
 
     private Integer radioKm;
 
@@ -27,11 +46,11 @@ public class RoutePreferences  {
     @Enumerated(EnumType.STRING)
     private MapViewType mapView;
 
-	public List<String> getPreferredBrands() {
+	public List<Brands> getPreferredBrands() {
 		return preferredBrands;
 	}
 
-	public void setPreferredBrands(List<String> preferredBrands) {
+	public void setPreferredBrands(List<Brands> preferredBrands) {
 		this.preferredBrands = preferredBrands;
 	}
 
