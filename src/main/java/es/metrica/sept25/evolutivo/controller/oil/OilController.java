@@ -150,4 +150,25 @@ public class OilController {
 			
 		return new ResponseEntity<List<Gasolinera>>(gasolinera, HttpStatus.OK);
 	}
+	
+	@Operation(
+		    summary = "Devuelve todas las marcas de gasolineras disponibles",
+		    description = "Obtiene un listado único de marcas de gasolineras a partir de todas las estaciones disponibles. "
+		                + "El resultado se devuelve sin duplicados y se sirve desde caché."
+		)
+		@ApiResponses(value = {
+		    @ApiResponse(responseCode = "200", description = "Marcas recuperadas correctamente"),
+		    @ApiResponse(responseCode = "204", description = "No se encontraron marcas")
+		})
+		@GetMapping("/gasolineras/marcas")
+		public ResponseEntity<List<String>> getMarcasGasolineras() {
+
+		    List<String> marcas = gasolineraService.getMarcasFromAllGasolineras();
+
+		    if (marcas == null || marcas.isEmpty()) {
+		        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+		    }
+
+		    return new ResponseEntity<>(marcas, HttpStatus.OK);
+		}
 }
