@@ -15,7 +15,7 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 @EnableCaching
 public class CaffeineCacheConfig {
 
-	@Bean
+	@Bean(name = "staticCacheManager")
 	@Primary
 	public CacheManager staticCacheManager() {
 		CaffeineCacheManager cacheManager = new CaffeineCacheManager();

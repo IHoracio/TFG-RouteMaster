@@ -102,65 +102,77 @@ public class GasolineraServiceImpl implements GasolineraService {
 		List<Gasolinera> foundRadius = new ArrayList<>();
 
 		if (radius < 1) {
-			log.info("[gas-service] [" + LocalDateTime.now().toString() + "] " + "Invalid radius (" + radius
-					+ ") for searching gas stations around (lat:[" + lat + "], lng:[" + lng + "]).");
+			log.info("[gas-service] [" + LocalDateTime.now().toString() + "] " +
+					"Invalid radius (r=" + radius + 
+					") for searching gas stations around (lat=[" + lat + 
+					"], lng=[" + lng + "]).");
 			return foundRadius;
 		}
 
-		String urlRadio = UriComponentsBuilder.fromUriString(API_URL + "radio").queryParam("latitud", lat)
-				.queryParam("longitud", lng).queryParam("radio", radius).toUriString();
+		String urlRadio = UriComponentsBuilder
+				.fromUriString(API_URL + "radio")
+				.queryParam("latitud", lat)
+				.queryParam("longitud", lng)
+				.queryParam("radio", radius)
+				.toUriString();
 
 		Gasolinera[] gasolinerasPorRadio;
 		try {
 			gasolinerasPorRadio = restTemplate.getForObject(urlRadio, Gasolinera[].class);
 		} catch (HttpClientErrorException.NotFound e) {
 			log.warn("[gas-service] [" + LocalDateTime.now().toString() + "] "
-					+ "No gas stations were found around data: " + "[lat:(" + lat + "), lng:(" + lng + "), r:" + radius
-					+ "].");
+					+ "No gas stations were found around data: "
+					+ "[lat=(" + lat + "), lng=(" + lng + "), r=" + radius + "].");
 			return foundRadius;
 		}
 
 		if (Objects.nonNull(gasolinerasPorRadio)) {
-			log.info("[gas-service] [" + LocalDateTime.now().toString() + "] " + "Found gas stations around data: "
-					+ "[lat:(" + lat + "), lng:(" + lng + "), r:" + radius + "].");
+			log.info("[gas-service] [" + LocalDateTime.now().toString() + "] "
+					+ "Found gas stations around data: "
+					+ "[lat=(" + lat + "), lng=(" + lng + "), r=" + radius + "].");
 			foundRadius.addAll(Arrays.asList(gasolinerasPorRadio));
 		}
 
 		return foundRadius;
 	}
-
+	
 	@Override
 	@Cacheable(value = "getGasStationsInRadiusAddress", cacheManager = "gasCacheManager")
 	public List<Gasolinera> getGasolinerasInRadiusAddress(String address, Long radius) {
 		log.info("[gas-service] [" + LocalDateTime.now().toString() + "] "
-				+ "Attempting to retrieve gas stations for data: " + "[address:(" + address + "), r:" + radius + "].");
+				+ "Attempting to retrieve gas stations for data: "+
+				"[address=(" + address + "), r=" + radius + "].");
 		List<Gasolinera> foundRadius = new ArrayList<>();
 
 		Optional<Coords> coordsOpt = geocodeService.getCoordinates(address);
 
 		if (coordsOpt.isEmpty()) {
 			log.warn("[gas-service] [" + LocalDateTime.now().toString() + "] "
-					+ "Coordinates could not be extracted from the address. " + "Data: [address:(" + address + "), r:"
-					+ radius + "].");
+					+ "Coordinates could not be extracted from the address. "
+					+ "Data: [address=(" + address + "), r=" + radius + "].");
 			return foundRadius;
 		}
 
 		if (radius < 1) {
 			log.warn("[gas-service] [" + LocalDateTime.now().toString() + "] "
-					+ "Invalid radius value for the method call (" + radius + ")" + "Data: [address:(" + address
-					+ "), r:" + radius + "].");
+					+ "Invalid radius value for the method call (" + radius + ")"
+					+ "Data: [address=(" + address + "), r=" + radius + "].");
 			return foundRadius;
 		}
-
-		String urlRadio = UriComponentsBuilder.fromUriString(API_URL + "radio")
-				.queryParam("latitud", coordsOpt.get().getLat()).queryParam("longitud", coordsOpt.get().getLng())
-				.queryParam("radio", radius).toUriString();
-
+		
+		String urlRadio = UriComponentsBuilder
+				.fromUriString(API_URL + "radio")
+				.queryParam("latitud", coordsOpt.get().getLat())
+				.queryParam("longitud", coordsOpt.get().getLng())
+				.queryParam("radio", radius)
+				.toUriString();
+		
 		Gasolinera[] gasolinerasPorRadio;
 		try {
 			gasolinerasPorRadio = restTemplate.getForObject(urlRadio, Gasolinera[].class);
 		} catch (HttpClientErrorException.NotFound e) {
-			System.err.println("No se han encontrado gasolineras en radio " + radius + " de la dirección " + address);
+			System.err.println("No se han encontrado gasolineras en radio " + radius
+					+ " de la dirección " + address);
 			return foundRadius;
 		}
 
@@ -172,10 +184,10 @@ public class GasolineraServiceImpl implements GasolineraService {
 	}
 
 	@Override
-	@Cacheable(value = "getGasStationsInRadiusAddress", cacheManager = "gasCacheManager")
-	public List<Gasolinera> getGasolinerasInRadiusAddress(String direccion, Long radio) {
-		List<Gasolinera> foundRadius = new ArrayList<>();
-
+	@Cacheable(value = "getMarcasGasolineras", cacheManager = "staticCacheManager")
+	public List<String> getMarcasFromAllGasolineras() {
+		log.info("[gas-service] [" + LocalDateTime.now().toString() + "] "
+				+ "Attempting to retrieve all brands for all gas stations.");
 	    List<Municipio> municipios = municipioService.getMunicipios();
 	    Set<String> marcas = new HashSet<>();
 
@@ -191,6 +203,8 @@ public class GasolineraServiceImpl implements GasolineraService {
 	        }
 	    }
 
+		log.info("[gas-service] [" + LocalDateTime.now().toString() + "] "
+				+ "Succesfully retrieved all brands.");
 	    return new ArrayList<>(marcas);
 	}
 }

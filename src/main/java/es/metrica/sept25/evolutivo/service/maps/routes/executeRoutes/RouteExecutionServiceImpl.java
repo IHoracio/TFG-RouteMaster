@@ -1,5 +1,6 @@
 package es.metrica.sept25.evolutivo.service.maps.routes.executeRoutes;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -14,7 +15,9 @@ import es.metrica.sept25.evolutivo.domain.dto.maps.routes.savedRoutes.PointDTO;
 import es.metrica.sept25.evolutivo.domain.dto.maps.routes.savedRoutes.SavedRouteDTO;
 import es.metrica.sept25.evolutivo.service.maps.routes.RoutesService;
 import es.metrica.sept25.evolutivo.service.maps.routes.savedRoutes.SavedRouteService;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 public class RouteExecutionServiceImpl implements RouteExecutionService{
 
@@ -28,15 +31,22 @@ public class RouteExecutionServiceImpl implements RouteExecutionService{
 	@Override
 	@Cacheable("execSavedRoute")
 	public Optional<RouteExecutionDTO> executeSavedRoute(Long id) {
+		log.info("[route-exec-service] [" + LocalDateTime.now().toString() + "] "
+				+ "Attempting to execute saved route with ID: " + id + ".");
 		Optional<SavedRouteDTO> savedRouteOpt = savedRouteService.getSavedRoute(id);
 
 		if (savedRouteOpt.isEmpty()) {
+			log.warn("[route-exec-service] [" + LocalDateTime.now().toString() + "] "
+					+ "Couldn't find a saved route for ID: " + id + ".");
 			return Optional.empty();
 		}
 
 		SavedRouteDTO savedRoute = savedRouteOpt.get();
 
 		if (savedRoute.getPoints().isEmpty()) {
+			log.warn("[route-exec-service] [" + LocalDateTime.now().toString() + "] "
+					+ "Fail to execute saved route - "
+					+ "The saved route has no points.");
 			return Optional.empty();
 		}
 
@@ -57,6 +67,9 @@ public class RouteExecutionServiceImpl implements RouteExecutionService{
 				);
 
 		if (routeGroupOpt.isEmpty()) {
+			log.warn("[route-exec-service] [" + LocalDateTime.now().toString() + "] "
+					+ "Fail to execute saved route - "
+					+ "Could not get directions for the saved route.");
 			return Optional.empty();
 		}
 
@@ -73,6 +86,8 @@ public class RouteExecutionServiceImpl implements RouteExecutionService{
 
 		dto.setPolylines(polylines);
 
+		log.info("[route-exec-service] [" + LocalDateTime.now().toString() + "] "
+				+ "Successfully extracted route execution for ID: " + id + ".");
 		return Optional.of(dto);
 	}
 }

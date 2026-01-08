@@ -1,5 +1,6 @@
 package es.metrica.sept25.evolutivo.service.maps.geocode;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,7 +11,9 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import es.metrica.sept25.evolutivo.entity.maps.reverseGeocode.ReverseGeocodeGroup;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 public class ReverseGeocodeServiceImpl implements ReverseGeocodeService{
 
@@ -34,10 +37,18 @@ public class ReverseGeocodeServiceImpl implements ReverseGeocodeService{
         
         ReverseGeocodeGroup response = restTemplate.getForObject(url, ReverseGeocodeGroup.class);
         
-        if(response != null && response.getResults().length > 0) {
+        if (response != null && response.getResults().length > 0) {
+
+			log.info("[rev-geocode-service] [" + LocalDateTime.now().toString() + "] "
+					+ "Succesfully found an address for data: +"
+					+ "[lat=(" + lat + "), lng=("+ lng +")].");
+
         	return Optional.of(response.getResults()[0].getFormatted_address());
         }
-        
+
+        log.warn("[rev-geocode-service] [" + LocalDateTime.now().toString() + "] "
+        		+ "Couldn't find the address for data: +"
+        		+ "[lat=(" + lat + "), lng=("+ lng +")].");
         return Optional.empty();
 	}
 

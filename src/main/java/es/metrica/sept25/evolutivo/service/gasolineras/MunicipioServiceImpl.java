@@ -1,5 +1,6 @@
 package es.metrica.sept25.evolutivo.service.gasolineras;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -15,7 +16,9 @@ import org.springframework.web.client.RestTemplate;
 import es.metrica.sept25.evolutivo.entity.gasolinera.Municipio;
 import es.metrica.sept25.evolutivo.entity.gasolinera.Provincia;
 import es.metrica.sept25.evolutivo.repository.MunicipioRepository;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 public class MunicipioServiceImpl implements MunicipioService {
 
@@ -36,12 +39,17 @@ public class MunicipioServiceImpl implements MunicipioService {
 	@Override
 	@Cacheable("municipios")
 	public List<Municipio> getMunicipios() {
+		log.info("[mun-service] [" + LocalDateTime.now().toString() + "] "
+				+ "Attempting to retrieve all municipalities.");
 		List<Provincia> provList = provinciaService.getProvincias();
 		List<Municipio> munList = municipioRepository.findAll();
 
 		List<Long> provIds = provList.stream().map(p -> p.getIdProvincia()).collect(Collectors.toList());
 
 		if (Objects.isNull(munList) | munList.isEmpty()) {
+			log.info("[mun-service] [" + LocalDateTime.now().toString() + "] "
+					+ "Fetching all municipalities from the external API. "
+					+ "This might take a while.");
 			ArrayList<Municipio> tempList = new ArrayList<>();
 			provIds.forEach(l -> {
 				Municipio[] munArr = restTemplate.getForObject(API_URL + l, Municipio[].class);
@@ -50,27 +58,56 @@ public class MunicipioServiceImpl implements MunicipioService {
 					municipioRepository.saveAllAndFlush(tempList);
 				}
 			});
+			log.info("[mun-service] [" + LocalDateTime.now().toString() + "] "
+					+ "All municipalities from the external API were retrieved and stored.");
 			return tempList;
 		}
-
+		log.info("[mun-service] [" + LocalDateTime.now().toString() + "] "
+				+ "All municipalities were retrieved.");
 		return munList;
 	}
 
 	@Override
 	@Cacheable("municipio_id")
 	public Optional<Municipio> getMunicipioFromId(Long idMunicipio) {
+		log.info("[mun-service] [" + LocalDateTime.now().toString() + "] "
+				+ "Attempting to retrieve municipality with ID: " + idMunicipio + ".");
 		List<Municipio> munList = getMunicipios();
-		return munList.stream()
+		Optional<Municipio> munFromId = munList.stream()
 				.filter(m -> m.getIdMunicipio() == idMunicipio)
 				.findFirst();
+		
+		if (munFromId.isEmpty()) {
+			log.warn("[mun-service] [" + LocalDateTime.now().toString() + "] "
+					+ "No municipality was found for the ID: " + idMunicipio + ".");
+		} else {
+			log.info("[mun-service] [" + LocalDateTime.now().toString() + "] "
+					+ "Succesfully found a municipality with ID: " + idMunicipio + ".");
+		}
+
+		return munFromId;
 	}
 
 	@Override
 	@Cacheable("municipio_str")
 	public Optional<Municipio> getMunicipioFromString(String munStr) {
+		log.info("[mun-service] [" + LocalDateTime.now().toString() + "] "
+				+ "Attempting to retrieve municipality from string identifier: " + munStr + ".");
 		List<Municipio> munList = getMunicipios();
-		return munList.stream()
-				.filter(m -> m.getNombreMunicipio().toLowerCase().equals(munStr.toLowerCase()))
+		Optional<Municipio> municipalityFromStr = munList.stream()
+				.filter(m -> m.getNombreMunicipio()
+						.toLowerCase()
+						.equals(munStr.toLowerCase()))
 				.findFirst();
+		
+		if (municipalityFromStr.isEmpty()) {
+			log.warn("[mun-service] [" + LocalDateTime.now().toString() + "] "
+					+ "No municipality was found for the string identifier: " + munStr + ".");
+		} else {
+			log.info("[mun-service] [" + LocalDateTime.now().toString() + "] "
+					+ "Succesfully found a municipality with string identifier: " + munStr + ".");
+		}
+
+		return municipalityFromStr;
 	}
 }

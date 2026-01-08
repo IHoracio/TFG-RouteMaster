@@ -10,8 +10,6 @@ import es.metrica.sept25.evolutivo.domain.dto.maps.routes.CoordsWithWeather;
 import es.metrica.sept25.evolutivo.domain.dto.maps.routes.RouteGroup;
 
 public interface RoutesService {
-	RouteGroup deleteLastLeg(RouteGroup response);
-
 	Optional<RouteGroup> getDirections(String origin, String destination, List<String> waypoints,
 			boolean optimizeWaypoints, boolean optimizeRoute, String language);
 

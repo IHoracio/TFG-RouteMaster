@@ -1,5 +1,6 @@
 package es.metrica.sept25.evolutivo.service.weather;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -25,7 +26,9 @@ import es.metrica.sept25.evolutivo.domain.dto.weather.Dia;
 import es.metrica.sept25.evolutivo.domain.dto.weather.Prediccion;
 import es.metrica.sept25.evolutivo.domain.dto.weather.Weather;
 import es.metrica.sept25.evolutivo.domain.dto.weather.WeatherLink;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 public class WeatherServiceImpl implements WeatherService {
 
@@ -48,6 +51,9 @@ public class WeatherServiceImpl implements WeatherService {
 			)
 	@Cacheable(value = "weather", cacheManager = "climateCacheManager")
 	public Optional<Weather> getWeather(String code) {
+		log.info("[weather-service] [" + LocalDateTime.now().toString() + "] "
+				+ "Attempting to get the weather object for a given INE code: "
+				+ code + ".");
 		String url = UriComponentsBuilder
     			.fromUriString(API_URL)
     			.path(code)
@@ -67,15 +73,26 @@ public class WeatherServiceImpl implements WeatherService {
 	@Qualifier("climateCacheManager")
 	@Cacheable(value = "weatherData",  cacheManager = "climateCacheManager")
 	private List<Weather> getWeatherData(String url) {
+		log.info("[weather-service] [" + LocalDateTime.now().toString() + "] "
+				+ "Attempting to get Weather data for the given URL: " + url);
 		String json = restTemplate.getForObject(url, String.class);
 		try {
+			log.info("[weather-service] [" + LocalDateTime.now().toString() + "] "
+					+ "Successfully converted the JSON obtained from " + url);
 			return objectMapper.readValue(json, new TypeReference<List<Weather>>() {
 			});
 		} catch (JsonMappingException e) {
+			log.error("[weather-service] [" + LocalDateTime.now().toString() + "] "
+				+ "Failed to map the Weather JSON to the Java object. Stacktrace:");
 			e.printStackTrace();
 		} catch (JsonProcessingException e) {
+			log.error("[weather-service] [" + LocalDateTime.now().toString() + "] "
+					+ "Failed to process the Weather JSON for the Java object. Stacktrace:");
 			e.printStackTrace();
 		}
+
+		log.error("[weather-service] [" + LocalDateTime.now().toString() + "] "
+				+ "Couldn't retrieve any weather for the given URL: " + url);
 		return Collections.emptyList();
 	}
 
