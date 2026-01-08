@@ -8,6 +8,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import es.metrica.sept25.evolutivo.domain.dto.user.UserDTO;
 import es.metrica.sept25.evolutivo.entity.maps.routes.RoutePreferences;
 import es.metrica.sept25.evolutivo.entity.user.User;
 import es.metrica.sept25.evolutivo.entity.user.UserPreferences;
@@ -52,17 +53,17 @@ public class UserServiceImpl implements UserService {
 	
 	@Override
 	@Transactional
-	public Optional<User> createUser(String nombre, String apellido, String password, String email) {
+	public Optional<User> createUser(UserDTO userDTO) {
 
-	    if (userRepository.findByEmail(email).isPresent()) {
+		if (userRepository.findByEmail(userDTO.getEmail()).isPresent()) {
 	        return Optional.empty();
 	    }
 
 	    User user = new User();
-	    user.setName(nombre);
-	    user.setSurname(apellido);
-	    user.setPassword(password);
-	    user.setEmail(email);
+		user.setName(userDTO.getName());
+		user.setSurname(userDTO.getSurname());
+		user.setPassword(userDTO.getPassword());
+		user.setEmail(userDTO.getEmail());
 	    
 	    RoutePreferences prefs = new RoutePreferences();
         prefs.setPreferredBrands(List.of("REPSOL", "CEPSA"));

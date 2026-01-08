@@ -1,0 +1,44 @@
+import { CommonModule } from '@angular/common';
+import { ChangeDetectionStrategy, Component, input, output, computed, signal, effect } from '@angular/core';
+import { WeatherData } from '../../../../Dto/weather-dtos';
+
+@Component({
+  selector: 'app-weather-overlay',
+  standalone: true,
+  imports: [CommonModule],
+  templateUrl: './weather-overlay.component.html',
+  styleUrls: ['./weather-overlay.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush
+})
+export class WeatherOverlayComponent {
+  data = input<WeatherData[] | null>();
+  close = output<void>();
+
+  currentHour = signal<number>(new Date().getHours());
+  currentHourStr = computed(() => this.currentHour().toString());
+
+  constructor() {
+    effect(() => {
+      const timer = setInterval(() => {
+        this.currentHour.set(new Date().getHours());
+      }, 60_000);
+      return () => clearInterval(timer);
+    });
+  }
+
+  hourEntries(obj: { [key: string]: any } | null): Array<[string, any]> {
+    if (!obj) return [];
+    return Object.entries(obj);
+  }
+
+  getForHour(obj: { [key: string]: any } | null, hourStr: string | null): any | null {
+    if (!obj || hourStr == null) return null;
+    return obj.hasOwnProperty(hourStr) ? obj[hourStr] : null;
+  }
+
+  hasForHour(obj: { [key: string]: any } | null, hourStr: string | null): boolean {
+    if (!obj || hourStr == null) return false;
+    return obj.hasOwnProperty(hourStr);
+  }
+
+}

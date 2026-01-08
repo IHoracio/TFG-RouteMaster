@@ -1,0 +1,40 @@
+<div class="user-info">
+  <h2>Información del Usuario</h2>
+  
+  <div class="user-details">
+    <p><strong>Email:</strong> {{ user().email }}</p>
+    <p><strong>Nombre:</strong> {{ user().name }}</p>
+    <p><strong>Apellido:</strong> {{ user().surname }}</p>
+  </div>
+  
+  <div class="favorites-section">
+    <h3>Rutas Favoritas</h3>
+    @if (favoriteRoutes().length > 0) {
+      <ul>
+        @for (route of favoriteRoutes(); track route.name) {
+          <li>
+            {{ route.name }}
+            @if (route.canShare) {
+              <button (click)="shareRoute(route)">Compartir</button>
+            }
+          </li>
+        }
+      </ul>
+    } @else {
+      <p>No hay rutas favoritas.</p>
+    }
+  </div>
+  
+  <div class="favorites-section">
+    <h3>Gasolineras Favoritas</h3>
+    @if (favoriteGasStations().length > 0) {
+      <ul>
+        @for (station of favoriteGasStations(); track station) {
+          <li>{{ station }}</li>
+        }
+      </ul>
+    } @else {
+      <p>No hay gasolineras favoritas.</p>
+    }
+  </div>
+</div>

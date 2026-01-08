@@ -1,0 +1,69 @@
+<div class="weather-overlay" role="region" aria-label="Weather route overlay">
+  <header class="weather-header">
+    <div class="weather-title">Información meteorológica de la ruta</div>
+    <div class="weather-actions">
+      <button class="btn close" (click)="close.emit()" aria-label="Cerrar overlay">✕</button>
+    </div>
+  </header>
+
+  @if (data(); as weatherPoints) {
+    @if (currentHourStr(); as currentHourStr) {
+      <div class="weather-body">
+        @for (weatherPoint of weatherPoints; track weatherPoint.address; let i = $index) {
+          <div class="weather-entry">
+            <div class="weather-entry-top">
+              <div class="weather-entry-index">{{ i + 1 }}</div>
+              <div class="weather-entry-main">
+                <div class="weather-entry-address" title="{{ weatherPoint.address }}">{{ weatherPoint.address }}</div>
+              </div>
+            </div>
+
+            <div class="weather-summary-compact">
+              @if (getForHour(weatherPoint.weatherDescription, currentHourStr); as desc) {
+                <div class="weather-desc">{{ desc }}</div>
+              } @else {
+                <div class="weather-desc weather-empty-value">(sin descripción)</div>
+              }
+
+              @if (hasForHour(weatherPoint.temperatures, currentHourStr)) {
+                <div class="weather-temp">{{ getForHour(weatherPoint.temperatures, currentHourStr) }}°C</div>
+              } @else {
+                <div class="weather-temp weather-empty-value">(sin temperatura)</div>
+              }
+            </div>
+
+            <details class="weather-details">
+              <summary class="weather-summary">Ver horario completo</summary>
+
+              <div class="weather-content">
+                <div class="weather-current-hour-line">Hora actual: <strong>{{ currentHourStr }}</strong> @if (currentHour() < 13) { <strong> AM</strong> } @else { <strong> PM</strong> }</div>
+
+                <h4 class="weather-section-title">Descripción por hora</h4>
+                <ul class="weather-hour-list">
+                  @for (entry of hourEntries(weatherPoint.weatherDescription); track entry[0]) {
+                    <li [class.weather-hour-current]="entry[0] === currentHourStr">
+                      <span class="hour-key">{{ entry[0] }}:00</span>
+                      <span class="hour-val">{{ entry[1] }}</span>
+                    </li>
+                  }
+                </ul>
+
+                <h4 class="weather-section-title">Temperaturas por hora</h4>
+                <ul class="weather-hour-list">
+                  @for (entry of hourEntries(weatherPoint.temperatures); track entry[0]) {
+                    <li [class.weather-hour-current]="entry[0] === currentHourStr">
+                      <span class="hour-key">{{ entry[0] }}:00</span>
+                      <span class="hour-val">{{ entry[1] }}°C</span>
+                    </li>
+                  }
+                </ul>
+              </div>
+            </details>
+          </div>
+        }
+      </div>
+    }
+  } @else {
+    <div class="weather-empty">No hay datos meteorológicos disponibles.</div>
+  }
+</div>

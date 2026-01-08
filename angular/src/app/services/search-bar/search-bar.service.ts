@@ -1,8 +1,10 @@
 import { Injectable, TemplateRef } from '@angular/core';
-import { RouteFormResponse } from '../../features/pages/map-page/Utils/route-form-response';
+import { RouteFormResponse } from '../../Dto/route-form-response';
 import { RouteService } from '../routes/route.service';
 import { Coords, RouteGroupResponse } from '../../Dto/maps-dtos';
 import { MapCommunicationService } from '../map/map-communication.service';
+import { WeatherData } from '../../Dto/weather-dtos';
+
 
 @Injectable({
   providedIn: 'root'
@@ -12,23 +14,12 @@ export class SearchBarService {
   constructor(private routeService: RouteService, private mapCommunication: MapCommunicationService) { }
 
   onSubmit(routeFormResponse: RouteFormResponse) {
-    /*console.log(routeFormResponse)
-    let message: RouteGroupResponse = {
-    routes: []
-    };
-    let cadena: string = ""
-    this.routeService.calculateRoute(routeFormResponse)
-      .subscribe(data => {
-        message = JSON.parse(data)
-        console.log(message)
-        
-      })
-      */
      this.saveCoordinates(routeFormResponse)
      setTimeout(()=>{
         this.saveWaypointCoordinates(routeFormResponse)    
      }, 1000)
     this.saveGasStationsCoordinates(routeFormResponse)
+    this.saveWeatherRoute(routeFormResponse)
   }
 
   saveCoordinates(routeFormResponse: RouteFormResponse){
@@ -57,7 +48,6 @@ export class SearchBarService {
     let coords: Coords[] = []
     this.routeService.calculateGasStations(routeFormResponse)
     .subscribe(data => {
-      console.log("gasolinera", data)
       const parsedData = JSON.parse(data);
       coords = parsedData;
       console.log(coords)
@@ -65,6 +55,17 @@ export class SearchBarService {
     })
     
   }
+
+  saveWeatherRoute(routeFormResponse: RouteFormResponse){
+    let weather: WeatherData []
+
+    this.routeService.calculateWeatherRoute(routeFormResponse).subscribe(data =>{
+      weather = JSON.parse(data);
+      console.log(weather)
+      this.giveWeatherCoords(weather)
+    })
+  }
+
 
   giveCoords(coords: Coords[]){
     this.mapCommunication.sendRoute(coords)
@@ -74,5 +75,8 @@ export class SearchBarService {
   }
   giveGasStationCoords(coords: Coords[]){
     this.mapCommunication.sendGasStations(coords)
+  }
+  giveWeatherCoords(weather: WeatherData []){
+    this.mapCommunication.sendWeather(weather);
   }
 }
