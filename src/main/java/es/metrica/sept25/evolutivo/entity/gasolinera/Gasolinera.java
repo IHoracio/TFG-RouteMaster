@@ -33,7 +33,7 @@ public class Gasolinera {
 
 	private Long idMunicipio;
 
-	private Long codPostal;
+	private String codPostal;
 
 	private String provincia;
 
@@ -98,7 +98,7 @@ public class Gasolinera {
 	}
 
 	public Gasolinera(Long idEstacion, String nombreEstacion, String marca, String horario, String lastUpdate,
-			Double longitud, Double latitud, String direccion, String localidad, Long idMunicipio, Long codPostal,
+			Double longitud, Double latitud, String direccion, String localidad, Long idMunicipio, String codPostal,
 			String provincia, String provinciaDistrito, String tipoVenta, Double precioGasolina95,
 			Double precioGasolina95Media, Double precioGasolina98, Double precioGasolina98Media, Double precioDiesel,
 			Double precioDieselMedia, Double precioDieselB, Double precioDieselBMedia, Double precioDieselPremium,
@@ -212,11 +212,11 @@ public class Gasolinera {
 		this.idMunicipio = idMunicipio;
 	}
 
-	public Long getCodPostal() {
+	public String getCodPostal() {
 		return this.codPostal;
 	}
 
-	public void setCodPostal(Long codPostal) {
+	public void setCodPostal(String codPostal) {
 		this.codPostal = codPostal;
 	}
 
