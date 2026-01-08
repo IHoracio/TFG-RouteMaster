@@ -1,68 +1,118 @@
 <div class="user-preferences">
-  <h2>Preferencias de Usuario</h2>
-  
-  <form class="preferences-form">
-    <div class="form-group">
-      <label for="fuelType">Tipo de Combustible:</label>
-      <select id="fuelType" [(ngModel)]="fuelType" name="fuelType">
-        @for (option of fuelOptions; track option) {
-          <option [value]="option">{{ option }}</option>
+    <h2>Preferencias de Usuario</h2>
+
+    <form class="preferences-form">
+        <div class="form-group">
+            <label for="fuelType">Tipo de Combustible:</label>
+            <select id="fuelType" [(ngModel)]="fuelType" name="fuelType">
+                @for (option of fuelOptions; track option) {
+                <option [value]="option">{{ option }}</option>
+                }
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="favoriteGasStation">Marca de Gasolinera Favorita:</label>
+            <select id="favoriteGasStation" [(ngModel)]="favoriteGasStation" name="favoriteGasStation">
+                <option value="">Ninguna</option>
+                @for (option of gasStationOptions; track option) {
+                <option [value]="option">{{ option }}</option>
+                }
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="precioMaximo">Precio Máximo de Combustible:</label>
+            <input id="precioMaximo" type="number" [(ngModel)]="precioMaximo" name="precioMaximo" min="0" step="0.01">
+        </div>
+
+        <div class="form-group">
+            <label for="theme">Tema:</label>
+            <select id="theme" [(ngModel)]="theme" name="theme">
+                @for (option of themeOptions; track option) {
+                <option [value]="option">{{ option }}</option>
+                }
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="language">Idioma:</label>
+            <select id="language" [(ngModel)]="language" name="language">
+                @for (option of languageOptions; track option) {
+                <option [value]="option">{{ option }}</option>
+                }
+            </select>
+        </div>
+
+        <div class="form-group radio-slider">
+            <label for="radioKm">Radio KM: <span (click)="toggleInfo()" class="info-icon">ℹ️</span></label>
+            <div class="slider-container">
+                <input id="radioKm" type="range" [(ngModel)]="radioKm" name="radioKm" min="1" max="30" step="1">
+                <span>{{ radioKm() }} km</span>
+            </div>
+            @if (showInfo()) {
+            <div class="info-tooltip">
+                El radio en kilómetros en el que se buscaran gasolineras alrededor
+            </div>
+            }
+        </div>
+
+        <div class="form-group">
+            <label>Buscar Gasolineras Cercanas:</label>
+            <input type="text" [(ngModel)]="searchAddress" name="searchAddress" placeholder="Escribe una dirección">
+            <button type="button" (click)="searchGasStations()" [disabled]="isLoading()">Buscar</button>
+            @if (isLoading()) {
+            <span>Cargando...</span>
+            }
+        </div>
+
+        @if (searchResults().length > 0) {
+        <div class="form-group">
+            <label>Seleccionar Gasolinera:</label>
+            <ul class="gas-stations-list">
+                @for (station of searchResults(); track station.idEstacion) {
+                @if (favoriteGasStations().includes(station.nombreEstacion + ' - ' + station.direccion)) {
+                <li class="added-station">
+                    {{ station.nombreEstacion }} - {{ station.direccion }}
+                    <button type="button"
+                        (click)="removeFavoriteGasStation(station.nombreEstacion + ' - ' + station.direccion)">Eliminar</button>
+                </li>
+                } @else {
+                <li (click)="toggleSelection(station)"
+                    [class.selected]="selectedStation() === station.nombreEstacion + ' - ' + station.direccion"
+                    class="clickable-station">
+                    {{ station.nombreEstacion }} - {{ station.direccion }}
+                </li>
+                }
+                }
+            </ul>
+            <button type="button" (click)="addSelectedGasStations()" [disabled]="!selectedStation()">Añadir</button>
+        </div>
+
+        <div class="map-container">
+            <app-map-page [showWeather]="false" [showControls]="false" [gasStations]="searchResults()"
+                [selectedStation]="selectedStation()">
+            </app-map-page>
+        </div>
+        } @else if (!isLoading() && hasSearched() && searchResults().length === 0) {
+        <div class="form-group">
+            <p>No existen gasolineras en {{ searchAddress() }} en un radio de {{ radioKm() }} km</p>
+        </div>
         }
-      </select>
-    </div>
-    
-    <div class="form-group">
-      <label for="favoriteGasStation">Marca de Gasolinera Favorita:</label>
-      <select id="favoriteGasStation" [(ngModel)]="favoriteGasStation" name="favoriteGasStation">
-        <option value="">Ninguna</option>
-        @for (option of gasStationOptions; track option) {
-          <option [value]="option">{{ option }}</option>
-        }
-      </select>
-    </div>
-    
-    <div class="form-group">
-      <label for="radioKm">Radio KM:</label>
-      <input id="radioKm" type="number" [(ngModel)]="radioKm" name="radioKm" min="5" step="1">
-    </div>
-    
-    <div class="form-group">
-      <label for="precioMaximo">Precio Máximo de Combustible:</label>
-      <input id="precioMaximo" type="number" [(ngModel)]="precioMaximo" name="precioMaximo" min="0" step="0.01">
-    </div>
-    
-    <div class="form-group">
-      <label for="theme">Tema:</label>
-      <select id="theme" [(ngModel)]="theme" name="theme">
-        @for (option of themeOptions; track option) {
-          <option [value]="option">{{ option }}</option>
-        }
-      </select>
-    </div>
-    
-    <div class="form-group">
-      <label for="language">Idioma:</label>
-      <select id="language" [(ngModel)]="language" name="language">
-        @for (option of languageOptions; track option) {
-          <option [value]="option">{{ option }}</option>
-        }
-      </select>
-    </div>
-    
-    <div class="form-group">
-      <label>Gasolineras Favoritas:</label>
-      <ul>
-        @for (station of favoriteGasStations(); track station) {
-          <li>{{ station }} <button type="button" (click)="removeFavoriteGasStation(station)">Eliminar</button></li>
-        }
-      </ul>
-      <input type="text" [(ngModel)]="newGasStation" name="newGasStation" placeholder="Añadir gasolinera">
-      <button type="button" (click)="addFavoriteGasStation()">Añadir</button>
-    </div>
-    
-    <div class="buttons">
-      <button type="button" (click)="savePreferences()">Guardar Cambios</button>
-      <button type="button" (click)="resetPreferences()">Reiniciar a Por Defecto</button>
-    </div>
-  </form>
+
+        <div class="form-group">
+            <label>Gasolineras Favoritas:</label>
+            <ul>
+                @for (station of favoriteGasStations(); track station) {
+                <li>{{ station }} <button type="button" (click)="removeFavoriteGasStation(station)">Eliminar</button>
+                </li>
+                }
+            </ul>
+        </div>
+
+        <div class="buttons">
+            <button type="button" (click)="savePreferences()">Guardar Cambios</button>
+            <button type="button" (click)="resetPreferences()">Reiniciar a Por Defecto</button>
+        </div>
+    </form>
 </div>

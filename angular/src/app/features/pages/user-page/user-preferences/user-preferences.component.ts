@@ -1,15 +1,19 @@
-import { Component, signal } from '@angular/core';
+import { Component, signal, inject, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { GasStationService } from '../../../../services/gas-station/gas-station.service';
+import { GasStation } from '../../../../Dto/gas-station';
+import { MapPageComponent } from '../../map-page/map-page.component';
 
 @Component({
   selector: 'app-user-preferences',
-  standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, MapPageComponent],
   templateUrl: './user-preferences.component.html',
   styleUrls: ['./user-preferences.component.css']
 })
 export class UserPreferencesComponent {
+  private gasStationService = inject(GasStationService);
+
   fuelType = signal<string>('Todos');
   favoriteGasStation = signal<string>('');
   theme = signal<string>('Claro');
@@ -24,10 +28,72 @@ export class UserPreferencesComponent {
 
   favoriteGasStations = signal<string[]>([]);
 
-  newGasStation = signal<string>('');
+  searchAddress = signal<string>('');
+  searchResults = signal<GasStation[]>([]);
+  selectedStation = signal<string | null>(null);
+  isLoading = signal<boolean>(false);
+  hasSearched = signal<boolean>(false);
+
+  showInfo = signal<boolean>(false);
+
+  constructor() {
+    effect(() => {
+      this.searchAddress();
+      this.hasSearched.set(false);
+    });
+
+    effect(() => {
+      this.radioKm();
+      this.hasSearched.set(false);
+    });
+  }
+
+  searchGasStations(): void {
+    this.searchResults.set([]);
+    if (!this.searchAddress().trim()) return;
+
+    this.isLoading.set(true);
+    this.hasSearched.set(true);
+    this.gasStationService.searchGasStations(this.searchAddress(), this.radioKm()).subscribe({
+      next: (results) => {
+        this.searchResults.set(results || []);
+        this.selectedStation.set(null);
+        this.isLoading.set(false);
+      },
+      error: (error) => {
+        console.error('Error fetching gas stations:', error);
+        alert('Error al buscar gasolineras. Intenta de nuevo.');
+        this.isLoading.set(false);
+      }
+    });
+  }
+
+  toggleSelection(station: GasStation): void {
+    const key = `${station.nombreEstacion} - ${station.direccion}`;
+    if (this.selectedStation() === key) {
+      this.selectedStation.set(null);
+    } else {
+      this.selectedStation.set(key);
+    }
+  }
+
+  addSelectedGasStations(): void {
+    if (this.selectedStation()) {
+      this.favoriteGasStations.update(stations => [...stations, this.selectedStation()!]);
+      // Removido: this.searchResults.update(results => results.filter(station => `${station.nombreEstacion} - ${station.direccion}` !== this.selectedStation()));
+      this.selectedStation.set(null);
+    }
+  }
 
   savePreferences(): void {
-
+    alert('Preferencias guardadas:\n' +
+          `Combustible: ${this.fuelType()}\n` +
+          `Gasolinera: ${this.favoriteGasStation()}\n` +
+          `Tema: ${this.theme()}\n` +
+          `Idioma: ${this.language()}\n` +
+          `Radio KM: ${this.radioKm()}\n` +
+          `Precio Máximo: ${this.precioMaximo()}\n` +
+          `Gasolineras: ${this.favoriteGasStations().join(', ')}`);
   }
 
   resetPreferences(): void {
@@ -40,14 +106,11 @@ export class UserPreferencesComponent {
     this.favoriteGasStations.set([]);
   }
 
-  addFavoriteGasStation(): void {
-    if (this.newGasStation().trim() && !this.favoriteGasStations().includes(this.newGasStation().trim())) {
-      this.favoriteGasStations.update(stations => [...stations, this.newGasStation().trim()]);
-      this.newGasStation.set('');
-    }
-  }
-
   removeFavoriteGasStation(station: string): void {
     this.favoriteGasStations.update(stations => stations.filter(s => s !== station));
+  }
+
+  toggleInfo(): void {
+    this.showInfo.update(v => !v);
   }
 }
