@@ -19,7 +19,7 @@
       <select name="destinationType" id="destinationType" [(ngModel)]="destinationType">
         <option value="">¿Qué quieres introducir?</option>
         <option value="coordinates">Destino</option>
-        <option value="favoriteGasStations">Gasolinera favorita</option>
+        <option value="favouriteGasStations">Gasolinera favorita</option>
       </select>
     </p>
 
@@ -30,15 +30,25 @@
         placeholder="¿A dónde quieres ir?" required #destinationField="ngModel" />
 
       @if(destinationField && destinationField.touched){
-        <div class="error">
-          @if(destinationField.errors?.['required']){
-          Tienes que introducir un destino.
-          }
-        </div>
-        }
+    <div class="error">
+      @if(destinationField.errors?.['required']){
+      Tienes que introducir un destino.
+      }
+    </div>
+    }
     </p>
     }
 
+
+
+    @if(destinationType === "favouriteGasStations"){
+    <select name="gasStation" id="gasStation" [(ngModel)]="routeFormResponse.destination">
+      <option value="">Elige una gasolinera</option>
+      <option *ngFor="let brand of userDto.routePreferences.preferredBrands" [value]="brand">
+        {{ brand }}
+      </option>
+    </select>
+    }
 
     <button type="button" (click)="addWaypoint()">Añadir punto intermedio</button>
 

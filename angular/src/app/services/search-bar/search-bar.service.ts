@@ -4,6 +4,9 @@ import { RouteService } from '../routes/route.service';
 import { Coords, RouteGroupResponse } from '../../Dto/maps-dtos';
 import { MapCommunicationService } from '../map/map-communication.service';
 import { WeatherData } from '../../Dto/weather-dtos';
+import { UserDto } from '../../Dto/user-dtos';
+import { UserService } from '../user/user.service';
+import { Observable } from 'rxjs';
 
 
 @Injectable({
@@ -11,7 +14,7 @@ import { WeatherData } from '../../Dto/weather-dtos';
 })
 export class SearchBarService {
 
-  constructor(private routeService: RouteService, private mapCommunication: MapCommunicationService) { }
+  constructor(private routeService: RouteService, private mapCommunication: MapCommunicationService, private userService: UserService) { }
 
   onSubmit(routeFormResponse: RouteFormResponse) {
      this.saveCoordinates(routeFormResponse)
@@ -66,8 +69,9 @@ export class SearchBarService {
     })
   }
 
-
-
+  saveUserData(mail: string): Observable<string> {
+    return this.userService.receiveUserData(mail);
+  }
   giveCoords(coords: Coords[]){
     this.mapCommunication.sendRoute(coords)
   }
