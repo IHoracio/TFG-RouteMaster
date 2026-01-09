@@ -1,4 +1,4 @@
-import { Component, signal, inject, effect } from '@angular/core';
+import { Component, signal, inject, effect, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { GasStationService } from '../../../../services/gas-station/gas-station.service';
@@ -26,7 +26,7 @@ export class UserPreferencesComponent {
   languageOptions = ['Español', 'Inglés'];
   gasStationOptions = ['Repsol', 'Cepsa', 'BP', 'Shell', 'Galp'];
 
-  favoriteGasStations = signal<string[]>([]);
+  favoriteGasStations = signal<GasStation[]>([]);
 
   searchAddress = signal<string>('');
   searchResults = signal<GasStation[]>([]);
@@ -35,6 +35,12 @@ export class UserPreferencesComponent {
   hasSearched = signal<boolean>(false);
 
   showInfo = signal<boolean>(false);
+
+  allStations = computed(() => 
+    [...this.favoriteGasStations(), ...this.searchResults()].filter((s, i, arr) => 
+      arr.findIndex(x => x.idEstacion === s.idEstacion) === i
+    )
+  );
 
   constructor() {
     effect(() => {
@@ -79,10 +85,16 @@ export class UserPreferencesComponent {
 
   addSelectedGasStations(): void {
     if (this.selectedStation()) {
-      this.favoriteGasStations.update(stations => [...stations, this.selectedStation()!]);
-      // Removido: this.searchResults.update(results => results.filter(station => `${station.nombreEstacion} - ${station.direccion}` !== this.selectedStation()));
+      const station = this.searchResults().find(s => `${s.nombreEstacion} - ${s.direccion}` === this.selectedStation());
+      if (station && !this.isFavorite(station)) {
+        this.favoriteGasStations.update(stations => [...stations, station]);
+      }
       this.selectedStation.set(null);
     }
+  }
+
+  isFavorite(station: GasStation): boolean {
+    return this.favoriteGasStations().some(f => f.idEstacion === station.idEstacion);
   }
 
   savePreferences(): void {
@@ -93,7 +105,7 @@ export class UserPreferencesComponent {
           `Idioma: ${this.language()}\n` +
           `Radio KM: ${this.radioKm()}\n` +
           `Precio Máximo: ${this.precioMaximo()}\n` +
-          `Gasolineras: ${this.favoriteGasStations().join(', ')}`);
+          `Gasolineras: ${this.favoriteGasStations().map(s => s.nombreEstacion + ' - ' + s.direccion).join(', ')}`);
   }
 
   resetPreferences(): void {
@@ -106,11 +118,15 @@ export class UserPreferencesComponent {
     this.favoriteGasStations.set([]);
   }
 
-  removeFavoriteGasStation(station: string): void {
-    this.favoriteGasStations.update(stations => stations.filter(s => s !== station));
+  removeFavoriteGasStation(station: GasStation): void {
+    this.favoriteGasStations.update(stations => stations.filter(s => s.idEstacion !== station.idEstacion));
   }
 
   toggleInfo(): void {
     this.showInfo.update(v => !v);
+  }
+
+  setSelectedStation(station: GasStation): void {
+    this.selectedStation.set(`${station.nombreEstacion} - ${station.direccion}`);
   }
 }
