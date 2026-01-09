@@ -30,6 +30,7 @@ import es.metrica.sept25.evolutivo.domain.dto.weather.Dia;
 import es.metrica.sept25.evolutivo.domain.dto.weather.EstadoCielo;
 import es.metrica.sept25.evolutivo.domain.dto.weather.Temperatura;
 import es.metrica.sept25.evolutivo.domain.dto.weather.Weather;
+import es.metrica.sept25.evolutivo.entity.gasolinera.Gasolinera;
 import es.metrica.sept25.evolutivo.service.gasolineras.GasolineraService;
 import es.metrica.sept25.evolutivo.service.ine.INEService;
 import es.metrica.sept25.evolutivo.service.maps.geocode.GeocodeService;
