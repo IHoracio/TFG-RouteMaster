@@ -21,11 +21,13 @@ import es.metrica.sept25.evolutivo.entity.gasolinera.Gasolinera;
 import es.metrica.sept25.evolutivo.entity.gasolinera.Municipio;
 import es.metrica.sept25.evolutivo.repository.GasolineraRepository;
 import es.metrica.sept25.evolutivo.service.maps.geocode.GeocodeService;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-@Slf4j
 @Service
 public class GasolineraServiceImpl implements GasolineraService {
+	
+	private static final Logger log = LoggerFactory.getLogger(GasolineraServiceImpl.class);
 	private static final String API_URL = "https://api.precioil.es/estaciones/";
 
 	@Autowired

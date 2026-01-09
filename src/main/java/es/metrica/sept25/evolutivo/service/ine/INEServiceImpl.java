@@ -14,12 +14,15 @@ import org.springframework.web.util.UriComponentsBuilder;
 import es.metrica.sept25.evolutivo.entity.ine.INEMunicipio;
 import es.metrica.sept25.evolutivo.repository.INEMunicipioRepository;
 import es.metrica.sept25.evolutivo.service.maps.geocode.GeocodeService;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-@Slf4j
 @Service
 public class INEServiceImpl implements INEService {
 
+	private static final Logger log = LoggerFactory.getLogger(INEServiceImpl.class);
+
+	
 	@Autowired
 	private GeocodeService geocodeService;
 

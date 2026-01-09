@@ -14,12 +14,15 @@ import es.metrica.sept25.evolutivo.entity.maps.routes.Point;
 import es.metrica.sept25.evolutivo.entity.maps.routes.SavedRoute;
 import es.metrica.sept25.evolutivo.entity.user.User;
 import es.metrica.sept25.evolutivo.repository.SavedRouteRepository;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-@Slf4j
 @Service
 public class SavedRouteServiceImpl implements SavedRouteService {
 
+	private static final Logger log = LoggerFactory.getLogger(SavedRouteServiceImpl.class);
+
+	
 	@Autowired
 	private SavedRouteRepository repository;
 

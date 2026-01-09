@@ -26,12 +26,15 @@ import es.metrica.sept25.evolutivo.domain.dto.weather.Dia;
 import es.metrica.sept25.evolutivo.domain.dto.weather.Prediccion;
 import es.metrica.sept25.evolutivo.domain.dto.weather.Weather;
 import es.metrica.sept25.evolutivo.domain.dto.weather.WeatherLink;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-@Slf4j
 @Service
 public class WeatherServiceImpl implements WeatherService {
 
+	private static final Logger log = LoggerFactory.getLogger(WeatherServiceImpl.class);
+
+	
 	private static final String API_URL = "https://opendata.aemet.es/opendata/api/prediccion/especifica/municipio/horaria/";
 
 	@Autowired

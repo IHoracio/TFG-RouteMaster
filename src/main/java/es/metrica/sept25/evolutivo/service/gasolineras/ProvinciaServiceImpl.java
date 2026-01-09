@@ -15,12 +15,14 @@ import org.springframework.web.client.RestTemplate;
 import es.metrica.sept25.evolutivo.entity.gasolinera.Municipio;
 import es.metrica.sept25.evolutivo.entity.gasolinera.Provincia;
 import es.metrica.sept25.evolutivo.repository.ProvinciaRepository;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-@Slf4j
 @Service
 public class ProvinciaServiceImpl implements ProvinciaService {
 
+	private static final Logger log = LoggerFactory.getLogger(ProvinciaServiceImpl.class);
+	
 	private static final String API_URL = "https://api.precioil.es/provincias";
 
 	@Autowired
