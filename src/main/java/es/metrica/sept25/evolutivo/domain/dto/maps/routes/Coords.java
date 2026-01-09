@@ -51,5 +51,9 @@ public class Coords {
 		return Objects.equals(lat, other.lat) && Objects.equals(lng, other.lng);
 	}
 
+	@Override
+	public String toString() {
+		return lat + "," + lng;
+	}
 	
 }

@@ -8,16 +8,17 @@ import org.springframework.web.util.UriComponentsBuilder;
 import es.metrica.sept25.evolutivo.domain.dto.maps.routes.Coords;
 import es.metrica.sept25.evolutivo.domain.dto.maps.routes.CoordsWithWeather;
 import es.metrica.sept25.evolutivo.domain.dto.maps.routes.RouteGroup;
+import es.metrica.sept25.evolutivo.service.maps.routes.RoutesServiceImpl.VehicleEmissionType;
 
 public interface RoutesService {
-	RouteGroup deleteLastLeg(RouteGroup response);
 
 	Optional<RouteGroup> getDirections(String origin, String destination, List<String> waypoints,
-			boolean optimizeWaypoints, boolean optimizeRoute, String language);
+			boolean optimizeWaypoints, boolean optimizeRoute, String language, boolean avoidTolls,
+			VehicleEmissionType vehicleEmissionType);
 
 	List<Coords> getGasStationsCoordsForRoute(RouteGroup routeGroup, Long radius);
 
-	String getUrl(List<String> waypoints, UriComponentsBuilder url);
+	String getUrl(List<Coords> waypoints, UriComponentsBuilder url);
 
 	List<CoordsWithWeather> getWeatherForRoute(RouteGroup routeGroup);
 
@@ -28,4 +29,6 @@ public interface RoutesService {
 	List<Coords> extractRoutePolylinePoints(RouteGroup routeGroup);
 	
 	List<Coords> decodePolyline(String polylinePoints);
+
+
 }

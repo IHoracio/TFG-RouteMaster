@@ -4,6 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import es.metrica.sept25.evolutivo.entity.gasolinera.Gasolinera;
+import es.metrica.sept25.evolutivo.entity.gasolinera.UserSavedGasStation;
 import es.metrica.sept25.evolutivo.entity.maps.routes.RoutePreferences;
 import es.metrica.sept25.evolutivo.entity.maps.routes.SavedRoute;
 import jakarta.persistence.CascadeType;
@@ -15,6 +16,9 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
@@ -45,15 +49,14 @@ public class User {
 	private String name;
 	private String surname;
 
-	@Embedded
-	@OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
 	private UserPreferences userPreferences;
 
 	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<SavedRoute> savedRoutes = new LinkedList<SavedRoute>();
 	
-	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<Gasolinera> favouriteGasStations = new LinkedList<Gasolinera>();
+	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<UserSavedGasStation> savedGasStations = new LinkedList<>();
 
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false)
@@ -61,7 +64,7 @@ public class User {
 	
 	@Embedded
     private RoutePreferences routePreferences;
-	
+
 	public Long getId() {
 		return id;
 	}
@@ -71,7 +74,7 @@ public class User {
 	}
 
 	public String getEmail() {
-		return this.email;
+		return email;
 	}
 
 	public void setEmail(String email) {
@@ -79,7 +82,7 @@ public class User {
 	}
 
 	public String getPassword() {
-		return this.password;
+		return password;
 	}
 
 	public void setPassword(String password) {
@@ -87,7 +90,7 @@ public class User {
 	}
 
 	public String getPasswordConfirmation() {
-		return this.passwordConfirmation;
+		return passwordConfirmation;
 	}
 
 	public void setPasswordConfirmation(String passwordConfirmation) {
@@ -95,7 +98,7 @@ public class User {
 	}
 
 	public String getName() {
-		return this.name;
+		return name;
 	}
 
 	public void setName(String name) {
@@ -103,7 +106,7 @@ public class User {
 	}
 
 	public String getSurname() {
-		return this.surname;
+		return surname;
 	}
 
 	public void setSurname(String surname) {
@@ -119,27 +122,29 @@ public class User {
 	}
 
 	public List<SavedRoute> getSavedRoutes() {
-		return new LinkedList<SavedRoute>(this.savedRoutes);
+		return savedRoutes;
 	}
 
 	public void setSavedRoutes(List<SavedRoute> savedRoutes) {
 		this.savedRoutes = savedRoutes;
 	}
 
-	public List<Gasolinera> getFavouriteGasStations() {
-		return new LinkedList<Gasolinera>(this.favouriteGasStations);
+
+
+	public List<UserSavedGasStation> getSavedGasStations() {
+		return savedGasStations;
 	}
 
-	public void setFavouriteGasStations(List<Gasolinera> favouriteGasStations) {
-		this.favouriteGasStations = favouriteGasStations;
+	public void setSavedGasStations(List<UserSavedGasStation> savedGasStations) {
+		this.savedGasStations = savedGasStations;
 	}
 
 	public PrioridadGasolineras getGasStationPriority() {
-		return this.gasStationPriority;
+		return gasStationPriority;
 	}
 
-	public void setGasStationPriority(PrioridadGasolineras prioridadGasolineras) {
-		this.gasStationPriority = prioridadGasolineras;
+	public void setGasStationPriority(PrioridadGasolineras gasStationPriority) {
+		this.gasStationPriority = gasStationPriority;
 	}
 
 	public RoutePreferences getRoutePreferences() {
@@ -149,5 +154,6 @@ public class User {
 	public void setRoutePreferences(RoutePreferences routePreferences) {
 		this.routePreferences = routePreferences;
 	}
+	
 	
 }

@@ -1,10 +1,16 @@
 package es.metrica.sept25.evolutivo.service.maps.routes;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,15 +33,19 @@ import es.metrica.sept25.evolutivo.domain.dto.weather.Weather;
 import es.metrica.sept25.evolutivo.entity.gasolinera.Gasolinera;
 import es.metrica.sept25.evolutivo.service.gasolineras.GasolineraService;
 import es.metrica.sept25.evolutivo.service.ine.INEService;
+import es.metrica.sept25.evolutivo.service.maps.geocode.GeocodeService;
 import es.metrica.sept25.evolutivo.service.maps.geocode.ReverseGeocodeService;
 import es.metrica.sept25.evolutivo.service.weather.WeatherService;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 public class RoutesServiceImpl implements RoutesService {
 
 	private static final String API_URL = "https://maps.googleapis.com/maps/api/directions/json";
 	private static final String MODE = "driving";
 	private static final String OPTIMIZE = "optimize:true|";
+	private static final String AVOID_TOLLS = "tolls";
 
 	@Value("${evolutivo.api_key_google}")
 	private String API_KEY_GOOGLE;
@@ -54,40 +64,107 @@ public class RoutesServiceImpl implements RoutesService {
 	
 	@Autowired
 	private ReverseGeocodeService reverseGeocodeService;
+	
+	@Autowired
+	private GeocodeService geocodeService;
+	
+	public enum VehicleEmissionType {
+	    ELECTRIC,
+	    GASOLINE,
+	    DIESEL,
+	    HYBRID;
+	}
 
 	@Override
 	public Optional<RouteGroup> getDirections(String origin, String destination, List<String> waypoints,
-			boolean optimizeWaypoints, boolean optimizeRoute, String language) {
-		origin = origin.replaceAll(" ", "");
-		destination = destination.replaceAll(" ", "");
+			boolean optimizeWaypoints, boolean optimizeRoute, String language, boolean avoidTolls,
+	        VehicleEmissionType vehicleEmissionType) {
 
-		UriComponentsBuilder url = UriComponentsBuilder.fromUriString(API_URL).queryParam("mode", MODE)
-				.queryParam("language", language).queryParam("key", API_KEY_GOOGLE).queryParam("origin", origin);
+		Set<String> invalidDirections = new HashSet<String>();
+		
+		Optional<Coords> originCoords = geocodeService.getCoordinates(origin);
 
-		if (waypoints.isEmpty() || !optimizeRoute)
-			url.queryParam("destination", destination);
+		if (originCoords.isEmpty()) {
+			invalidDirections.add(origin);
+		}
+		
+		Optional<Coords> destinationCoords = geocodeService.getCoordinates(destination);
+
+		if (destinationCoords.isEmpty()) {
+			invalidDirections.add(destination);
+		}
+
+		List<Coords> waypointsCoords = new ArrayList<>();
+		
+		if(!waypoints.isEmpty()) {
+			for (String waypoint : waypoints) {
+				Optional<Coords> waypointCoords = geocodeService.getCoordinates(waypoint);
+				
+				if (waypointCoords.isEmpty()) {
+					invalidDirections.add(waypoint);
+				} else {
+					waypointsCoords.add(waypointCoords.get());
+				}
+			}
+		}
+		
+		if(!invalidDirections.isEmpty()) {
+			
+			log.error("[routes-service] [" + LocalDateTime.now().toString() + "] "
+					+ "Invalid directions were found: \n" 
+					+ invalidDirections.toString() + ".");
+			return Optional.empty();
+		}
+		
+		UriComponentsBuilder url = UriComponentsBuilder
+				.fromUriString(API_URL)
+				.queryParam("mode", MODE)
+				.queryParam("language", language)
+				.queryParam("key", API_KEY_GOOGLE)
+				.queryParam("origin", originCoords.get().toString());
+
+		if (avoidTolls) {
+		    url.queryParam("avoid", AVOID_TOLLS);
+		} else {
+		    url.queryParam("avoid", "");
+		}
+		
+		if (vehicleEmissionType != null) {
+		    url.queryParam("vehicleEmissionType", vehicleEmissionType.name());
+		}
+		
+		if (!optimizeRoute) {
+			url.queryParam("destination", destinationCoords.get().toString());
+		}
 
 		String result = "";
 		if (!waypoints.isEmpty() && 
 				optimizeWaypoints || optimizeRoute) {
-			result += OPTIMIZE;
 
+			result += OPTIMIZE;
 			if (optimizeRoute) {
-				waypoints.add(destination);
-				url.queryParam("destination", origin);
+				waypointsCoords.add(destinationCoords.get());
+				url.queryParam("destination", originCoords.get().toString());
 			}
 		}
-		result = getUrl(waypoints, url);
+
+		result = getUrl(waypointsCoords, url);
 
 		RouteGroup response = restTemplate.getForObject(result, RouteGroup.class);
-		if (!waypoints.isEmpty() && optimizeRoute)
-			response = deleteLastLeg(response);
 
+		if (!waypoints.isEmpty() && optimizeRoute) {
+			response = deleteLastLeg(response);
+		}
+
+		log.info("[routes-service] [" + LocalDateTime.now().toString() + "] "
+				+ "Sucessfully calculated directions for the given data: \n ["
+				+ origin + " - " + waypoints.toString() + " - " + destination
+				+ " | OptWay=" + optimizeWaypoints + ", OptRoute=" + optimizeRoute
+				+ ", lang=" + language + "]");
 		return Optional.of(response);
 	}
 
-	@Override
-	public RouteGroup deleteLastLeg(RouteGroup response) {
+	private RouteGroup deleteLastLeg(RouteGroup response) {
 		List<Leg> legs = response.getRoutes().getFirst().getLegs();
 		legs.removeLast();
 		response.getRoutes().getFirst().setLegs(legs);
@@ -96,16 +173,21 @@ public class RoutesServiceImpl implements RoutesService {
 	}
 
 	@Override
-	public String getUrl(List<String> waypoints, UriComponentsBuilder url) {
+	public String getUrl(List<Coords> waypoints, UriComponentsBuilder url) {
+		log.info("[routes-service] [" + LocalDateTime.now().toString() + "] "
+				+ "Attempting to compose a URL from a list of waypoints.");
 		url.queryParam("waypoints", "");
 
-		return url.toUriString() + waypoints.stream().map(s -> s.replaceAll(" ", "")).collect(Collectors.joining("|"));
+		return url.toUriString() + waypoints.stream().map(coord -> coord.toString()).collect(Collectors.joining("|"));
 	}
 
 	@Override
 	public List<Coords> extractRoutePoints(RouteGroup routeGroup) {
-		if (routeGroup == null || routeGroup.getRoutes() == null)
+		if (routeGroup == null || routeGroup.getRoutes() == null) {
+			log.error("[routes-service] [" + LocalDateTime.now().toString() + "] "
+					+ "No route or routeGroup were given.");
 			return List.of();
+		}
 
 		return routeGroup.getRoutes().stream()
 				.flatMap(route -> route.getLegs().stream())
@@ -116,8 +198,13 @@ public class RoutesServiceImpl implements RoutesService {
 	
 	@Override
 	public List<Coords> extractRoutePolylinePoints(RouteGroup routeGroup) {
-		if (routeGroup == null || routeGroup.getRoutes() == null)
+		log.info("[routes-service] [" + LocalDateTime.now().toString() + "] "
+				+ "Attempting to extract route polylinePoints for a given route.");
+		if (routeGroup == null || routeGroup.getRoutes() == null) {
+			log.error("[routes-service] [" + LocalDateTime.now().toString() + "] "
+					+ "No route or routeGroup were given.");
 			return List.of();
+		}
 		
 		return routeGroup.getRoutes().stream()
 				.flatMap(route -> route.getLegs().stream())
@@ -129,6 +216,9 @@ public class RoutesServiceImpl implements RoutesService {
 
 	@Override
 	public List<Coords> decodePolyline(String polylinePoints) {
+		log.info("[routes-service] [" + LocalDateTime.now().toString() + "] "
+				+ "Attempting to decode into coordinates a given route polyline: \n" 
+				+ polylinePoints );
 		EncodedPolyline polyline = new EncodedPolyline(polylinePoints);
 		List<LatLng> latLngs = polyline.decodePath();
 		
@@ -139,58 +229,134 @@ public class RoutesServiceImpl implements RoutesService {
 
 	@Override
 	public List<CoordsWithWeather> getWeatherForRoute(RouteGroup routeGroup) {
-		return extractRoutePoints(routeGroup).stream().map(coords -> {
+		log.info("[routes-service] [" + LocalDateTime.now() + "] "
+	            + "Attempting to get weather for each point of the route.");
+
+	    List<Coords> sampledPoints = getSampledRoutePoints(routeGroup);
+
+	    if (sampledPoints.isEmpty()) {
+	        return List.of();
+	    }
+
+		Map<String, Coords> coordsPorMunicipio = new LinkedHashMap<>();
+
+		for (Coords coords : sampledPoints) {
+			Optional<String> codigoINE =
+					ineService.getCodigoINE(coords.getLat(), coords.getLng());
 			
-			String address = reverseGeocodeService
-	                .getAddress(coords.getLat(), coords.getLng())
-	                .orElse("Ubicación desconocida");
-			
-			Optional<String> codigoINE = ineService.getCodigoINE(coords.getLat(), coords.getLng());
 			if (codigoINE.isEmpty()) {
-				return new CoordsWithWeather(address, new HashMap<>(), new HashMap<>());
+				log.warn("[routes-service] [" + LocalDateTime.now().toString() + "] "
+						+ "No INE code could be extracted for the given coords: "
+						+ coords.toString());
 			}
 
-			Optional<Weather> weatherOpt = weatherService.getWeather(codigoINE.get());
-			if (weatherOpt.isEmpty()) {
-				return new CoordsWithWeather(address, new HashMap<>(), new HashMap<>());
-			}
+			codigoINE.ifPresent(code ->
+					coordsPorMunicipio.putIfAbsent(code, coords)
+			);
+		}
 
-			Weather weather = weatherOpt.get();
+		return coordsPorMunicipio.entrySet().stream()
+				.map(entry -> {
 
-			Dia dia = weather.getPrediccion().getDia().get(0);
+					String codigoINE = entry.getKey();
+					Coords coords = entry.getValue();
 
-			Map<Integer, String> mapaDescripciones = new HashMap<>();
-	        if (dia.getEstadoCielo() != null && !dia.getEstadoCielo().isEmpty()) {
-	            for (EstadoCielo estado : dia.getEstadoCielo()) {
-	                mapaDescripciones.put(estado.getPeriodo(), estado.getDescripcion());
-	            }
-	        }
+					String address = reverseGeocodeService
+							.getAddress(coords.getLat(), coords.getLng())
+							.orElse("Ubicación desconocida");
 
-			Map<Integer, Double> mapaTemperaturas = new HashMap<>();
+					Optional<Weather> weatherOpt =
+							weatherService.getWeather(codigoINE);
 
-			if (dia.getTemperatura() != null && !dia.getTemperatura().isEmpty()) {
-			    for (Temperatura temp : dia.getTemperatura()) {
-			        mapaTemperaturas.put(temp.getPeriodo(), temp.getValue());
-			    }
-			}
+					if (weatherOpt.isEmpty()) {
+						return new CoordsWithWeather(
+								address,
+								new HashMap<>(),
+								new HashMap<>()
+								);
+					}
 
-			return new CoordsWithWeather(address, mapaDescripciones, mapaTemperaturas);
-		}).toList();
+					Weather weather = weatherOpt.get();
+					Dia dia = weather.getPrediccion().getDia().get(0);
+
+					Map<Integer, String> mapaDescripciones = new HashMap<>();
+					if (dia.getEstadoCielo() != null) {
+						for (EstadoCielo estado : dia.getEstadoCielo()) {
+							mapaDescripciones.put(
+									estado.getPeriodo(),
+									estado.getDescripcion()
+									);
+						}
+					}
+
+					Map<Integer, Double> mapaTemperaturas = new HashMap<>();
+					if (dia.getTemperatura() != null) {
+						for (Temperatura temp : dia.getTemperatura()) {
+							mapaTemperaturas.put(
+									temp.getPeriodo(),
+									temp.getValue()
+									);
+						}
+					}
+
+					return new CoordsWithWeather(
+							address,
+							mapaDescripciones,
+							mapaTemperaturas
+							);
+				})
+				.toList();
 	}
 
+	private int calculateMaxCalls(long meters) {
+
+        if (meters <= 5_000) return 2;
+        if (meters <= 20_000) return 4;
+        if (meters <= 100_000) return 8;
+        return 14;
+    }
+	private List<Coords> getSampledRoutePoints(RouteGroup routeGroup) {
+
+	    List<Coords> allPoints = extractRoutePolylinePoints(routeGroup);
+
+	    if (allPoints.isEmpty()) {
+	        log.warn("[routes-service] [" + LocalDateTime.now() + "] No polyline points extracted.");
+	        return List.of();
+	    }
+
+	    long totalMeters = routeGroup.getRoutes().get(0).getLegs().stream()
+	            .mapToLong(leg -> leg.getDistance().getValue())
+	            .sum();
+
+	    int maxCalls = calculateMaxCalls(totalMeters);
+
+	    int step = Math.max(
+	            1,
+	            (int) Math.ceil((double) allPoints.size() / maxCalls)
+	    );
+
+	    return IntStream.range(0, allPoints.size())
+	            .filter(i -> i % step == 0 || i == allPoints.size() - 1)
+	            .mapToObj(allPoints::get)
+	            .toList();
+	}
+	
 	@Override
 	public List<Coords> getGasStationsCoordsForRoute(RouteGroup routeGroup, Long radius) {
-		List<Coords> coords = extractRoutePoints(routeGroup);
+		log.info("[routes-service] [" + LocalDateTime.now().toString() + "] "
+				+ "Attempting to extract coordinates for all gas stations in the route's radius: " 
+				+ radius + ".");
+		List<Coords> sampledRoutePoints = getSampledRoutePoints(routeGroup);
+
+	    if (sampledRoutePoints.isEmpty()) {
+	        return List.of();
+	    }
 		
-		List<Coords> stationsForRoute = coords.stream().flatMap(
-				coord ->
-				{ 
-					List<Gasolinera> g = gasolineraService.getGasolinerasInRadiusCoords(coord.getLat(), coord.getLng(), radius);
+		List<Coords> stationsForRoute = sampledRoutePoints.stream().flatMap(
+				sampledRoutePoint ->
+				{
+					List<Gasolinera> g = gasolineraService.getGasolinerasInRadiusCoords(sampledRoutePoint.getLat(),sampledRoutePoint.getLng(),radius);
 					return g.stream();
-				 })
-				.peek(g -> {
-					System.out.println(g.getDireccion());
-					System.out.println(g.getLatitud() + "|" + g.getLongitud());
 				})
 				.map(station -> {
 					return new Coords(station.getLatitud(), station.getLongitud());
@@ -203,6 +369,8 @@ public class RoutesServiceImpl implements RoutesService {
 	
 	@Override
 	public List<Coords> getLegCoords(RouteGroup routeGroup) {
+		log.info("[routes-service] [" + LocalDateTime.now().toString() + "] "
+				+ "Attempting to extract leg coordinates for a given route.");
 		List<Coords> legCoords = routeGroup.getRoutes().stream()
 				.flatMap(route -> route.getLegs().stream())
 				.flatMap(leg -> {
@@ -214,6 +382,8 @@ public class RoutesServiceImpl implements RoutesService {
 				.distinct()
 				.collect(Collectors.toList());
 
+		log.info("[routes-service] [" + LocalDateTime.now().toString() + "] "
+				+ "Successfully retrieved the leg coordinates for the given route.");
 		return legCoords;
 	}
 
