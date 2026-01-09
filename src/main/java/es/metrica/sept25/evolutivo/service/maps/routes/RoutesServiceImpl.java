@@ -229,32 +229,14 @@ public class RoutesServiceImpl implements RoutesService {
 
 	@Override
 	public List<CoordsWithWeather> getWeatherForRoute(RouteGroup routeGroup) {
-		log.info("[routes-service] [" + LocalDateTime.now().toString() + "] "
-				+ "Attempting to get weather for each point of the route.");
+		log.info("[routes-service] [" + LocalDateTime.now() + "] "
+	            + "Attempting to get weather for each point of the route.");
 
-		List<Coords> allPoints = extractRoutePolylinePoints(routeGroup);
+	    List<Coords> sampledPoints = getSampledRoutePoints(routeGroup);
 
-		if (allPoints.isEmpty()) {
-			log.warn("[routes-service] [" + LocalDateTime.now().toString() + "] "
-					+ "No points were extracted as a polyline from the route.");
-			return List.of();
-		}
-
-		long totalMeters = routeGroup.getRoutes().get(0).getLegs().stream()
-				.mapToLong(leg -> leg.getDistance().getValue())
-				.sum();
-
-		int maxCalls = calculateMaxCalls(totalMeters);
-
-		int step = Math.max(
-				1,
-				(int) Math.ceil((double) allPoints.size() / maxCalls)
-				);
-
-		List<Coords> sampledPoints = IntStream.range(0, allPoints.size())
-				.filter(i -> i % step == 0 || i == allPoints.size() - 1)
-				.mapToObj(allPoints::get)
-				.toList();
+	    if (sampledPoints.isEmpty()) {
+	        return List.of();
+	    }
 
 		Map<String, Coords> coordsPorMunicipio = new LinkedHashMap<>();
 
@@ -333,20 +315,49 @@ public class RoutesServiceImpl implements RoutesService {
         if (meters <= 100_000) return 8;
         return 14;
     }
+	private List<Coords> getSampledRoutePoints(RouteGroup routeGroup) {
+
+	    List<Coords> allPoints = extractRoutePolylinePoints(routeGroup);
+
+	    if (allPoints.isEmpty()) {
+	        log.warn("[routes-service] [" + LocalDateTime.now() + "] No polyline points extracted.");
+	        return List.of();
+	    }
+
+	    long totalMeters = routeGroup.getRoutes().get(0).getLegs().stream()
+	            .mapToLong(leg -> leg.getDistance().getValue())
+	            .sum();
+
+	    int maxCalls = calculateMaxCalls(totalMeters);
+
+	    int step = Math.max(
+	            1,
+	            (int) Math.ceil((double) allPoints.size() / maxCalls)
+	    );
+
+	    return IntStream.range(0, allPoints.size())
+	            .filter(i -> i % step == 0 || i == allPoints.size() - 1)
+	            .mapToObj(allPoints::get)
+	            .toList();
+	}
 	
 	@Override
 	public List<Coords> getGasStationsCoordsForRoute(RouteGroup routeGroup, Long radius) {
 		log.info("[routes-service] [" + LocalDateTime.now().toString() + "] "
 				+ "Attempting to extract coordinates for all gas stations in the route's radius: " 
 				+ radius + ".");
-		List<Coords> coords = extractRoutePoints(routeGroup);
+		List<Coords> sampledRoutePoints = getSampledRoutePoints(routeGroup);
+
+	    if (sampledRoutePoints.isEmpty()) {
+	        return List.of();
+	    }
 		
-		List<Coords> stationsForRoute = coords.stream().flatMap(
-				coord ->
-				{ 
-					List<Gasolinera> g = gasolineraService.getGasolinerasInRadiusCoords(coord.getLat(), coord.getLng(), radius);
+		List<Coords> stationsForRoute = sampledRoutePoints.stream().flatMap(
+				sampledRoutePoint ->
+				{
+					List<Gasolinera> g = gasolineraService.getGasolinerasInRadiusCoords(sampledRoutePoint.getLat(),sampledRoutePoint.getLng(),radius);
 					return g.stream();
-				 })
+				})
 				.map(station -> {
 					return new Coords(station.getLatitud(), station.getLongitud());
 				})
