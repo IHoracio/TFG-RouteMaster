@@ -45,6 +45,7 @@ public class RoutesServiceImpl implements RoutesService {
 	private static final String API_URL = "https://maps.googleapis.com/maps/api/directions/json";
 	private static final String MODE = "driving";
 	private static final String OPTIMIZE = "optimize:true|";
+	private static final String AVOID_TOLLS = "tolls";
 
 	@Value("${evolutivo.api_key_google}")
 	private String API_KEY_GOOGLE;
@@ -66,10 +67,18 @@ public class RoutesServiceImpl implements RoutesService {
 	
 	@Autowired
 	private GeocodeService geocodeService;
+	
+	public enum VehicleEmissionType {
+	    ELECTRIC,
+	    GASOLINE,
+	    DIESEL,
+	    HYBRID;
+	}
 
 	@Override
 	public Optional<RouteGroup> getDirections(String origin, String destination, List<String> waypoints,
-			boolean optimizeWaypoints, boolean optimizeRoute, String language) {
+			boolean optimizeWaypoints, boolean optimizeRoute, String language, boolean avoidTolls,
+	        VehicleEmissionType vehicleEmissionType) {
 
 		Set<String> invalidDirections = new HashSet<String>();
 		
@@ -114,6 +123,16 @@ public class RoutesServiceImpl implements RoutesService {
 				.queryParam("key", API_KEY_GOOGLE)
 				.queryParam("origin", originCoords.get().toString());
 
+		if (avoidTolls) {
+		    url.queryParam("avoid", AVOID_TOLLS);
+		} else {
+		    url.queryParam("avoid", "");
+		}
+		
+		if (vehicleEmissionType != null) {
+		    url.queryParam("vehicleEmissionType", vehicleEmissionType.name());
+		}
+		
 		if (!optimizeRoute) {
 			url.queryParam("destination", destinationCoords.get().toString());
 		}

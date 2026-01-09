@@ -14,6 +14,7 @@ import es.metrica.sept25.evolutivo.domain.dto.maps.routes.executionRoutes.RouteE
 import es.metrica.sept25.evolutivo.domain.dto.maps.routes.savedRoutes.PointDTO;
 import es.metrica.sept25.evolutivo.domain.dto.maps.routes.savedRoutes.SavedRouteDTO;
 import es.metrica.sept25.evolutivo.service.maps.routes.RoutesService;
+import es.metrica.sept25.evolutivo.service.maps.routes.RoutesServiceImpl.VehicleEmissionType;
 import es.metrica.sept25.evolutivo.service.maps.routes.savedRoutes.SavedRouteService;
 import lombok.extern.slf4j.Slf4j;
 
@@ -63,7 +64,9 @@ public class RouteExecutionServiceImpl implements RouteExecutionService{
 				intermedios,
 				false,
 				false,
-				"es"
+				"es",
+				false,
+				VehicleEmissionType.DIESEL
 				);
 
 		if (routeGroupOpt.isEmpty()) {
