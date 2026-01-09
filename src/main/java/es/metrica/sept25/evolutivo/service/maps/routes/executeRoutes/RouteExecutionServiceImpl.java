@@ -16,11 +16,13 @@ import es.metrica.sept25.evolutivo.domain.dto.maps.routes.savedRoutes.SavedRoute
 import es.metrica.sept25.evolutivo.service.maps.routes.RoutesService;
 import es.metrica.sept25.evolutivo.service.maps.routes.RoutesServiceImpl.VehicleEmissionType;
 import es.metrica.sept25.evolutivo.service.maps.routes.savedRoutes.SavedRouteService;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-@Slf4j
 @Service
 public class RouteExecutionServiceImpl implements RouteExecutionService{
+
+	private static final Logger log = LoggerFactory.getLogger(RouteExecutionServiceImpl.class);
 
 	@Autowired
 	private SavedRouteService savedRouteService;

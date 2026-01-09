@@ -16,12 +16,15 @@ import es.metrica.sept25.evolutivo.domain.dto.maps.geocode.GeocodeGroup;
 import es.metrica.sept25.evolutivo.domain.dto.maps.geocode.GeocodeGroupAddress;
 import es.metrica.sept25.evolutivo.domain.dto.maps.geocode.GeocodeResultAddress;
 import es.metrica.sept25.evolutivo.domain.dto.maps.routes.Coords;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-@Slf4j
 @Service
 public class GeocodeServiceImpl implements GeocodeService {
 
+	private static final Logger log = LoggerFactory.getLogger(GeocodeServiceImpl.class);
+
+	
 	private static final String GEOCODE_URL = "https://maps.googleapis.com/maps/api/geocode/json";
 
 	@Autowired
