@@ -1,5 +1,6 @@
 package es.metrica.sept25.evolutivo.service.gasolineras;
 
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -14,10 +15,14 @@ import org.springframework.web.client.RestTemplate;
 import es.metrica.sept25.evolutivo.entity.gasolinera.Municipio;
 import es.metrica.sept25.evolutivo.entity.gasolinera.Provincia;
 import es.metrica.sept25.evolutivo.repository.ProvinciaRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Service
 public class ProvinciaServiceImpl implements ProvinciaService {
 
+	private static final Logger log = LoggerFactory.getLogger(ProvinciaServiceImpl.class);
+	
 	private static final String API_URL = "https://api.precioil.es/provincias";
 
 	@Autowired
@@ -27,22 +32,29 @@ public class ProvinciaServiceImpl implements ProvinciaService {
 	ProvinciaRepository provinciaRepository;
 
 	public void save(Provincia provincia) {
+		log.info("[prov-service] [" + LocalDateTime.now().toString() + "] "
+				+ "Attempting to save the following province: " + provincia.toString() + ".");
 		provinciaRepository.save(provincia);
 	}
 
 	@Override
 	@Cacheable("provincias")
 	public List<Provincia> getProvincias() {
-		// Cogemos del repo
+		log.info("[prov-service] [" + LocalDateTime.now().toString() + "] "
+				+ "Attempting to retrieve all provinces from the repository.");
 		List<Provincia> provList = provinciaRepository.findAll();
 
 		// Si no tenemos, populamos con las españolas
 		if (Objects.isNull(provList) || provList.isEmpty()) {
+			log.info("[prov-service] [" + LocalDateTime.now().toString() + "] "
+					+ "Fetching all provinces from the external API.");
 			Provincia[] provArr = restTemplate.getForObject(API_URL, Provincia[].class);
 			if (!(Objects.isNull(provArr))) {
 				provList = Arrays.asList(provArr);
 				provinciaRepository.saveAllAndFlush(
 						provList.stream().filter(p -> p.getIdProvincia() < 100).collect(Collectors.toList()));
+				log.info("[prov-service] [" + LocalDateTime.now().toString() + "] "
+						+ "Fetched and stored all provinces from the external API successfully.");
 			}
 		}
 
@@ -52,7 +64,20 @@ public class ProvinciaServiceImpl implements ProvinciaService {
 
 	@Override
 	public Optional<Provincia> getProvinciaById(Long id) {
-		return provinciaRepository.findById(id);
+		getProvincias();
+		log.info("[prov-service] [" + LocalDateTime.now().toString() + "] "
+				+ "Attempting to fetch province with ID: " + id);
+		Optional<Provincia> retrieved = provinciaRepository.findById(id);
+
+		if (retrieved.isEmpty()) {
+			log.info("[prov-service] [" + LocalDateTime.now().toString() + "] "
+					+ "No province was found with ID: " + id);
+		} else {
+			log.info("[prov-service] [" + LocalDateTime.now().toString() + "] "
+					+ "Successfully found the province with ID: " + id);
+		}
+
+		return retrieved;
 	}
 
 	@Override
@@ -60,6 +85,16 @@ public class ProvinciaServiceImpl implements ProvinciaService {
 	public Optional<Provincia> getProvinciaForMunicipio(Municipio mun) {
 		Long provId = mun.getIdProvincia();
 		List<Provincia> provList = getProvincias();
-		return provList.stream().filter(p -> p.getIdProvincia() == provId).findFirst();
+		Optional<Provincia> foundProvForMun = provList.stream().filter(p -> p.getIdProvincia() == provId).findFirst();
+		
+		if (foundProvForMun.isEmpty()) {
+			log.info("[prov-service] [" + LocalDateTime.now().toString() + "] "
+					+ "Failed to find the province for municipality: " + mun.toString() + ".");
+		} else {
+			log.info("[prov-service] [" + LocalDateTime.now().toString() + "] "
+					+ "Successfully found the province for municipality: " + mun.toString() + ".");
+		}
+		
+		return foundProvForMun;
 	}
 }

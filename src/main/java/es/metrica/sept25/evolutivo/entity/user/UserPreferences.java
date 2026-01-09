@@ -17,9 +17,7 @@ public class UserPreferences {
 	
 	private String theme;
     private String language;
-    @OneToOne
-    @JoinColumn(name = "user_id")
-    private User user;
+
 	public String getTheme() {
 		return theme;
 	}
@@ -32,12 +30,7 @@ public class UserPreferences {
 	public void setLanguage(String language) {
 		this.language = language;
 	}
-	public User getUser() {
-		return user;
-	}
-	public void setUser(User user) {
-		this.user = user;
-	}
+
 
     
 

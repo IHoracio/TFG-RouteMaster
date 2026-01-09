@@ -1,5 +1,6 @@
-import { Component, OnDestroy, signal } from '@angular/core';
+import { Component, OnDestroy, signal, input, effect, AfterViewInit } from '@angular/core';
 import { setOptions, importLibrary } from '@googlemaps/js-api-loader';
+import { MarkerClusterer } from '@googlemaps/markerclusterer';
 
 import { MapCommunicationService } from '../../../services/map/map-communication.service';
 import { environment } from '../../../../environments/environment';
@@ -7,27 +8,44 @@ import { Coords } from '../../../Dto/maps-dtos';
 import { CommonModule } from '@angular/common';
 import { WeatherOverlayHostComponent } from './weather-overlay/weather-overlay-host/weather-overlay-host.component';
 import { WeatherData } from '../../../Dto/weather-dtos';
+import { GasStation } from '../../../Dto/gas-station';
 
 @Component({
   selector: 'app-map-page',
   standalone: true,
   imports: [CommonModule, WeatherOverlayHostComponent],
   templateUrl: './map-page.component.html',
-  styleUrls: ['./map-page.component.css']
+  styleUrl: './map-page.component.css'
 })
-export class MapPageComponent implements OnDestroy {
+export class MapPageComponent implements OnDestroy, AfterViewInit {
   public map?: google.maps.Map;
   private routePolyline?: google.maps.Polyline;
   private startMarker?: any;
   private endMarker?: any;
   private waypoints: any[] = [];
   private gasStationsMarkers: any[] = [];
+  private markerClusterer?: MarkerClusterer;
   protected weatherRoute = signal<WeatherData[] | null>(null);
   protected createdRoute = signal<boolean>(false);
+  private previousSelected = signal<string | null>(null);
 
-  constructor(private mapComm: MapCommunicationService) { }
+  showWeather = input<boolean>(true);
+  showControls = input<boolean>(true);
+  gasStations = input<GasStation[]>([]);
+  selectedStation = input<string | null>(null);
+  mapType = input<string>('Mapa');  // Nuevo input para el tipo de mapa, por defecto 'Mapa'
 
-  async ngOnInit(): Promise<void> {
+  constructor(private mapComm: MapCommunicationService) {
+    effect(() => {
+      this.updateMarkers();
+    });
+
+    effect(() => {
+      this.remarkGasStation();
+    });
+  }
+
+  async ngAfterViewInit(): Promise<void> {
     await this.initMap();
   }
 
@@ -51,24 +69,36 @@ export class MapPageComponent implements OnDestroy {
       center: { lat: 40.4168, lng: -3.7038 },
       zoom: 6,
       tilt: 45,
-      mapTypeControl: true,
-      fullscreenControl: true,
-      disableDefaultUI: true,
+      mapTypeControl: this.showControls(),
+      fullscreenControl: this.showControls(),
       streetViewControl: false,
-      zoomControl: false,
-      mapId: environment.googleMapsMapId
+      mapId: environment.googleMapsMapId,
+      mapTypeId: this.getMapTypeId()  // Aplicar el tipo de mapa basado en el input
     };
 
     this.map = new Map(document.getElementById('map') as HTMLElement, mapOptions);
+    this.markerClusterer = new MarkerClusterer({ map: this.map });
     this.mapComm.registerMapPage(this);
+
+    this.updateMarkers();
+  }
+
+  private getMapTypeId(): google.maps.MapTypeId {
+    const type = this.mapType();
+    switch (type) {
+      case 'Mapa': return google.maps.MapTypeId.ROADMAP;
+      case 'Mapa relieve': return google.maps.MapTypeId.TERRAIN;
+      case 'Satelite': return google.maps.MapTypeId.SATELLITE;
+      case 'Satelite etiquetas': return google.maps.MapTypeId.HYBRID;
+      default: return google.maps.MapTypeId.ROADMAP;
+    }
   }
 
   /* ---------- Map helpers (route / markers / weather) ---------- */
 
   public drawRoute(coords: Coords[]): void {
-
     if (!this.map) {
-      console.warn('Map not initialiced');
+      console.warn('Map not initialized');
       return;
     }
 
@@ -106,12 +136,7 @@ export class MapPageComponent implements OnDestroy {
       this.waypoints = [];
     }
 
-    if (this.gasStationsMarkers && this.gasStationsMarkers.length) {
-      this.gasStationsMarkers.forEach(marker => {
-        marker.map = null;
-      })
-      this.gasStationsMarkers = [];
-    }
+    this.clearGasStations();
 
     if (this.weatherRoute()) {
       this.weatherRoute.update(() => null);
@@ -131,7 +156,7 @@ export class MapPageComponent implements OnDestroy {
 
   public drawPoints(coords: Coords[]): void {
     if (!this.map) {
-      console.warn('Map not initialiced');
+      console.warn('Map not initialized');
       return;
     }
     if (!coords || coords.length === 0) return;
@@ -195,18 +220,118 @@ export class MapPageComponent implements OnDestroy {
       container.style.transform = 'translateY(-6px)';
 
       const marker = new google.maps.marker.AdvancedMarkerElement({
-        map: this.map,
+        map: null, // cluster handle it
         position: { lat: c.lat, lng: c.lng },
         content: container,
         title: (c as any).name || 'Gasolinera'
       });
       this.gasStationsMarkers.push(marker);
+      this.markerClusterer?.addMarker(marker);
     });
+  }
 
+  private updateMarkers(): void {
+    const stations = this.gasStations();
+    this.clearGasStations();
+
+    if (stations.length > 0 && this.map) {
+      stations.forEach(station => {
+        const key = `${station.nombreEstacion} - ${station.direccion}`;
+        const size = 36;
+        const fillColor = '#e71616';
+        const gasStationPointSvg = `
+          <svg height="${size}" width="${size}" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" 
+          viewBox="0 0 624.138 624.138" xml:space="preserve" fill="${fillColor}"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <g> <g> <g> <g> <path style="fill:${fillColor};" d="M312.064,0C203.478,0,115.439,88.029,115.439,196.566c0,108.634,196.625,427.572,196.625,427.572 S508.698,305.2,508.698,196.566C508.698,88.029,420.698,0,312.064,0z M312.064,348.678 c-83.701,0-151.809-68.108-151.809-151.809c0-83.721,68.118-151.809,151.809-151.809c83.701,0,151.809,68.088,151.809,151.809 C463.873,280.57,395.765,348.678,312.064,348.678z"></path> <path style="fill:#010002;" d="M372.658,122.41l20.078,20.498v106.006c0,1.729-0.352,2.97-1.094,3.703 c-1.7,1.671-5.921,1.563-8.109,1.544c-4.719,0-8.275-0.938-9.956-2.609c-1.075-1.133-1.133-2.276-1.075-2.638V145.888H354.74 V95.2h-98.806v182.409H234.42v25.344h141.882v-25.344H354.74V156.01h7.591v92.475c-0.039,0.547-0.274,5.452,3.664,9.78 c3.722,3.996,9.565,6.028,17.42,6.028l1.514,0.02c3.742,0,9.682-0.449,13.805-4.484c2.745-2.697,4.133-6.36,4.133-10.933 V138.746l-22.989-23.448L372.658,122.41z M342.039,166.151h-70.922v-50.668h70.922V166.151z"></path> </g> </g> </g> </g> </g>
+          </svg>
+        `;
+
+        const container = document.createElement('div');
+        container.innerHTML = gasStationPointSvg;
+        container.style.width = `${size}px`;
+        container.style.height = `${size}px`;
+        container.style.display = 'block';
+        container.style.transform = 'translateY(-6px)';
+
+        const marker = new google.maps.marker.AdvancedMarkerElement({
+          map: null,
+          position: { lat: station.latitud, lng: station.longitud },
+          content: container,
+          title: key
+        });
+        this.gasStationsMarkers.push(marker);
+        this.markerClusterer?.addMarker(marker);
+      });
+
+      const bounds = new google.maps.LatLngBounds();
+      stations.forEach(s => bounds.extend({ lat: s.latitud, lng: s.longitud }));
+      this.map.fitBounds(bounds, { top: 70, right: 120, bottom: 150, left: 120 });
+    }
+  }
+
+  private remarkGasStation(): void {
+    const currentSelected = this.selectedStation();
+    const prevSelected = this.previousSelected();
+
+    if (prevSelected && prevSelected !== currentSelected) {
+      const prevMarker = this.gasStationsMarkers.find(m => m.title === prevSelected);
+      if (prevMarker) {
+        const size = 36;
+        const fillColor = '#e71616';
+        const gasStationPointSvg = `
+          <svg height="${size}" width="${size}" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" 
+          viewBox="0 0 624.138 624.138" xml:space="preserve" fill="${fillColor}"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <g> <g> <g> <g> <path style="fill:${fillColor};" d="M312.064,0C203.478,0,115.439,88.029,115.439,196.566c0,108.634,196.625,427.572,196.625,427.572 S508.698,305.2,508.698,196.566C508.698,88.029,420.698,0,312.064,0z M312.064,348.678 c-83.701,0-151.809-68.108-151.809-151.809c0-83.721,68.118-151.809,151.809-151.809c83.701,0,151.809,68.088,151.809,151.809 C463.873,280.57,395.765,348.678,312.064,348.678z"></path> <path style="fill:#010002;" d="M372.658,122.41l20.078,20.498v106.006c0,1.729-0.352,2.97-1.094,3.703 c-1.7,1.671-5.921,1.563-8.109,1.544c-4.719,0-8.275-0.938-9.956-2.609c-1.075-1.133-1.133-2.276-1.075-2.638V145.888H354.74 V95.2h-98.806v182.409H234.42v25.344h141.882v-25.344H354.74V156.01h7.591v92.475c-0.039,0.547-0.274,5.452,3.664,9.78 c3.722,3.996,9.565,6.028,17.42,6.028l1.514,0.02c3.742,0,9.682-0.449,13.805-4.484c2.745-2.697,4.133-6.36,4.133-10.933 V138.746l-22.989-23.448L372.658,122.41z M342.039,166.151h-70.922v-50.668h70.922V166.151z"></path> </g> </g> </g> </g> </g>
+          </svg>
+        `;
+        const container = document.createElement('div');
+        container.innerHTML = gasStationPointSvg;
+        container.style.width = `${size}px`;
+        container.style.height = `${size}px`;
+        container.style.display = 'block';
+        container.style.transform = 'translateY(-6px)';
+        prevMarker.content = container;
+      }
+    }
+
+    if (currentSelected) {
+      const currentMarker = this.gasStationsMarkers.find(m => m.title === currentSelected);
+      if (currentMarker) {
+        const size = 48;
+        const fillColor = '#940202ff';
+        const gasStationPointSvg = `
+          <svg height="${size}" width="${size}" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" 
+          viewBox="0 0 624.138 624.138" xml:space="preserve" fill="${fillColor}"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <g> <g> <g> <g> <path style="fill:${fillColor};" d="M312.064,0C203.478,0,115.439,88.029,115.439,196.566c0,108.634,196.625,427.572,196.625,427.572 S508.698,305.2,508.698,196.566C508.698,88.029,420.698,0,312.064,0z M312.064,348.678 c-83.701,0-151.809-68.108-151.809-151.809c0-83.721,68.118-151.809,151.809-151.809c83.701,0,151.809,68.088,151.809,151.809 C463.873,280.57,395.765,348.678,312.064,348.678z"></path> <path style="fill:#010002;" d="M372.658,122.41l20.078,20.498v106.006c0,1.729-0.352,2.97-1.094,3.703 c-1.7,1.671-5.921,1.563-8.109,1.544c-4.719,0-8.275-0.938-9.956-2.609c-1.075-1.133-1.133-2.276-1.075-2.638V145.888H354.74 V95.2h-98.806v182.409H234.42v25.344h141.882v-25.344H354.74V156.01h7.591v92.475c-0.039,0.547-0.274,5.452,3.664,9.78 c3.722,3.996,9.565,6.028,17.42,6.028l1.514,0.02c3.742,0,9.682-0.449,13.805-4.484c2.745-2.697,4.133-6.36,4.133-10.933 V138.746l-22.989-23.448L372.658,122.41z M342.039,166.151h-70.922v-50.668h70.922V166.151z"></path> </g> </g> </g> </g> </g>
+          </svg>
+        `;
+        const container = document.createElement('div');
+        container.innerHTML = gasStationPointSvg;
+        container.style.width = `${size}px`;
+        container.style.height = `${size}px`;
+        container.style.display = 'block';
+        container.style.transform = 'translateY(-6px)';
+        currentMarker.content = container;
+      }
+
+      const selectedStationData = this.gasStations().find(s => `${s.nombreEstacion} - ${s.direccion}` === currentSelected);
+      if (selectedStationData && this.map) {
+        this.map.setCenter({ lat: selectedStationData.latitud, lng: selectedStationData.longitud });
+        this.map.setZoom(15);
+      }
+    }
+
+    this.previousSelected.set(currentSelected);
+  }
+
+  private clearGasStations(): void {
+    if (this.gasStationsMarkers && this.gasStationsMarkers.length) {
+      this.gasStationsMarkers.forEach(marker => {
+        this.markerClusterer?.removeMarker(marker);
+        marker.map = null;
+      });
+      this.gasStationsMarkers = [];
+    }
   }
 
   public setWeatherData(data: WeatherData[] | null): void {
     this.weatherRoute.update(() => data);
   }
-
 }

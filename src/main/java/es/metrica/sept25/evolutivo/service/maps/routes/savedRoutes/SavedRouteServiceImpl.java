@@ -1,5 +1,6 @@
 package es.metrica.sept25.evolutivo.service.maps.routes.savedRoutes;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -13,10 +14,15 @@ import es.metrica.sept25.evolutivo.entity.maps.routes.Point;
 import es.metrica.sept25.evolutivo.entity.maps.routes.SavedRoute;
 import es.metrica.sept25.evolutivo.entity.user.User;
 import es.metrica.sept25.evolutivo.repository.SavedRouteRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Service
 public class SavedRouteServiceImpl implements SavedRouteService {
 
+	private static final Logger log = LoggerFactory.getLogger(SavedRouteServiceImpl.class);
+
+	
 	@Autowired
 	private SavedRouteRepository repository;
 
@@ -51,24 +57,30 @@ public class SavedRouteServiceImpl implements SavedRouteService {
 		dto.setRouteId(saved.getRouteId());
 		dto.setName(saved.getName());
 		dto.setPoints(puntosDTO);
+
+		log.info("[route-save-service] [" + LocalDateTime.now().toString() + "] "
+				+ "Successfully saved route with name: " + name + ".");
 		return dto;
 	}
 
 	@Override
 	@Transactional
 	public void deleteRoute(Long id, User user) {
-
+		log.info("[route-save-service] [" + LocalDateTime.now().toString() + "] "
+				+ "Attempting to delete saved route with ID: " + id + 
+				" for user with email: " + user.getEmail() + " .");
 		Optional<SavedRoute> route = repository.findById(id);
 		
 		if (route.isEmpty()) {
-			System.err.println("No existe una ruta con el ID " + id.toString());
+			log.error("[route-save-service] [" + LocalDateTime.now().toString() + "] "
+				+ "Couldn't find route with ID: " + id + ".");
 			return;
 		}
 
 		if (!route.get().getUser().getId().equals(user.getId())) {
-			System.err.println("El usuario " + user.toString() + 
-					"intentó borrar una ruta con ID: " + id.toString()
-					+ " que no era suya.");
+			log.error("[route-save-service] [" + LocalDateTime.now().toString() + "] "
+				+ "The user " + user.getEmail() + " tried to delete the route "
+						+ "with ID: " + id + " , which isn't theirs.");
 			return;
 		}
 
@@ -76,9 +88,19 @@ public class SavedRouteServiceImpl implements SavedRouteService {
 	}
 
 	public Optional<SavedRouteDTO> getSavedRoute(Long id) {
+		log.info("[route-save-service] [" + LocalDateTime.now().toString() + "] "
+				+ "Attempting to retrieve saved route with ID: " + id + ".");
 		Optional<SavedRoute> route = repository.findById(id);
-
-		return route.isPresent() ? Optional.of(mapToDTO(route.get())) : Optional.empty();
+		
+		if (route.isPresent()) {
+			log.info("[route-save-service] [" + LocalDateTime.now().toString() + "] "
+					+ "Retrieved saved route with ID: " + id + ".");
+			return Optional.of(mapToDTO(route.get()))	;
+		} else {
+			log.warn("[route-save-service] [" + LocalDateTime.now().toString() + "] "
+					+ "Couldn't retrieve a saved route for ID: " + id + ".");
+			return Optional.empty();
+		}
 	}
 
 	private SavedRouteDTO mapToDTO(SavedRoute route) {

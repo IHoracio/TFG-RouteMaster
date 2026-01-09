@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import es.metrica.sept25.evolutivo.domain.dto.maps.routes.CoordsWithWeather;
 import es.metrica.sept25.evolutivo.domain.dto.maps.routes.RouteGroup;
 import es.metrica.sept25.evolutivo.service.maps.routes.RoutesService;
+import es.metrica.sept25.evolutivo.service.maps.routes.RoutesServiceImpl.VehicleEmissionType;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -41,10 +42,12 @@ public class RouteWeatherController {
 			@RequestParam(required = false, defaultValue = "") List<String> waypoints,
 			@RequestParam(required = false, defaultValue = "false") boolean optimizeWaypoints,
 			@RequestParam(required = false, defaultValue = "false") boolean optimizeRoute,
-			@RequestParam(required = false, defaultValue = "es") String language) {
+			@RequestParam(required = false, defaultValue = "es") String language,
+			@RequestParam(required = false, defaultValue = "")boolean avoidTolls,
+			@RequestParam(required = false, defaultValue = "DIESEL")VehicleEmissionType vehicleEmissionType
+			) {
 
-		Optional<RouteGroup> routeGroupOpt = routesService.getDirections(origin, destination, waypoints,
-				optimizeWaypoints, optimizeRoute, language);
+		Optional<RouteGroup> routeGroupOpt = routesService.getDirections(origin, destination, waypoints, optimizeWaypoints, optimizeRoute, language, avoidTolls, vehicleEmissionType);
 
 		if (routeGroupOpt.isEmpty()) {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);

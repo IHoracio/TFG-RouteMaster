@@ -1,6 +1,6 @@
-import { Component, signal } from '@angular/core';
+import { Component, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-user-info',
@@ -9,6 +9,8 @@ import { CommonModule } from '@angular/common';
   styleUrls: ['./user-info.component.css']
 })
 export class UserInfoComponent {
+  private router = inject(Router);
+
   user = signal({
     email: 'usuario@ejemplo.com',
     name: 'Juan',
@@ -22,4 +24,16 @@ export class UserInfoComponent {
   shareRoute(route: any): void {
 
   }
+
+  goToLanding(): void {
+    this.router.navigate(['/']);
+  }
+
+  goToPreferences(): void {
+    const element = document.getElementById('add-gas-stations');
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+  }
+
 }
