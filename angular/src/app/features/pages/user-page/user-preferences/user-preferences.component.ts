@@ -20,11 +20,16 @@ export class UserPreferencesComponent {
   language = signal<string>('Español');
   radioKm = signal<number>(5);
   precioMaximo = signal<number>(2.0);
+  mapType = signal<string>('Mapa');
+  avoidTolls = signal<boolean>(false);
+  emissionLabel = signal<string>('Ninguna');
 
   fuelOptions = ['Todos', 'Gasolina', 'Diésel', 'Eléctrico'];
   themeOptions = ['Claro', 'Oscuro'];
   languageOptions = ['Español', 'Inglés'];
   gasStationOptions = ['Repsol', 'Cepsa', 'BP', 'Shell', 'Galp'];
+  mapTypeOptions = ['Mapa', 'Mapa relieve', 'Satelite', 'Satelite etiquetas'];
+  emissionLabelOptions = ['Ninguna', 'Eco', '0 Emisiones', 'B', 'C'];
 
   favoriteGasStations = signal<GasStation[]>([]);
 
@@ -98,14 +103,7 @@ export class UserPreferencesComponent {
   }
 
   savePreferences(): void {
-    alert('Preferencias guardadas:\n' +
-          `Combustible: ${this.fuelType()}\n` +
-          `Gasolinera: ${this.favoriteGasStation()}\n` +
-          `Tema: ${this.theme()}\n` +
-          `Idioma: ${this.language()}\n` +
-          `Radio KM: ${this.radioKm()}\n` +
-          `Precio Máximo: ${this.precioMaximo()}\n` +
-          `Gasolineras: ${this.favoriteGasStations().map(s => s.nombreEstacion + ' - ' + s.direccion).join(', ')}`);
+
   }
 
   resetPreferences(): void {
@@ -115,6 +113,9 @@ export class UserPreferencesComponent {
     this.language.set('Español');
     this.radioKm.set(5);
     this.precioMaximo.set(2.0);
+    this.mapType.set('Mapa');
+    this.avoidTolls.set(false);
+    this.emissionLabel.set('Ninguna');
     this.favoriteGasStations.set([]);
   }
 

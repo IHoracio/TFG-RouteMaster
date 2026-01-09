@@ -27,6 +27,29 @@
         </div>
 
         <div class="form-group">
+            <label for="mapType">Tipo de Mapa:</label>
+            <select id="mapType" [(ngModel)]="mapType" name="mapType">
+                @for (option of mapTypeOptions; track option) {
+                <option [value]="option">{{ option }}</option>
+                }
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="avoidTolls">Evitar Peajes:</label>
+            <input id="avoidTolls" type="checkbox" [(ngModel)]="avoidTolls" name="avoidTolls">
+        </div>
+
+        <div class="form-group">
+            <label for="emissionLabel">Etiqueta Medioambiental:</label>
+            <select id="emissionLabel" [(ngModel)]="emissionLabel" name="emissionLabel">
+                @for (option of emissionLabelOptions; track option) {
+                <option [value]="option">{{ option }}</option>
+                }
+            </select>
+        </div>
+
+        <div class="form-group">
             <label for="theme">Tema:</label>
             <select id="theme" [(ngModel)]="theme" name="theme">
                 @for (option of themeOptions; track option) {
@@ -98,7 +121,8 @@
         <div class="map-container">
             <app-map-page [showWeather]="false" [showControls]="false" 
                 [gasStations]="allStations()"
-                [selectedStation]="selectedStation()">
+                [selectedStation]="selectedStation()"
+                [mapType]="mapType()">
             </app-map-page>
         </div>
         }

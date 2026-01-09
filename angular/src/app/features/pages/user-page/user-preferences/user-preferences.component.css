@@ -28,6 +28,47 @@
   border-radius: 4px;
 }
 
+/* Nueva regla para alinear checkbox horizontalmente con el label */
+.form-group:has(input[type="checkbox"]) {
+  flex-direction: row;
+  align-items: center;
+  gap: 10px; /* Espacio entre label y checkbox */
+}
+
+/* Estilos personalizados para el checkbox: más grande y cursor pointer */
+.form-group input[type="checkbox"] {
+  width: 24px; /* Más grande */
+  height: 24px; /* Más grande */
+  cursor: pointer; /* Cursor de pinchar */
+  -webkit-appearance: none;
+  appearance: none;
+  border: 2px solid #ccc;
+  border-radius: 4px;
+  background: #fff;
+  position: relative;
+  transition: background-color 0.2s, border-color 0.2s;
+}
+
+.form-group input[type="checkbox"]:checked {
+  background: #007bff;
+  border-color: #007bff;
+}
+
+.form-group input[type="checkbox"]:checked::after {
+  content: '✓';
+  color: white;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.form-group input[type="checkbox"]:hover {
+  border-color: #007bff;
+}
+
 .form-group ul {
   list-style: none;
   padding: 0;

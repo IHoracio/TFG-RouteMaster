@@ -33,6 +33,7 @@ export class MapPageComponent implements OnDestroy, AfterViewInit {
   showControls = input<boolean>(true);
   gasStations = input<GasStation[]>([]);
   selectedStation = input<string | null>(null);
+  mapType = input<string>('Mapa');  // Nuevo input para el tipo de mapa, por defecto 'Mapa'
 
   constructor(private mapComm: MapCommunicationService) {
     effect(() => {
@@ -71,7 +72,8 @@ export class MapPageComponent implements OnDestroy, AfterViewInit {
       mapTypeControl: this.showControls(),
       fullscreenControl: this.showControls(),
       streetViewControl: false,
-      mapId: environment.googleMapsMapId
+      mapId: environment.googleMapsMapId,
+      mapTypeId: this.getMapTypeId()  // Aplicar el tipo de mapa basado en el input
     };
 
     this.map = new Map(document.getElementById('map') as HTMLElement, mapOptions);
@@ -79,6 +81,17 @@ export class MapPageComponent implements OnDestroy, AfterViewInit {
     this.mapComm.registerMapPage(this);
 
     this.updateMarkers();
+  }
+
+  private getMapTypeId(): google.maps.MapTypeId {
+    const type = this.mapType();
+    switch (type) {
+      case 'Mapa': return google.maps.MapTypeId.ROADMAP;
+      case 'Mapa relieve': return google.maps.MapTypeId.TERRAIN;
+      case 'Satelite': return google.maps.MapTypeId.SATELLITE;
+      case 'Satelite etiquetas': return google.maps.MapTypeId.HYBRID;
+      default: return google.maps.MapTypeId.ROADMAP;
+    }
   }
 
   /* ---------- Map helpers (route / markers / weather) ---------- */
