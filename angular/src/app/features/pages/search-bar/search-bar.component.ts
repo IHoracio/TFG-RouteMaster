@@ -1,4 +1,4 @@
-import { Component} from '@angular/core';
+import { Component, signal} from '@angular/core';
 import { FormsModule} from '@angular/forms';
 import { RouteFormResponse } from '../../../Dto/route-form-response';
 import { MapPageComponent } from '../map-page/map-page.component';
@@ -6,7 +6,8 @@ import { SearchBarService } from '../../../services/search-bar/search-bar.servic
 import { NgFor } from '@angular/common';
 import { RouteService } from '../../../services/routes/route.service';
 import { RouteGroupResponse } from '../../../Dto/maps-dtos';
-import { UserDto} from '../../../Dto/user-dtos';
+import { FavouriteGasStationDto, UserDto} from '../../../Dto/user-dtos';
+import { FavouriteGasStation, GasStation } from '../../../Dto/gas-station';
 
 
 
@@ -18,6 +19,7 @@ import { UserDto} from '../../../Dto/user-dtos';
 })
 export class SearchBarComponent {
 
+  /*
   userDto: UserDto = {
   id: 0,
   email: '',
@@ -45,7 +47,9 @@ export class SearchBarComponent {
     maxPrice: 0,
     mapView: 'SATELLITE'
   }
-};
+};*/
+
+  favouriteGasStations = signal<FavouriteGasStation[]>([]);
 
 
   destinationType: string = "";
@@ -57,16 +61,19 @@ export class SearchBarComponent {
     optimizeRoute : false
   }
   
+  
   constructor(private searchBarService: SearchBarService, private routeService: RouteService) {
     this.initializeUser()
   }
   
   initializeUser() {
   this.searchBarService
-    .saveUserData('lorenzoboda01@gmail.com')
-    .subscribe(user => {
-      this.userDto = JSON.parse(user);
-      console.log(this.userDto);
+    .saveFavouriteGasStations('prueba@gmail.com')
+    .subscribe(gas => {
+      const parsedGas: FavouriteGasStation[] = JSON.parse(gas);
+      this.favouriteGasStations.set(parsedGas)
+      console.log(this.favouriteGasStations());
+      console.log(parsedGas)
     });
   }
   addWaypoint(){

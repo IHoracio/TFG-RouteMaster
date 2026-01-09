@@ -44,9 +44,9 @@
     @if(destinationType === "favouriteGasStations"){
     <select name="gasStation" id="gasStation" [(ngModel)]="routeFormResponse.destination">
       <option value="">Elige una gasolinera</option>
-      <option *ngFor="let brand of userDto.routePreferences.preferredBrands" [value]="brand">
-        {{ brand }}
-      </option>
+      <option *ngFor="let gasStation of favouriteGasStations()" [value]="gasStation.direccion">
+        {{ gasStation.alias }} - {{ gasStation.marca }}
+       </option>
     </select>
     }
 
