@@ -1,19 +1,18 @@
-import { Component, Signal, signal } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouteFormResponse } from '../../../Dto/route-form-response';
 import { MapPageComponent } from '../map-page/map-page.component';
 import { SearchBarService } from '../../../services/search-bar/search-bar.service';
-import { KeyValuePipe, NgFor } from '@angular/common';
+import { KeyValuePipe, NgFor, NgIf } from '@angular/common';
 import { RouteService } from '../../../services/routes/route.service';
 import { RouteGroupResponse } from '../../../Dto/maps-dtos';
-import { FavouriteGasStationDto, UserDto } from '../../../Dto/user-dtos';
-import { FavouriteGasStation, GasStation } from '../../../Dto/gas-station';
+import { FavouriteGasStation } from '../../../Dto/gas-station';
 
 
 
 @Component({
   selector: 'app-search-bar',
-  imports: [FormsModule, MapPageComponent, NgFor, KeyValuePipe],
+  imports: [FormsModule, MapPageComponent, NgFor, KeyValuePipe, NgIf],
   templateUrl: './search-bar.component.html',
   styleUrl: './search-bar.component.css'
 })
@@ -21,6 +20,7 @@ export class SearchBarComponent {
 
   favouriteGasStations = signal<FavouriteGasStation[]>([]);
   destinationType: string = "";
+  routeAlias: string = "";
 
   routeFormResponse: RouteFormResponse = {
     origin: "",
@@ -65,16 +65,31 @@ export class SearchBarComponent {
 
 
   submitted: boolean = false;
-  routeAlias: string = ""
   onSubmit() {
     this.searchBarService.onSubmit(this.routeFormResponse)
     console.log(this.routeFormResponse)
     this.submitted = true;
+    this.routeAlias =
+    `${this.routeFormResponse.origin} — ${this.routeFormResponse.destination}`
   }
   trackByIndex(index: number) {
     return index;
   }
+  
+  successfulMessage: string = "";
+  errorMessage: string = "";
   saveRoute(){
     this.searchBarService.saveFavouriteRoute(this.routeAlias, "prueba@gmail.com", this.routeFormResponse)
+    .subscribe({
+      next: (response) => {
+          this.successfulMessage = "Se ha guardado la ruta como favorita."
+          this.errorMessage = "";
+          console.log(response)
+      }, error: (err) => {
+          this.errorMessage = "Ha occurido un error."
+          this.successfulMessage = ""
+          console.log(err)
+      },
+    })
   }
 }

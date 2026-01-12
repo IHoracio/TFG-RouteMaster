@@ -76,9 +76,8 @@ export class SearchBarService {
     return this.userService.receiveFavouriteGasStations(mail)
   }
 
-  saveFavouriteRoute(alias: string, email:string, routeFormResponse: RouteFormResponse){
+  saveFavouriteRoute(alias: string, email:string, routeFormResponse: RouteFormResponse) {
     return this.routeService.saveFavouriteRoute(alias, email, routeFormResponse)
-    .subscribe(data => console.log(data))
   }
   giveCoords(coords: Coords[]){
     this.mapCommunication.sendRoute(coords)

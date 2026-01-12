@@ -46,7 +46,7 @@
       <option value="">Elige una gasolinera</option>
       <option *ngFor="let gasStation of favouriteGasStations()" [value]="gasStation.direccion">
         {{ gasStation.alias }} - {{ gasStation.marca }}
-       </option>
+      </option>
     </select>
     }
 
@@ -84,27 +84,34 @@
 
     <p>
       <label for="vehiculeEmissionType">Tipo de combustible</label>
-      <select [(ngModel)]="routeFormResponse.vehiculeEmissionType" name="vehiculeEmissionType" id="vehiculeEmissionType">
+      <select [(ngModel)]="routeFormResponse.vehiculeEmissionType" name="vehiculeEmissionType"
+        id="vehiculeEmissionType">
         @for (item of vehiculeEmissionTypeOptions | keyvalue; track item.key){
-          <option [value]="item.key">{{item.value}}</option>
+        <option [value]="item.key">{{item.value}}</option>
         }
       </select>
     </p>
 
-
-
-
-
     <button type="submit" [disabled]="!form.valid">Enviar</button>
 
+    
 
     @if (submitted){
-      <label for="routeAlias">Guardar ruta</label>
-      <input [defaultValue]="routeFormResponse.origin + ' — ' + routeFormResponse.destination" type="text"
-       id="routeAlias" name="routeAlias" [(ngModel)]="routeAlias" placeholder="Alias de la ruta"/>
-    }
+    <label for="routeAlias">Guardar ruta</label>
+    <input type="text" id="routeAlias" name="routeAlias" [(ngModel)]="routeAlias" placeholder="Alias de la ruta" />
 
     <button type="button" (click)="saveRoute()">Guardar ruta</button>
+    }
+
+    <!-- Mostrar mensaje de éxito -->
+    <div *ngIf="successfulMessage" class="success">
+      {{ successfulMessage }}
+    </div>
+
+    <!-- Mostrar mensaje de error -->
+    <div *ngIf="errorMessage" class="error">
+      {{ errorMessage }}
+    </div>
   </form>
 
 
