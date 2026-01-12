@@ -43,7 +43,7 @@ public class RouteWeatherController {
 			@RequestParam(required = false, defaultValue = "false") boolean optimizeWaypoints,
 			@RequestParam(required = false, defaultValue = "false") boolean optimizeRoute,
 			@RequestParam(required = false, defaultValue = "es") String language,
-			@RequestParam(required = false, defaultValue = "")boolean avoidTolls,
+			@RequestParam(required = false, defaultValue = "false") boolean avoidTolls,
 			@RequestParam(required = false, defaultValue = "DIESEL")VehicleEmissionType vehicleEmissionType
 			) {
 
