@@ -18,8 +18,9 @@
     <p>
       <select name="destinationType" id="destinationType" [(ngModel)]="destinationType" #required>
         <option value="">¿Qué quieres introducir?</option>
-        <option value="coordinates">Destino</option>
-        <option value="favouriteGasStations">Gasolinera favorita</option>
+        @for(destination of destinationTypeOptions | keyvalue; track destination.key){
+        <option [value]="destination.key">{{destination.value}}</option>
+        }
       </select>
     </p>
 
@@ -42,12 +43,24 @@
 
 
     @if(destinationType === "favouriteGasStations"){
-    <select name="gasStation" id="gasStation" [(ngModel)]="routeFormResponse.destination">
-      <option value="">Elige una gasolinera</option>
-      <option *ngFor="let gasStation of favouriteGasStations()" [value]="gasStation.direccion">
-        {{ gasStation.alias }} - {{ gasStation.marca }}
-      </option>
-    </select>
+    <p>
+      <select name="gasStation" id="gasStation" [(ngModel)]="routeFormResponse.destination">
+        <option value="">Elige una gasolinera</option>
+        <option *ngFor="let gasStation of favouriteGasStations()" [value]="gasStation.direccion">
+          {{ gasStation.alias }} - {{ gasStation.marca }}
+        </option>
+      </select>
+    </p>
+    }
+    @if(destinationType === "savedRoute"){
+    <p>
+      <select name="savedRoute" id="savedRoute" [(ngModel)]="routeFormResponse.destination">
+        <option value="">Elige una ruta guardada</option>
+        <option *ngFor="let gasStation of favouriteGasStations()" [value]="gasStation.direccion">
+          {{ gasStation.alias }} - {{ gasStation.marca }}
+        </option>
+      </select>
+    </p>
     }
 
     <button type="button" (click)="addWaypoint()">Añadir punto intermedio</button>
@@ -60,26 +73,18 @@
 
     <p>
       <label for="optimizeRoute">Optimizar puntos intermedios</label>
-      <select [(ngModel)]="routeFormResponse.optimizeWaypoints" name="optimizeWaypoints" id="optimizeWaypoints">
-        <option [value]="false">No</option>
-        <option [value]="true">Sí</option>
-      </select>
+      <input type="checkbox" [(ngModel)]="routeFormResponse.optimizeWaypoints" name="optimizeWaypoints"
+        id="optimizeWaypoints">
     </p>
 
     <p>
       <label for="optimizeRoute">Optimizar la ruta</label>
-      <select [(ngModel)]="routeFormResponse.optimizeRoute" name="optimizeRoute" id="optimizeRoute">
-        <option [value]="false">No</option>
-        <option [value]="true">Sí</option>
-      </select>
+      <input type="checkbox" [(ngModel)]="routeFormResponse.optimizeRoute" name="optimizeRoute" id="optimizeRoute">
     </p>
 
     <p>
       <label for="avoidTolls">Evitar peajes</label>
-      <select [(ngModel)]="routeFormResponse.avoidTolls" name="avoidTolls" id="avoidTolls">
-        <option [value]="false">No</option>
-        <option [value]="true">Sí</option>
-      </select>
+      <input type="checkbox" [(ngModel)]="routeFormResponse.avoidTolls" name="avoidTolls" id="avoidTolls">
     </p>
 
     <p>
@@ -94,9 +99,9 @@
 
     <button type="submit" [disabled]="!form.valid">Enviar</button>
 
-    
 
-    @if (submitted){
+
+    @if (submitted && destinationType==="coordinates"){
     <label for="routeAlias">Guardar ruta</label>
     <input type="text" id="routeAlias" name="routeAlias" [(ngModel)]="routeAlias" placeholder="Alias de la ruta" />
 

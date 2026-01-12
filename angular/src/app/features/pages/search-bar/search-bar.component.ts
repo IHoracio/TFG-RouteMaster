@@ -32,6 +32,12 @@ export class SearchBarComponent {
     vehiculeEmissionType: "DIESEL"
   }
 
+  destinationTypeOptions: Record<string, string> = {
+    coordinates: "Destino",
+    favouriteGasStations: "Gasolinera favorita",
+    savedRoute: "Ruta guardada"
+  }
+
   vehiculeEmissionTypeOptions: Record<string, string> = {
     ELECTRIC: "Eléctrico",
     HYBRID: "Híbrido",
