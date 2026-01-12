@@ -15,6 +15,10 @@ public class UserDTO {
 		this.surname = surname;
 	}
 
+	public UserDTO() {
+		// TODO Auto-generated constructor stub
+	}
+
 	public String getEmail() {
 		return email;
 	}

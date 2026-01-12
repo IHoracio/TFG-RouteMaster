@@ -4,6 +4,16 @@ public class EstadoCielo {
 	private String value;
 	private Integer periodo;
 	private String descripcion;
+	
+	public EstadoCielo() {
+		
+	}
+
+	public EstadoCielo(Integer periodo, String descripcion) {
+		super();
+		this.periodo = periodo;
+		this.descripcion = descripcion;
+	}
 
 	public String getValue() {
 		return value;

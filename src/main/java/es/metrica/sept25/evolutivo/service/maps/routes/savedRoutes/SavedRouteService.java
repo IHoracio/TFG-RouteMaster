@@ -15,4 +15,6 @@ public interface SavedRouteService {
 			boolean optimizeRoute, String language);
 
 	void deleteRoute(Long id, User user);
+
+	Optional<List<SavedRouteDTO>> getAllSavedRoutes(String email);
 }
