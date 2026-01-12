@@ -59,7 +59,7 @@
     <button type="button" (click)="deleteWaypoint()">Eliminar punto intermedio</button>
 
     <p>
-      <label for="optimizeRoute">¿Quieres optimizar los puntos intermedios??</label>
+      <label for="optimizeRoute">Optimizar puntos intermedios</label>
       <select [(ngModel)]="routeFormResponse.optimizeWaypoints" name="optimizeWaypoints" id="optimizeWaypoints">
         <option [value]="false">No</option>
         <option [value]="true">Sí</option>
@@ -67,12 +67,31 @@
     </p>
 
     <p>
-      <label for="optimizeRoute">¿Quieres optimizar la ruta?</label>
+      <label for="optimizeRoute">Optimizar la ruta</label>
       <select [(ngModel)]="routeFormResponse.optimizeRoute" name="optimizeRoute" id="optimizeRoute">
         <option [value]="false">No</option>
         <option [value]="true">Sí</option>
       </select>
     </p>
+
+    <p>
+      <label for="avoidTolls">Evitar peajes</label>
+      <select [(ngModel)]="routeFormResponse.avoidTolls" name="avoidTolls" id="avoidTolls">
+        <option [value]="false">No</option>
+        <option [value]="true">Sí</option>
+      </select>
+    </p>
+
+    <p>
+      <label for="vehiculeEmissionType">Tipo de combustible</label>
+      <select [(ngModel)]="routeFormResponse.vehiculeEmissionType" name="vehiculeEmissionType" id="vehiculeEmissionType">
+        @for (item of vehiculeEmissionTypeOptions | keyvalue; track item.key){
+          <option [value]="item.key">{{item.value}}</option>
+        }
+      </select>
+    </p>
+
+
 
 
 
@@ -80,10 +99,6 @@
 
   </form>
 
-
-
-  <!--<button (click)="guardarCoordenadas()">Guardar coordenadas</button>-->
-  <!--<button (click)="imprimirMensaje()">imprime</button>-->
 
   <app-map-page></app-map-page>
 

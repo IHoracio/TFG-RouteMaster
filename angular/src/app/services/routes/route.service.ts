@@ -41,6 +41,8 @@ export class RouteService {
       .set('waypoints', waypointsString)
       .set('optimizeWaypoints', routeFormResponse.optimizeWaypoints)
       .set('optimizeRoute', routeFormResponse.optimizeRoute)
+      .set('avoidTolls', routeFormResponse.avoidTolls)
+      .set('vehiculeEmissionType', routeFormResponse.vehiculeEmissionType)
     return this.http.get(this.apiUrl + "/polylineCoords", {headers: headers, params: parameters, responseType: 'text' });
   }
 
@@ -54,6 +56,8 @@ export class RouteService {
       .set('waypoints', waypointsString)
       .set('optimizeWaypoints', routeFormResponse.optimizeWaypoints)
       .set('optimizeRoute', routeFormResponse.optimizeRoute)
+      .set('avoidTolls', routeFormResponse.avoidTolls)
+      .set('vehiculeEmissionType', routeFormResponse.vehiculeEmissionType)
 
     return this.http.get(this.apiUrl + "/legCoords", {headers: headers, params: parameters, responseType: 'text' });
   }
@@ -69,7 +73,7 @@ export class RouteService {
       .set('optimizeWaypoints', routeFormResponse.optimizeWaypoints)
       .set('optimizeRoute', routeFormResponse.optimizeRoute)
       .set('radius', 5)
-
+      
     return this.http.get(this.apiUrl + "/gasStations", {headers: headers, params: parameters, responseType: 'text' });
   }
 
@@ -82,7 +86,9 @@ export class RouteService {
       .set('waypoints', waypointsString)
       .set('optimizeWaypoints', routeFormResponse.optimizeWaypoints)
       .set('optimizeRoute', routeFormResponse.optimizeRoute)
-
+      .set('avoidTolls', routeFormResponse.avoidTolls)
+      .set('vehiculeEmissionType', routeFormResponse.vehiculeEmissionType)
+      
     return this.http.get(this.apiUrl + "/weather", {headers: headers, params: parameters, responseType: 'text' });
   }
 
