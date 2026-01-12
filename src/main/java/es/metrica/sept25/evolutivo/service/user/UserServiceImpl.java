@@ -79,6 +79,7 @@ public class UserServiceImpl implements UserService {
 		if (user.isPresent()) {
 			log.info("[user-service] [" + LocalDateTime.now().toString() + "] "
                     + "User successfully deleted: " + email);
+			//TODO: Falta eliminar usuario de verdad
         } else {
             log.warn("[user-service] [" + LocalDateTime.now().toString() + "] "
                     + "No user found to delete with email: " + email);

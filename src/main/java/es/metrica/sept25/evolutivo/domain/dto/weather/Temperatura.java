@@ -4,6 +4,16 @@ public class Temperatura {
 	private Double value;
 	private Integer periodo;
 
+	public Temperatura() {
+		
+	}
+	
+	public Temperatura(int periodo, double value) {
+		super();
+		this.periodo=periodo;
+		this.value=value;
+	}
+
 	public Double getValue() {
 		return value;
 	}

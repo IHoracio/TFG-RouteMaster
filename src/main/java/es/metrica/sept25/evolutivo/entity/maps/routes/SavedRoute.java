@@ -22,7 +22,7 @@ public class SavedRoute {
     private Long id;
 
 	@Column(name = "route_id", nullable = false, updatable = false, unique = true)
-    private UUID routeId;
+    private Long routeId;
 
     private String name;
 
@@ -38,7 +38,13 @@ public class SavedRoute {
     private boolean optimizeRoute;
     private String language;
 
-	public UUID getRouteId() {
+    
+    
+	public void setRouteId(Long routeId) {
+		this.routeId = routeId;
+	}
+
+	public Long getRouteId() {
 		return routeId;
 	}
 
@@ -92,7 +98,9 @@ public class SavedRoute {
 	
 	@PrePersist
 	private void generateRouteId() {
-		this.routeId = UUID.randomUUID();
+	    if (this.routeId == null) {
+	        this.routeId = System.currentTimeMillis();
+	    }
 	}
 }
 

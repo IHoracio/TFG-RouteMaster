@@ -128,8 +128,6 @@ public class RoutesServiceImpl implements RoutesService {
 
 		if (avoidTolls) {
 		    url.queryParam("avoid", AVOID_TOLLS);
-		} else {
-		    url.queryParam("avoid", "");
 		}
 		
 		if (vehicleEmissionType != null) {
@@ -355,17 +353,14 @@ public class RoutesServiceImpl implements RoutesService {
 	        return List.of();
 	    }
 		
-		List<Coords> stationsForRoute = sampledRoutePoints.stream().flatMap(
-				sampledRoutePoint ->
-				{
-					List<Gasolinera> g = gasolineraService.getGasolinerasInRadiusCoords(sampledRoutePoint.getLat(),sampledRoutePoint.getLng(),radius);
-					return g.stream();
-				})
-				.map(station -> {
-					return new Coords(station.getLatitud(), station.getLongitud());
-				})
-				.distinct()
-				.toList();
+	    List<Coords> stationsForRoute = sampledRoutePoints.stream()
+	    	    .flatMap(point -> gasolineraService
+	    	                        .getGasolinerasInRadiusCoords(point.getLat(), point.getLng(), radius)
+	    	                        .stream()
+	    	    )
+	    	    .map(station -> new Coords(station.getLatitud(), station.getLongitud()))
+	    	    .distinct()
+	    	    .collect(Collectors.toList());
 		
 		return stationsForRoute;
 	}

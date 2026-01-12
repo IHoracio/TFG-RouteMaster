@@ -14,6 +14,8 @@ import es.metrica.sept25.evolutivo.entity.maps.routes.Point;
 import es.metrica.sept25.evolutivo.entity.maps.routes.SavedRoute;
 import es.metrica.sept25.evolutivo.entity.user.User;
 import es.metrica.sept25.evolutivo.repository.SavedRouteRepository;
+import es.metrica.sept25.evolutivo.repository.UserRepository;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,6 +24,9 @@ public class SavedRouteServiceImpl implements SavedRouteService {
 
 	private static final Logger log = LoggerFactory.getLogger(SavedRouteServiceImpl.class);
 
+	
+	@Autowired
+	private UserRepository userRepository;
 	
 	@Autowired
 	private SavedRouteRepository repository;
@@ -87,22 +92,49 @@ public class SavedRouteServiceImpl implements SavedRouteService {
 		repository.delete(route.get());
 	}
 
-	public Optional<SavedRouteDTO> getSavedRoute(Long id) {
+	@Override
+	public Optional<SavedRouteDTO> getSavedRoute(Long routeId) {
 		log.info("[route-save-service] [" + LocalDateTime.now().toString() + "] "
-				+ "Attempting to retrieve saved route with ID: " + id + ".");
-		Optional<SavedRoute> route = repository.findById(id);
+				+ "Attempting to retrieve saved route with ID: " + routeId + ".");
+		Optional<SavedRoute> route = repository.findByRouteId(routeId);
 		
 		if (route.isPresent()) {
 			log.info("[route-save-service] [" + LocalDateTime.now().toString() + "] "
-					+ "Retrieved saved route with ID: " + id + ".");
-			return Optional.of(mapToDTO(route.get()))	;
+					+ "Retrieved saved route with ID: " + routeId + ".");
+			return Optional.of(mapToDTO(route.get()));
 		} else {
 			log.warn("[route-save-service] [" + LocalDateTime.now().toString() + "] "
-					+ "Couldn't retrieve a saved route for ID: " + id + ".");
+					+ "Couldn't retrieve a saved route for ID: " + routeId + ".");
 			return Optional.empty();
 		}
 	}
+	
+	@Override
+	public Optional<List<SavedRouteDTO>> getAllSavedRoutes(String email) {
 
+	    log.info("[route-save-service] [" + LocalDateTime.now().toString() + "] "
+	            + "Attempting to retrieve all saved routes for user: " + email + ".");
+
+	    Optional<User> user = userRepository.findByEmail(email);
+
+	    if (user.isPresent()) {
+	        List<SavedRouteDTO> routes = user.get().getSavedRoutes().stream()
+	                .map(this::mapToDTO)
+	                .toList();
+
+	        log.info("[route-save-service] [" + LocalDateTime.now().toString() + "] "
+	                + "Retrieved " + routes.size() + " saved routes for user: " + email + ".");
+
+	        return Optional.of(routes);
+	    } else {
+	        log.warn("[route-save-service] [" + LocalDateTime.now().toString() + "] "
+	                + "Couldn't retrieve saved routes because user was not found: " + email + ".");
+
+	        return Optional.empty();
+	    }
+	}
+
+	
 	private SavedRouteDTO mapToDTO(SavedRoute route) {
 		SavedRouteDTO dto = new SavedRouteDTO();
 		dto.setRouteId(route.getRouteId());

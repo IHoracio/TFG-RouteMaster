@@ -34,6 +34,7 @@ public class SavedRouteController {
 
 	@Autowired
 	private UserService userService;
+	
 
 	@Operation(summary = "Guarda una ruta calculada")
 	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Ruta guardada correctamente"),
@@ -82,9 +83,9 @@ public class SavedRouteController {
 	@Operation(summary = "Obtiene una ruta guardada por su ID")
 	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Ruta encontrada"),
 			@ApiResponse(responseCode = "404", description = "Ruta no encontrada") })
-	@GetMapping("/get/{id}")
-	public ResponseEntity<SavedRouteDTO> getSavedRoute(@PathVariable Long id) {
-		Optional<SavedRouteDTO> routeDTO = savedRouteService.getSavedRoute(id);
+	@GetMapping("/get/{routeId}")
+	public ResponseEntity<SavedRouteDTO> getSavedRoute(@PathVariable Long routeId) {
+		Optional<SavedRouteDTO> routeDTO = savedRouteService.getSavedRoute(routeId);
 
 		if (routeDTO.isEmpty()) {
 			return ResponseEntity.notFound().build();
@@ -109,4 +110,19 @@ public class SavedRouteController {
 		savedRouteService.deleteRoute(id, user.get());
 		return ResponseEntity.noContent().build();
 	}
+	@GetMapping
+    public ResponseEntity<List<SavedRouteDTO>> getAllSavedRoutes(
+            @RequestParam String email) {
+
+
+        Optional<List<SavedRouteDTO>> routes = savedRouteService.getAllSavedRoutes(email);
+
+        if (routes.isPresent()) {
+
+            return ResponseEntity.ok(routes.get());
+        }
+
+         return ResponseEntity.notFound().build();
+        
+    }
 }

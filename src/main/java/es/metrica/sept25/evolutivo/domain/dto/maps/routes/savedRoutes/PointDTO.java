@@ -5,6 +5,14 @@ public class PointDTO {
 	private String type;
 	private String address;
 
+	public PointDTO(String type, String address) {
+		this.type= type;
+		this.address= address;
+	}
+
+	public PointDTO() {
+	}
+
 	public String getType() {
 		return type;
 	}
