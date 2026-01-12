@@ -6,14 +6,17 @@ public class UserSavedGasStationDto {
     private Long idEstacion;
     private String nombreEstacion;
     private String marca;
+	private String direccion;
     
     public UserSavedGasStationDto() {}
 
-    public UserSavedGasStationDto(String alias, Long idEstacion, String nombreEstacion, String marca) {
+	public UserSavedGasStationDto(String alias, Long idEstacion, String nombreEstacion, String marca,
+			String direccion) {
         this.alias = alias;
         this.idEstacion = idEstacion;
         this.nombreEstacion = nombreEstacion;
         this.marca = marca;
+		this.direccion = direccion;
     }
     
 	public String getAlias() {
@@ -39,6 +42,14 @@ public class UserSavedGasStationDto {
 	}
 	public void setMarca(String marca) {
 		this.marca = marca;
+	}
+
+	public String getDireccion() {
+		return direccion;
+	}
+
+	public void setDireccion(String direccion) {
+		this.direccion = direccion;
 	}
     
     
