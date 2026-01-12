@@ -16,7 +16,7 @@
 
 
     <p>
-      <select name="destinationType" id="destinationType" [(ngModel)]="destinationType">
+      <select name="destinationType" id="destinationType" [(ngModel)]="destinationType" #required>
         <option value="">¿Qué quieres introducir?</option>
         <option value="coordinates">Destino</option>
         <option value="favouriteGasStations">Gasolinera favorita</option>
@@ -97,6 +97,14 @@
 
     <button type="submit" [disabled]="!form.valid">Enviar</button>
 
+
+    @if (submitted){
+      <label for="routeAlias">Guardar ruta</label>
+      <input [defaultValue]="routeFormResponse.origin + ' — ' + routeFormResponse.destination" type="text"
+       id="routeAlias" name="routeAlias" [(ngModel)]="routeAlias" placeholder="Alias de la ruta"/>
+    }
+
+    <button type="button" (click)="saveRoute()">Guardar ruta</button>
   </form>
 
 
