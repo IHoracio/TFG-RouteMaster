@@ -200,7 +200,8 @@ public class UserServiceImpl implements UserService {
 	                                sg.getAlias(),
 	                                g.getIdEstacion(),
 	                                g.getNombreEstacion(),
-	                                g.getMarca()
+	                                g.getMarca(),
+	                                g.getDireccion()
 	                        );
 	                    })
 	                    .toList()

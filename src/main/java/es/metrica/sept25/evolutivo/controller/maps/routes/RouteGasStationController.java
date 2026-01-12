@@ -46,7 +46,7 @@ public class RouteGasStationController {
 			@RequestParam(required = false, defaultValue = "false") boolean optimizeRoute,
 			@RequestParam(required = false, defaultValue = "es") String language,
 			@Parameter(example = "5") @RequestParam(required = true) Long radius,
-			@RequestParam(required = false, defaultValue = "")boolean avoidTolls,
+			@RequestParam(required = false, defaultValue = "false") boolean avoidTolls,
 			@RequestParam(required = false, defaultValue = "DIESEL")VehicleEmissionType vehicleEmissionType
 			) {
 		
