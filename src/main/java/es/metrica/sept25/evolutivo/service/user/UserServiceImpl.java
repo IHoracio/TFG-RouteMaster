@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import es.metrica.sept25.evolutivo.domain.dto.gasolineras.UserSavedGasStationDto;
 import es.metrica.sept25.evolutivo.domain.dto.user.UserDTO;
+import es.metrica.sept25.evolutivo.domain.dto.user.UserResponseDTO;
 import es.metrica.sept25.evolutivo.entity.gasolinera.Gasolinera;
 import es.metrica.sept25.evolutivo.entity.gasolinera.UserSavedGasStation;
 import es.metrica.sept25.evolutivo.entity.maps.routes.RoutePreferences;
@@ -56,17 +57,36 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public Optional<User> getByEmail(String email) {
+	public Optional<UserResponseDTO> getByEmail(String email) {
 		log.info("[user-service] [" + LocalDateTime.now().toString() + "] "
                 + "Attempting to retrieve user by email: " + email);
-		return userRepository.findByEmail(email);
+		Optional<User> user = userRepository.findByEmail(email);
+
+	    if (user.isPresent()) {
+	        log.info("[user-service] [" + LocalDateTime.now().toString() + "] "
+	                + "User found with email: " + email);
+
+	        return Optional.of(mapToResponseDTO(user.get()));
+	    } else {
+	        log.warn("[user-service] [" + LocalDateTime.now().toString() + "] "
+	                + "User not found with email: " + email);
+
+	        return Optional.empty();
+	    }
+	}
+	@Override
+	public Optional<User> getEntityByEmail(String email) {
+	    log.info("[user-service] Attempting to retrieve USER ENTITY by email: {}", email);
+	    return userRepository.findByEmail(email);
 	}
 
 	@Override
-	public List<User> getAll() {
+	public List<UserResponseDTO> getAll() {
 		 log.info("[user-service] [" + LocalDateTime.now().toString() + "] "
 	                + "Attempting to retrieve all users.");
-		return userRepository.findAll();
+		 return userRepository.findAll().stream()
+		            .map(this::mapToResponseDTO)  // aquí aplicamos el mapper
+		            .toList();
 	}
 
 	@Override
@@ -75,7 +95,7 @@ public class UserServiceImpl implements UserService {
 		log.info("[user-service] [" + LocalDateTime.now().toString() + "] "
                 + "Attempting to delete user with email: " + email);
 		
-		Optional<User> user = getByEmail(email);
+		Optional<UserResponseDTO> user = getByEmail(email);
 		if (user.isPresent()) {
 			log.info("[user-service] [" + LocalDateTime.now().toString() + "] "
                     + "User successfully deleted: " + email);
@@ -262,4 +282,13 @@ public class UserServiceImpl implements UserService {
 	    
 	    return Optional.empty();
 	}
+	
+	private UserResponseDTO mapToResponseDTO(User user) {
+	    return new UserResponseDTO(
+	        user.getEmail(),
+	        user.getName(),
+	        user.getSurname()
+	    );
+	}
 }
+

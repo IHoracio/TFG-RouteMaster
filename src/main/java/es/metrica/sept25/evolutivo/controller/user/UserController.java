@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import es.metrica.sept25.evolutivo.domain.dto.gasolineras.UserSavedGasStationDto;
 import es.metrica.sept25.evolutivo.domain.dto.maps.routes.PreferredBrandsDTO;
 import es.metrica.sept25.evolutivo.domain.dto.user.UserDTO;
+import es.metrica.sept25.evolutivo.domain.dto.user.UserResponseDTO;
 import es.metrica.sept25.evolutivo.entity.gasolinera.Gasolinera;
 import es.metrica.sept25.evolutivo.entity.gasolinera.UserSavedGasStation;
 import es.metrica.sept25.evolutivo.entity.maps.routes.RoutePreferences;
@@ -77,7 +78,7 @@ public class UserController {
 		@ApiResponse(responseCode = "404", description = "Usuario no encontrado") 
 	})
 	@GetMapping("/get")
-	public ResponseEntity<User> getUser(
+	public ResponseEntity<UserResponseDTO> getUser(
 			@Parameter(description = "Email del usuario a buscar", example = "usuario@example.com") @RequestParam String mail) {
 		return service.getByEmail(mail)
 				.map(ResponseEntity::ok)
@@ -92,9 +93,7 @@ public class UserController {
 	@DeleteMapping("/delete")
 	public ResponseEntity<String> deleteUser(@RequestParam String email) {
 
-		Optional<User> userOpt = service.getByEmail(email);
-
-		if (userOpt.isPresent()) {
+		if (service.getByEmail(email).isPresent()) {
 			service.deleteByEmail(email);
 			return ResponseEntity.ok("Usuario eliminado correctamente");
 		}
@@ -112,8 +111,8 @@ public class UserController {
 		@ApiResponse(responseCode = "404", description = "No se encontraron usuarios registrados") 
 	})
 	@GetMapping("/all")
-	public ResponseEntity<List<User>> getAllUsers() {
-		List<User> usuarios = service.getAll();
+	public ResponseEntity<List<UserResponseDTO>> getAllUsers() {
+		List<UserResponseDTO> usuarios = service.getAll();
 
 		if (usuarios.isEmpty()) {
 			return ResponseEntity.notFound().build();
@@ -131,7 +130,7 @@ public class UserController {
 	        @RequestParam double maxPrice,
 	        @RequestParam RoutePreferences.MapViewType mapView
 	) {
-	    Optional<User> userOpt = service.getByEmail(email);
+	    Optional<User> userOpt = service.getEntityByEmail(email);
 
 	    if (userOpt.isEmpty()) {
 	        return ResponseEntity.notFound().build();
@@ -155,7 +154,7 @@ public class UserController {
 	        @RequestParam String theme,
 	        @RequestParam String language
 	) {
-	    Optional<User> userOpt = service.getByEmail(email);
+	    Optional<User> userOpt = service.getEntityByEmail(email);	
 	    if (userOpt.isEmpty()) {
 	        return ResponseEntity.notFound().build();
 	    }
@@ -176,7 +175,7 @@ public class UserController {
 	})
 	@GetMapping("/{id}/preferences")
 	public ResponseEntity<RoutePreferences> getRoutePreferences(@RequestParam String email) {
-	    Optional<User> userOpt = service.getByEmail(email);
+	    Optional<User> userOpt = service.getEntityByEmail(email);
 
 	    if (userOpt.isEmpty() ) {
 	        return ResponseEntity.notFound().build();
@@ -192,7 +191,7 @@ public class UserController {
 	})
 	@GetMapping("/{id}/preferences/user")
 	public ResponseEntity<UserPreferences> getUserPreferences(@RequestParam String email) {
-	    Optional<User> userOpt = service.getByEmail(email);
+	    Optional<User> userOpt = service.getEntityByEmail(email);
 
 	    if (userOpt.isEmpty() || userOpt.get().getUserPreferences() == null) {
 	        return ResponseEntity.notFound().build();
@@ -212,7 +211,7 @@ public class UserController {
 	@GetMapping("/{id}/preferredBrands/user")
 	public ResponseEntity<List<RoutePreferences.Brands>> getPreferredBrands(@RequestParam String email) {
 	
-		Optional<User> userOpt = service.getByEmail(email);
+		Optional<User> userOpt = service.getEntityByEmail(email);
 
 	    if (userOpt.isEmpty()) {
 	        return ResponseEntity.notFound().build();
