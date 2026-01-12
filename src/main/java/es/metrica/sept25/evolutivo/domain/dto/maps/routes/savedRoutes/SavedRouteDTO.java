@@ -5,16 +5,16 @@ import java.util.UUID;
 
 public class SavedRouteDTO {
 
-	private UUID routeId;
+	private Long routeId;
 	private String name;
 	private List<PointDTO> points;
 	private RoutePreferencesDTO preferences;
 
-	public UUID getRouteId() {
+	public Long getRouteId() {
 		return routeId;
 	}
 
-	public void setRouteId(UUID routeId) {
+	public void setRouteId(Long routeId) {
 		this.routeId = routeId;
 	}
 
