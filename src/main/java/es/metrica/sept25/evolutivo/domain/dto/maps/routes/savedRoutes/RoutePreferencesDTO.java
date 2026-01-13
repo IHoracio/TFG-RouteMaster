@@ -3,6 +3,7 @@ package es.metrica.sept25.evolutivo.domain.dto.maps.routes.savedRoutes;
 import java.util.List;
 
 import es.metrica.sept25.evolutivo.entity.maps.routes.RoutePreferences;
+import es.metrica.sept25.evolutivo.enums.MapViewType;
 
 public class RoutePreferencesDTO {
 
@@ -10,7 +11,7 @@ public class RoutePreferencesDTO {
     private Integer radioKm;
     private String fuelType;
     private Double maxPrice;
-    private RoutePreferences.MapViewType mapView;
+    private MapViewType mapView;
 	public List<String> getPreferredBrands() {
 		return preferredBrands;
 	}
@@ -35,10 +36,10 @@ public class RoutePreferencesDTO {
 	public void setMaxPrice(Double maxPrice) {
 		this.maxPrice = maxPrice;
 	}
-	public RoutePreferences.MapViewType getMapView() {
+	public MapViewType getMapView() {
 		return mapView;
 	}
-	public void setMapView(RoutePreferences.MapViewType mapView) {
+	public void setMapView(MapViewType mapView) {
 		this.mapView = mapView;
 	}
     

@@ -10,6 +10,7 @@ import java.util.Optional;
 
 import es.metrica.sept25.evolutivo.domain.dto.gasolineras.UserSavedGasStationDto;
 import es.metrica.sept25.evolutivo.domain.dto.user.UserDTO;
+import es.metrica.sept25.evolutivo.domain.dto.user.UserResponseDTO;
 import es.metrica.sept25.evolutivo.entity.gasolinera.Gasolinera;
 import es.metrica.sept25.evolutivo.entity.gasolinera.UserSavedGasStation;
 import es.metrica.sept25.evolutivo.entity.maps.routes.RoutePreferences;
@@ -83,7 +84,7 @@ class UserServiceImplTest {
 
         when(userRepository.findByEmail("test@mail.com")).thenReturn(Optional.of(user));
 
-        Optional<User> result = userService.getByEmail("test@mail.com");
+        Optional<UserResponseDTO> result = userService.getByEmail("test@mail.com");
 
         assertTrue(result.isPresent());
         assertEquals("test@mail.com", result.get().getEmail());
@@ -94,7 +95,7 @@ class UserServiceImplTest {
     void getByEmail_userNotExists_returnsEmpty() {
         when(userRepository.findByEmail("x@mail.com")).thenReturn(Optional.empty());
 
-        Optional<User> result = userService.getByEmail("x@mail.com");
+        Optional<UserResponseDTO> result = userService.getByEmail("x@mail.com");
 
         assertTrue(result.isEmpty());
         verify(userRepository).findByEmail("x@mail.com");
@@ -105,7 +106,7 @@ class UserServiceImplTest {
         List<User> users = List.of(new User(), new User());
         when(userRepository.findAll()).thenReturn(users);
 
-        List<User> result = userService.getAll();
+        List<UserResponseDTO> result = userService.getAll();
 
         assertEquals(2, result.size());
         verify(userRepository).findAll();

@@ -13,12 +13,16 @@ import org.springframework.transaction.annotation.Transactional;
 
 import es.metrica.sept25.evolutivo.domain.dto.gasolineras.UserSavedGasStationDto;
 import es.metrica.sept25.evolutivo.domain.dto.user.UserDTO;
+import es.metrica.sept25.evolutivo.domain.dto.user.UserResponseDTO;
 import es.metrica.sept25.evolutivo.entity.gasolinera.Gasolinera;
 import es.metrica.sept25.evolutivo.entity.gasolinera.UserSavedGasStation;
 import es.metrica.sept25.evolutivo.entity.maps.routes.RoutePreferences;
-import es.metrica.sept25.evolutivo.entity.maps.routes.RoutePreferences.Brands;
 import es.metrica.sept25.evolutivo.entity.user.User;
 import es.metrica.sept25.evolutivo.entity.user.UserPreferences;
+import es.metrica.sept25.evolutivo.entity.user.UserPreferences.Language;
+import es.metrica.sept25.evolutivo.entity.user.UserPreferences.Theme;
+import es.metrica.sept25.evolutivo.enums.FuelType;
+import es.metrica.sept25.evolutivo.enums.MapViewType;
 import es.metrica.sept25.evolutivo.repository.GasolineraRepository;
 import es.metrica.sept25.evolutivo.repository.UserRepository;
 import es.metrica.sept25.evolutivo.service.gasolineras.GasolineraService;
@@ -56,17 +60,36 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public Optional<User> getByEmail(String email) {
+	public Optional<UserResponseDTO> getByEmail(String email) {
 		log.info("[user-service] [" + LocalDateTime.now().toString() + "] "
                 + "Attempting to retrieve user by email: " + email);
-		return userRepository.findByEmail(email);
+		Optional<User> user = userRepository.findByEmail(email);
+
+	    if (user.isPresent()) {
+	        log.info("[user-service] [" + LocalDateTime.now().toString() + "] "
+	                + "User found with email: " + email);
+
+	        return Optional.of(mapToResponseDTO(user.get()));
+	    } else {
+	        log.warn("[user-service] [" + LocalDateTime.now().toString() + "] "
+	                + "User not found with email: " + email);
+
+	        return Optional.empty();
+	    }
+	}
+	@Override
+	public Optional<User> getEntityByEmail(String email) {
+	    log.info("[user-service] Attempting to retrieve USER ENTITY by email: {}", email);
+	    return userRepository.findByEmail(email);
 	}
 
 	@Override
-	public List<User> getAll() {
+	public List<UserResponseDTO> getAll() {
 		 log.info("[user-service] [" + LocalDateTime.now().toString() + "] "
 	                + "Attempting to retrieve all users.");
-		return userRepository.findAll();
+		 return userRepository.findAll().stream()
+		            .map(this::mapToResponseDTO)  // aquí aplicamos el mapper
+		            .toList();
 	}
 
 	@Override
@@ -75,7 +98,7 @@ public class UserServiceImpl implements UserService {
 		log.info("[user-service] [" + LocalDateTime.now().toString() + "] "
                 + "Attempting to delete user with email: " + email);
 		
-		Optional<User> user = getByEmail(email);
+		Optional<UserResponseDTO> user = getByEmail(email);
 		if (user.isPresent()) {
 			log.info("[user-service] [" + LocalDateTime.now().toString() + "] "
                     + "User successfully deleted: " + email);
@@ -106,17 +129,17 @@ public class UserServiceImpl implements UserService {
 	    
 	    RoutePreferences prefs = new RoutePreferences();
 	    
-	    prefs.setPreferredBrands(List.of(Brands.REPSOL, Brands.CEPSA));
+	    prefs.setPreferredBrands(List.of("REPSOL", "CEPSA"));
         prefs.setRadioKm(5);
-        prefs.setFuelType("GASOLINE");
+        prefs.setFuelType(FuelType.GASOLINE);
         prefs.setMaxPrice(1.50);
-        prefs.setMapView(RoutePreferences.MapViewType.SCHEMATIC);
+        prefs.setMapView(MapViewType.SATELLITE);
 
         user.setRoutePreferences(prefs);
         
         UserPreferences defaultPrefs = new UserPreferences();
-        defaultPrefs.setTheme("Claro");
-        defaultPrefs.setLanguage("es");
+        defaultPrefs.setTheme(Theme.LIGHT);
+        defaultPrefs.setLanguage(Language.ES);
 
         user.setUserPreferences(defaultPrefs);
 
@@ -130,11 +153,11 @@ public class UserServiceImpl implements UserService {
 	@Transactional
 	public void updateRoutePreferences(
 	        User user,
-	        List<RoutePreferences.Brands> preferredBrands,
+	        List<String> preferredBrands,
 	        int radioKm,
-	        String fuelType,
+	        FuelType fuelType,
 	        double maxPrice,
-	        RoutePreferences.MapViewType mapView
+	        MapViewType mapView
 	) {
 
 		log.info("[user-service] [" + LocalDateTime.now().toString() + "] "
@@ -155,8 +178,8 @@ public class UserServiceImpl implements UserService {
 	@Transactional
 	public void updateUserPreferences(
 	        User user,
-	        String theme,
-	        String language
+	        Theme theme,
+	        Language language
 	) {
 		log.info("[user-service] [" + LocalDateTime.now().toString() + "] "
                 + "Attempting to update user preferences for user: " + user.getEmail());
@@ -262,4 +285,15 @@ public class UserServiceImpl implements UserService {
 	    
 	    return Optional.empty();
 	}
+	
+	private UserResponseDTO mapToResponseDTO(User user) {
+	    return new UserResponseDTO(
+	        user.getEmail(),
+	        user.getName(),
+	        user.getSurname(),
+	        user.getSavedRoutes(),
+	        user.getSavedGasStations()
+	    );
+	}
 }
+

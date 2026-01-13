@@ -46,7 +46,7 @@ public class SavedRouteController {
 			@RequestParam(required = false, defaultValue = "false") boolean optimizeWaypoints,
 			@RequestParam(required = false, defaultValue = "false") boolean optimizeRoute,
 			@RequestParam(required = false, defaultValue = "es") String language, @RequestParam String email) {
-		Optional<User> userOpt = userService.getByEmail(email);
+		Optional<User> userOpt = userService.getEntityByEmail(email);
 
 		if (userOpt.isEmpty()) {
 			return ResponseEntity.status(404).build();
@@ -101,7 +101,7 @@ public class SavedRouteController {
 	@DeleteMapping("/delete/{id}")
 	public ResponseEntity<Void> deleteRoute(@PathVariable Long id, @RequestParam String email) {
 
-		Optional<User> user = userService.getByEmail(email);
+		Optional<User> user = userService.getEntityByEmail(email);
 
 		if (user.isEmpty()) {
 			return ResponseEntity.notFound().build();
