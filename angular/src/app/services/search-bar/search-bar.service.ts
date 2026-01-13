@@ -75,6 +75,11 @@ export class SearchBarService {
   saveFavouriteGasStations(mail: string): Observable<string>{
     return this.userService.receiveFavouriteGasStations(mail)
   }
+  saveSavedRoutes(mail: string): Observable<string>{
+    return this.userService.receiveSavedRoutes(mail)
+  }
+  
+
 
   saveFavouriteRoute(alias: string, email:string, routeFormResponse: RouteFormResponse) {
     return this.routeService.saveFavouriteRoute(alias, email, routeFormResponse)

@@ -7,6 +7,8 @@ import { KeyValuePipe, NgFor, NgIf } from '@angular/common';
 import { RouteService } from '../../../services/routes/route.service';
 import { RouteGroupResponse } from '../../../Dto/maps-dtos';
 import { FavouriteGasStation } from '../../../Dto/gas-station';
+import { SavedRoute } from '../../../Dto/saved-route';
+import { Parser } from '@angular/compiler';
 
 
 
@@ -19,8 +21,13 @@ import { FavouriteGasStation } from '../../../Dto/gas-station';
 export class SearchBarComponent {
 
   favouriteGasStations = signal<FavouriteGasStation[]>([]);
+  savedRoute = signal<SavedRoute[]>([])
   destinationType: string = "";
   routeAlias: string = "";
+  selectedRouteOption = {
+    origin: "",
+    destination: ""
+  }
 
   routeFormResponse: RouteFormResponse = {
     origin: "",
@@ -46,18 +53,24 @@ export class SearchBarComponent {
   }
 
   constructor(private searchBarService: SearchBarService, private routeService: RouteService) {
-    this.initializeUser()
+    //this.initializeUser()
+  }
+  ngOnInit(): void {
+    this.initializeUser();
   }
 
   initializeUser() {
     this.searchBarService
       .saveFavouriteGasStations('prueba@gmail.com')
-      .subscribe(gas => {
-        const parsedGas: FavouriteGasStation[] = JSON.parse(gas);
-        this.favouriteGasStations.set(parsedGas)
-        console.log(this.favouriteGasStations());
-        console.log(parsedGas)
-      });
+      .subscribe(gas => this.favouriteGasStations.set(JSON.parse(gas))
+      );
+
+    this.searchBarService
+      .saveSavedRoutes("prueba@gmail.com")
+      .subscribe(route => {
+        console.log(route)
+        this.savedRoute.set(JSON.parse(route))
+      })
   }
   addWaypoint() {
     this.routeFormResponse.waypoints.push('')
@@ -65,37 +78,38 @@ export class SearchBarComponent {
   deleteWaypoint() {
     this.routeFormResponse.waypoints.pop()
   }
-  message: RouteGroupResponse = {
-    routes: []
-  };
+  savedRouteSelected(){
+    this.routeFormResponse.origin = this.selectedRouteOption.origin
+    this.routeFormResponse.destination = this.selectedRouteOption.destination
+  }
+  
 
 
   submitted: boolean = false;
   onSubmit() {
     this.searchBarService.onSubmit(this.routeFormResponse)
-    console.log(this.routeFormResponse)
     this.submitted = true;
-    this.routeAlias =
-    `${this.routeFormResponse.origin} — ${this.routeFormResponse.destination}`
+    this.initializeUser()
+    
   }
   trackByIndex(index: number) {
     return index;
   }
-  
+
   successfulMessage: string = "";
   errorMessage: string = "";
-  saveRoute(){
+  saveRoute() {
     this.searchBarService.saveFavouriteRoute(this.routeAlias, "prueba@gmail.com", this.routeFormResponse)
-    .subscribe({
-      next: (response) => {
+      .subscribe({
+        next: (response) => {
           this.successfulMessage = "Se ha guardado la ruta como favorita."
           this.errorMessage = "";
           console.log(response)
-      }, error: (err) => {
+        }, error: (err) => {
           this.errorMessage = "Ha occurido un error."
           this.successfulMessage = ""
           console.log(err)
-      },
-    })
+        },
+      })
   }
 }
