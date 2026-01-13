@@ -88,7 +88,7 @@ public class UserServiceImpl implements UserService {
 		 log.info("[user-service] [" + LocalDateTime.now().toString() + "] "
 	                + "Attempting to retrieve all users.");
 		 return userRepository.findAll().stream()
-		            .map(this::mapToResponseDTO)  // aquí aplicamos el mapper
+		            .map(this::mapToResponseDTO)
 		            .toList();
 	}
 
@@ -114,6 +114,16 @@ public class UserServiceImpl implements UserService {
 	public Optional<User> createUser(UserDTO userDTO) {
 		log.info("[user-service] [" + LocalDateTime.now().toString() + "] "
                 + "Attempting to create user with email: " + userDTO.getEmail());
+		
+		if (!isValidEmail(userDTO.getEmail())) {
+	        log.warn("[user-service] [" + LocalDateTime.now() + "] Invalid email format: " + userDTO.getEmail());
+	        return Optional.empty();
+	    }
+
+	    if (!isValidPassword(userDTO.getPassword())) {
+	        log.warn("[user-service] [" + LocalDateTime.now() + "] Invalid password for user: " + userDTO.getEmail());
+	        return Optional.empty();
+	    }
 		
 		if (userRepository.findByEmail(userDTO.getEmail()).isPresent()) {
 			log.warn("[user-service] [" + LocalDateTime.now().toString() + "] "
@@ -294,6 +304,18 @@ public class UserServiceImpl implements UserService {
 	        user.getSavedRoutes(),
 	        user.getSavedGasStations()
 	    );
+	}
+	
+	private boolean isValidEmail(String email) {
+	    String emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$";
+	    return email != null && email.matches(emailRegex);
+	}
+
+	private boolean isValidPassword(String password) {
+	    if (password == null || password.length() < 8) return false;
+	    boolean hasLetter = password.chars().anyMatch(Character::isLetter);
+	    boolean hasDigit = password.chars().anyMatch(Character::isDigit);
+	    return hasLetter && hasDigit;
 	}
 }
 
