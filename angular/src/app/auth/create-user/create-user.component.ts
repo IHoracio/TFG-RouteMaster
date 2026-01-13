@@ -1,8 +1,8 @@
 import { Component } from '@angular/core';
 import { FormsModule, ReactiveFormsModule, FormGroup, FormControl, Validators, FormBuilder } from '@angular/forms';
-import { User } from '../../../Dto/user-dtos';
+import { User } from '../../Dto/user-dtos';
 import { NgIf } from '@angular/common';
-import { UserService } from '../../../services/user/user.service';
+import { UserService } from '../../services/user/user.service';
 
 @Component({
   selector: 'app-create-user',

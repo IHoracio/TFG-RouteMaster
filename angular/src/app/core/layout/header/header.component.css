@@ -4,15 +4,21 @@ header {
     align-items: center;
     padding: 15px 30px;
     
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 50px;
 }
 
 header a {
     text-decoration: none;
     font-size: 18px;
+    color: #4dbe55;
 }
 
 header a:hover {
-    text-decoration: underline;
+    text-decoration: none;
 }
 
 .logo {
