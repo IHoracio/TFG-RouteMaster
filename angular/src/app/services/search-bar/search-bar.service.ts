@@ -4,7 +4,7 @@ import { RouteService } from '../routes/route.service';
 import { Coords, RouteGroupResponse } from '../../Dto/maps-dtos';
 import { MapCommunicationService } from '../map/map-communication.service';
 import { WeatherData } from '../../Dto/weather-dtos';
-import { UserDto } from '../../Dto/user-dtos';
+import { FavouriteGasStationDto, UserDto } from '../../Dto/user-dtos';
 import { UserService } from '../user/user.service';
 import { Observable } from 'rxjs';
 
@@ -71,6 +71,18 @@ export class SearchBarService {
 
   saveUserData(mail: string): Observable<string> {
     return this.userService.receiveUserData(mail);
+  }
+  saveFavouriteGasStations(mail: string): Observable<string>{
+    return this.userService.receiveFavouriteGasStations(mail)
+  }
+  saveSavedRoutes(mail: string): Observable<string>{
+    return this.userService.receiveSavedRoutes(mail)
+  }
+  
+
+
+  saveFavouriteRoute(alias: string, email:string, routeFormResponse: RouteFormResponse) {
+    return this.routeService.saveFavouriteRoute(alias, email, routeFormResponse)
   }
   giveCoords(coords: Coords[]){
     this.mapCommunication.sendRoute(coords)

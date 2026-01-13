@@ -1,89 +1,115 @@
-import { Component} from '@angular/core';
-import { FormsModule} from '@angular/forms';
+import { Component, signal } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { RouteFormResponse } from '../../../Dto/route-form-response';
 import { MapPageComponent } from '../map-page/map-page.component';
 import { SearchBarService } from '../../../services/search-bar/search-bar.service';
-import { NgFor } from '@angular/common';
+import { KeyValuePipe, NgFor, NgIf } from '@angular/common';
 import { RouteService } from '../../../services/routes/route.service';
 import { RouteGroupResponse } from '../../../Dto/maps-dtos';
-import { UserDto} from '../../../Dto/user-dtos';
+import { FavouriteGasStation } from '../../../Dto/gas-station';
+import { SavedRoute } from '../../../Dto/saved-route';
+import { Parser } from '@angular/compiler';
 
 
 
 @Component({
   selector: 'app-search-bar',
-  imports: [FormsModule, MapPageComponent, NgFor],
+  imports: [FormsModule, MapPageComponent, NgFor, KeyValuePipe, NgIf],
   templateUrl: './search-bar.component.html',
   styleUrl: './search-bar.component.css'
 })
 export class SearchBarComponent {
 
-  userDto: UserDto = {
-  id: 0,
-  email: '',
-  password: '',
-  passwordConfirmation: '',
-  name: '',
-  surname: '',
-
-  userPreferences: {
-    theme: '',
-    language: '',
-    user: ''
-  },
-
-  savedRoutes: [],
-
-  favouriteGasStations: [],
-
-  gasStationPriority: 'PRICE',
-
-  routePreferences: {
-    preferredBrands: [],
-    radioKm: 0,
-    fuelType: '',
-    maxPrice: 0,
-    mapView: 'SATELLITE'
-  }
-};
-
-
+  favouriteGasStations = signal<FavouriteGasStation[]>([]);
+  savedRoute = signal<SavedRoute[]>([])
   destinationType: string = "";
+  routeAlias: string = "";
+  selectedRouteOption = {
+    origin: "",
+    destination: ""
+  }
+
   routeFormResponse: RouteFormResponse = {
-    origin : "",
-    destination : "",
+    origin: "",
+    destination: "",
     waypoints: [],
     optimizeWaypoints: false,
-    optimizeRoute : false
+    optimizeRoute: false,
+    avoidTolls: false,
+    vehiculeEmissionType: "DIESEL"
   }
-  
+
+  destinationTypeOptions: Record<string, string> = {
+    coordinates: "Destino",
+    favouriteGasStations: "Gasolinera favorita",
+    savedRoute: "Ruta guardada"
+  }
+
+  vehiculeEmissionTypeOptions: Record<string, string> = {
+    ELECTRIC: "Eléctrico",
+    HYBRID: "Híbrido",
+    DIESEL: 'Diesel',
+    GASOLINE: "Gasolina"
+  }
+
   constructor(private searchBarService: SearchBarService, private routeService: RouteService) {
-    this.initializeUser()
+    //this.initializeUser()
   }
-  
+  ngOnInit(): void {
+    this.initializeUser();
+  }
+
   initializeUser() {
-  this.searchBarService
-    .saveUserData('lorenzoboda01@gmail.com')
-    .subscribe(user => {
-      this.userDto = JSON.parse(user);
-      console.log(this.userDto);
-    });
+    this.searchBarService
+      .saveFavouriteGasStations('prueba@gmail.com')
+      .subscribe(gas => this.favouriteGasStations.set(JSON.parse(gas))
+      );
+
+    this.searchBarService
+      .saveSavedRoutes("prueba@gmail.com")
+      .subscribe(route => {
+        console.log(route)
+        this.savedRoute.set(JSON.parse(route))
+      })
   }
-  addWaypoint(){
+  addWaypoint() {
     this.routeFormResponse.waypoints.push('')
   }
-  deleteWaypoint(){
+  deleteWaypoint() {
     this.routeFormResponse.waypoints.pop()
   }
-  message: RouteGroupResponse = {
-      routes: []
-  };
+  savedRouteSelected(){
+    this.routeFormResponse.origin = this.selectedRouteOption.origin
+    this.routeFormResponse.destination = this.selectedRouteOption.destination
+  }
+  
 
+
+  submitted: boolean = false;
   onSubmit() {
-      this.searchBarService.onSubmit(this.routeFormResponse)
-      console.log(this.routeFormResponse)
-    }
+    this.searchBarService.onSubmit(this.routeFormResponse)
+    this.submitted = true;
+    this.initializeUser()
+    
+  }
   trackByIndex(index: number) {
-  return index;
-}
+    return index;
+  }
+
+  successfulMessage: string = "";
+  errorMessage: string = "";
+  saveRoute() {
+    this.searchBarService.saveFavouriteRoute(this.routeAlias, "prueba@gmail.com", this.routeFormResponse)
+      .subscribe({
+        next: (response) => {
+          this.successfulMessage = "Se ha guardado la ruta como favorita."
+          this.errorMessage = "";
+          console.log(response)
+        }, error: (err) => {
+          this.errorMessage = "Ha occurido un error."
+          this.successfulMessage = ""
+          console.log(err)
+        },
+      })
+  }
 }
