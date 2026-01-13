@@ -290,7 +290,9 @@ public class UserServiceImpl implements UserService {
 	    return new UserResponseDTO(
 	        user.getEmail(),
 	        user.getName(),
-	        user.getSurname()
+	        user.getSurname(),
+	        user.getSavedRoutes(),
+	        user.getSavedGasStations()
 	    );
 	}
 }
