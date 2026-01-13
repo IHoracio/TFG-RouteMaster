@@ -1,20 +1,68 @@
-.error{
+.error {
     color: red;
     font-weight: bold;
 }
+
 .asterisk {
     color: red;
     font-weight: bold;
     margin-right: 5px;
 }
-.success{
+
+.success {
     color: green;
     font-weight: bold;
 }
 
+.container {
+    min-height: 50vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
 .card {
-  background: var(--color-card);
-  border-radius: var(--border-radius);
-  padding: 1.5rem;
-  box-shadow: var(--shadow-sm);
+    background: var(--color-card);
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    max-width: 400px;
+    width: 100%;
+}
+
+.form-header {
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+.form-header h2 {
+    font-weight: bold;
+}
+
+.form-header p {
+    font-size: 0.9rem;
+    color: #6c757d;
+}
+
+.form-control:focus {
+    box-shadow: 0 0 10px rgba(38, 143, 255, 0.5);
+    border-color: #268fff;
+}
+
+.btn-custom:enabled {
+    background: linear-gradient(135deg, #68bb6e, #248C54);
+    border: none;
+    border-radius: 8px;
+    transition: background 0.3s ease;
+    padding: 5px;
+}
+
+.btn-custom:hover:enabled {
+    background: linear-gradient(135deg, #248C54, #68bb6e);
+}
+
+.text-muted {
+    font-size: 0.8rem;
+    text-align: center;
+    margin-top: 1rem;
 }

@@ -16,8 +16,11 @@ body {
   background-color: var(--color-bg);
   color: var(--color-text);
   margin-top: 80px;
+}
+app-root{
   padding: 30px;
 }
+
 .card {
   background: var(--color-card);
   border-radius: var(--border-radius);
@@ -25,7 +28,8 @@ body {
   box-shadow: var(--shadow-sm);
 }
 footer, header{
-    background: #68bb6e;
+/*background: #68bb6e;*/
+    background: linear-gradient(135deg, #68bb6e, #248C54);
     text-decoration: none;
 }
 
