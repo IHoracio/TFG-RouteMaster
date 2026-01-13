@@ -1,7 +1,6 @@
 package es.metrica.sept25.evolutivo.entity.maps.routes;
 
 import java.util.List;
-import java.util.UUID;
 
 import es.metrica.sept25.evolutivo.entity.user.User;
 import jakarta.persistence.CascadeType;

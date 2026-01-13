@@ -23,9 +23,7 @@
 //	public String prueba() {
 ////		GasolineraService gService = new GasolineraServiceImpl();
 //		Gasolinera g = new Gasolinera("pepe");
-//		System.out.println(g);
 ////		gService.save(g);
-////		System.out.println(gService.getGasolineraList());
 //		return "";
 //	}
 //}

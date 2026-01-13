@@ -3,8 +3,9 @@ package es.metrica.sept25.evolutivo.controller.user;
 import java.util.List;
 import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,8 +21,6 @@ import es.metrica.sept25.evolutivo.domain.dto.gasolineras.UserSavedGasStationDto
 import es.metrica.sept25.evolutivo.domain.dto.maps.routes.PreferredBrandsDTO;
 import es.metrica.sept25.evolutivo.domain.dto.user.UserDTO;
 import es.metrica.sept25.evolutivo.domain.dto.user.UserResponseDTO;
-import es.metrica.sept25.evolutivo.entity.gasolinera.Gasolinera;
-import es.metrica.sept25.evolutivo.entity.gasolinera.UserSavedGasStation;
 import es.metrica.sept25.evolutivo.entity.maps.routes.RoutePreferences;
 import es.metrica.sept25.evolutivo.entity.user.User;
 import es.metrica.sept25.evolutivo.entity.user.UserPreferences;
@@ -40,6 +39,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = "User", description = "Endpoints CRUD para la gestión de los usuarios")
 @RequestMapping("/api/users")
 public class UserController {
+	
+	private static Logger log = LoggerFactory.getLogger(UserController.class);
 
 	@Autowired
 	private UserService service;
@@ -51,28 +52,15 @@ public class UserController {
 		@ApiResponse(responseCode = "400", description = "Datos inválidos") 
 	})
 	@PostMapping("/create")
-	public ResponseEntity<User> createUser(
-			/*@Parameter(description = "Email del usuario", example = "usuario@example.com") 
-			@RequestParam(required = true) String email,
-
-			@Parameter(description = "Contraseña del usuario", example = "password123") 
-			@RequestParam(required = true) String password,
-
-			@Parameter(description = "Nombre del usuario", example = "Usuario") 
-			@RequestParam(required = true) String name,
-
-			@Parameter(description = "Apellido del usuario", example = "Prueba") 
-			@RequestParam(required = true) String surname*/ @RequestBody(required = true) UserDTO userDTO) {
-
-//		System.err.printf("[%s] [%s] [%s] [%s]\n", email, password, name, surname);
-//		Optional<User> user = service.createUser(name, surname, password, email);
-		System.err.println(userDTO.toString());
+	public ResponseEntity<User> createUser(@RequestBody(required = true) UserDTO userDTO) 
+	{
+		log.debug(userDTO.toString());
 		Optional<User> user = service.createUser(userDTO);
 		if (user.isEmpty()) {
 			return ResponseEntity.badRequest().build();
 		}
 
-		System.err.println(user.toString());
+		log.debug(user.toString());
 		return ResponseEntity.ok(user.get());
 	}
 
@@ -87,22 +75,6 @@ public class UserController {
 		return service.getByEmail(mail)
 				.map(ResponseEntity::ok)
 				.orElse(ResponseEntity.notFound().build());
-	}
-
-	@Operation(summary = "Eliminar un usuario por email")
-	@ApiResponses(value = { 
-		@ApiResponse(responseCode = "204", description = "Usuario eliminado correctamente"),
-		@ApiResponse(responseCode = "404", description = "Usuario no encontrado") 
-	})
-	@DeleteMapping("/delete")
-	public ResponseEntity<String> deleteUser(@RequestParam String email) {
-
-		if (service.getByEmail(email).isPresent()) {
-			service.deleteByEmail(email);
-			return ResponseEntity.ok("Usuario eliminado correctamente");
-		}
-
-		return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuario no encontrado");
 	}
 
 	@Operation(

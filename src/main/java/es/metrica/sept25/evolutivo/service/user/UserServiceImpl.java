@@ -94,23 +94,6 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	@Transactional
-	public void deleteByEmail(String email) {
-		log.info("[user-service] [" + LocalDateTime.now().toString() + "] "
-                + "Attempting to delete user with email: " + email);
-		
-		Optional<UserResponseDTO> user = getByEmail(email);
-		if (user.isPresent()) {
-			log.info("[user-service] [" + LocalDateTime.now().toString() + "] "
-                    + "User successfully deleted: " + email);
-			userRepository.deleteByEmail(email);
-        } else {
-            log.warn("[user-service] [" + LocalDateTime.now().toString() + "] "
-                    + "No user found to delete with email: " + email);
-        }
-	}
-	
-	@Override
-	@Transactional
 	public Optional<User> createUser(UserDTO userDTO) {
 		log.info("[user-service] [" + LocalDateTime.now().toString() + "] "
                 + "Attempting to create user with email: " + userDTO.getEmail());
@@ -214,7 +197,7 @@ public class UserServiceImpl implements UserService {
 	    if (user.isPresent()) {
 	    	user.get().getSavedGasStations().removeIf(sg -> sg.getAlias().equalsIgnoreCase(alias));
 	    	userRepository.save(user.get());
-	    }else {
+	    } else {
             log.warn("[user-service] [" + LocalDateTime.now().toString() + "] "
                     + "No user found while removing gas station for email: " + email);
         }
@@ -255,7 +238,6 @@ public class UserServiceImpl implements UserService {
                     + "No user found with email: " + email);
 	        return Optional.of("Usuario no encontrado");
 	    }
-
 	    
 	    Optional<Gasolinera> gasolinera = gasolineraRepository.findByIdEstacion(idEstacion);
 	    

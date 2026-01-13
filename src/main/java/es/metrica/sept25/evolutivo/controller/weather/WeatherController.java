@@ -1,7 +1,10 @@
 package es.metrica.sept25.evolutivo.controller.weather;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,6 +28,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 	)
 @RequestMapping("/api/weather")
 public class WeatherController {
+	
+	private static Logger log = LoggerFactory.getLogger(WeatherController.class);
 
 	@Autowired
 	private WeatherService weatherService;
@@ -43,7 +48,8 @@ public class WeatherController {
 	public ResponseEntity<Weather> getWeather(@RequestParam(required = true) String code) {
 
 		if (code == null || !code.matches("\\d{5}")) {
-			System.out.println("1");
+			log.warn("[weather-controller] [" + LocalDateTime.now().toString() + "] "
+					+ "Bad format for INE code inputted");
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 

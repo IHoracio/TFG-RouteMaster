@@ -1,7 +1,6 @@
 package es.metrica.sept25.evolutivo.domain.dto.maps.routes.savedRoutes;
 
 import java.util.List;
-import java.util.UUID;
 
 public class SavedRouteDTO {
 

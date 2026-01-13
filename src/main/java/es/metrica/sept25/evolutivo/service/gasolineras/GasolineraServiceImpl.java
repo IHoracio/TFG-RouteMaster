@@ -173,8 +173,9 @@ public class GasolineraServiceImpl implements GasolineraService {
 		try {
 			gasolinerasPorRadio = restTemplate.getForObject(urlRadio, Gasolinera[].class);
 		} catch (HttpClientErrorException.NotFound e) {
-			System.err.println("No se han encontrado gasolineras en radio " + radius
-					+ " de la dirección " + address);
+			log.warn("[gas-service] [" + LocalDateTime.now().toString() + "] "
+					+ "No gas stations were found in a radius: " + radius + " for"
+					+ " address = " + address + ".");
 			return foundRadius;
 		}
 

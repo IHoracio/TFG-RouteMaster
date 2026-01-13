@@ -3,7 +3,6 @@ package es.metrica.sept25.evolutivo.entity.user;
 import java.util.LinkedList;
 import java.util.List;
 
-import es.metrica.sept25.evolutivo.entity.gasolinera.Gasolinera;
 import es.metrica.sept25.evolutivo.entity.gasolinera.UserSavedGasStation;
 import es.metrica.sept25.evolutivo.entity.maps.routes.RoutePreferences;
 import es.metrica.sept25.evolutivo.entity.maps.routes.SavedRoute;
@@ -16,9 +15,6 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
