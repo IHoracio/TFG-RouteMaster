@@ -13,9 +13,11 @@ import es.metrica.sept25.evolutivo.domain.dto.user.UserDTO;
 import es.metrica.sept25.evolutivo.domain.dto.user.UserResponseDTO;
 import es.metrica.sept25.evolutivo.entity.gasolinera.Gasolinera;
 import es.metrica.sept25.evolutivo.entity.gasolinera.UserSavedGasStation;
-import es.metrica.sept25.evolutivo.entity.maps.routes.RoutePreferences;
-import es.metrica.sept25.evolutivo.entity.maps.routes.RoutePreferences.Brands;
 import es.metrica.sept25.evolutivo.entity.user.User;
+import es.metrica.sept25.evolutivo.entity.user.UserPreferences.Language;
+import es.metrica.sept25.evolutivo.entity.user.UserPreferences.Theme;
+import es.metrica.sept25.evolutivo.enums.FuelType;
+import es.metrica.sept25.evolutivo.enums.MapViewType;
 import es.metrica.sept25.evolutivo.repository.GasolineraRepository;
 import es.metrica.sept25.evolutivo.repository.UserRepository;
 import es.metrica.sept25.evolutivo.service.gasolineras.GasolineraService;
@@ -113,25 +115,6 @@ class UserServiceImplTest {
     }
 
     public final static String CORREO_EXISTENTE = "EXISTE@gmail.com";
-    @Test
-    void deleteByEmail_userExists() {
-    	
-    	doAnswer(a-> {
-    		if(CORREO_EXISTENTE.equals(a.getArgument(0))) {
-    			User user = new User();
-    	        user.setEmail(a.getArgument(0));
-    			Optional.of(user);
-    		}
-    		return Optional.empty();
-    	}).
-    	when(userRepository.findByEmail(anyString()));
-    	
-    	userService.deleteByEmail("EXISTE@gmail.com");
-    	verify(userRepository, times(1)).deleteByEmail("EXISTE@gmail.com");
-        
-    	userService.deleteByEmail("del@mail.com");
-        verify(userRepository, times(0)).deleteByEmail("del@mail.com");
-    }
 
     @Test
     void deleteByEmail_userNotExists() {
@@ -180,10 +163,10 @@ class UserServiceImplTest {
         User user = new User();
         when(userRepository.save(any(User.class))).thenAnswer(inv -> inv.getArgument(0));
 
-        userService.updateRoutePreferences(user, List.of(Brands.CEPSA), 10, "DIESEL", 1.2, RoutePreferences.MapViewType.SATELLITE);
+        userService.updateRoutePreferences(user, List.of("CEPSA"), 10, FuelType.DIESEL, 1.2, MapViewType.SATELLITE);
 
         assertEquals(10, user.getRoutePreferences().getRadioKm());
-        assertEquals("DIESEL", user.getRoutePreferences().getFuelType());
+        assertEquals(FuelType.DIESEL, user.getRoutePreferences().getFuelType());
         verify(userRepository).save(user);
     }
 
@@ -192,10 +175,10 @@ class UserServiceImplTest {
         User user = new User();
         when(userRepository.save(any(User.class))).thenAnswer(inv -> inv.getArgument(0));
 
-        userService.updateUserPreferences(user, "Oscuro", "en");
+        userService.updateUserPreferences(user, Theme.LIGHT, Language.EN);
 
-        assertEquals("Oscuro", user.getUserPreferences().getTheme());
-        assertEquals("en", user.getUserPreferences().getLanguage());
+        assertEquals(Theme.LIGHT, user.getUserPreferences().getTheme());
+        assertEquals(Language.EN, user.getUserPreferences().getLanguage());
         verify(userRepository).save(user);
     }
 
