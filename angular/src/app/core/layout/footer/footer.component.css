@@ -1,0 +1,13 @@
+footer{    
+    left: 0;
+    right: 0;
+    height: 50px;
+    margin-top: 20px;
+    padding: 20px;
+    text-align: center;
+    justify-content: center;
+    justify-items: center;
+}
+footer a{
+    text-decoration: none;
+}

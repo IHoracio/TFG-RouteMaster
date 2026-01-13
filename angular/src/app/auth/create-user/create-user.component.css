@@ -11,3 +11,10 @@
     color: green;
     font-weight: bold;
 }
+
+.card {
+  background: var(--color-card);
+  border-radius: var(--border-radius);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-sm);
+}
