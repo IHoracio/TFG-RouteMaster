@@ -7,13 +7,13 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 public class PreferredBrandsDTO {
 	
-	public List<RoutePreferences.Brands> preferredBrands;
+	public List<String> preferredBrands;
 
-	public List<RoutePreferences.Brands> getPreferredBrands() {
+	public List<String> getPreferredBrands() {
 		return preferredBrands;
 	}
 
-	public void setPreferredBrands(List<RoutePreferences.Brands> preferredBrands) {
+	public void setPreferredBrands(List<String> preferredBrands) {
 		this.preferredBrands = preferredBrands;
 	}
 

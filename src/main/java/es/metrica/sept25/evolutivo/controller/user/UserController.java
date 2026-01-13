@@ -25,6 +25,10 @@ import es.metrica.sept25.evolutivo.entity.gasolinera.UserSavedGasStation;
 import es.metrica.sept25.evolutivo.entity.maps.routes.RoutePreferences;
 import es.metrica.sept25.evolutivo.entity.user.User;
 import es.metrica.sept25.evolutivo.entity.user.UserPreferences;
+import es.metrica.sept25.evolutivo.entity.user.UserPreferences.Language;
+import es.metrica.sept25.evolutivo.entity.user.UserPreferences.Theme;
+import es.metrica.sept25.evolutivo.enums.FuelType;
+import es.metrica.sept25.evolutivo.enums.MapViewType;
 import es.metrica.sept25.evolutivo.service.user.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -126,9 +130,9 @@ public class UserController {
 			@RequestParam String email,
 			@RequestBody PreferredBrandsDTO brandsDto,
 	        @RequestParam int radioKm,
-	        @RequestParam String fuelType,
+	        @RequestParam FuelType fuelType,
 	        @RequestParam double maxPrice,
-	        @RequestParam RoutePreferences.MapViewType mapView
+	        @RequestParam MapViewType mapView
 	) {
 	    Optional<User> userOpt = service.getEntityByEmail(email);
 
@@ -151,8 +155,8 @@ public class UserController {
 	@PutMapping("/{id}/preferences/user")
 	public ResponseEntity<Void> updateUserPreferences(
 			@RequestParam String email,
-	        @RequestParam String theme,
-	        @RequestParam String language
+	        @RequestParam Theme theme,
+	        @RequestParam Language language
 	) {
 	    Optional<User> userOpt = service.getEntityByEmail(email);	
 	    if (userOpt.isEmpty()) {
@@ -209,7 +213,7 @@ public class UserController {
 		    @ApiResponse(responseCode = "404",description = "Usuario no encontrado")
 		})
 	@GetMapping("/{id}/preferredBrands/user")
-	public ResponseEntity<List<RoutePreferences.Brands>> getPreferredBrands(@RequestParam String email) {
+	public ResponseEntity<List<String>> getPreferredBrands(@RequestParam String email) {
 	
 		Optional<User> userOpt = service.getEntityByEmail(email);
 
@@ -217,7 +221,7 @@ public class UserController {
 	        return ResponseEntity.notFound().build();
 	    }
 
-	    List<RoutePreferences.Brands> brands = userOpt.get().getRoutePreferences().getPreferredBrands();
+	    List<String> brands = userOpt.get().getRoutePreferences().getPreferredBrands();
 
 	    return ResponseEntity.ok(brands);
 	
