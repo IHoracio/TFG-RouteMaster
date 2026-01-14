@@ -1,14 +1,27 @@
-/* You can add global styles to this file, and also import other style files */
 :root {
-  --color-primary: #2563eb;
-  --color-primary-dark: #1e40af;
-  --color-bg: #e2e1eb ;
-  --color-card: #97cd97;
-  --color-title: #F2F2F2   ;
-  --color-text: #0f172a;
+  /*Gradients*/
+  --color-primary: #6a11cb;
+  --color-secondary: #2323FF;
 
+  --color-primary-light: #7e3dff;
+  --color-secondary-light: #525aff;
+
+  --color-title: #F2F2F2;
+  --color-title-dark: #252525;
+  /*Background*/
+  --color-bg: #e2e1eb ;
+
+  /*Cards*/
+  --color-card: #d3d3ff;
+  --color-text: #0f172a;
+  --color-p: #545454;
   --border-radius: 8px;
-  --shadow-sm: 0 1px 3px rgba(0,0,0,0.1);
+  --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+
+  /*Messages*/
+  --color-error: red;
+  --color-success: #28a745;
+  
 }
 
 body {
@@ -22,15 +35,9 @@ app-root{
   padding: 30px;
 }
 
-.card {
-  background: var(--color-card);
-  border-radius: var(--border-radius);
-  padding: 1.5rem;
-  box-shadow: var(--shadow-sm);
-}
 footer, header{
-/*background: #68bb6e;*/
-    background: linear-gradient(135deg, #68bb6e, #248C54);
+    /*background: #8866DE;*/
+    background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
     text-decoration: none;
 }
 

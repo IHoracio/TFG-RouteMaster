@@ -3,10 +3,11 @@ import { FormsModule, ReactiveFormsModule, FormGroup, FormControl, Validators, F
 import { User } from '../../Dto/user-dtos';
 import { NgIf } from '@angular/common';
 import { UserService } from '../../services/user/user.service';
+import { RouterLink } from "@angular/router";
 
 @Component({
   selector: 'app-create-user',
-  imports: [FormsModule, ReactiveFormsModule, NgIf],
+  imports: [FormsModule, ReactiveFormsModule, NgIf, RouterLink],
   templateUrl: './create-user.component.html',
   styleUrl: './create-user.component.css'
 })

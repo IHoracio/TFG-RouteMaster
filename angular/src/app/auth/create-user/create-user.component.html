@@ -12,7 +12,8 @@
       <div class="mb-3">
         <span class="asterisk">*</span>
         <label for="email">Email</label>
-        <input class="form-control" type="email" name="email" id="email" formControlName="email" placeholder="Introduzca su email">
+        <input class="form-control" type="email" name="email" id="email" formControlName="email"
+          placeholder="Introduzca su email">
 
         <!--Error messages-->
         <div *ngIf="hasError('email', 'required')">
@@ -28,7 +29,8 @@
       <div class="mb-3">
         <span class="asterisk">*</span>
         <label for="password">Contraseña</label>
-        <input class="form-control" type="password" name="password" id="password" formControlName="password" placeholder="Introduzca una contraseña segura">
+        <input class="form-control" type="password" name="password" id="password" formControlName="password"
+          placeholder="Introduzca una contraseña segura">
 
         <!--Error messages-->
         <div *ngIf="hasError('password', 'required')">
@@ -39,7 +41,8 @@
           <p class="error">La contraseña debe tener mínimo 8 caracteres.</p>
         </div>
         <div *ngIf="hasError('password', 'pattern')">
-          <p class="error">La contraseña debe tener al menos 8 carácteres, un número, una mayuscula, una minúscula y un símbolo.</p>
+          <p class="error">La contraseña debe tener al menos 8 carácteres, un número, una mayuscula, una minúscula y un
+            símbolo.</p>
         </div>
       </div>
 
@@ -47,7 +50,8 @@
       <div class="mb-3">
         <span class="asterisk">*</span>
         <label for="confirmPassword">Confirmación de contraseña</label>
-        <input class="form-control" type="password" name="confirmPassword" id="confirmPassword" formControlName="confirmPassword" placeholder="Confirme su contraseña">
+        <input class="form-control" type="password" name="confirmPassword" id="confirmPassword"
+          formControlName="confirmPassword" placeholder="Confirme su contraseña">
 
         <!--Error messages-->
         <div *ngIf="hasError('confirmPassword', 'required')">
@@ -63,7 +67,8 @@
       <div class="mb-3">
         <span class="asterisk">*</span>
         <label for="name">Nombre</label>
-        <input class="form-control" type="text" name="name" id="name" formControlName="name" placeholder="Introduzca su nombre">
+        <input class="form-control" type="text" name="name" id="name" formControlName="name"
+          placeholder="Introduzca su nombre">
 
         <!--Error messages-->
         <div *ngIf="hasError('name', 'required')">
@@ -75,7 +80,8 @@
       <div class="mb-3">
         <span class="asterisk">*</span>
         <label for="surname">Apellidos</label>
-        <input class="form-control" type="text" name="surname" id="surname" formControlName="surname" placeholder="Introduzca sus apellidos">
+        <input class="form-control" type="text" name="surname" id="surname" formControlName="surname"
+          placeholder="Introduzca sus apellidos">
 
         <!--Error messages-->
         <div *ngIf="hasError('surname', 'required')">
@@ -94,6 +100,10 @@
       </div>
 
       <input class="btn-custom" type="submit" [disabled]="form.invalid" />
+
+      <div class="text-muted">
+        <p>¿Ya tienes una cuenta? <a routerLink="/login">Inicia sesión</a></p>
+      </div>
     </div>
   </div>
 </form>

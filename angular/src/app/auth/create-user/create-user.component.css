@@ -1,16 +1,16 @@
 .error {
-    color: red;
+    color: var(--color-error);
     font-weight: bold;
 }
 
 .asterisk {
-    color: red;
+    color: var(--color-error);
     font-weight: bold;
     margin-right: 5px;
 }
 
 .success {
-    color: green;
+    color: var(--color-success);
     font-weight: bold;
 }
 
@@ -25,7 +25,7 @@
     background: var(--color-card);
     padding: 2rem;
     border-radius: 10px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--card-shadow);
     max-width: 400px;
     width: 100%;
 }
@@ -41,7 +41,7 @@
 
 .form-header p {
     font-size: 0.9rem;
-    color: #6c757d;
+    color: var(--color-p);
 }
 
 .form-control:focus {
@@ -50,15 +50,19 @@
 }
 
 .btn-custom:enabled {
-    background: linear-gradient(135deg, #68bb6e, #248C54);
+    background: linear-gradient(90deg, var(--color-primary), var(--color-secondary));
     border: none;
     border-radius: 8px;
     transition: background 0.3s ease;
     padding: 5px;
+    color: var(--color-title);
+    font-weight: bold;
 }
 
 .btn-custom:hover:enabled {
-    background: linear-gradient(135deg, #248C54, #68bb6e);
+    background: linear-gradient(90deg, var(--color-secondary-light), #7e3dff);
+    color:var(--color-title-dark);
+    font-weight: bold;
 }
 
 .text-muted {
