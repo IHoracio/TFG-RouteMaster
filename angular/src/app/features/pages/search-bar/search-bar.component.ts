@@ -55,8 +55,6 @@ export class SearchBarComponent {
 
   activeTab: string = 'destination';
 
-  males = ['Juan', 'Pedro', 'Luis'];
-  females = ['Ana', 'María', 'Lucía'];
 
   setTab(tab: string) {
     this.activeTab = tab;

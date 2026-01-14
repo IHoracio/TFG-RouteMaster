@@ -1,6 +1,6 @@
 <div class="container">
   <section class="card">
-    <h2>¿Qué quieres introducir?</h2>
+    <h2>Tipo de Búsqueda</h2>
     <div class="tabs_wrap">
       <ul>
         <li [ngClass]="{ active: activeTab === 'destination' }" (click)="setTab('destination')">
@@ -17,40 +17,27 @@
       </ul>
     </div>
     <form (ngSubmit)="onSubmit()" #form="ngForm">
-
-
-      <!--
-      <p>
-        <select name="destinationType" id="destinationType" [(ngModel)]="destinationType" required>
-          <option value="">¿Qué quieres introducir?</option>
-          @for(destination of destinationTypeOptions | keyvalue; track destination.key){
-          <option [value]="destination.key">{{destination.value}}</option>
-          }
-        </select>
-      </p>
-      -->
-
       @if(activeTab === "destination" || activeTab === "gas"){
       <p>
-        <label for="origin">Elige el origen:</label>
-        <input type="text" id="origin" name="origin" [(ngModel)]="routeFormResponse.origin" placeholder="¿Desde dónde?"
+        <label for="origin">Origen</label>
+        <input class="form-control" type="text" id="origin" name="origin" [(ngModel)]="routeFormResponse.origin" placeholder="¿Desde dónde?"
           required #originField="ngModel" />
 
         @if(originField && originField.touched){
-      <div class="error">
-        @if(originField.errors?.['required']){
-        Tienes que introducir un origen.
+          <div class="error">
+            @if(originField.errors?.['required']){
+            Tienes que introducir un origen.
+            }
+          </div>
         }
-      </div>
-      }
       </p>
       }
 
       @if(activeTab === "destination"){
       <p>
-        <label for="destination">Elige el destino:</label>
-        <input type="text" id="destination" name="destination" [(ngModel)]="routeFormResponse.destination"
-          placeholder="¿A dónde quieres ir?" required #destinationField="ngModel" />
+        <label for="destination">Destino</label>
+        <input class="form-control" type="text" id="destination" name="destination" [(ngModel)]="routeFormResponse.destination"
+          placeholder="¿A dónde?" required #destinationField="ngModel" />
 
         @if(destinationField && destinationField.touched){
       <div class="error">
