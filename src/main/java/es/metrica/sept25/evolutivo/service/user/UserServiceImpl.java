@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import es.metrica.sept25.evolutivo.domain.dto.gasolineras.UserSavedGasStationDto;
 import es.metrica.sept25.evolutivo.domain.dto.user.UserDTO;
@@ -145,13 +146,13 @@ public class UserServiceImpl implements UserService {
 	    
 	    RoutePreferences prefs = new RoutePreferences();
 	    
-	    prefs.setPreferredBrands(List.of("REPSOL", "CEPSA"));
-        prefs.setRadioKm(5);
-        prefs.setFuelType(FuelType.GASOLINE);
-        prefs.setMaxPrice(1.50);
-        prefs.setMapView(MapViewType.SATELLITE);
+	    prefs.setPreferredBrands(List.of());
+        prefs.setRadioKm(1);
+        prefs.setFuelType(FuelType.ALL);
+        prefs.setMaxPrice(3.0);
+        prefs.setMapView(MapViewType.MAP);
         prefs.setAvoidTolls(false);
-        prefs.setEmissionType(EmissionType.C);
+        prefs.setEmissionType(EmissionType.NONE);
         
         user.setRoutePreferences(prefs);
         
@@ -212,6 +213,23 @@ public class UserServiceImpl implements UserService {
 
 	    user.setUserPreferences(prefs);
 	    userRepository.save(user);
+	}
+	
+	@Override
+	public Optional<RoutePreferences> getDefaultPreferences() {
+		 RoutePreferences prefs = new RoutePreferences();
+		 prefs.setPreferredBrands(List.of());
+	     prefs.setRadioKm(1);
+	     prefs.setFuelType(FuelType.ALL);
+	     prefs.setMaxPrice(3.0);
+	     prefs.setMapView(MapViewType.MAP);
+	     prefs.setAvoidTolls(false);
+	     prefs.setEmissionType(EmissionType.NONE);
+
+	     return Optional.of(prefs);
+
+		
+		
 	}
 	
 	@Override

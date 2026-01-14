@@ -176,6 +176,26 @@ public class UserController {
 	    return ResponseEntity.ok().build();
 	}
 	
+	@Operation(summary = "Obtener las preferencias por defecto de las rutas")
+	@ApiResponses(value = { 
+	    @ApiResponse(responseCode = "200", description = "Preferencias devueltas correctamente"),
+	    @ApiResponse(responseCode = "404", description = "Preferencias no encontradas")
+	})
+	@GetMapping("/defaultPreferences")
+	public ResponseEntity<RoutePreferences> getDefaultPreferences(){
+		
+		Optional<RoutePreferences> rpOpt = service.getDefaultPreferences();
+		
+		if(rpOpt.isEmpty()) {
+			return ResponseEntity.notFound().build();
+		}
+		
+		return ResponseEntity.ok(rpOpt.get());
+		 
+		 
+		 
+	}
+	
 	@Operation(summary = "Obtener las preferencias de rutas de un usuario")
 	@ApiResponses(value = { 
 	    @ApiResponse(responseCode = "200", description = "Preferencias devueltas correctamente"),
