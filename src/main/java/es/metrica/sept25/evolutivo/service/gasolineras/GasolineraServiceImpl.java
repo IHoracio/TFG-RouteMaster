@@ -9,20 +9,26 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import es.metrica.sept25.evolutivo.domain.dto.maps.routes.Coords;
+import es.metrica.sept25.evolutivo.entity.gasolinera.Brand;
 import es.metrica.sept25.evolutivo.entity.gasolinera.Gasolinera;
 import es.metrica.sept25.evolutivo.entity.gasolinera.Municipio;
+import es.metrica.sept25.evolutivo.repository.BrandRepository;
 import es.metrica.sept25.evolutivo.repository.GasolineraRepository;
 import es.metrica.sept25.evolutivo.service.maps.geocode.GeocodeService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import jakarta.annotation.PostConstruct;
 
 @Service
 public class GasolineraServiceImpl implements GasolineraService {
@@ -41,6 +47,9 @@ public class GasolineraServiceImpl implements GasolineraService {
 
 	@Autowired
 	GasolineraRepository gasolineraRepository;
+	
+	@Autowired
+	BrandRepository brandRepository;
 
 	@Override
 	@Cacheable(value = "gasolinera_id", cacheManager = "gasCacheManager")
@@ -187,8 +196,10 @@ public class GasolineraServiceImpl implements GasolineraService {
 	}
 
 	@Override
-	@Cacheable(value = "getMarcasGasolineras", cacheManager = "staticCacheManager")
-	public List<String> getMarcasFromAllGasolineras() {
+	@Scheduled(cron = "0 0 */6 * * *") // cada 6 horas
+	@Transactional
+	@CacheEvict(value = "brands", allEntries = true)
+	public void syncBrandsFromGasStations() {
 		log.info("[gas-service] [" + LocalDateTime.now().toString() + "] "
 				+ "Attempting to retrieve all brands for all gas stations.");
 	    List<Municipio> municipios = municipioService.getMunicipios();
@@ -209,9 +220,50 @@ public class GasolineraServiceImpl implements GasolineraService {
 	            }
 	        }
 	    }
+	    syncBrands(marcas);
 
 		log.info("[gas-service] [" + LocalDateTime.now().toString() + "] "
-				+ "Succesfully retrieved all brands.");
-	    return new ArrayList<>(marcas);
+				+ "Sync brands finished. Total brands: {}", marcas.size());
+
 	}
+	@Override
+	@Cacheable(value = "brands", cacheManager = "staticCacheManager")
+	public List<String> getMarcasFromAllGasolineras() {
+
+	    log.info("[gas-service] [" + LocalDateTime.now().toString() + "] "
+	    		+ "Fetching brands from database");
+
+	    return brandRepository.findAll()
+	        .stream()
+	        .map(Brand::getName)
+	        .sorted()
+	        .toList();
+	}
+	
+	@Transactional
+	public void syncBrands(Set<String> marcas) {
+
+	    LocalDateTime now = LocalDateTime.now();
+
+	    for (String marca : marcas) {
+	        brandRepository.findByName(marca)
+	            .orElseGet(() -> {
+	                Brand brand = new Brand();
+	                brand.setName(marca);
+	                brand.setLastUpdated(now);
+	                return brandRepository.save(brand);
+	            });
+	    }
+	}
+	
+	@PostConstruct
+    public void initBrandsAtStartup() {
+        if (brandRepository.count() == 0) {
+            log.info("[gas-service] [ " + LocalDateTime.now().toString() + "] "
+            		+ "Initial brand sync at startup");
+            syncBrandsFromGasStations();
+
+           getMarcasFromAllGasolineras();
+        }
+    }
 }
