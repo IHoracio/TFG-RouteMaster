@@ -12,8 +12,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import es.metrica.sept25.evolutivo.domain.dto.maps.routes.Coords;
 import es.metrica.sept25.evolutivo.domain.dto.maps.routes.RouteGroup;
+import es.metrica.sept25.evolutivo.enums.EmissionType;
 import es.metrica.sept25.evolutivo.service.maps.routes.RoutesService;
-import es.metrica.sept25.evolutivo.service.maps.routes.RoutesServiceImpl.VehicleEmissionType;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -47,7 +47,7 @@ public class RouteGasStationController {
 			@RequestParam(required = false, defaultValue = "es") String language,
 			@Parameter(example = "5") @RequestParam(required = true) Long radius,
 			@RequestParam(required = false, defaultValue = "false") boolean avoidTolls,
-			@RequestParam(required = false, defaultValue = "DIESEL")VehicleEmissionType vehicleEmissionType
+			@RequestParam(required = false, defaultValue = "C")EmissionType vehicleEmissionType
 			) {
 		
 		Optional<RouteGroup> routeGroupOpt = routesService.getDirections(origin, destination, waypoints, optimizeWaypoints, optimizeRoute, language, avoidTolls, vehicleEmissionType);
