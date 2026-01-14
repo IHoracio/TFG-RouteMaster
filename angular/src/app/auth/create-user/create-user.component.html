@@ -47,16 +47,16 @@
       <!--CONFIRM PASSWORD FIELD-->
       <div class="mb-3">
         <span class="asterisk">*</span>
-        <label for="confirmPassword">Confirmación de contraseña</label>
-        <input class="form-control" type="password" name="confirmPassword" id="confirmPassword"
-          formControlName="confirmPassword" placeholder="Confirme su contraseña">
+        <label for="passwordConfirmation">Confirmación de contraseña</label>
+        <input class="form-control" type="password" name="passwordConfirmation" id="passwordConfirmation"
+          formControlName="passwordConfirmation" placeholder="Confirme su contraseña">
 
         <!--Error messages-->
-        <div *ngIf="hasError('confirmPassword', 'required')">
+        <div *ngIf="hasError('passwordConfirmation', 'required')">
           <p class="error">La confirmación de contraseña es obligatoria.</p>
         </div>
 
-        <div *ngIf="form.errors?.['passwordMismatch'] && form.get('confirmPassword')?.touched">
+        <div *ngIf="form.errors?.['passwordMismatch'] && form.get('passwordConfirmation')?.touched">
           <p class="error">Las contraseñas no coinciden.</p>
         </div>
       </div>

@@ -3,7 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { RouteFormResponse } from '../../../Dto/route-form-response';
 import { MapPageComponent } from '../map-page/map-page.component';
 import { SearchBarService } from '../../../services/search-bar/search-bar.service';
-import { KeyValuePipe, NgFor, NgIf } from '@angular/common';
+import { KeyValuePipe, NgClass, NgFor, NgIf } from '@angular/common';
 import { RouteService } from '../../../services/routes/route.service';
 import { RouteGroupResponse } from '../../../Dto/maps-dtos';
 import { FavouriteGasStation } from '../../../Dto/gas-station';
@@ -14,7 +14,7 @@ import { Parser } from '@angular/compiler';
 
 @Component({
   selector: 'app-search-bar',
-  imports: [FormsModule, MapPageComponent, NgFor, KeyValuePipe, NgIf],
+  imports: [FormsModule, MapPageComponent, NgFor, KeyValuePipe, NgIf, NgClass],
   templateUrl: './search-bar.component.html',
   styleUrl: './search-bar.component.css'
 })
@@ -52,6 +52,15 @@ export class SearchBarComponent {
     GASOLINE: "Gasolina"
   }
 
+
+  activeTab: string = 'destination';
+
+  males = ['Juan', 'Pedro', 'Luis'];
+  females = ['Ana', 'María', 'Lucía'];
+
+  setTab(tab: string) {
+    this.activeTab = tab;
+  }
   constructor(private searchBarService: SearchBarService, private routeService: RouteService) {
     //this.initializeUser()
   }

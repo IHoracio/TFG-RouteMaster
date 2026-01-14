@@ -1,6 +1,25 @@
 <div class="container">
   <section class="card">
+    <h2>¿Qué quieres introducir?</h2>
+    <div class="tabs_wrap">
+      <ul>
+        <li [ngClass]="{ active: activeTab === 'destination' }" (click)="setTab('destination')">
+          Origen y destino
+        </li>
+
+        <li [ngClass]="{ active: activeTab === 'gas' }" (click)="setTab('gas')">
+          Gasolinera favorita
+        </li>
+
+        <li [ngClass]="{ active: activeTab === 'route' }" (click)="setTab('route')">
+          Ruta guardada
+        </li>
+      </ul>
+    </div>
     <form (ngSubmit)="onSubmit()" #form="ngForm">
+
+
+      <!--
       <p>
         <select name="destinationType" id="destinationType" [(ngModel)]="destinationType" required>
           <option value="">¿Qué quieres introducir?</option>
@@ -9,9 +28,9 @@
           }
         </select>
       </p>
+      -->
 
-
-      @if(destinationType === "coordinates" || destinationType === "favouriteGasStations"){
+      @if(activeTab === "destination" || activeTab === "gas"){
       <p>
         <label for="origin">Elige el origen:</label>
         <input type="text" id="origin" name="origin" [(ngModel)]="routeFormResponse.origin" placeholder="¿Desde dónde?"
@@ -27,7 +46,7 @@
       </p>
       }
 
-      @if(destinationType === "coordinates"){
+      @if(activeTab === "destination"){
       <p>
         <label for="destination">Elige el destino:</label>
         <input type="text" id="destination" name="destination" [(ngModel)]="routeFormResponse.destination"
@@ -42,7 +61,7 @@
       }
       </p>
       }
-      @if(destinationType === "favouriteGasStations"){
+      @if(activeTab === "gas"){
       <p>
         <select name="gasStation" id="gasStation" [(ngModel)]="routeFormResponse.destination" required>
           <option value="">Elige una gasolinera</option>
@@ -52,7 +71,7 @@
         </select>
       </p>
       }
-      @if(destinationType === "savedRoute"){
+      @if(activeTab === "route"){
       <p>
         <select name="savedRoute" id="savedRoute" [(ngModel)]="selectedRouteOption" required="">
           <option [ngValue]="">Elige una ruta guardada</option>
@@ -67,7 +86,7 @@
       </p>
       }
 
-      @if (destinationType === "coordinates" || destinationType === "favouriteGasStations"){
+      @if (activeTab === "destination" || activeTab === "gas"){
       <button type="button" (click)="addWaypoint()">Añadir punto intermedio</button>
 
 
@@ -109,7 +128,7 @@
 
 
 
-      @if (submitted && destinationType==="coordinates"){
+      @if (submitted && activeTab==="destination"){
       <label for="routeAlias">Guardar ruta</label>
       <input type="text" id="routeAlias" name="routeAlias" [(ngModel)]="routeAlias" placeholder="Alias de la ruta" />
 
