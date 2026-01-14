@@ -29,6 +29,8 @@ public class RoutePreferences  {
 
     @Enumerated(EnumType.STRING)
     private MapViewType mapView;
+    
+    private boolean avoidTolls;
 
 	public List<String> getPreferredBrands() {
 		return preferredBrands;
@@ -77,6 +79,16 @@ public class RoutePreferences  {
 	public void setMapView(MapViewType mapView) {
 		this.mapView = mapView;
 	}
+
+	public boolean isAvoidTolls() {
+		return avoidTolls;
+	}
+
+	public void setAvoidTolls(boolean avoidTolls) {
+		this.avoidTolls = avoidTolls;
+	}
+
+	
 
 	
     

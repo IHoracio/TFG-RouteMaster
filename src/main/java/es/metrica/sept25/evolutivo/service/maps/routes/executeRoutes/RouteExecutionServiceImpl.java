@@ -13,8 +13,8 @@ import es.metrica.sept25.evolutivo.domain.dto.maps.routes.RouteGroup;
 import es.metrica.sept25.evolutivo.domain.dto.maps.routes.executionRoutes.RouteExecutionDTO;
 import es.metrica.sept25.evolutivo.domain.dto.maps.routes.savedRoutes.PointDTO;
 import es.metrica.sept25.evolutivo.domain.dto.maps.routes.savedRoutes.SavedRouteDTO;
+import es.metrica.sept25.evolutivo.enums.EmissionType;
 import es.metrica.sept25.evolutivo.service.maps.routes.RoutesService;
-import es.metrica.sept25.evolutivo.service.maps.routes.RoutesServiceImpl.VehicleEmissionType;
 import es.metrica.sept25.evolutivo.service.maps.routes.savedRoutes.SavedRouteService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -68,7 +68,7 @@ public class RouteExecutionServiceImpl implements RouteExecutionService{
 				false,
 				"es",
 				false,
-				VehicleEmissionType.DIESEL
+				EmissionType.C
 				);
 
 		if (routeGroupOpt.isEmpty()) {

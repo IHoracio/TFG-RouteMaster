@@ -13,6 +13,7 @@ import es.metrica.sept25.evolutivo.domain.dto.maps.routes.savedRoutes.SavedRoute
 import es.metrica.sept25.evolutivo.entity.maps.routes.Point;
 import es.metrica.sept25.evolutivo.entity.maps.routes.SavedRoute;
 import es.metrica.sept25.evolutivo.entity.user.User;
+import es.metrica.sept25.evolutivo.enums.EmissionType;
 import es.metrica.sept25.evolutivo.repository.SavedRouteRepository;
 import es.metrica.sept25.evolutivo.repository.UserRepository;
 
@@ -38,13 +39,18 @@ public class SavedRouteServiceImpl implements SavedRouteService {
 	        User user,
 	        boolean optimizeWaypoints,
 	        boolean optimizeRoute,
-	        String language) {
+	        String language, 
+	        boolean avoidTolls,
+	        EmissionType vehicleEmissionType) {
 		SavedRoute route = new SavedRoute();
 		route.setName(name);
 		route.setUser(user);
 		route.setOptimizeWaypoints(optimizeWaypoints);
 	    route.setOptimizeRoute(optimizeRoute);
 	    route.setLanguage(language);
+	    route.setAvoidTolls(avoidTolls);
+	    route.setVehicleEmissionType(vehicleEmissionType);
+	    
 		
 		List<Point> puntos = puntosDTO.stream().map(dto -> {
 			Point point = new Point();

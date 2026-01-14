@@ -13,7 +13,8 @@ import { Coords, RouteGroupResponse } from '../../Dto/maps-dtos';
 export class RouteService {
 
   private apiUrl = 'http://localhost:8080/api/routes';
-  constructor(private http: HttpClient) {}
+  private routeUrl = 'http://localhost:8080/api/ruta'
+  constructor(private http: HttpClient) { }
 
   calculateRoute(routeFormResponse: RouteFormResponse): Observable<string> {
     const headers = new HttpHeaders().set('key', environment.googleMapsMapId);
@@ -25,9 +26,9 @@ export class RouteService {
       .set('waypoints', waypointsString)
       .set('optimizeWaypoints', routeFormResponse.optimizeWaypoints)
       .set('optimizeRoute', routeFormResponse.optimizeRoute)
-      
 
-    return this.http.get(this.apiUrl, {headers: headers, params: parameters, responseType: 'text' });
+
+    return this.http.get(this.apiUrl, { headers: headers, params: parameters, responseType: 'text' });
   }
 
 
@@ -41,10 +42,12 @@ export class RouteService {
       .set('waypoints', waypointsString)
       .set('optimizeWaypoints', routeFormResponse.optimizeWaypoints)
       .set('optimizeRoute', routeFormResponse.optimizeRoute)
-    return this.http.get(this.apiUrl + "/polylineCoords", {headers: headers, params: parameters, responseType: 'text' });
+      .set('avoidTolls', routeFormResponse.avoidTolls)
+      .set('vehiculeEmissionType', routeFormResponse.vehiculeEmissionType)
+    return this.http.get(this.apiUrl + "/polylineCoords", { headers: headers, params: parameters, responseType: 'text' });
   }
 
-  calculatePointCoords(routeFormResponse: RouteFormResponse): Observable<string>{
+  calculatePointCoords(routeFormResponse: RouteFormResponse): Observable<string> {
     const headers = new HttpHeaders().set('key', environment.googleMapsMapId);
 
     let waypointsString = routeFormResponse.waypoints.join('|');
@@ -54,11 +57,13 @@ export class RouteService {
       .set('waypoints', waypointsString)
       .set('optimizeWaypoints', routeFormResponse.optimizeWaypoints)
       .set('optimizeRoute', routeFormResponse.optimizeRoute)
+      .set('avoidTolls', routeFormResponse.avoidTolls)
+      .set('vehiculeEmissionType', routeFormResponse.vehiculeEmissionType)
 
-    return this.http.get(this.apiUrl + "/legCoords", {headers: headers, params: parameters, responseType: 'text' });
+    return this.http.get(this.apiUrl + "/legCoords", { headers: headers, params: parameters, responseType: 'text' });
   }
 
-  calculateGasStations(routeFormResponse: RouteFormResponse): Observable<string>{
+  calculateGasStations(routeFormResponse: RouteFormResponse): Observable<string> {
     const headers = new HttpHeaders().set('key', environment.googleMapsMapId);
 
     let waypointsString = routeFormResponse.waypoints.join('|');
@@ -70,10 +75,10 @@ export class RouteService {
       .set('optimizeRoute', routeFormResponse.optimizeRoute)
       .set('radius', 5)
 
-    return this.http.get(this.apiUrl + "/gasStations", {headers: headers, params: parameters, responseType: 'text' });
+    return this.http.get(this.apiUrl + "/gasStations", { headers: headers, params: parameters, responseType: 'text' });
   }
 
-  calculateWeatherRoute(routeFormResponse: RouteFormResponse): Observable<string>{
+  calculateWeatherRoute(routeFormResponse: RouteFormResponse): Observable<string> {
     const headers = new HttpHeaders().set('key', environment.googleMapsMapId);
     let waypointsString = routeFormResponse.waypoints.join('|');
     let parameters = new HttpParams()
@@ -82,8 +87,33 @@ export class RouteService {
       .set('waypoints', waypointsString)
       .set('optimizeWaypoints', routeFormResponse.optimizeWaypoints)
       .set('optimizeRoute', routeFormResponse.optimizeRoute)
+      .set('avoidTolls', routeFormResponse.avoidTolls)
+      .set('vehiculeEmissionType', routeFormResponse.vehiculeEmissionType)
 
-    return this.http.get(this.apiUrl + "/weather", {headers: headers, params: parameters, responseType: 'text' });
+    return this.http.get(this.apiUrl + "/weather", { headers: headers, params: parameters, responseType: 'text' });
+  }
+
+  saveFavouriteRoute(alias: string, email:string, routeFormResponse: RouteFormResponse) {
+
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+    });
+    let waypointsString = routeFormResponse.waypoints.join('|');
+    let params = new HttpParams()
+      .set('name', alias)
+      .set('origin', routeFormResponse.origin)
+      .set('destination', routeFormResponse.destination)
+      .set('waypoints', waypointsString)
+      .set('optimizeWaypoints', routeFormResponse.optimizeWaypoints)
+      .set('optimizeRoute', routeFormResponse.optimizeRoute)
+      .set('email', email)
+
+    console.log(params)
+    return this.http.post(
+    this.routeUrl + '/save',
+    null,
+    { params }
+  );
   }
 
 }

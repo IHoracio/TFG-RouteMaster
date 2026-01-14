@@ -3,5 +3,7 @@ export interface RouteFormResponse {
     destination: string,
     waypoints: string [],
     optimizeWaypoints: boolean,
-    optimizeRoute: boolean
+    optimizeRoute: boolean,
+    avoidTolls: boolean,
+    vehiculeEmissionType: string
 }

@@ -15,4 +15,6 @@ public interface GasolineraService {
 	List<Gasolinera> getGasolinerasInRadiusAddress(String direccion, Long radio);
 
 	List<String> getMarcasFromAllGasolineras();
+
+	void syncBrandsFromGasStations();
 }

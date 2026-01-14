@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import es.metrica.sept25.evolutivo.domain.dto.maps.routes.savedRoutes.PointDTO;
 import es.metrica.sept25.evolutivo.domain.dto.maps.routes.savedRoutes.SavedRouteDTO;
 import es.metrica.sept25.evolutivo.entity.user.User;
+import es.metrica.sept25.evolutivo.enums.EmissionType;
 import es.metrica.sept25.evolutivo.service.maps.routes.savedRoutes.SavedRouteService;
 import es.metrica.sept25.evolutivo.service.user.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -40,12 +41,17 @@ public class SavedRouteController {
 	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Ruta guardada correctamente"),
 			@ApiResponse(responseCode = "404", description = "Usuario no encontrado") })
 	@PostMapping("/save")
-	public ResponseEntity<SavedRouteDTO> saveRoute(@RequestParam String name,
-			@RequestParam(required = true) String origin, @RequestParam(required = true) String destination,
+	public ResponseEntity<SavedRouteDTO> saveRoute(
+			@RequestParam(required = false) String email,
+			@RequestParam String name,
+			@RequestParam(required = true) String origin, 
+			@RequestParam(required = true) String destination,
 			@RequestParam(required = false, defaultValue = "") List<String> waypoints,
 			@RequestParam(required = false, defaultValue = "false") boolean optimizeWaypoints,
 			@RequestParam(required = false, defaultValue = "false") boolean optimizeRoute,
-			@RequestParam(required = false, defaultValue = "es") String language, @RequestParam String email) {
+			@RequestParam(required = false, defaultValue = "es") String language, 
+			@RequestParam(required = false, defaultValue = "false") boolean avoidTolls,
+			@RequestParam(required = false, defaultValue = "C") EmissionType vehicleEmissionType) {
 		Optional<User> userOpt = userService.getEntityByEmail(email);
 
 		if (userOpt.isEmpty()) {
@@ -76,7 +82,7 @@ public class SavedRouteController {
 		puntos.add(destinationPoint);
 
 		SavedRouteDTO saved = savedRouteService.saveRoute(name, puntos, user, optimizeWaypoints, optimizeRoute,
-				language);
+				language, avoidTolls, vehicleEmissionType);
 		return ResponseEntity.ok(saved);
 	}
 

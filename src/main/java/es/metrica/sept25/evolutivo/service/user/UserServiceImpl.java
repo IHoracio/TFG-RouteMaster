@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import es.metrica.sept25.evolutivo.domain.dto.gasolineras.UserSavedGasStationDto;
 import es.metrica.sept25.evolutivo.domain.dto.user.UserDTO;
@@ -21,6 +22,7 @@ import es.metrica.sept25.evolutivo.entity.user.User;
 import es.metrica.sept25.evolutivo.entity.user.UserPreferences;
 import es.metrica.sept25.evolutivo.entity.user.UserPreferences.Language;
 import es.metrica.sept25.evolutivo.entity.user.UserPreferences.Theme;
+import es.metrica.sept25.evolutivo.enums.EmissionType;
 import es.metrica.sept25.evolutivo.enums.FuelType;
 import es.metrica.sept25.evolutivo.enums.MapViewType;
 import es.metrica.sept25.evolutivo.repository.GasolineraRepository;
@@ -51,7 +53,7 @@ public class UserServiceImpl implements UserService {
 		log.info("[user-service] [" + LocalDateTime.now().toString() + "] "
                 + "Attempting to save user with email: " + user.getEmail());
 
-		if (user.getPassword() != null && !user.getPassword().startsWith("$2a$")) {
+		if (user.getPassword() != null && !user.getPassword().startsWith("\"^\\\\$2[aby]\\\\$.*\"")) {
 			log.info("[user-service] [" + LocalDateTime.now().toString() + "] "
                     + "Encoding password for user: " + user.getEmail());
 			user.setPassword(passwordEncoder.encode(user.getPassword()));
@@ -88,7 +90,7 @@ public class UserServiceImpl implements UserService {
 		 log.info("[user-service] [" + LocalDateTime.now().toString() + "] "
 	                + "Attempting to retrieve all users.");
 		 return userRepository.findAll().stream()
-		            .map(this::mapToResponseDTO)  // aquí aplicamos el mapper
+		            .map(this::mapToResponseDTO)
 		            .toList();
 	}
 
@@ -102,7 +104,7 @@ public class UserServiceImpl implements UserService {
 		if (user.isPresent()) {
 			log.info("[user-service] [" + LocalDateTime.now().toString() + "] "
                     + "User successfully deleted: " + email);
-			//TODO: Falta eliminar usuario de verdad
+			userRepository.deleteByEmail(email);
         } else {
             log.warn("[user-service] [" + LocalDateTime.now().toString() + "] "
                     + "No user found to delete with email: " + email);
@@ -115,12 +117,27 @@ public class UserServiceImpl implements UserService {
 		log.info("[user-service] [" + LocalDateTime.now().toString() + "] "
                 + "Attempting to create user with email: " + userDTO.getEmail());
 		
+		if (!isValidEmail(userDTO.getEmail())) {
+	        log.warn("[user-service] [" + LocalDateTime.now() + "] Invalid email format: " + userDTO.getEmail());
+	        return Optional.empty();
+	    }
+
+	    if (!isValidPassword(userDTO.getPassword())) {
+	        log.warn("[user-service] [" + LocalDateTime.now() + "] Invalid password for user: " + userDTO.getEmail());
+	        return Optional.empty();
+	    }
+	    
+		if (!userDTO.getPassword().equals(userDTO.getPasswordConfirmation())) {
+		    log.warn("[user-service] [" + LocalDateTime.now() + "] Passwords do not match for user: " + userDTO.getEmail());
+		    return Optional.empty();
+		}
+		
 		if (userRepository.findByEmail(userDTO.getEmail()).isPresent()) {
 			log.warn("[user-service] [" + LocalDateTime.now().toString() + "] "
                     + "User already exists with email: " + userDTO.getEmail());
 	        return Optional.empty();
 	    }
-
+		
 	    User user = new User();
 		user.setName(userDTO.getName());
 		user.setSurname(userDTO.getSurname());
@@ -129,12 +146,14 @@ public class UserServiceImpl implements UserService {
 	    
 	    RoutePreferences prefs = new RoutePreferences();
 	    
-	    prefs.setPreferredBrands(List.of("REPSOL", "CEPSA"));
-        prefs.setRadioKm(5);
-        prefs.setFuelType(FuelType.GASOLINE);
-        prefs.setMaxPrice(1.50);
-        prefs.setMapView(MapViewType.SATELLITE);
-
+	    prefs.setPreferredBrands(List.of());
+        prefs.setRadioKm(1);
+        prefs.setFuelType(FuelType.ALL);
+        prefs.setMaxPrice(3.0);
+        prefs.setMapView(MapViewType.MAP);
+        prefs.setAvoidTolls(false);
+        prefs.setEmissionType(EmissionType.NONE);
+        
         user.setRoutePreferences(prefs);
         
         UserPreferences defaultPrefs = new UserPreferences();
@@ -157,7 +176,9 @@ public class UserServiceImpl implements UserService {
 	        int radioKm,
 	        FuelType fuelType,
 	        double maxPrice,
-	        MapViewType mapView
+	        MapViewType mapView,
+	        boolean avoidTolls,
+	        EmissionType vehicleEmissionType
 	) {
 
 		log.info("[user-service] [" + LocalDateTime.now().toString() + "] "
@@ -169,6 +190,8 @@ public class UserServiceImpl implements UserService {
         prefs.setFuelType(fuelType);
         prefs.setMaxPrice(maxPrice);
         prefs.setMapView(mapView);
+        prefs.setAvoidTolls(avoidTolls);
+        prefs.setEmissionType(vehicleEmissionType);
 
         user.setRoutePreferences(prefs);
         userRepository.save(user);
@@ -190,6 +213,23 @@ public class UserServiceImpl implements UserService {
 
 	    user.setUserPreferences(prefs);
 	    userRepository.save(user);
+	}
+	
+	@Override
+	public Optional<RoutePreferences> getDefaultPreferences() {
+		 RoutePreferences prefs = new RoutePreferences();
+		 prefs.setPreferredBrands(List.of());
+	     prefs.setRadioKm(1);
+	     prefs.setFuelType(FuelType.ALL);
+	     prefs.setMaxPrice(3.0);
+	     prefs.setMapView(MapViewType.MAP);
+	     prefs.setAvoidTolls(false);
+	     prefs.setEmissionType(EmissionType.NONE);
+
+	     return Optional.of(prefs);
+
+		
+		
 	}
 	
 	@Override
@@ -294,6 +334,18 @@ public class UserServiceImpl implements UserService {
 	        user.getSavedRoutes(),
 	        user.getSavedGasStations()
 	    );
+	}
+	
+	private boolean isValidEmail(String email) {
+	    String emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$";
+	    return email != null && email.matches(emailRegex);
+	}
+
+	private boolean isValidPassword(String password) {
+	    if (password == null || password.length() < 8) return false;
+	    boolean hasLetter = password.chars().anyMatch(Character::isLetter);
+	    boolean hasDigit = password.chars().anyMatch(Character::isDigit);
+	    return hasLetter && hasDigit;
 	}
 }
 
