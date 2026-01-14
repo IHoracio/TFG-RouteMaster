@@ -4,19 +4,20 @@ public class UserDTO {
 
 	private String email;
 	private String password;
+	private String passwordConfirmation;
 	private String name;
 	private String surname;
 
-	public UserDTO(String email, String password, String name, String surname) {
+	public UserDTO(String email, String password, String passwordConfirmation, String name, String surname) {
 		super();
 		this.email = email;
 		this.password = password;
+		this.passwordConfirmation = passwordConfirmation;
 		this.name = name;
 		this.surname = surname;
 	}
 
 	public UserDTO() {
-		// TODO Auto-generated constructor stub
 	}
 
 	public String getEmail() {
@@ -49,6 +50,14 @@ public class UserDTO {
 
 	public void setSurname(String surname) {
 		this.surname = surname;
+	}
+
+	public String getPasswordConfirmation() {
+		return passwordConfirmation;
+	}
+
+	public void setPasswordConfirmation(String passwordConfirmation) {
+		this.passwordConfirmation = passwordConfirmation;
 	}
 
 	@Override

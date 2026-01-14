@@ -1,9 +1,9 @@
 package es.metrica.sept25.evolutivo.entity.maps.routes;
 
 import java.util.List;
-import java.util.UUID;
 
 import es.metrica.sept25.evolutivo.entity.user.User;
+import es.metrica.sept25.evolutivo.enums.EmissionType;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -37,7 +37,8 @@ public class SavedRoute {
     private boolean optimizeWaypoints;
     private boolean optimizeRoute;
     private String language;
-
+    private boolean avoidTolls;
+    private EmissionType vehicleEmissionType;
     
     
 	public void setRouteId(Long routeId) {
@@ -96,6 +97,23 @@ public class SavedRoute {
 		this.language = language;
 	}
 	
+	
+	public boolean isAvoidTolls() {
+		return avoidTolls;
+	}
+
+	public void setAvoidTolls(boolean avoidTolls) {
+		this.avoidTolls = avoidTolls;
+	}
+
+	public EmissionType getVehicleEmissionType() {
+		return vehicleEmissionType;
+	}
+
+	public void setVehicleEmissionType(EmissionType vehicleEmissionType) {
+		this.vehicleEmissionType = vehicleEmissionType;
+	}
+
 	@PrePersist
 	private void generateRouteId() {
 	    if (this.routeId == null) {
