@@ -1,8 +1,6 @@
-<form [formGroup]="form" (ngSubmit)="onSubmit()">
-
-  <div class="container">
-    <div class="card">
-
+<div class="container">
+  <section class="card">
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
       <div class="form-header">
         <h2>Crea Tu Cuenta</h2>
         <p>¡Regístrate para desbloquear nuevas funciones!</p>
@@ -104,6 +102,6 @@
       <div class="text-muted">
         <p>¿Ya tienes una cuenta? <a routerLink="/login">Inicia sesión</a></p>
       </div>
-    </div>
-  </div>
-</form>
+    </form>
+  </section>
+</div>

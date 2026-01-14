@@ -15,13 +15,13 @@
 }
 
 .container {
-    min-height: 50vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .card {
+    margin-bottom: 40px;
     background: var(--color-card);
     padding: 2rem;
     border-radius: 10px;
@@ -58,7 +58,9 @@
     color: var(--color-title);
     font-weight: bold;
 }
-
+.btn-custom:disabled{
+    border-radius: 8px;
+}
 .btn-custom:hover:enabled {
     background: linear-gradient(90deg, var(--color-secondary-light), #7e3dff);
     color:var(--color-title-dark);

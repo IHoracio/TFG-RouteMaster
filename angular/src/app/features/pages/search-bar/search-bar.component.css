@@ -1,13 +1,27 @@
 .error{
-    color:red;
+    color:var(--color-error);
     font-weight: bold;
 }
 .asterisk {
-    color: red;
+    color: var(--color-error);
     font-weight: bold;
     margin-right: 5px;
 }
 .success{
-    color: green;
+    color: var(--color-success);
     font-weight: bold;
+}
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.card {
+    margin-bottom: 50px;
+    background: var(--color-card);
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: var(--card-shadow);
+    max-width: 1200px;
+    width: 100%;
 }
