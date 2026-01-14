@@ -30,8 +30,8 @@
     <h3>Gasolineras Favoritas</h3>
     @if (favoriteGasStations().length > 0) {
       <ul>
-        @for (station of favoriteGasStations(); track station) {
-          <li>{{ station }}</li>
+        @for (station of favoriteGasStations(); track station.idEstacion) {
+          <li>{{ station.nombreEstacion }} - {{ station.direccion }}</li>
         }
       </ul>
     } @else {

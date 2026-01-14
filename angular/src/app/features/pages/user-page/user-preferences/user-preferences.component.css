@@ -28,18 +28,16 @@
   border-radius: 4px;
 }
 
-/* Nueva regla para alinear checkbox horizontalmente con el label */
 .form-group:has(input[type="checkbox"]) {
   flex-direction: row;
   align-items: center;
-  gap: 10px; /* Espacio entre label y checkbox */
+  gap: 10px;
 }
 
-/* Estilos personalizados para el checkbox: más grande y cursor pointer */
 .form-group input[type="checkbox"] {
-  width: 24px; /* Más grande */
-  height: 24px; /* Más grande */
-  cursor: pointer; /* Cursor de pinchar */
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
   -webkit-appearance: none;
   appearance: none;
   border: 2px solid #ccc;
@@ -81,6 +79,27 @@
   align-items: center;
   padding: 5px 0;
   border-bottom: 1px solid #ddd;
+}
+
+.dropdown-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  max-height: 120px;
+  overflow-y: auto;
+  background: white;
+}
+
+.dropdown-list li {
+  padding: 8px;
+  cursor: pointer;
+  border-bottom: 1px solid #eee;
+}
+
+.dropdown-list li:hover {
+  background: #f0f0f0;
 }
 
 .buttons {

@@ -26,3 +26,7 @@ export interface GasStation {
   GLP: number | null;
   GLP_media: number | null;
 }
+
+export interface GasStationFavourite extends GasStation {
+  alias: string;
+}
