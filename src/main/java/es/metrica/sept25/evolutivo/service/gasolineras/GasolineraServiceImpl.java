@@ -200,8 +200,12 @@ public class GasolineraServiceImpl implements GasolineraService {
 	                getGasolinerasForMunicipio(municipio.getNombreMunicipio());
 
 	        for (Gasolinera gasolinera : gasolineras) {
-	            if (gasolinera.getMarca() != null && !gasolinera.getMarca().isBlank()) {
-	                marcas.add(gasolinera.getMarca());
+	        	String marca = gasolinera.getMarca();
+
+	            if (marca != null
+	                    && !marca.isBlank()
+	                    && !marca.matches("\\d+")) {
+	                marcas.add(marca.trim());
 	            }
 	        }
 	    }

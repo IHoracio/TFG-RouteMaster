@@ -32,6 +32,7 @@ import es.metrica.sept25.evolutivo.domain.dto.weather.Dia;
 import es.metrica.sept25.evolutivo.domain.dto.weather.EstadoCielo;
 import es.metrica.sept25.evolutivo.domain.dto.weather.Temperatura;
 import es.metrica.sept25.evolutivo.domain.dto.weather.Weather;
+import es.metrica.sept25.evolutivo.enums.EmissionType;
 import es.metrica.sept25.evolutivo.service.gasolineras.GasolineraService;
 import es.metrica.sept25.evolutivo.service.ine.INEService;
 import es.metrica.sept25.evolutivo.service.maps.geocode.GeocodeService;
@@ -70,17 +71,12 @@ public class RoutesServiceImpl implements RoutesService {
 	@Autowired
 	private GeocodeService geocodeService;
 	
-	public enum VehicleEmissionType {
-	    ELECTRIC,
-	    GASOLINE,
-	    DIESEL,
-	    HYBRID;
-	}
+
 
 	@Override
 	public Optional<RouteGroup> getDirections(String origin, String destination, List<String> waypoints,
 			boolean optimizeWaypoints, boolean optimizeRoute, String language, boolean avoidTolls,
-	        VehicleEmissionType vehicleEmissionType) {
+	        EmissionType vehicleEmissionType) {
 
 		Set<String> invalidDirections = new HashSet<String>();
 		
