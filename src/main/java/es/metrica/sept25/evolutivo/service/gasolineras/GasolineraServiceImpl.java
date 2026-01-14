@@ -212,11 +212,13 @@ public class GasolineraServiceImpl implements GasolineraService {
 	        for (Gasolinera gasolinera : gasolineras) {
 	        	String marca = gasolinera.getMarca();
 
-	            if (marca != null
-	                    && !marca.isBlank()
-	                    && !marca.matches("\\d+")) {
-	                marcas.add(marca.trim());
-	            }
+	        	if (marca != null && !marca.isBlank()) {
+	        	    marca = marca.replaceFirst("^\"[^\"]*\"\\s*", "").trim();
+	        	    
+	        	    if (marca.matches(".*[a-zA-Z].*")) {
+	        	        marcas.add(marca);
+	        	    }
+	        	}
 	        }
 	    }
 	    syncBrands(marcas);
