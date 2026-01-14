@@ -21,6 +21,7 @@ import es.metrica.sept25.evolutivo.entity.user.User;
 import es.metrica.sept25.evolutivo.entity.user.UserPreferences;
 import es.metrica.sept25.evolutivo.entity.user.UserPreferences.Language;
 import es.metrica.sept25.evolutivo.entity.user.UserPreferences.Theme;
+import es.metrica.sept25.evolutivo.enums.EmissionType;
 import es.metrica.sept25.evolutivo.enums.FuelType;
 import es.metrica.sept25.evolutivo.enums.MapViewType;
 import es.metrica.sept25.evolutivo.repository.GasolineraRepository;
@@ -51,7 +52,7 @@ public class UserServiceImpl implements UserService {
 		log.info("[user-service] [" + LocalDateTime.now().toString() + "] "
                 + "Attempting to save user with email: " + user.getEmail());
 
-		if (user.getPassword() != null && !user.getPassword().startsWith("$2a$")) {
+		if (user.getPassword() != null && !user.getPassword().startsWith("\"^\\\\$2[aby]\\\\$.*\"")) {
 			log.info("[user-service] [" + LocalDateTime.now().toString() + "] "
                     + "Encoding password for user: " + user.getEmail());
 			user.setPassword(passwordEncoder.encode(user.getPassword()));
@@ -124,13 +125,18 @@ public class UserServiceImpl implements UserService {
 	        log.warn("[user-service] [" + LocalDateTime.now() + "] Invalid password for user: " + userDTO.getEmail());
 	        return Optional.empty();
 	    }
+	    
+		if (!userDTO.getPassword().equals(userDTO.getPasswordConfirmation())) {
+		    log.warn("[user-service] [" + LocalDateTime.now() + "] Passwords do not match for user: " + userDTO.getEmail());
+		    return Optional.empty();
+		}
 		
 		if (userRepository.findByEmail(userDTO.getEmail()).isPresent()) {
 			log.warn("[user-service] [" + LocalDateTime.now().toString() + "] "
                     + "User already exists with email: " + userDTO.getEmail());
 	        return Optional.empty();
 	    }
-
+		
 	    User user = new User();
 		user.setName(userDTO.getName());
 		user.setSurname(userDTO.getSurname());
@@ -144,7 +150,9 @@ public class UserServiceImpl implements UserService {
         prefs.setFuelType(FuelType.GASOLINE);
         prefs.setMaxPrice(1.50);
         prefs.setMapView(MapViewType.SATELLITE);
-
+        prefs.setAvoidTolls(false);
+        prefs.setEmissionType(EmissionType.C);
+        
         user.setRoutePreferences(prefs);
         
         UserPreferences defaultPrefs = new UserPreferences();
@@ -167,7 +175,9 @@ public class UserServiceImpl implements UserService {
 	        int radioKm,
 	        FuelType fuelType,
 	        double maxPrice,
-	        MapViewType mapView
+	        MapViewType mapView,
+	        boolean avoidTolls,
+	        EmissionType vehicleEmissionType
 	) {
 
 		log.info("[user-service] [" + LocalDateTime.now().toString() + "] "
@@ -179,6 +189,8 @@ public class UserServiceImpl implements UserService {
         prefs.setFuelType(fuelType);
         prefs.setMaxPrice(maxPrice);
         prefs.setMapView(mapView);
+        prefs.setAvoidTolls(avoidTolls);
+        prefs.setEmissionType(vehicleEmissionType);
 
         user.setRoutePreferences(prefs);
         userRepository.save(user);

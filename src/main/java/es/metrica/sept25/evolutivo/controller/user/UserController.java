@@ -27,6 +27,7 @@ import es.metrica.sept25.evolutivo.entity.user.User;
 import es.metrica.sept25.evolutivo.entity.user.UserPreferences;
 import es.metrica.sept25.evolutivo.entity.user.UserPreferences.Language;
 import es.metrica.sept25.evolutivo.entity.user.UserPreferences.Theme;
+import es.metrica.sept25.evolutivo.enums.EmissionType;
 import es.metrica.sept25.evolutivo.enums.FuelType;
 import es.metrica.sept25.evolutivo.enums.MapViewType;
 import es.metrica.sept25.evolutivo.service.user.UserService;
@@ -132,21 +133,24 @@ public class UserController {
 	        @RequestParam int radioKm,
 	        @RequestParam FuelType fuelType,
 	        @RequestParam double maxPrice,
-	        @RequestParam MapViewType mapView
+	        @RequestParam MapViewType mapView,
+	        @RequestParam boolean avoidTolls,
+		    @RequestParam EmissionType vehicleEmissionType
 	) {
 	    Optional<User> userOpt = service.getEntityByEmail(email);
 
 	    if (userOpt.isEmpty()) {
 	        return ResponseEntity.notFound().build();
 	    }
-
 	    service.updateRoutePreferences(
 	        userOpt.get(), 
 	        brandsDto.preferredBrands, 
 	        radioKm, 
 	        fuelType, 
 	        maxPrice, 
-	        mapView
+	        mapView,
+	        avoidTolls,
+	        vehicleEmissionType
 	    );
 
 	    return ResponseEntity.ok().build();
