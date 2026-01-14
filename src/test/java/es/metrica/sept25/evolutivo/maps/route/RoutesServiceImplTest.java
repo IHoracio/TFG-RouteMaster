@@ -1,7 +1,13 @@
-package es.metrica.sept25.evolutivo.route;
+package es.metrica.sept25.evolutivo.maps.route;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.anyDouble;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
 
 import java.util.List;
 import java.util.Optional;
@@ -15,12 +21,19 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.client.RestTemplate;
 
 import es.metrica.sept25.evolutivo.domain.dto.maps.routes.Coords;
+import es.metrica.sept25.evolutivo.domain.dto.maps.routes.CoordsWithWeather;
+import es.metrica.sept25.evolutivo.domain.dto.maps.routes.Distance;
+import es.metrica.sept25.evolutivo.domain.dto.maps.routes.Leg;
+import es.metrica.sept25.evolutivo.domain.dto.maps.routes.Polyline;
+import es.metrica.sept25.evolutivo.domain.dto.maps.routes.Route;
 import es.metrica.sept25.evolutivo.domain.dto.maps.routes.RouteGroup;
+import es.metrica.sept25.evolutivo.domain.dto.maps.routes.Step;
 import es.metrica.sept25.evolutivo.domain.dto.weather.Dia;
 import es.metrica.sept25.evolutivo.domain.dto.weather.EstadoCielo;
 import es.metrica.sept25.evolutivo.domain.dto.weather.Prediccion;
 import es.metrica.sept25.evolutivo.domain.dto.weather.Temperatura;
 import es.metrica.sept25.evolutivo.domain.dto.weather.Weather;
+import es.metrica.sept25.evolutivo.enums.EmissionType;
 import es.metrica.sept25.evolutivo.service.gasolineras.GasolineraService;
 import es.metrica.sept25.evolutivo.service.ine.INEService;
 import es.metrica.sept25.evolutivo.service.maps.geocode.GeocodeService;
@@ -78,7 +91,7 @@ class RoutesServiceImplTest {
 
         Optional<RouteGroup> result = service.getDirections(
             "Origin", "Destination", List.of(), false, false, "es", false,
-            RoutesServiceImpl.VehicleEmissionType.DIESEL
+            EmissionType.C
         );
 
         assertTrue(result.isPresent());
@@ -92,7 +105,7 @@ class RoutesServiceImplTest {
 
         Optional<RouteGroup> result = service.getDirections(
             "Origin", "Destination", List.of(), false, false, "es", false,
-            RoutesServiceImpl.VehicleEmissionType.DIESEL
+            EmissionType.C
         );
 
         assertTrue(result.isEmpty());
@@ -125,30 +138,53 @@ class RoutesServiceImplTest {
        ========================= */
     @Test
     void getWeatherForRoute_success() {
-        RouteGroup rg = mock(RouteGroup.class);
-        Coords sampleCoord = new Coords(40, -3);
+    	Polyline polyline = new Polyline();
+        polyline.setPoints("}_ilFjk~uOwHJy@P");
 
-        // Mockeo de getSampledRoutePoints
-        RoutesServiceImpl spyService = spy(service);
-        doReturn(List.of(sampleCoord)).when(spyService).getSampledRoutePoints(rg);
+        Step step = new Step();
+        step.setPolyline(polyline);
 
-        // Mock INE
-        when(ineService.getCodigoINE(40, -3)).thenReturn(Optional.of("28079"));
+        Distance distance = new Distance();
+        distance.setValue(10_000L);
 
-        // Mock ReverseGeocode
-        when(reverseGeocodeService.getAddress(40, -3)).thenReturn(Optional.of("Madrid"));
-        // Mock Weather
-        Weather w = new Weather();
-        Dia d = new Dia();
-        d.setEstadoCielo(List.of(new EstadoCielo(0, "Despejado")));
-        d.setTemperatura(List.of(new Temperatura(0, 20.0)));
-        w.setPrediccion(new Prediccion());
-        w.getPrediccion().setDia(List.of(d));
+        Leg leg = new Leg();
+        leg.setSteps(List.of(step));
+        leg.setDistance(distance);
+        leg.setStartLocation(new Coords(40, -3));
+        leg.setEndLocation(new Coords(40.1, -3.1));
 
-        when(weatherService.getWeather("28079")).thenReturn(Optional.of(w));
+        Route route = new Route();
+        route.setLegs(List.of(leg));
 
-        List<?> result = spyService.getWeatherForRoute(rg);
+        RouteGroup rg = new RouteGroup();
+        rg.setRoutes(List.of(route));
 
-        assertFalse(result.isEmpty());
+        when(ineService.getCodigoINE(anyDouble(), anyDouble()))
+                .thenReturn(Optional.of("28079"));
+
+        when(reverseGeocodeService.getAddress(anyDouble(), anyDouble()))
+                .thenReturn(Optional.of("Madrid"));
+
+        Weather weather = new Weather();
+        Dia dia = new Dia();
+        dia.setEstadoCielo(List.of(new EstadoCielo(0, "Despejado")));
+        dia.setTemperatura(List.of(new Temperatura(0, 20.0)));
+
+        Prediccion pred = new Prediccion();
+        pred.setDia(List.of(dia));
+        weather.setPrediccion(pred);
+
+        when(weatherService.getWeather("28079"))
+                .thenReturn(Optional.of(weather));
+
+        List<CoordsWithWeather> result =
+                service.getWeatherForRoute(rg);
+
+        assertEquals(1, result.size());
+
+        CoordsWithWeather cw = result.get(0);
+        assertEquals("Madrid", cw.getAddress());
+        assertEquals("Despejado", cw.getWeatherDescription().get(0));
+        assertEquals(20.0, cw.getTemperatures().get(0));
     }
 }
