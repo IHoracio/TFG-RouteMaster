@@ -256,14 +256,14 @@ public class GasolineraServiceImpl implements GasolineraService {
 	    }
 	}
 	
-	@PostConstruct
-    public void initBrandsAtStartup() {
-        if (brandRepository.count() == 0) {
-            log.info("[gas-service] [ " + LocalDateTime.now().toString() + "] "
-            		+ "Initial brand sync at startup");
-            syncBrandsFromGasStations();
-
-           getMarcasFromAllGasolineras();
-        }
-    }
+//	@PostConstruct
+//    public void initBrandsAtStartup() {
+//        if (brandRepository.count() == 0) {
+//            log.info("[gas-service] [ " + LocalDateTime.now().toString() + "] "
+//            		+ "Initial brand sync at startup");
+//            syncBrandsFromGasStations();
+//
+//           getMarcasFromAllGasolineras();
+//        }
+//    }
 }

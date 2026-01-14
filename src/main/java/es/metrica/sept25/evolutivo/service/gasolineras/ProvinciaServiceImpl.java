@@ -38,7 +38,7 @@ public class ProvinciaServiceImpl implements ProvinciaService {
 	}
 
 	@Override
-	@Cacheable("provincias")
+	@Cacheable(value = "provincias", cacheManager = "staticCacheManager")
 	public List<Provincia> getProvincias() {
 		log.info("[prov-service] [" + LocalDateTime.now().toString() + "] "
 				+ "Attempting to retrieve all provinces from the repository.");
@@ -63,6 +63,7 @@ public class ProvinciaServiceImpl implements ProvinciaService {
 	}
 
 	@Override
+	@Cacheable(value = "provinciaById", cacheManager = "staticCacheManager")
 	public Optional<Provincia> getProvinciaById(Long id) {
 		getProvincias();
 		log.info("[prov-service] [" + LocalDateTime.now().toString() + "] "
@@ -81,7 +82,7 @@ public class ProvinciaServiceImpl implements ProvinciaService {
 	}
 
 	@Override
-	@Cacheable("provinciaForMuni")
+	@Cacheable(value = "provinciaForMuni", cacheManager = "staticCacheManager")
 	public Optional<Provincia> getProvinciaForMunicipio(Municipio mun) {
 		Long provId = mun.getIdProvincia();
 		List<Provincia> provList = getProvincias();

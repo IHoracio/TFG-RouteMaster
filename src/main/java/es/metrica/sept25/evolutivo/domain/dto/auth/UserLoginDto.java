@@ -1,8 +1,14 @@
 package es.metrica.sept25.evolutivo.domain.dto.auth;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
+@Schema(name = "UserLoginDto", description = "Login payload containing user (email) and password")
 public class UserLoginDto {
 
+    @Schema(description = "User email", example = "user@example.com")
     private String user;
+
+    @Schema(description = "User password", example = "P4ssword123")
     private String password;
 
     public UserLoginDto() {

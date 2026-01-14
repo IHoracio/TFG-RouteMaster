@@ -39,7 +39,7 @@ public class MunicipioServiceImpl implements MunicipioService {
 	 * NO USAR SALVO ESTRICTAMENTE NECESARIO
 	 */
 	@Override
-	@Cacheable("municipios")
+	@Cacheable(value = "municipios", cacheManager = "staticCacheManager")
 	public List<Municipio> getMunicipios() {
 		log.info("[mun-service] [" + LocalDateTime.now().toString() + "] "
 				+ "Attempting to retrieve all municipalities.");
@@ -48,7 +48,7 @@ public class MunicipioServiceImpl implements MunicipioService {
 
 		List<Long> provIds = provList.stream().map(p -> p.getIdProvincia()).collect(Collectors.toList());
 
-		if (Objects.isNull(munList) | munList.isEmpty()) {
+		if (Objects.isNull(munList) || munList.isEmpty()) {
 			log.info("[mun-service] [" + LocalDateTime.now().toString() + "] "
 					+ "Fetching all municipalities from the external API. "
 					+ "This might take a while.");
@@ -70,7 +70,7 @@ public class MunicipioServiceImpl implements MunicipioService {
 	}
 
 	@Override
-	@Cacheable("municipio_id")
+	@Cacheable(value = "municipio_id", cacheManager = "staticCacheManager")
 	public Optional<Municipio> getMunicipioFromId(Long idMunicipio) {
 		log.info("[mun-service] [" + LocalDateTime.now().toString() + "] "
 				+ "Attempting to retrieve municipality with ID: " + idMunicipio + ".");
@@ -91,7 +91,7 @@ public class MunicipioServiceImpl implements MunicipioService {
 	}
 
 	@Override
-	@Cacheable("municipio_str")
+	@Cacheable(value = "municipio_str", cacheManager = "staticCacheManager")
 	public Optional<Municipio> getMunicipioFromString(String munStr) {
 		log.info("[mun-service] [" + LocalDateTime.now().toString() + "] "
 				+ "Attempting to retrieve municipality from string identifier: " + munStr + ".");

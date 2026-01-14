@@ -1,14 +1,15 @@
 package es.metrica.sept25.evolutivo.service.session;
 
+import java.nio.charset.StandardCharsets;
+import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Base64;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
 import javax.crypto.Cipher;
+import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
 import org.slf4j.Logger;
@@ -23,197 +24,158 @@ import jakarta.servlet.http.HttpServletResponse;
 @Service
 public class CookieServiceImpl implements CookieService {
 
-	private static Logger log = LoggerFactory.getLogger(CookieServiceImpl.class);;
+    private static Logger log = LoggerFactory.getLogger(CookieServiceImpl.class);
 
 	@Value("${evolutivo.auth.secret-cookie-key}")
 	private String secretString;
 
 	private SecretKeySpec secretKeySpec;
+	
+    public SecretKeySpec getSecretKey() {
+        if (Objects.isNull(secretKeySpec)) {
+            secretKeySpec = new SecretKeySpec(secretString.getBytes(StandardCharsets.UTF_8), "AES");
+        }
+        return secretKeySpec;
+    }
 
-	@Override
-	public SecretKeySpec getSecretKey() {
-		if (Objects.isNull(secretKeySpec)) {
-			secretKeySpec = new SecretKeySpec(secretString.getBytes(), "AES");
-		}
-		return secretKeySpec;
-	}
+    @Override
+    public String cipher(String plainText) {
+        try {
+            // AES-GCM with 12-byte IV and 128-bit tag
+            Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
+            byte[] iv = new byte[12];
+            SecureRandom rnd = new SecureRandom();
+            rnd.nextBytes(iv);
+            GCMParameterSpec spec = new GCMParameterSpec(128, iv);
+            cipher.init(Cipher.ENCRYPT_MODE, getSecretKey(), spec);
+            byte[] cipherBytes = cipher.doFinal(plainText.getBytes(StandardCharsets.UTF_8));
 
-	@Override
-	public String cipher(String plainText) {
-		try {
-			Cipher cipher = Cipher.getInstance("AES");
-			cipher.init(Cipher.ENCRYPT_MODE, getSecretKey());
-			byte[] cifrado = cipher.doFinal(plainText.getBytes());
-			return Base64.getEncoder().encodeToString(cifrado);
-		} catch (Exception e) {
-			log.error("[cookie-service] [" + LocalDateTime.now() + "] " + "Could not cipher the plain-text String: "
-					+ "[" + plainText + "]. Reason: " + e);
-			return "";
-		}
-	}
+            // prepend IV to cipher bytes
+            byte[] out = new byte[iv.length + cipherBytes.length];
+            System.arraycopy(iv, 0, out, 0, iv.length);
+            System.arraycopy(cipherBytes, 0, out, iv.length, cipherBytes.length);
 
-	@Override
-	public String decipher(String cipheredText) {
-		try {
-			Cipher cipher = Cipher.getInstance("AES");
-			cipher.init(Cipher.DECRYPT_MODE, getSecretKey());
-			byte[] descifrado = cipher.doFinal(Base64.getDecoder().decode(cipheredText));
-			return new String(descifrado);
-		} catch (Exception e) {
-			log.error("[cookie-service] [" + LocalDateTime.now() + "] "
-					+ "Could not decipher the ciphered text String: " + "[" + cipheredText + "]. Reason: " + e);
-			return "";
-		}
-	}
+            return Base64.getEncoder().encodeToString(out);
+        } catch (Exception e) {
+            log.error("[cookie-service] [" + LocalDateTime.now() + "] " + "Could not cipher the plain-text String: "
+                    + "[" + plainText + "]. Reason: " + e);
+            return "";
+        }
+    }
 
-	@Override
-	public boolean validate(String cipheredCookieValue) {
-		if (cipheredCookieValue == null || cipheredCookieValue.isEmpty()) {
-			log.error("[cookie-service] [" + LocalDateTime.now() + "] " + 
-					"Could not validate the given ciphered cookie: " + 
-					"[" + cipheredCookieValue + "].");
-			return false;
-		}
+    @Override
+    public String decipher(String cipheredText) {
+        try {
+            byte[] all = Base64.getDecoder().decode(cipheredText);
+            if (all.length < 13) {
+                throw new IllegalArgumentException("Ciphertext too short");
+            }
+            byte[] iv = Arrays.copyOfRange(all, 0, 12);
+            byte[] cipherBytes = Arrays.copyOfRange(all, 12, all.length);
 
-		try {
-			String plainText = decipher(cipheredCookieValue);
+            Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
+            GCMParameterSpec spec = new GCMParameterSpec(128, iv);
+            cipher.init(Cipher.DECRYPT_MODE, getSecretKey(), spec);
+            byte[] plain = cipher.doFinal(cipherBytes);
+            return new String(plain, StandardCharsets.UTF_8);
+        } catch (Exception e) {
+            log.error("[cookie-service] [" + LocalDateTime.now() + "] "
+                    + "Could not decipher the ciphered text String: " + "[" + cipheredText + "]. Reason: " + e);
+            return "";
+        }
+    }
 
-			// Regex that verifies the following:
-			// - No double separators (// o !!)
-			// - No text ending in !
-			// - "user!number" repeated format
-			String regex = "^(?!.*//)(?!.*!!)(?!.*!$)(?!^!)([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}!\\d+)(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}!\\d+)*$";
-			return plainText.matches(regex);
+    @Override
+    public boolean validate(String cipheredCookieValue) {
+        if (cipheredCookieValue == null || cipheredCookieValue.isEmpty()) {
+            log.error("[cookie-service] [" + LocalDateTime.now() + "] "
+                    + "Could not validate the given ciphered cookie: "
+                    + "[" + cipheredCookieValue + "].");
+            return false;
+        }
 
-		} catch (Exception e) {
-			// Failing to decipher or any other exception is considered invalid.
-			log.error("[cookie-service] [" + LocalDateTime.now() + "] "
-					+ "Failed to validate ciphered cookie value. Reason: " + e);
-			return false;
-		}
-	}
+        try {
+            String plainText = decipher(cipheredCookieValue);
+            System.err.println(plainText);
+            // Regex that verifies the following:
+            // - No double separators (// o !!)
+            // - No text ending in !
+            // - "user!number" repeated format
+            String regex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$";
+            return Objects.nonNull(plainText) && plainText.matches(regex);
 
-	@Override
-	public Map<String, Integer> deserialize(String cookieValue) {
-		if (!validate(cookieValue)) {
-			return new HashMap<>();
-		}
-		cookieValue = decipher(cookieValue);
-		Map<String, Integer> users = new HashMap<>();
-		for (String pair : cookieValue.split("/")) {
-			String[] data = pair.split("!");
-			users.put(data[0], Integer.parseInt(data[1]));
-		}
-		return users;
-	}
+        } catch (Exception e) {
+            // Failing to decipher or any other exception is considered invalid.
+            log.error("[cookie-service] [" + LocalDateTime.now() + "] "
+                    + "Failed to validate ciphered cookie value. Reason: " + e);
+            return false;
+        }
+    }
 
-	@Override
-	public String serialize(Map<String, Integer> usuarios) {
-		StringBuilder valor = new StringBuilder();
-		boolean primero = true;
+    @Override
+    public void createCookie(
+            HttpServletResponse response,
+            String name,
+            String value,
+            int maxDurationSeconds
+    ) {
+        String cipheredValue = cipher(value);
+        Cookie cookie = new Cookie(name, cipheredValue);
+        cookie.setPath("/");
+        cookie.setMaxAge(maxDurationSeconds);
+        response.addCookie(cookie);
+        log.info("[cookie-service] [" + LocalDateTime.now() + "] "
+                + "Created cookie with name: [" + name + "] , and value: "
+                + "[" + value + "].");
+    }
 
-		for (Map.Entry<String, Integer> entry : usuarios.entrySet()) {
-			if (!primero)
-				valor.append("/");
-			valor.append(entry.getKey()).append("!").append(entry.getValue());
-			primero = false;
-		}
-		return valor.toString();
-	}
+    @Override
+    public void deleteCookie(HttpServletResponse response, String name) {
+        Cookie cookie = new Cookie(name, "");
+        cookie.setPath("/");
+        cookie.setMaxAge(0); // TTL set to zero for no elimination.
+        response.addCookie(cookie);
+        log.info("[cookie-service] [" + LocalDateTime.now() + "] "
+                + "Deleted cookie with name: [" + name + "].");
+    }
 
-	@Override
-	public String update(Map<String, Integer> userMap, String usuarioActual) {
-		int contador = userMap.getOrDefault(usuarioActual, 0);
-		userMap.put(usuarioActual, ++contador);
-		return serialize(userMap);
-	}
+    @Override
+    public Optional<String> getCookieValue(HttpServletRequest request, String name) {
+        if (request.getCookies() == null) {
+            log.warn("[cookie-service] [" + LocalDateTime.now() + "] "
+                    + "Couldn't get value from cookie with name: [" + name + "].");
+            return Optional.empty();
+        }
 
-	@Override
-	public void createCookie(
-			HttpServletResponse response, 
-			String name, 
-			String value, 
-			int maxDurationSeconds
-			) {
-		String cipheredValue = cipher(value);
-		Cookie cookie = new Cookie(name, cipheredValue);
-		cookie.setPath("/");
-		cookie.setMaxAge(maxDurationSeconds);
-		response.addCookie(cookie);
-		log.info("[cookie-service] [" + LocalDateTime.now() + "] " + 
-				"Created cookie with name: [" + name + "] , and value: " + 
-				"[" + value + "].");
-	}
+        Optional<String> transformed = Arrays.stream(request.getCookies())
+                .filter(cookie -> cookie.getName().equals(name))
+                .findFirst()
+                .map(cookie -> decipher(cookie.getValue()));
+        if (transformed.isEmpty()) {
+            log.warn("[cookie-service] [" + LocalDateTime.now() + "] "
+                    + "Couldn't get value from cookie with name: [" + name + "].");
+        } else {
+            log.info("[cookie-service] [" + LocalDateTime.now() + "] "
+                    + "Retrieved successfully the value from cookie with name: ["
+                    + name + "].");
+        }
 
-	@Override
-	public void deleteCookie(HttpServletResponse response, String name) {
-		Cookie cookie = new Cookie(name, "");
-		cookie.setPath("/");
-		cookie.setMaxAge(0); // TTL set to zero for no elimination.
-		response.addCookie(cookie);
-		log.info("[cookie-service] [" + LocalDateTime.now() + "] " + 
-				"Deleted cookie with name: [" + name + "].");
-	}
+        return transformed;
+    }
 
-	@Override
-	public Optional<String> getCookieValue(HttpServletRequest request, String name) {
-		if (request.getCookies() == null) {
-			log.warn("[cookie-service] [" + LocalDateTime.now() + "] " + 
-					"Couldn't get value from cookie with name: [" + name + "].");
-			return Optional.empty();
-		}
+    @Override
+    public void createSessionCookie(HttpServletResponse response, String email) {
+        createCookie(response, "sesionActiva", email, 1800); // 30 minutos
+        log.info("[cookie-service] [" + LocalDateTime.now() + "] "
+                + "Created the session cookie successfully for email: ["
+                + email + "].");
+    }
 
-		Optional<String> transformed = Arrays.stream(request.getCookies())
-				.filter(cookie -> cookie.getName().equals(name))
-				.findFirst()
-				.map(cookie -> decipher(cookie.getValue()));
-		if (transformed.isEmpty()) {
-			log.warn("[cookie-service] [" + LocalDateTime.now() + "] " + 
-					"Couldn't get value from cookie with name: [" + name + "].");
-		} else {
-			log.info("[cookie-service] [" + LocalDateTime.now() + "] " 
-					+ "Retrieved successfully the value from cookie with name: [" 
-					+ name + "].");
-		}
-
-		return transformed;
-	}
-
-	@Override
-	public void updateHistoryCookie(jakarta.servlet.http.HttpServletRequest request, HttpServletResponse response, String email) {
-		Optional<String> actualValue = getCookieValue(request, "historialLogins");
-		if (actualValue.isPresent()) {
-			Map<String, Integer> userMap = deserialize(actualValue.get());
-			String newValue = update(userMap, email);
-			createCookie(response, "historialLogins", newValue, 604800); // 7 días
-			log.info("[cookie-service] [" + LocalDateTime.now() + "] " 
-					+ "Updated the cookie successfully for email: [" 
-					+ email + "].");
-		}
-	}
-
-	@Override
-	public int getLogins(String cookie, String user) {
-		if (cookie == null || user == null)
-			return 0;
-
-		Map<String, Integer> users = deserialize(cookie);
-		return users.getOrDefault(user, 1);
-	}
-
-	@Override
-	public void createSessionCookie(HttpServletResponse response, String email) {
-		createCookie(response, "sesionActiva", email, 1800); // 30 minutos
-		log.info("[cookie-service] [" + LocalDateTime.now() + "] " 
-				+ "Created the session cookie successfully for email: [" 
-				+ email + "].");
-	}
-
-	@Override
-	public void closeSession(HttpServletResponse response, String name) {
-		deleteCookie(response, name);
-		log.info("[cookie-service] [" + LocalDateTime.now() + "] " 
-				+ "Closed the session successfully for email: [" 
-				+ name + "].");
-	}
+    @Override
+    public void closeSession(HttpServletResponse response, String name) {
+        deleteCookie(response, name);
+        log.info("[cookie-service] [" + LocalDateTime.now() + "] "
+                + "Closed the session successfully for email: ["
+                + name + "].");
+    }
 }
