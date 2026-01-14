@@ -1,3 +1,7 @@
+app-map-page{
+    margin-top: 20px;
+}
+
 .error {
     color: var(--color-error);
     font-weight: bold;

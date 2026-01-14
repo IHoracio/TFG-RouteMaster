@@ -1,29 +1,40 @@
-<form [formGroup]="form" (ngSubmit)="onSubmit()">
-    <!--USERNAME FIELD-->
-    <div>
-        <span class="asterisk">*</span>
-        <label for="username">Introduzca el nombre de usuario.</label>
-        <input type="username" name="username" id="username" formControlName="username">
-
-
-        <!--Error messages-->
-        <div *ngIf="hasError('username', 'required')">
-            <p class="error">El nombre de usuario es obligatorio</p>
+<div class="container">
+    <div class="card">
+        <div class="form-header">
+            <h2>Inicio de Sesión</h2>
         </div>
+        <form [formGroup]="form" (ngSubmit)="onSubmit()">
+            <!--USERNAME FIELD-->
+            <div>
+                <span class="asterisk">*</span>
+                <label for="username">Introduzca el nombre de usuario.</label>
+                <input class="form-control" type="username" name="username" id="username" formControlName="username">
+
+
+                <!--Error messages-->
+                <div *ngIf="hasError('username', 'required')">
+                    <p class="error">El nombre de usuario es obligatorio</p>
+                </div>
+            </div>
+
+            <!--PASSWORD FIELD-->
+            <div>
+                <span class="asterisk">*</span>
+                <label for="password">Introduzca la contraseña.</label>
+                <input class="form-control" type="password" name="password" id="password" formControlName="password">
+
+
+                <!--Error messages-->
+                <div *ngIf="hasError('password', 'required')">
+                    <p class="error">La contraseña es obligatoria</p>
+                </div>
+            </div>
+
+            <input class="btn-custom" type="submit" [disabled]="form.invalid" />
+
+            <div class="text-muted">
+                <p>¿Todavía no te has registrado? <a routerLink="/register-user">Crea una cuenta</a></p>
+            </div>
+        </form>
     </div>
-
-    <!--PASSWORD FIELD-->
-    <div>
-        <span class="asterisk">*</span>
-        <label for="password">Introduzca la contraseña.</label>
-        <input type="password" name="password" id="password" formControlName="password">
-
-
-        <!--Error messages-->
-        <div *ngIf="hasError('password', 'required')">
-            <p class="error">La contraseña es obligatoria</p>
-        </div>
-    </div>
-
-    <input type="submit" [disabled]="form.invalid" />
-</form>
+</div>
