@@ -96,7 +96,6 @@ public class CookieServiceImpl implements CookieService {
 
         try {
             String plainText = decipher(cipheredCookieValue);
-            System.err.println(plainText);
             // Regex that verifies the following:
             // - No double separators (// o !!)
             // - No text ending in !

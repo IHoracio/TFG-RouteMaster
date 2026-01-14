@@ -32,8 +32,8 @@ public class ProvinciaServiceImpl implements ProvinciaService {
 	ProvinciaRepository provinciaRepository;
 
 	public void save(Provincia provincia) {
-		log.info("[prov-service] [" + LocalDateTime.now().toString() + "] "
-				+ "Attempting to save the following province: " + provincia.toString() + ".");
+//		log.info("[prov-service] [" + LocalDateTime.now().toString() + "] "
+//				+ "Attempting to save the following province: " + provincia.toString() + ".");
 		provinciaRepository.save(provincia);
 	}
 
@@ -71,11 +71,11 @@ public class ProvinciaServiceImpl implements ProvinciaService {
 		Optional<Provincia> retrieved = provinciaRepository.findById(id);
 
 		if (retrieved.isEmpty()) {
-			log.info("[prov-service] [" + LocalDateTime.now().toString() + "] "
+			log.warn("[prov-service] [" + LocalDateTime.now().toString() + "] "
 					+ "No province was found with ID: " + id);
 		} else {
-			log.info("[prov-service] [" + LocalDateTime.now().toString() + "] "
-					+ "Successfully found the province with ID: " + id);
+//			log.info("[prov-service] [" + LocalDateTime.now().toString() + "] "
+//					+ "Successfully found the province with ID: " + id);
 		}
 
 		return retrieved;
@@ -89,11 +89,11 @@ public class ProvinciaServiceImpl implements ProvinciaService {
 		Optional<Provincia> foundProvForMun = provList.stream().filter(p -> p.getIdProvincia() == provId).findFirst();
 		
 		if (foundProvForMun.isEmpty()) {
-			log.info("[prov-service] [" + LocalDateTime.now().toString() + "] "
+			log.warn("[prov-service] [" + LocalDateTime.now().toString() + "] "
 					+ "Failed to find the province for municipality: " + mun.toString() + ".");
 		} else {
-			log.info("[prov-service] [" + LocalDateTime.now().toString() + "] "
-					+ "Successfully found the province for municipality: " + mun.toString() + ".");
+//			log.info("[prov-service] [" + LocalDateTime.now().toString() + "] "
+//					+ "Successfully found the province for municipality: " + mun.toString() + ".");
 		}
 		
 		return foundProvForMun;
