@@ -8,7 +8,7 @@ import javax.crypto.spec.SecretKeySpec;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-interface CookieService {
+public interface CookieService {
 	SecretKeySpec getSecretKey();
 
 	String cipher(String plainText);
@@ -79,7 +79,7 @@ interface CookieService {
 	 * @param response The response which contains the users cookie
 	 * @param email The user to update the login info for
 	 */
-	void updateHistoryCookie(HttpServletResponse response, String email);
+	void updateHistoryCookie(HttpServletRequest request, HttpServletResponse response, String email);
 
 	/**
 	 * Returns the amount of times the user has gone through log-in

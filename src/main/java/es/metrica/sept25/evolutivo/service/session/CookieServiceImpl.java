@@ -25,7 +25,7 @@ public class CookieServiceImpl implements CookieService {
 
 	private static Logger log = LoggerFactory.getLogger(CookieServiceImpl.class);;
 
-	@Value("evolutivo.auth.secret-cookie-key")
+	@Value("${evolutivo.auth.secret-cookie-key}")
 	private String secretString;
 
 	private SecretKeySpec secretKeySpec;
@@ -180,8 +180,8 @@ public class CookieServiceImpl implements CookieService {
 	}
 
 	@Override
-	public void updateHistoryCookie(HttpServletResponse response, String email) {
-		Optional<String> actualValue = getCookieValue(null, "historialLogins");
+	public void updateHistoryCookie(jakarta.servlet.http.HttpServletRequest request, HttpServletResponse response, String email) {
+		Optional<String> actualValue = getCookieValue(request, "historialLogins");
 		if (actualValue.isPresent()) {
 			Map<String, Integer> userMap = deserialize(actualValue.get());
 			String newValue = update(userMap, email);
