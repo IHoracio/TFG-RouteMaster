@@ -213,8 +213,7 @@ public class RoutesServiceImpl implements RoutesService {
 	@Override
 	public List<Coords> decodePolyline(String polylinePoints) {
 		log.info("[routes-service] [" + LocalDateTime.now().toString() + "] "
-				+ "Attempting to decode into coordinates a given route polyline: \n" 
-				+ polylinePoints );
+				+ "Attempting to decode into coordinates a given route polyline.");
 		EncodedPolyline polyline = new EncodedPolyline(polylinePoints);
 		List<LatLng> latLngs = polyline.decodePath();
 		

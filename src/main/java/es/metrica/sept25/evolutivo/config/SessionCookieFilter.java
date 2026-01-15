@@ -31,9 +31,10 @@ public class SessionCookieFilter extends OncePerRequestFilter {
 
         // Only protect API endpoints, skip login/logout and static resources
         if (path.startsWith("/api/")
-                && !path.equals("/api/register")
-                && !path.equals("/api/login")
-                && !path.equals("/api/logout")) {
+//                && !path.equals("/api/register")
+//                && !path.equals("/api/login")
+//                && !path.equals("/api/logout")
+                ) {
 
             Cookie[] cookies = request.getCookies();
             if (cookies == null) {

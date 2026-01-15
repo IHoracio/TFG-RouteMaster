@@ -19,19 +19,28 @@ import es.metrica.sept25.evolutivo.domain.dto.maps.routes.savedRoutes.SavedRoute
 import es.metrica.sept25.evolutivo.entity.user.User;
 import es.metrica.sept25.evolutivo.enums.EmissionType;
 import es.metrica.sept25.evolutivo.service.maps.routes.savedRoutes.SavedRouteService;
+import es.metrica.sept25.evolutivo.service.session.CookieService;
 import es.metrica.sept25.evolutivo.service.user.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
-@Tag(name = "Ruta", description = "Endpoints que guardan, recuperan, ejecutan y borran una ruta")
-@RequestMapping("/api/ruta")
+@Tag(
+		name = "Rutas guardadas", 
+		description = "Endpoints que hacen CRUD sobre las rutas que se guardan"
+				+ " asociadas a un usuario."
+)
+@RequestMapping("/api/savedRoute")
 public class SavedRouteController {
 
 	@Autowired
 	private SavedRouteService savedRouteService;
+
+	@Autowired
+	private CookieService cookieService;
 
 	@Autowired
 	private UserService userService;
@@ -42,7 +51,7 @@ public class SavedRouteController {
 			@ApiResponse(responseCode = "404", description = "Usuario no encontrado") })
 	@PostMapping("/save")
 	public ResponseEntity<SavedRouteDTO> saveRoute(
-			@RequestParam(required = false) String email,
+			HttpServletRequest request,
 			@RequestParam String name,
 			@RequestParam(required = true) String origin, 
 			@RequestParam(required = true) String destination,
@@ -52,6 +61,8 @@ public class SavedRouteController {
 			@RequestParam(required = false, defaultValue = "es") String language, 
 			@RequestParam(required = false, defaultValue = "false") boolean avoidTolls,
 			@RequestParam(required = false, defaultValue = "C") EmissionType vehicleEmissionType) {
+		
+		String email = cookieService.getCookieValue(request, "sesionActiva").get();
 		Optional<User> userOpt = userService.getEntityByEmail(email);
 
 		if (userOpt.isEmpty()) {
@@ -105,8 +116,9 @@ public class SavedRouteController {
 			@ApiResponse(responseCode = "404", description = "Ruta no encontrada."),
 			@ApiResponse(responseCode = "403", description = "No autorizada") })
 	@DeleteMapping("/delete/{id}")
-	public ResponseEntity<Void> deleteRoute(@PathVariable Long id, @RequestParam String email) {
+	public ResponseEntity<Void> deleteRoute(@PathVariable Long id, HttpServletRequest request) {
 
+		String email = cookieService.getCookieValue(request, "sesionActiva").get();
 		Optional<User> user = userService.getEntityByEmail(email);
 
 		if (user.isEmpty()) {
@@ -116,19 +128,31 @@ public class SavedRouteController {
 		savedRouteService.deleteRoute(id, user.get());
 		return ResponseEntity.noContent().build();
 	}
-	@GetMapping
-    public ResponseEntity<List<SavedRouteDTO>> getAllSavedRoutes(
-            @RequestParam String email) {
-
-
-        Optional<List<SavedRouteDTO>> routes = savedRouteService.getAllSavedRoutes(email);
-
-        if (routes.isPresent()) {
-
-            return ResponseEntity.ok(routes.get());
-        }
-
-         return ResponseEntity.notFound().build();
-        
-    }
+	
+//	@Operation(summary = "Obtiene todas las rutas guardadas")
+//	@ApiResponses(value = { 
+//			@ApiResponse(
+//					responseCode = "200", 
+//					description = "Ruta encontrada"
+//					),
+//			@ApiResponse(
+//					responseCode = "404", 
+//					description = "Ruta no encontrada"
+//					) 
+//	})
+//	@GetMapping
+//    public ResponseEntity<List<SavedRouteDTO>> getAllSavedRoutes(
+//            HttpServletRequest request) {
+//
+//		String email = cookieService.getCookieValue(request, "sesionActiva").get();
+//        Optional<List<SavedRouteDTO>> routes = savedRouteService.getAllSavedRoutes(email);
+//
+//        if (routes.isPresent()) {
+//
+//            return ResponseEntity.ok(routes.get());
+//        }
+//
+//         return ResponseEntity.notFound().build();
+//        
+//    }
 }
