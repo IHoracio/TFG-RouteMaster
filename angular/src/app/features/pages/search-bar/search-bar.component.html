@@ -47,6 +47,51 @@
       </div>
       }
       </p>
+
+      <!-- From Uiverse.io by andrew-demchenk0 --> 
+
+      <p>Puntos intermedios</p>
+
+    <button (click)="addWaypoint()" type="button" class="button">
+      <span class="button__text">Añadir</span>
+      <span class="button__icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" viewBox="0 0 24 24" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" stroke="currentColor" height="24" fill="none" class="svg"><line y2="19" y1="5" x2="12" x1="12"></line><line y2="12" y1="12" x2="19" x1="5"></line></svg></span>
+    </button>
+
+    <button (click)="deleteWaypoint()" type="button" class="button">
+      <span class="button__text">Eliminar</span>
+      <span class="button__icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" viewBox="0 0 24 24" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" stroke="currentColor" height="24" fill="none" class="svg"><line y2="19" y1="5" x2="12" x1="12"></line><line y2="12" y1="12" x2="19" x1="5"></line></svg></span>
+    </button>
+
+      <div *ngFor="let waypoint of routeFormResponse.waypoints; let i = index; trackBy: trackByIndex">
+        <input type="text" [name]="'waypoint' + i" [(ngModel)]="routeFormResponse.waypoints[i]" />
+      </div>
+
+      <p>
+        <label for="optimizeRoute">Optimizar puntos intermedios</label>
+        <input type="checkbox" [(ngModel)]="routeFormResponse.optimizeWaypoints" name="optimizeWaypoints"
+          id="optimizeWaypoints">
+      </p>
+
+      <p>
+        <label for="optimizeRoute">Optimizar la ruta</label>
+        <input type="checkbox" [(ngModel)]="routeFormResponse.optimizeRoute" name="optimizeRoute" id="optimizeRoute">
+      </p>
+
+      <p>
+        <label for="avoidTolls">Evitar peajes</label>
+        <input type="checkbox" [(ngModel)]="routeFormResponse.avoidTolls" name="avoidTolls" id="avoidTolls">
+      </p>
+
+      <p>
+        <label for="vehiculeEmissionType">Tipo de combustible</label>
+        <select [(ngModel)]="routeFormResponse.vehiculeEmissionType" name="vehiculeEmissionType"
+          id="vehiculeEmissionType">
+          @for (item of vehiculeEmissionTypeOptions | keyvalue; track item.key){
+          <option [value]="item.key">{{item.value}}</option>
+          }
+        </select>
+      </p>
+
       }
       @if(activeTab === "gas"){
       <p>
@@ -73,49 +118,11 @@
       </p>
       }
 
-      @if (activeTab === "destination" || activeTab === "gas"){
-      <button type="button" (click)="addWaypoint()">Añadir punto intermedio</button>
-
-
-      <div *ngFor="let waypoint of routeFormResponse.waypoints; let i = index; trackBy: trackByIndex">
-        <input type="text" [name]="'waypoint' + i" [(ngModel)]="routeFormResponse.waypoints[i]" />
-      </div>
-      <button type="button" (click)="deleteWaypoint()">Eliminar punto intermedio</button>
-
-      <p>
-        <label for="optimizeRoute">Optimizar puntos intermedios</label>
-        <input type="checkbox" [(ngModel)]="routeFormResponse.optimizeWaypoints" name="optimizeWaypoints"
-          id="optimizeWaypoints">
-      </p>
-
-      <p>
-        <label for="optimizeRoute">Optimizar la ruta</label>
-        <input type="checkbox" [(ngModel)]="routeFormResponse.optimizeRoute" name="optimizeRoute" id="optimizeRoute">
-      </p>
-      }
-
-
-
-      <p>
-        <label for="avoidTolls">Evitar peajes</label>
-        <input type="checkbox" [(ngModel)]="routeFormResponse.avoidTolls" name="avoidTolls" id="avoidTolls">
-      </p>
-
-      <p>
-        <label for="vehiculeEmissionType">Tipo de combustible</label>
-        <select [(ngModel)]="routeFormResponse.vehiculeEmissionType" name="vehiculeEmissionType"
-          id="vehiculeEmissionType">
-          @for (item of vehiculeEmissionTypeOptions | keyvalue; track item.key){
-          <option [value]="item.key">{{item.value}}</option>
-          }
-        </select>
-      </p>
-
       <button type="submit" [disabled]="!form.valid">Enviar</button>
 
 
 
-      @if (submitted && activeTab==="destination"){
+      @if (form.valid && activeTab==="destination"){
       <label for="routeAlias">Guardar ruta</label>
       <input type="text" id="routeAlias" name="routeAlias" [(ngModel)]="routeAlias" placeholder="Alias de la ruta" />
 
