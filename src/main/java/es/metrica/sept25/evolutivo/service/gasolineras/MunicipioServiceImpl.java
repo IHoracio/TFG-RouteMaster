@@ -39,19 +39,19 @@ public class MunicipioServiceImpl implements MunicipioService {
 	 * NO USAR SALVO ESTRICTAMENTE NECESARIO
 	 */
 	@Override
-	@Cacheable("municipios")
+	@Cacheable(value = "municipios", cacheManager = "staticCacheManager")
 	public List<Municipio> getMunicipios() {
-		log.info("[mun-service] [" + LocalDateTime.now().toString() + "] "
-				+ "Attempting to retrieve all municipalities.");
+//		log.info("[mun-service] [" + LocalDateTime.now().toString() + "] "
+//				+ "Attempting to retrieve all municipalities.");
 		List<Provincia> provList = provinciaService.getProvincias();
 		List<Municipio> munList = municipioRepository.findAll();
 
 		List<Long> provIds = provList.stream().map(p -> p.getIdProvincia()).collect(Collectors.toList());
 
-		if (Objects.isNull(munList) | munList.isEmpty()) {
-			log.info("[mun-service] [" + LocalDateTime.now().toString() + "] "
-					+ "Fetching all municipalities from the external API. "
-					+ "This might take a while.");
+		if (Objects.isNull(munList) || munList.isEmpty()) {
+//			log.info("[mun-service] [" + LocalDateTime.now().toString() + "] "
+//					+ "Fetching all municipalities from the external API. "
+//					+ "This might take a while.");
 			ArrayList<Municipio> tempList = new ArrayList<>();
 			provIds.forEach(l -> {
 				Municipio[] munArr = restTemplate.getForObject(API_URL + l, Municipio[].class);
@@ -60,17 +60,17 @@ public class MunicipioServiceImpl implements MunicipioService {
 					municipioRepository.saveAllAndFlush(tempList);
 				}
 			});
-			log.info("[mun-service] [" + LocalDateTime.now().toString() + "] "
-					+ "All municipalities from the external API were retrieved and stored.");
+//			log.info("[mun-service] [" + LocalDateTime.now().toString() + "] "
+//					+ "All municipalities from the external API were retrieved and stored.");
 			return tempList;
 		}
-		log.info("[mun-service] [" + LocalDateTime.now().toString() + "] "
-				+ "All municipalities were retrieved.");
+//		log.info("[mun-service] [" + LocalDateTime.now().toString() + "] "
+//				+ "All municipalities were retrieved.");
 		return munList;
 	}
 
 	@Override
-	@Cacheable("municipio_id")
+	@Cacheable(value = "municipio_id", cacheManager = "staticCacheManager")
 	public Optional<Municipio> getMunicipioFromId(Long idMunicipio) {
 		log.info("[mun-service] [" + LocalDateTime.now().toString() + "] "
 				+ "Attempting to retrieve municipality with ID: " + idMunicipio + ".");
@@ -80,21 +80,21 @@ public class MunicipioServiceImpl implements MunicipioService {
 				.findFirst();
 		
 		if (munFromId.isEmpty()) {
-			log.warn("[mun-service] [" + LocalDateTime.now().toString() + "] "
-					+ "No municipality was found for the ID: " + idMunicipio + ".");
+//			log.warn("[mun-service] [" + LocalDateTime.now().toString() + "] "
+//					+ "No municipality was found for the ID: " + idMunicipio + ".");
 		} else {
-			log.info("[mun-service] [" + LocalDateTime.now().toString() + "] "
-					+ "Succesfully found a municipality with ID: " + idMunicipio + ".");
+//			log.info("[mun-service] [" + LocalDateTime.now().toString() + "] "
+//					+ "Succesfully found a municipality with ID: " + idMunicipio + ".");
 		}
 
 		return munFromId;
 	}
 
 	@Override
-	@Cacheable("municipio_str")
+	@Cacheable(value = "municipio_str", cacheManager = "staticCacheManager")
 	public Optional<Municipio> getMunicipioFromString(String munStr) {
-		log.info("[mun-service] [" + LocalDateTime.now().toString() + "] "
-				+ "Attempting to retrieve municipality from string identifier: " + munStr + ".");
+//		log.info("[mun-service] [" + LocalDateTime.now().toString() + "] "
+//				+ "Attempting to retrieve municipality from string identifier: " + munStr + ".");
 		List<Municipio> munList = getMunicipios();
 		Optional<Municipio> municipalityFromStr = munList.stream()
 				.filter(m -> m.getNombreMunicipio()
@@ -103,11 +103,11 @@ public class MunicipioServiceImpl implements MunicipioService {
 				.findFirst();
 		
 		if (municipalityFromStr.isEmpty()) {
-			log.warn("[mun-service] [" + LocalDateTime.now().toString() + "] "
-					+ "No municipality was found for the string identifier: " + munStr + ".");
+//			log.warn("[mun-service] [" + LocalDateTime.now().toString() + "] "
+//					+ "No municipality was found for the string identifier: " + munStr + ".");
 		} else {
-			log.info("[mun-service] [" + LocalDateTime.now().toString() + "] "
-					+ "Succesfully found a municipality with string identifier: " + munStr + ".");
+//			log.info("[mun-service] [" + LocalDateTime.now().toString() + "] "
+//					+ "Succesfully found a municipality with string identifier: " + munStr + ".");
 		}
 
 		return municipalityFromStr;

@@ -12,6 +12,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -30,15 +32,12 @@ import es.metrica.sept25.evolutivo.domain.dto.weather.Dia;
 import es.metrica.sept25.evolutivo.domain.dto.weather.EstadoCielo;
 import es.metrica.sept25.evolutivo.domain.dto.weather.Temperatura;
 import es.metrica.sept25.evolutivo.domain.dto.weather.Weather;
-import es.metrica.sept25.evolutivo.entity.gasolinera.Gasolinera;
 import es.metrica.sept25.evolutivo.enums.EmissionType;
 import es.metrica.sept25.evolutivo.service.gasolineras.GasolineraService;
 import es.metrica.sept25.evolutivo.service.ine.INEService;
 import es.metrica.sept25.evolutivo.service.maps.geocode.GeocodeService;
 import es.metrica.sept25.evolutivo.service.maps.geocode.ReverseGeocodeService;
 import es.metrica.sept25.evolutivo.service.weather.WeatherService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @Service
 public class RoutesServiceImpl implements RoutesService {
@@ -214,8 +213,7 @@ public class RoutesServiceImpl implements RoutesService {
 	@Override
 	public List<Coords> decodePolyline(String polylinePoints) {
 		log.info("[routes-service] [" + LocalDateTime.now().toString() + "] "
-				+ "Attempting to decode into coordinates a given route polyline: \n" 
-				+ polylinePoints );
+				+ "Attempting to decode into coordinates a given route polyline.");
 		EncodedPolyline polyline = new EncodedPolyline(polylinePoints);
 		List<LatLng> latLngs = polyline.decodePath();
 		

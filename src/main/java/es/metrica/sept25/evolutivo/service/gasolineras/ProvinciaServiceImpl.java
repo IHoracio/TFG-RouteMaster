@@ -32,13 +32,13 @@ public class ProvinciaServiceImpl implements ProvinciaService {
 	ProvinciaRepository provinciaRepository;
 
 	public void save(Provincia provincia) {
-		log.info("[prov-service] [" + LocalDateTime.now().toString() + "] "
-				+ "Attempting to save the following province: " + provincia.toString() + ".");
+//		log.info("[prov-service] [" + LocalDateTime.now().toString() + "] "
+//				+ "Attempting to save the following province: " + provincia.toString() + ".");
 		provinciaRepository.save(provincia);
 	}
 
 	@Override
-	@Cacheable("provincias")
+	@Cacheable(value = "provincias", cacheManager = "staticCacheManager")
 	public List<Provincia> getProvincias() {
 		log.info("[prov-service] [" + LocalDateTime.now().toString() + "] "
 				+ "Attempting to retrieve all provinces from the repository.");
@@ -63,6 +63,7 @@ public class ProvinciaServiceImpl implements ProvinciaService {
 	}
 
 	@Override
+	@Cacheable(value = "provinciaById", cacheManager = "staticCacheManager")
 	public Optional<Provincia> getProvinciaById(Long id) {
 		getProvincias();
 		log.info("[prov-service] [" + LocalDateTime.now().toString() + "] "
@@ -70,29 +71,29 @@ public class ProvinciaServiceImpl implements ProvinciaService {
 		Optional<Provincia> retrieved = provinciaRepository.findById(id);
 
 		if (retrieved.isEmpty()) {
-			log.info("[prov-service] [" + LocalDateTime.now().toString() + "] "
+			log.warn("[prov-service] [" + LocalDateTime.now().toString() + "] "
 					+ "No province was found with ID: " + id);
 		} else {
-			log.info("[prov-service] [" + LocalDateTime.now().toString() + "] "
-					+ "Successfully found the province with ID: " + id);
+//			log.info("[prov-service] [" + LocalDateTime.now().toString() + "] "
+//					+ "Successfully found the province with ID: " + id);
 		}
 
 		return retrieved;
 	}
 
 	@Override
-	@Cacheable("provinciaForMuni")
+	@Cacheable(value = "provinciaForMuni", cacheManager = "staticCacheManager")
 	public Optional<Provincia> getProvinciaForMunicipio(Municipio mun) {
 		Long provId = mun.getIdProvincia();
 		List<Provincia> provList = getProvincias();
 		Optional<Provincia> foundProvForMun = provList.stream().filter(p -> p.getIdProvincia() == provId).findFirst();
 		
 		if (foundProvForMun.isEmpty()) {
-			log.info("[prov-service] [" + LocalDateTime.now().toString() + "] "
+			log.warn("[prov-service] [" + LocalDateTime.now().toString() + "] "
 					+ "Failed to find the province for municipality: " + mun.toString() + ".");
 		} else {
-			log.info("[prov-service] [" + LocalDateTime.now().toString() + "] "
-					+ "Successfully found the province for municipality: " + mun.toString() + ".");
+//			log.info("[prov-service] [" + LocalDateTime.now().toString() + "] "
+//					+ "Successfully found the province for municipality: " + mun.toString() + ".");
 		}
 		
 		return foundProvForMun;

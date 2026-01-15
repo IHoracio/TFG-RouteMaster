@@ -18,8 +18,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
-@Tag(name = "Ruta")
-@RequestMapping("/api/ruta")
+@Tag(name = "Rutas Guardadas")
+@RequestMapping("/api/savedRoute")
 public class RouteExecutionController {
 
     @Autowired

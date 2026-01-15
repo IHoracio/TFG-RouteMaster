@@ -1,4 +1,4 @@
-package es.metrica.sept25.evolutivo.route;
+package es.metrica.sept25.evolutivo.maps.route;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -23,9 +23,8 @@ import es.metrica.sept25.evolutivo.domain.dto.maps.routes.Step;
 import es.metrica.sept25.evolutivo.domain.dto.maps.routes.executionRoutes.RouteExecutionDTO;
 import es.metrica.sept25.evolutivo.domain.dto.maps.routes.savedRoutes.PointDTO;
 import es.metrica.sept25.evolutivo.domain.dto.maps.routes.savedRoutes.SavedRouteDTO;
-
+import es.metrica.sept25.evolutivo.enums.EmissionType;
 import es.metrica.sept25.evolutivo.service.maps.routes.RoutesService;
-import es.metrica.sept25.evolutivo.service.maps.routes.RoutesServiceImpl.VehicleEmissionType;
 import es.metrica.sept25.evolutivo.service.maps.routes.executeRoutes.RouteExecutionServiceImpl;
 import es.metrica.sept25.evolutivo.service.maps.routes.savedRoutes.SavedRouteService;
 
@@ -92,7 +91,7 @@ class RouteExecutionServiceImplTest {
 				false, 
 				"es", 
 				false, 
-				VehicleEmissionType.DIESEL))
+				EmissionType.C))
 		.thenReturn(Optional.of(group));
 
 		Optional<RouteExecutionDTO> result = service.executeSavedRoute(1L);
@@ -132,7 +131,7 @@ class RouteExecutionServiceImplTest {
 
 		// Devuelve Optional.empty() simulando fallo en RoutesService
 		when(routesService.getDirections(anyString(), anyString(), anyList(), anyBoolean(), anyBoolean(), anyString(),
-				anyBoolean(), any(VehicleEmissionType.class))).thenReturn(Optional.empty());
+				anyBoolean(), any(EmissionType.class))).thenReturn(Optional.empty());
 
 		Optional<RouteExecutionDTO> result = service.executeSavedRoute(1L);
 

@@ -16,6 +16,7 @@ import es.metrica.sept25.evolutivo.entity.gasolinera.UserSavedGasStation;
 import es.metrica.sept25.evolutivo.entity.user.User;
 import es.metrica.sept25.evolutivo.entity.user.UserPreferences.Language;
 import es.metrica.sept25.evolutivo.entity.user.UserPreferences.Theme;
+import es.metrica.sept25.evolutivo.enums.EmissionType;
 import es.metrica.sept25.evolutivo.enums.FuelType;
 import es.metrica.sept25.evolutivo.enums.MapViewType;
 import es.metrica.sept25.evolutivo.repository.GasolineraRepository;
@@ -68,14 +69,17 @@ class UserServiceImplTest {
     void save_userWithEncodedPassword_savesDirectly() {
         User user = new User();
         user.setEmail("a@a.com");
-        user.setPassword("$2a$something");
+        user.setPassword("1234abcd");
+        user.setPasswordConfirmation("1234abcd");
+
+        when(passwordEncoder.encode("1234abcd")).thenReturn("$2a$something");
 
         when(userRepository.save(any(User.class))).thenAnswer(inv -> inv.getArgument(0));
 
         User saved = userService.save(user);
 
         assertEquals("$2a$something", saved.getPassword());
-        verify(passwordEncoder, never()).encode(anyString());
+        verify(passwordEncoder).encode("1234abcd");
         verify(userRepository).save(user);
     }
 
@@ -128,19 +132,20 @@ class UserServiceImplTest {
     @Test
     void createUser_newUser_returnsUser() {
         UserDTO dto = new UserDTO();
-        dto.setEmail("new@mail.com");
+        dto.setEmail("new@gmail.com");
         dto.setName("John");
         dto.setSurname("Doe");
-        dto.setPassword("1234");
+        dto.setPassword("1234abcd");
+        dto.setPasswordConfirmation("1234abcd");
 
-        when(userRepository.findByEmail("new@mail.com")).thenReturn(Optional.empty());
-        when(passwordEncoder.encode("1234")).thenReturn("encoded1234");
+        when(userRepository.findByEmail("new@gmail.com")).thenReturn(Optional.empty());
+        when(passwordEncoder.encode("1234abcd")).thenReturn("encoded1234");
         when(userRepository.save(any(User.class))).thenAnswer(inv -> inv.getArgument(0));
 
         Optional<User> result = userService.createUser(dto);
 
         assertTrue(result.isPresent());
-        assertEquals("new@mail.com", result.get().getEmail());
+        assertEquals("new@gmail.com", result.get().getEmail());
         assertEquals("encoded1234", result.get().getPassword());
         verify(userRepository).save(any(User.class));
     }
@@ -150,7 +155,7 @@ class UserServiceImplTest {
         UserDTO dto = new UserDTO();
         dto.setEmail("exists@mail.com");
 
-        when(userRepository.findByEmail("exists@mail.com")).thenReturn(Optional.of(new User()));
+        lenient().when(userRepository.findByEmail("exists@mail.com")).thenReturn(Optional.of(new User()));
 
         Optional<User> result = userService.createUser(dto);
 
@@ -163,7 +168,7 @@ class UserServiceImplTest {
         User user = new User();
         when(userRepository.save(any(User.class))).thenAnswer(inv -> inv.getArgument(0));
 
-        userService.updateRoutePreferences(user, List.of("CEPSA"), 10, FuelType.DIESEL, 1.2, MapViewType.SATELLITE);
+        userService.updateRoutePreferences(user, List.of("CEPSA"), 10, FuelType.DIESEL, 1.2, MapViewType.SATELLITE, false, EmissionType.C);
 
         assertEquals(10, user.getRoutePreferences().getRadioKm());
         assertEquals(FuelType.DIESEL, user.getRoutePreferences().getFuelType());
