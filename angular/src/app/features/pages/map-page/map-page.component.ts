@@ -33,7 +33,7 @@ export class MapPageComponent implements OnDestroy, AfterViewInit {
   showControls = input<boolean>(true);
   gasStations = input<GasStation[]>([]);
   selectedStation = input<string | null>(null);
-  mapType = input<string>('Mapa');  // Nuevo input para el tipo de mapa, por defecto 'Mapa'
+  mapType = input<string>('Mapa');
 
   constructor(private mapComm: MapCommunicationService) {
     effect(() => {
@@ -230,43 +230,57 @@ export class MapPageComponent implements OnDestroy, AfterViewInit {
     });
   }
 
-  private updateMarkers(): void {
-    const stations = this.gasStations();
-    this.clearGasStations();
+private updateMarkers(): void {
+  const stations = this.gasStations();
+  this.clearGasStations();
 
-    if (stations.length > 0 && this.map) {
-      stations.forEach(station => {
-        const key = `${station.nombreEstacion} - ${station.direccion}`;
-        const size = 36;
-        const fillColor = '#e71616';
-        const gasStationPointSvg = `
-          <svg height="${size}" width="${size}" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" 
-          viewBox="0 0 624.138 624.138" xml:space="preserve" fill="${fillColor}"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <g> <g> <g> <g> <path style="fill:${fillColor};" d="M312.064,0C203.478,0,115.439,88.029,115.439,196.566c0,108.634,196.625,427.572,196.625,427.572 S508.698,305.2,508.698,196.566C508.698,88.029,420.698,0,312.064,0z M312.064,348.678 c-83.701,0-151.809-68.108-151.809-151.809c0-83.721,68.118-151.809,151.809-151.809c83.701,0,151.809,68.088,151.809,151.809 C463.873,280.57,395.765,348.678,312.064,348.678z"></path> <path style="fill:#010002;" d="M372.658,122.41l20.078,20.498v106.006c0,1.729-0.352,2.97-1.094,3.703 c-1.7,1.671-5.921,1.563-8.109,1.544c-4.719,0-8.275-0.938-9.956-2.609c-1.075-1.133-1.133-2.276-1.075-2.638V145.888H354.74 V95.2h-98.806v182.409H234.42v25.344h141.882v-25.344H354.74V156.01h7.591v92.475c-0.039,0.547-0.274,5.452,3.664,9.78 c3.722,3.996,9.565,6.028,17.42,6.028l1.514,0.02c3.742,0,9.682-0.449,13.805-4.484c2.745-2.697,4.133-6.36,4.133-10.933 V138.746l-22.989-23.448L372.658,122.41z M342.039,166.151h-70.922v-50.668h70.922V166.151z"></path> </g> </g> </g> </g> </g>
-          </svg>
-        `;
+  if (stations.length > 0 && this.map) {
+    let hasValid = false;
+    const bounds = new google.maps.LatLngBounds();
 
-        const container = document.createElement('div');
-        container.innerHTML = gasStationPointSvg;
-        container.style.width = `${size}px`;
-        container.style.height = `${size}px`;
-        container.style.display = 'block';
-        container.style.transform = 'translateY(-6px)';
+    stations.forEach(station => {
+      const lat = Number(station.latitud);
+      const lng = Number(station.longitud);
+      if (isNaN(lat) || isNaN(lng) || lat < -90 || lat > 90 || lng < -180 || lng > 180) {
+        console.warn('Invalid coords for station:', station.nombreEstacion, 'lat:', station.latitud, 'lng:', station.longitud);
+        return;  // Salta esta station
+      }
 
-        const marker = new google.maps.marker.AdvancedMarkerElement({
-          map: null,
-          position: { lat: station.latitud, lng: station.longitud },
-          content: container,
-          title: key
-        });
-        this.gasStationsMarkers.push(marker);
-        this.markerClusterer?.addMarker(marker);
+      // Crea marker si coords válidas
+      const size = 36;
+      const fillColor = '#e71616';
+      const gasStationPointSvg = `
+        <svg height="${size}" width="${size}" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" 
+        viewBox="0 0 624.138 624.138" xml:space="preserve" fill="${fillColor}"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <g> <g> <g> <g> <path style="fill:${fillColor};" d="M312.064,0C203.478,0,115.439,88.029,115.439,196.566c0,108.634,196.625,427.572,196.625,427.572 S508.698,305.2,508.698,196.566C508.698,88.029,420.698,0,312.064,0z M312.064,348.678 c-83.701,0-151.809-68.108-151.809-151.809c0-83.721,68.118-151.809,151.809-151.809c83.701,0,151.809,68.088,151.809,151.809 C463.873,280.57,395.765,348.678,312.064,348.678z"></path> <path style="fill:#010002;" d="M372.658,122.41l20.078,20.498v106.006c0,1.729-0.352,2.97-1.094,3.703 c-1.7,1.671-5.921,1.563-8.109,1.544c-4.719,0-8.275-0.938-9.956-2.609c-1.075-1.133-1.133-2.276-1.075-2.638V145.888H354.74 V95.2h-98.806v182.409H234.42v25.344h141.882v-25.344H354.74V156.01h7.591v92.475c-0.039,0.547-0.274,5.452,3.664,9.78 c3.722,3.996,9.565,6.028,17.42,6.028l1.514,0.02c3.742,0,9.682-0.449,13.805-4.484c2.745-2.697,4.133-6.36,4.133-10.933 V138.746l-22.989-23.448L372.658,122.41z M342.039,166.151h-70.922v-50.668h70.922V166.151z"></path> </g> </g> </g> </g> </g>
+        </svg>
+      `;
+
+      const container = document.createElement('div');
+      container.innerHTML = gasStationPointSvg;
+      container.style.width = `${size}px`;
+      container.style.height = `${size}px`;
+      container.style.display = 'block';
+      container.style.transform = 'translateY(-6px)';
+
+      const marker = new google.maps.marker.AdvancedMarkerElement({
+        map: null,
+        position: { lat, lng },
+        content: container,
+        title: `${station.nombreEstacion} - ${station.direccion}`
       });
+      this.gasStationsMarkers.push(marker);
+      this.markerClusterer?.addMarker(marker);
+      bounds.extend({ lat, lng });
+      hasValid = true;
+    });
 
-      const bounds = new google.maps.LatLngBounds();
-      stations.forEach(s => bounds.extend({ lat: s.latitud, lng: s.longitud }));
+    if (hasValid) {
       this.map.fitBounds(bounds, { top: 70, right: 120, bottom: 150, left: 120 });
+    } else {
+      console.log('No valid gas stations to display on map');
     }
   }
+}
 
   private remarkGasStation(): void {
     const currentSelected = this.selectedStation();
