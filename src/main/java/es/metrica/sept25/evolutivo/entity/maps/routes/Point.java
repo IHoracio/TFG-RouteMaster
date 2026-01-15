@@ -60,6 +60,4 @@ public class Point {
 	public void setSavedRoute(SavedRoute savedRoute) {
 		this.savedRoute = savedRoute;
 	}
-    
-    
 }

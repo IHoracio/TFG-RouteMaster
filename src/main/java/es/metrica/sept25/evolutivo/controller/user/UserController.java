@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import es.metrica.sept25.evolutivo.domain.dto.gasolineras.UserSavedGasStationDto;
 import es.metrica.sept25.evolutivo.domain.dto.maps.routes.PreferredBrandsDTO;
+import es.metrica.sept25.evolutivo.domain.dto.user.UserBasicInfoDTO;
 import es.metrica.sept25.evolutivo.domain.dto.user.UserResponseDTO;
 import es.metrica.sept25.evolutivo.entity.maps.routes.RoutePreferences;
 import es.metrica.sept25.evolutivo.entity.user.User;
@@ -66,7 +67,8 @@ public class UserController {
 		return ResponseEntity.ok(user.get());
 	}
 
-	@Operation(summary = "Obtener un usuario por mail")
+	*/
+	@Operation(summary = "Obtener datos base de un usuario por mail")
 	@ApiResponses(value = { 
 		@ApiResponse(
 				responseCode = "200",
@@ -78,13 +80,12 @@ public class UserController {
 		) 
 	})
 	@GetMapping("/get")
-	public ResponseEntity<UserResponseDTO> getUser(HttpServletRequest request) {
+	public ResponseEntity<UserBasicInfoDTO> getUser(HttpServletRequest request) {
 		String email = cookieService.getCookieValue(request, "sesionActiva").get();
-		return service.getByEmail(email)
+		return service.getSimpleInfo(email)
 				.map(ResponseEntity::ok)
 				.orElse(ResponseEntity.notFound().build());
 	}
-	*/
 
 	@Operation(
 		summary = "Listar todos los usuarios", 
