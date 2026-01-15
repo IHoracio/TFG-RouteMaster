@@ -21,10 +21,6 @@ public interface UserService {
 
     List<UserResponseDTO> getAll();
 
-    void deleteByEmail(String mail);
-
-//	Optional<User> createUser(String name, String surname, String password, String email);
-
 	Optional<User> createUser(UserDTO userDTO);
 
 	void removeGasStation(String email, String alias);

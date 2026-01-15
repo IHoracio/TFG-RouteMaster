@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import es.metrica.sept25.evolutivo.domain.dto.gasolineras.UserSavedGasStationDto;
 import es.metrica.sept25.evolutivo.domain.dto.user.UserDTO;
@@ -94,23 +93,6 @@ public class UserServiceImpl implements UserService {
 		            .toList();
 	}
 
-	@Override
-	@Transactional
-	public void deleteByEmail(String email) {
-		log.info("[user-service] [" + LocalDateTime.now().toString() + "] "
-                + "Attempting to delete user with email: " + email);
-		
-		Optional<UserResponseDTO> user = getByEmail(email);
-		if (user.isPresent()) {
-			log.info("[user-service] [" + LocalDateTime.now().toString() + "] "
-                    + "User successfully deleted: " + email);
-			userRepository.deleteByEmail(email);
-        } else {
-            log.warn("[user-service] [" + LocalDateTime.now().toString() + "] "
-                    + "No user found to delete with email: " + email);
-        }
-	}
-	
 	@Override
 	@Transactional
 	public Optional<User> createUser(UserDTO userDTO) {
@@ -244,7 +226,7 @@ public class UserServiceImpl implements UserService {
 	    if (user.isPresent()) {
 	    	user.get().getSavedGasStations().removeIf(sg -> sg.getAlias().equalsIgnoreCase(alias));
 	    	userRepository.save(user.get());
-	    }else {
+	    } else {
             log.warn("[user-service] [" + LocalDateTime.now().toString() + "] "
                     + "No user found while removing gas station for email: " + email);
         }
@@ -285,7 +267,6 @@ public class UserServiceImpl implements UserService {
                     + "No user found with email: " + email);
 	        return Optional.of("Usuario no encontrado");
 	    }
-
 	    
 	    Optional<Gasolinera> gasolinera = gasolineraRepository.findByIdEstacion(idEstacion);
 	    

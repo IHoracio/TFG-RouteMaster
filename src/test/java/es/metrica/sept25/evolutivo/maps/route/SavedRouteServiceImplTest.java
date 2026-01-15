@@ -1,16 +1,16 @@
-package es.metrica.sept25.evolutivo.route;
+package es.metrica.sept25.evolutivo.maps.route;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -24,6 +24,7 @@ import es.metrica.sept25.evolutivo.domain.dto.maps.routes.savedRoutes.SavedRoute
 import es.metrica.sept25.evolutivo.entity.maps.routes.Point;
 import es.metrica.sept25.evolutivo.entity.maps.routes.SavedRoute;
 import es.metrica.sept25.evolutivo.entity.user.User;
+import es.metrica.sept25.evolutivo.enums.EmissionType;
 import es.metrica.sept25.evolutivo.repository.SavedRouteRepository;
 import es.metrica.sept25.evolutivo.service.maps.routes.savedRoutes.SavedRouteServiceImpl;
 
@@ -60,7 +61,7 @@ public class SavedRouteServiceImplTest {
         when(repository.save(any(SavedRoute.class))).thenReturn(savedRoute);
 
         SavedRouteDTO result = service.saveRoute(
-            "Mi Ruta", puntosDTO, testUser, true, false, "es"
+            "Mi Ruta", puntosDTO, testUser, true, false, "es", false, EmissionType.C
         );
 
         assertNotNull(result);
@@ -114,6 +115,10 @@ public class SavedRouteServiceImplTest {
 
     @Test
     void getSavedRoute_existingRoute() {
+    	
+    	System.out.println(service);
+    	System.out.println(repository);
+    	
         SavedRoute route = new SavedRoute();
         route.setRouteId(1L);
         route.setName("Ruta Test");
@@ -122,7 +127,7 @@ public class SavedRouteServiceImplTest {
         p.setType(Point.TypePoint.ORIGIN);
         route.setPuntos(List.of(p));
 
-        when(repository.findById(1L)).thenReturn(Optional.of(route));
+        when(repository.findByRouteId(1L)).thenReturn(Optional.of(route));
 
         Optional<SavedRouteDTO> result = service.getSavedRoute(1L);
 
@@ -135,7 +140,7 @@ public class SavedRouteServiceImplTest {
 
     @Test
     void getSavedRoute_routeNotFound() {
-        when(repository.findById(1L)).thenReturn(Optional.empty());
+        lenient().when(repository.findById(1L)).thenReturn(Optional.empty());
 
         Optional<SavedRouteDTO> result = service.getSavedRoute(1L);
 

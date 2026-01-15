@@ -2,7 +2,6 @@ package es.metrica.sept25.evolutivo.domain.dto.maps.routes.savedRoutes;
 
 import java.util.List;
 
-import es.metrica.sept25.evolutivo.entity.maps.routes.RoutePreferences;
 import es.metrica.sept25.evolutivo.enums.MapViewType;
 
 public class RoutePreferencesDTO {

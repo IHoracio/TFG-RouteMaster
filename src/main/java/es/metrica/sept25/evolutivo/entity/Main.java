@@ -40,12 +40,5 @@ public class Main {
 		List<Municipio> m = mapper.readValue(municipios, new TypeReference<List<Municipio>>() { });
 		m = m.stream().filter(muni -> muni.getIdProvincia() < 100).toList();
 
-		System.out.println("PROVINCIAS ESPAÑOLAS");
-		System.out.println(l);
-		System.out.println(l.size());
-
-		System.out.println("MUNICIPIOS ESPAÑOLES");
-		System.out.println(m);
-		System.out.println(m.size());
 	}
 }

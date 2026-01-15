@@ -182,8 +182,9 @@ public class GasolineraServiceImpl implements GasolineraService {
 		try {
 			gasolinerasPorRadio = restTemplate.getForObject(urlRadio, Gasolinera[].class);
 		} catch (HttpClientErrorException.NotFound e) {
-			System.err.println("No se han encontrado gasolineras en radio " + radius
-					+ " de la dirección " + address);
+			log.warn("[gas-service] [" + LocalDateTime.now().toString() + "] "
+					+ "No gas stations were found in a radius: " + radius + " for"
+					+ " address = " + address + ".");
 			return foundRadius;
 		}
 
@@ -212,11 +213,13 @@ public class GasolineraServiceImpl implements GasolineraService {
 	        for (Gasolinera gasolinera : gasolineras) {
 	        	String marca = gasolinera.getMarca();
 
-	            if (marca != null
-	                    && !marca.isBlank()
-	                    && !marca.matches("\\d+")) {
-	                marcas.add(marca.trim());
-	            }
+	        	if (marca != null && !marca.isBlank()) {
+	        	    marca = marca.replaceFirst("^\"[^\"]*\"\\s*", "").trim();
+	        	    
+	        	    if (marca.matches(".*[a-zA-Z].*")) {
+	        	        marcas.add(marca);
+	        	    }
+	        	}
 	        }
 	    }
 	    syncBrands(marcas);
