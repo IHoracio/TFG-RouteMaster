@@ -1,13 +1,172 @@
-.error{
-    color:red;
+app-map-page{
+    margin-top: 20px;
+}
+
+.error {
+    color: var(--color-error);
     font-weight: bold;
 }
+
 .asterisk {
-    color: red;
+    color: var(--color-error);
     font-weight: bold;
     margin-right: 5px;
 }
-.success{
-    color: green;
+
+.success {
+    color: var(--color-success);
     font-weight: bold;
+}
+
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+* {
+    list-style: none;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+.card {
+    margin-bottom: 50px;
+    background: var(--color-card);
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: var(--card-shadow);
+    max-width: 1200px;
+    width: 100%;
+}
+.card h2{
+    text-align: center;
+    font-weight: bold;
+}
+.tabs_wrap {
+    padding: 20px;
+    border-bottom: 1px solid #ebedec;
+    margin-bottom: 10px;
+}
+
+.tabs_wrap ul {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-pack: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+}
+
+.tabs_wrap ul li {
+    width: 200px;
+    text-align: center;
+    background: #e9ecf1;
+    border-right: 1px solid #c1c4c9;
+    padding: 13px 15px;
+    cursor: pointer;
+    -webkit-transition: all 0.2s ease;
+    -o-transition: all 0.2s ease;
+    transition: all 0.2s ease;
+}
+
+.tabs_wrap ul li:first-child {
+    border-top-left-radius: 25px;
+    border-bottom-left-radius: 25px;
+}
+
+.tabs_wrap ul li:last-child {
+    border-right: 0px;
+    border-top-right-radius: 25px;
+    border-bottom-right-radius: 25px;
+}
+
+.tabs_wrap ul li:hover {
+    background: linear-gradient(90deg, var(--color-primary), var(--color-secondary));
+    color: var(--color-title);
+}
+
+.tabs_wrap ul li.active {
+    background: linear-gradient(90deg, var(--color-secondary), var(--color-primary));
+    color: var(--color-title);
+}
+.form-control{
+    width: 350px;
+}
+.form-control:focus {
+    box-shadow: 0 0 10px rgba(38, 143, 255, 0.5);
+    border-color: #268fff;
+}
+
+/* From Uiverse.io by andrew-demchenk0 */ 
+.button{
+  position: relative;
+  width: 142px;
+  height: 25px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  border: 1px solid #34974d;
+  background-color: #3aa856;
+  border-radius: 8px;
+}
+.button-delete{
+  position: relative;
+  width: 142px;
+  height: 25px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  border: 1px solid #34974d;
+  background-color: #3aa856;
+  border-radius: 8px;
+}
+
+.button, .button-delete, .button__icon, .button__text {
+  transition: all 0.3s;
+}
+
+.button .button__text,
+.button-delete .button__text {
+  transform: translateX(30px);
+  color: #fff;
+  font-weight: 600;
+}
+
+.button .button__icon {
+  position: absolute;
+  transform: translateX(109px);
+  height: 100%;
+  width: 26px;
+  background-color: #34974d;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+}
+
+.button .svg {
+  width: 30px;
+  stroke: #fff;
+}
+
+.button:hover {
+  background: #34974d;
+}
+
+.button:hover .button__text {
+  color: transparent;
+}
+
+.button:hover .button__icon {
+  width: 130px;
+  transform: translateX(0);
+}
+
+.button:active .button__icon {
+  background-color: #2e8644;
+}
+
+.button:active {
+  border: 1px solid #2e8644;
 }

@@ -1,12 +1,13 @@
 import { Component } from '@angular/core';
 import { FormsModule, ReactiveFormsModule, FormGroup, FormControl, Validators, FormBuilder } from '@angular/forms';
-import { User } from '../../../Dto/user-dtos';
+import { User } from '../../Dto/user-dtos';
 import { NgIf } from '@angular/common';
-import { UserService } from '../../../services/user/user.service';
+import { UserService } from '../../services/user/user.service';
+import { RouterLink } from "@angular/router";
 
 @Component({
   selector: 'app-create-user',
-  imports: [FormsModule, ReactiveFormsModule, NgIf],
+  imports: [FormsModule, ReactiveFormsModule, NgIf, RouterLink],
   templateUrl: './create-user.component.html',
   styleUrl: './create-user.component.css'
 })
@@ -17,6 +18,7 @@ export class CreateUserComponent {
   user: User = {
     email: "",
     password: "",
+    passwordConfirmation: "",
     name: "",
     surname: ""
   }
@@ -33,7 +35,7 @@ export class CreateUserComponent {
         Validators.minLength(8),
         Validators.pattern(/(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*\W)/)
       ]],
-      confirmPassword: ['', [
+      passwordConfirmation: ['', [
         Validators.required
       ]],
       name: ['', [
@@ -47,14 +49,14 @@ export class CreateUserComponent {
 
   get email() { return this.form.get('email'); }
   get password() { return this.form.get('password'); }
-  get confirmPassword() { return this.form.get('confirmPassword'); }
+  get passwordConfirmation() { return this.form.get('passwordConfirmation'); }
   get name() { return this.form.get('name'); }
   get surname() { return this.form.get('surname'); }
 
   passwordMatchValidator(form: FormGroup) {
     const password = form.get('password')?.value;
-    const confirmPassword = form.get('confirmPassword')?.value;
-    if (password !== confirmPassword) {
+    const passwordConfirmation = form.get('passwordConfirmation')?.value;
+    if (password !== passwordConfirmation) {
       return { passwordMismatch: true };
     }
     return null;
@@ -66,25 +68,18 @@ export class CreateUserComponent {
             this.form.get(controlName)?.touched
         );
   }
-  userSent: User = {
-    email: "",
-    password: "",
-    name: "",
-    surname: ""
-  }
   message: string = "";
   error: string = "";
   onSubmit() {
     if(this.form.valid){
       this.user.email = this.email?.value;
       this.user.password = this.password?.value;
+      this.user.passwordConfirmation = this.passwordConfirmation?.value
       this.user.name = this.name?.value;
       this.user.surname = this.surname?.value;
 
       console.log(this.user)
       this.userService.saveUser(this.user).subscribe(response => {
-          this.userSent = response;
-          console.log(this.userSent)
           this.message = "Usuario creado con éxito."
           this.error = "";
       }, (err)=>{
