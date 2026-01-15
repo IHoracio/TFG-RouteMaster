@@ -27,7 +27,8 @@
             <label>Marcas de Gasolinera Favoritas:</label>
             <ul>
                 @for (brand of preferredBrands(); track $index) {
-                <li>{{ capitalize(brand) }} <button type="button" (click)="removePreferredBrand(brand)">Eliminar</button></li>
+                <li>{{ capitalize(brand) }} <button type="button"
+                        (click)="removePreferredBrand(brand)">Eliminar</button></li>
                 }
             </ul>
         </div>
@@ -35,7 +36,8 @@
         @if (fuelType() !== 'ELECTRIC') {
         <div class="form-group">
             <label for="precioMaximo">Precio Máximo de Combustible:</label>
-            <input id="precioMaximo" type="number" [value]="maxPrice()" (input)="setMaxPrice($event)" min="0" step="0.01">
+            <input id="precioMaximo" type="number" [value]="maxPrice()" (input)="setMaxPrice($event)" min="0"
+                step="0.01">
         </div>
         }
 
@@ -83,19 +85,22 @@
         <div class="form-group radio-slider">
             <label for="radioKm">Radio KM: <span (click)="toggleInfo()" class="info-icon">ℹ️</span></label>
             <div class="slider-container">
-                <input id="radioKm" type="range" [value]="radioKm()" (input)="setRadioKm($event)" min="1" max="15" step="1">
+                <input id="radioKm" type="range" [value]="radioKm()" (input)="setRadioKm($event)" min="1" max="15"
+                    step="1">
                 <span>{{ radioKm() }} km</span>
             </div>
             @if (showRadiusInfo()) {
             <div class="info-tooltip">
-                El radio en kilómetros define el área de búsqueda alrededor de la dirección especificada para encontrar gasolineras cercanas.
+                El radio en kilómetros define el área de búsqueda alrededor de la dirección especificada para encontrar
+                gasolineras cercanas.
             </div>
             }
         </div>
 
         <div class="form-group" id="add-gas-stations">
             <label>Añadir Gasolineras Favoritas: <span (click)="toggleGasInfo()" class="info-icon">ℹ️</span></label>
-            <input type="text" [value]="searchAddress()" (input)="setSearchAddress($event)" placeholder="Escribe una dirección">
+            <input type="text" [value]="searchAddress()" (input)="setSearchAddress($event)"
+                placeholder="Escribe una dirección">
             @if (showAddressDropdown() && filteredMunicipalities().length > 0) {
             <ul class="dropdown-list">
                 @for (municipality of filteredMunicipalities(); track $index) {
@@ -109,7 +114,8 @@
             }
             @if (showGasInfo()) {
             <div class="info-tooltip">
-                El autocompletado solo sugiere lugares con gasolineras. Puedes ingresar cualquier dirección y aumentar el radio KM para buscar más opciones.
+                El autocompletado solo sugiere lugares con gasolineras. Puedes ingresar cualquier dirección y aumentar
+                el radio KM para buscar más opciones.
             </div>
             }
         </div>
@@ -135,7 +141,8 @@
             </ul>
             <div class="add-favorite-container">
                 <input type="text" [value]="alias()" (input)="setAlias($event)" placeholder="Alias para la gasolinera">
-                <button type="button" (click)="addSelectedGasStations()" [disabled]="!selectedStation() || !alias().trim()">Añadir Seleccionada</button>
+                <button type="button" (click)="addSelectedGasStations()"
+                    [disabled]="!selectedStation() || !alias().trim()">Añadir Seleccionada</button>
             </div>
         </div>
         } @else if (!isLoading() && hasSearched() && searchResults().length === 0) {
@@ -144,11 +151,13 @@
         </div>
         }
 
-        @if (favoriteGasStations().length > 0) {
+        @if (favoriteGasStations().length > 0 || searchResults().length > 0) {
         <div class="map-container">
-            <app-map-page [showWeather]="false" [showControls]="false" 
+            <app-map-page 
+                [showWeather]="false" 
+                [showControls]="false" 
                 [gasStations]="allStations()"
-                [selectedStation]="selectedStation()"
+                [selectedStation]="selectedStation()" 
                 [mapType]="mapType()">
             </app-map-page>
         </div>
@@ -168,7 +177,8 @@
 
         <div class="buttons">
             <button type="button" (click)="savePreferences()">Guardar Cambios</button>
-            <button type="button" (click)="resetPreferences()">Reiniciar a Por Defecto</button>
+            <button type="button" (click)="resetPreferences()" [disabled]="!defaultsLoaded()">Reiniciar a Por
+                Defecto</button>
         </div>
     </form>
 </div>

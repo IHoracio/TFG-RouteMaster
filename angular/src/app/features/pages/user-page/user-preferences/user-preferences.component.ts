@@ -2,9 +2,12 @@ import { Component, signal, inject, effect, computed, OnInit } from '@angular/co
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { GasStationService } from '../../../../services/user-page/gas-station/gas-station.service';
-import { GasStation, GasStationFavourite } from '../../../../Dto/gas-station';
+import { GasStation, FavouriteGasStation } from '../../../../Dto/gas-station';
 import { MapPageComponent } from '../../map-page/map-page.component';
 import { UserPreferencesService } from '../../../../services/user-page/user-preferences.service';
+import { DefaultUserPreferences } from '../../../../Dto/preferences';
+import { forkJoin, of } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 
 @Component({
   selector: 'app-user-preferences',
@@ -15,6 +18,8 @@ import { UserPreferencesService } from '../../../../services/user-page/user-pref
 export class UserPreferencesComponent implements OnInit {
   private gasStationService = inject(GasStationService);
   private userPreferencesService = inject(UserPreferencesService);
+
+  defaultUserPreferences: DefaultUserPreferences | null = null;
 
   fuelType = signal<string>('');
   theme = signal<string>('');
@@ -34,8 +39,8 @@ export class UserPreferencesComponent implements OnInit {
   mapTypeOptions = signal<string[]>([]);
   emissionLabelOptions = signal<string[]>([]);
 
-  favoriteGasStations = signal<GasStationFavourite[]>([]);
-  deletedFavourites = signal<GasStationFavourite[]>([]);
+  favoriteGasStations = this.userPreferencesService.getFavoriteGasStationsSignal();
+  deletedFavourites = signal<FavouriteGasStation[]>([]);
 
   searchAddress = signal<string>('');
   searchResults = signal<GasStation[]>([]);
@@ -47,14 +52,16 @@ export class UserPreferencesComponent implements OnInit {
   showGasInfo = signal<boolean>(false);
 
   isLoadingPreferences = signal<boolean>(true);
+  defaultsLoaded = signal<boolean>(false);
 
   brandSearch = signal<string>('');
   showBrandDropdown = signal<boolean>(false);
   showAddressDropdown = signal<boolean>(false);
 
+  previousMaxPrice = signal<number>(0);
+
   alias = signal<string>('');
 
-  private userId: string = "1";
   private email: string = 'prueba@gmail.com';
 
   filteredBrands = computed(() => {
@@ -75,25 +82,44 @@ export class UserPreferencesComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadOptions();
-    this.userPreferencesService.getUserPreferences(this.userId, this.email).subscribe({
+    this.userPreferencesService.getDefaultPreferences().subscribe({
+      next: (defaults) => {
+        this.defaultUserPreferences = defaults;
+        this.defaultsLoaded.set(true);
+      },
+      error: (error) => {
+        console.error('Error loading default preferences:', error);
+        this.defaultsLoaded.set(true);
+      }
+    });
+    this.userPreferencesService.getUserPreferences(this.email).subscribe({
       next: (data) => {
         this.preferredBrands.set(data.preferredBrands || []);
         this.avoidTolls.set(data.avoidTolls || false);
-        this.radioKm.set(data.radioKm || 0);
-        this.fuelType.set(data.fuelType || '');
-        this.emissionType.set(data.emissionType || '');
+        this.radioKm.set(data.radioKm || 1);
+        this.fuelType.set(data.fuelType || 'GASOLINE');
+        this.emissionType.set(data.emissionType || 'B');
         this.maxPrice.set(data.maxPrice || 0);
-        this.mapType.set(data.mapView || '');
-        this.theme.set(data.theme || '');
-        this.language.set(data.language || '');
+        this.mapType.set(data.mapView || 'MAP');
         this.isLoadingPreferences.set(false);
+        this.previousMaxPrice.set(data.maxPrice || 0);
       },
       error: (error) => {
         this.isLoadingPreferences.set(false);
       }
     });
 
-    this.userPreferencesService.getUserGasStationFavourites(this.email).subscribe({
+    this.userPreferencesService.getUserThemeLanguage(this.email).subscribe({
+      next: (data) => {
+        this.theme.set(data.theme || 'LIGHT');
+        this.language.set(data.language || 'ES');
+      },
+      error: (error) => {
+        console.error('Error loading user prefs:', error);
+      }
+    });
+
+    this.userPreferencesService.getUserFavouriteGasStations(this.email).subscribe({
       next: (data) => {
         this.favoriteGasStations.set(data || []);
         this.favoriteGasStations().forEach(favorite => {
@@ -135,11 +161,6 @@ export class UserPreferencesComponent implements OnInit {
     });
 
     effect(() => {
-      this.radioKm();
-      this.hasSearched.set(false);
-    });
-
-    effect(() => {
       this.brandSearch();
       this.showBrandDropdown.set(this.brandSearch().length > 0);
     });
@@ -148,16 +169,19 @@ export class UserPreferencesComponent implements OnInit {
       this.searchAddress();
       this.showAddressDropdown.set(this.searchAddress().length > 0);
     });
-
-    effect(() => {
-      if (this.fuelType() === 'ELECTRIC') {
-        this.maxPrice.set(5);
-      }
-    });
   }
 
   setFuelType(event: Event): void {
-    this.fuelType.set((event.target as HTMLSelectElement).value);
+    const newFuelType = (event.target as HTMLSelectElement).value;
+
+    if (newFuelType === 'ELECTRIC') {
+      this.previousMaxPrice.set(this.maxPrice());
+      this.maxPrice.set(5);
+    } else if (this.fuelType() === 'ELECTRIC') {
+      this.maxPrice.set(this.previousMaxPrice());
+    }
+
+    this.fuelType.set(newFuelType);
   }
 
   setMaxPrice(event: Event): void {
@@ -200,7 +224,7 @@ export class UserPreferencesComponent implements OnInit {
     this.alias.set((event.target as HTMLInputElement).value);
   }
 
-  setSelectedStation(station: GasStation | GasStationFavourite): void {
+  setSelectedStation(station: GasStation | FavouriteGasStation): void {
     this.selectedStation.set(`${station.nombreEstacion} - ${station.direccion}`);
   }
 
@@ -239,7 +263,7 @@ export class UserPreferencesComponent implements OnInit {
           alert('El alias ya existe. Elige uno diferente.');
           return;
         }
-        const favorite: GasStationFavourite = { ...station, alias: this.alias() };
+        const favorite: FavouriteGasStation = { ...station, alias: this.alias() };
         this.favoriteGasStations.update(stations => [...stations, favorite]);
         this.alias.set('');
         this.selectedStation.set(null);
@@ -269,64 +293,108 @@ export class UserPreferencesComponent implements OnInit {
   }
 
   savePreferences(): void {
-    if (!this.userId || !this.email) return;
-    let mapView = this.mapType();
+    if (!this.email) return;
 
-    this.userPreferencesService.updateUserPreferences(this.userId, this.email, this.radioKm(), this.fuelType(), this.emissionType(), this.maxPrice(), mapView, this.preferredBrands(), this.theme(), this.language()).subscribe({
+    console.log('Sending preferences update with:', {
+      email: this.email,
+      radioKm: this.radioKm(),
+      fuelType: this.fuelType(),
+      emissionType: this.emissionType(),
+      maxPrice: this.maxPrice(),
+      mapView: this.mapType(),
+      avoidTolls: this.avoidTolls(),
+      preferredBrands: this.preferredBrands()
+    });
+
+    const updatePrefs$ = this.userPreferencesService.updateUserPreferences(
+      this.email, this.radioKm(), this.fuelType(), this.emissionType(), this.maxPrice(), this.mapType(), this.avoidTolls(), this.preferredBrands()
+    );
+
+    const updateTheme$ = this.userPreferencesService.updateUserThemeLanguage(
+      this.email, this.theme(), this.language()
+    ).pipe(
+      catchError(err => {
+        console.error('Theme update failed:', err);
+        return of(null);
+      })
+    );
+
+    const updateFavorites$ = this.favoriteGasStations().map(f =>
+      this.userPreferencesService.updateFavouriteGasStations(this.email, f.alias, f.idEstacion).pipe(
+        catchError(err => {
+          console.error('Favorite update failed for', f.alias, ':', err);
+          return of(null);
+        })
+      )
+    );
+
+    const deleteFavorites$ = this.deletedFavourites().map(f =>
+      this.userPreferencesService.deleteFavouriteGasStations(this.email, f.alias, f.idEstacion).pipe(
+        catchError(err => {
+          console.error('Delete favorite failed for', f.alias, ':', err);
+          return of(null);
+        })
+      )
+    );
+
+    console.log('Sending theme/language update with:', {
+      email: this.email,
+      theme: this.theme(),
+      language: this.language()
+    });
+
+    forkJoin([updatePrefs$, updateTheme$, ...updateFavorites$, ...deleteFavorites$]).subscribe({
       next: () => {
-        console.log('Preferencias guardadas exitosamente.');
+        console.log('All updates completed');
+        this.deletedFavourites.set([]);
+        window.scrollTo(0, 0);
         window.location.reload();
       },
-      error: (error) => {
-        console.error('Error al guardar preferencias. Intenta de nuevo.');
+      error: (err) => {
+        console.error('Error saving preferences:', err);
+        alert('Error saving preferences: ' + (err?.message || 'Unknown error'));
+        this.deletedFavourites.set([]);
       }
     });
-
-    this.favoriteGasStations().forEach(favorite => {
-      this.userPreferencesService.updateGasStationFavourites(this.email, favorite.alias, favorite.idEstacion).subscribe({
-        next: () => {
-          console.log(`Gasolinera favorita ${favorite.alias} guardada.`);
-        },
-        error: (error) => {
-          console.error(`Error al guardar gasolinera favorita ${favorite.alias}:`, error);
-        }
-      });
-    });
-
-    this.deletedFavourites().forEach(favorite => {
-      this.userPreferencesService.deleteGasStationFavourites(this.email, favorite.alias, favorite.idEstacion).subscribe({
-        next: () => {
-          console.log(`Gasolinera favorita ${favorite.alias} eliminada.`);
-        },
-        error: (error) => {
-          console.error(`Error al eliminar gasolinera favorita ${favorite.alias}:`, error);
-        }
-      });
-    });
-
-    this.deletedFavourites.set([]);
   }
 
   resetPreferences(): void {
-    this.fuelType.set('ALL');
+    if (!this.defaultUserPreferences) return;
+    this.fuelType.set(this.defaultUserPreferences.fuelType || 'GASOLINE');
     this.theme.set('LIGHT');
     this.language.set('ES');
-    this.radioKm.set(1);
-    this.maxPrice.set(2);
-    this.mapType.set('MAP');
-    this.avoidTolls.set(false);
-    this.emissionType.set('');
-    this.preferredBrands.set([]);
-    this.favoriteGasStations.set([]);
-    this.deletedFavourites.set([]);
+    this.radioKm.set(this.defaultUserPreferences.radioKm || 1);
+    this.maxPrice.set(this.defaultUserPreferences.maxPrice || 1.5);
+    this.mapType.set(this.defaultUserPreferences.mapView || 'MAP');
+    this.avoidTolls.set(this.defaultUserPreferences.avoidTolls || false);
+    this.emissionType.set(this.defaultUserPreferences.emissionType || 'B');
+    this.preferredBrands.set(this.defaultUserPreferences.preferredBrands || []);
 
-    this.userPreferencesService.updateUserPreferences(this.userId, this.email, this.radioKm(), this.fuelType(), this.emissionType(), this.maxPrice(), this.mapType(), this.preferredBrands(), this.theme(), this.language()).subscribe({
+    console.log('Resetting to defaults:', this.defaultUserPreferences);
+    console.log('Values being sent:');
+
+    const updatePrefs$ = this.userPreferencesService.updateUserPreferences(
+      this.email, this.radioKm(), this.fuelType(), this.emissionType(), this.maxPrice(), this.mapType(), this.avoidTolls(), this.preferredBrands()
+    );
+
+    const updateTheme$ = this.userPreferencesService.updateUserThemeLanguage(
+      this.email, this.theme(), this.language()
+    ).pipe(
+      catchError(err => {
+        console.error('Theme reset failed:', err);
+        return of(null);
+      })
+    );
+
+    forkJoin([updatePrefs$, updateTheme$]).subscribe({
       next: () => {
-        console.log('Preferencias reiniciadas a por defecto.');
+        console.log('Reset successful, reloading...');
+        window.scrollTo(0, 0);
         window.location.reload();
       },
-      error: (error) => {
-        console.error('Error al reiniciar preferencias.');
+      error: (err) => {
+        console.error('Error resetting preferences:', err);
+        alert('Error al reiniciar: ' + (err?.message || 'Error desconocido'));
       }
     });
   }

@@ -1,22 +1,27 @@
 <div class="user-info">
   <h2>Información del Usuario</h2>
   
-  <div class="user-details">
-    <p><strong>Email:</strong> {{ user().email }}</p>
-    <p><strong>Nombre:</strong> {{ user().name }}</p>
-    <p><strong>Apellido:</strong> {{ user().surname }}</p>
-  </div>
+  @if (loadingUser()) {
+    <p>Cargando información del usuario...</p>
+  } @else {
+    <div class="user-details">
+      <p><strong>Email:</strong> {{ user().email }}</p>
+      <p><strong>Nombre:</strong> {{ user().name }}</p>
+      <p><strong>Apellido:</strong> {{ user().surname }}</p>
+    </div>
+  }
   
   <div class="favorites-section">
     <h3>Rutas Favoritas</h3>
     @if (favoriteRoutes().length > 0) {
       <ul>
-        @for (route of favoriteRoutes(); track route.name) {
-          <li>
-            {{ route.name }}
+        @for (route of favoriteRoutes(); track route.routeId) {
+          <li (click)="selectRoute(route)" class="clickable">
+            {{ route.name }} - Origen: {{ route.points[0]?.address || 'N/A' }}, Destino: {{ route.points[1]?.address || 'N/A' }} - Distancia: {{ route.distanceKm }} km, Duración: {{ route.durationFormatted }}
             @if (route.canShare) {
               <button (click)="shareRoute(route)">Compartir</button>
             }
+            <button (click)="deleteRoute(route)">Eliminar</button>
           </li>
         }
       </ul>
@@ -31,7 +36,9 @@
     @if (favoriteGasStations().length > 0) {
       <ul>
         @for (station of favoriteGasStations(); track station.idEstacion) {
-          <li>{{ station.nombreEstacion }} - {{ station.direccion }}</li>
+          <li (click)="selectStation(station)" class="clickable">
+            {{ station.alias || 'Sin alias' }} - {{ station.nombreEstacion }} - {{ station.direccion }}
+          </li>
         }
       </ul>
     } @else {
