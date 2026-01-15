@@ -2,6 +2,8 @@ import { NgIf } from '@angular/common';
 import { Component } from '@angular/core';
 import { FormsModule, ReactiveFormsModule, FormBuilder, Validators, FormGroup } from '@angular/forms';
 import { RouterLink } from '@angular/router';
+import { UserLoginDTO } from '../../Dto/user-dtos';
+import { UserService } from '../../services/user/user.service';
 
 @Component({
   selector: 'app-login',
@@ -12,10 +14,13 @@ import { RouterLink } from '@angular/router';
 export class LoginComponent {
 
   form: FormGroup;
-
-  constructor(private formBuilder: FormBuilder) {
+  userLogin: UserLoginDTO = {
+    user: "",
+    password: ""
+  }
+  constructor(private formBuilder: FormBuilder, private userService: UserService) {
     this.form = formBuilder.group({
-      username: ['',
+      user: ['',
         [
           Validators.required,
         ]],
@@ -26,20 +31,26 @@ export class LoginComponent {
       ]]
     })
   }
+  get user() { return this.form.get('user'); }
+  get password() { return this.form.get('password'); }
 
+
+  message: string = "";
+  error: string = "";
   onSubmit() {
     if(this.form.valid){
       console.log(this.form.value)
-      /*this.userService.saveUser(this.user).subscribe(response => {
-          this.userSent = response;
-          console.log(this.userSent)
+      this.userLogin.user = this.user?.value
+      this.userLogin.password = this.password?.value
+      this.userService.loginUser(this.userLogin).subscribe(response => {
           this.message = "Usuario creado con éxito."
           this.error = "";
+          console.log(response)
       }, (err)=>{
           this.error = "Ha occurido un error con los datos introducidos."
           this.message = ""
           console.log(err)
-      });*/
+      });
     } else{
       console.log("El formulario tiene errores.")
     }

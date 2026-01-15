@@ -13,7 +13,7 @@ import { Coords, RouteGroupResponse } from '../../Dto/maps-dtos';
 export class RouteService {
 
   private apiUrl = 'http://localhost:8080/api/routes';
-  private routeUrl = 'http://localhost:8080/api/ruta'
+  private routeUrl = 'http://localhost:8080/api/savedRoute'
   constructor(private http: HttpClient) { }
 
   calculateRoute(routeFormResponse: RouteFormResponse): Observable<string> {
@@ -112,7 +112,7 @@ export class RouteService {
     return this.http.post(
     this.routeUrl + '/save',
     null,
-    { params }
+    { params, withCredentials: true }
   );
   }
 
