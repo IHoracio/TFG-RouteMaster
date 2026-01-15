@@ -155,4 +155,19 @@ public class SavedRouteServiceImpl implements SavedRouteService {
 
 		return dto;
 	}
+	
+	
+	@Override
+	@Transactional
+	public SavedRouteDTO renameRoute(String name, SavedRouteDTO savedRoute) {
+		SavedRoute route = repository.findByRouteId(savedRoute.getRouteId()).get();
+		route.setName(name);
+	    
+		repository.save(route);
+
+		log.info("[route-save-service] [" + LocalDateTime.now().toString() + "] "
+				+ "Successfully renamed route with ID " + route.getRouteId() + 
+				" to the name: " + name + ".");
+		return mapToDTO(route);
+	}
 }

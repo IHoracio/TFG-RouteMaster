@@ -29,6 +29,8 @@ public interface UserService {
 
 	Optional<String> saveGasStation(String email, String alias, Long idEstacion);
 
+	boolean renameGasStation(String email, String oldAlias, String newAlias);
+
 	Optional<User> getEntityByEmail(String email);
 
 	void updateUserPreferences(User user, Theme theme, Language language);
