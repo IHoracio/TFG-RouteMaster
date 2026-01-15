@@ -17,7 +17,7 @@ export class UserService {
     const headers = new HttpHeaders({
       'Content-Type': 'application/json',
     });
-    return this.http.post<User>(this.userUrl + "/create", user, { headers });
+    return this.http.post<User>("http://localhost:8080/auth/register", user, { headers });
   }
 
   receiveUserData(mail: string): Observable<string> {
