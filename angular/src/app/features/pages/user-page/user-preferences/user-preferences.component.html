@@ -4,65 +4,78 @@
     <form class="preferences-form">
         <div class="form-group">
             <label for="fuelType">Tipo de Combustible:</label>
-            <select id="fuelType" [(ngModel)]="fuelType" name="fuelType">
-                @for (option of fuelOptions; track option) {
-                <option [value]="option">{{ option }}</option>
+            <select id="fuelType" [value]="fuelType()" (change)="setFuelType($event)">
+                @for (option of fuelOptions(); track $index) {
+                <option [value]="option">{{ capitalize(option) }}</option>
                 }
             </select>
         </div>
 
         <div class="form-group">
-            <label for="favoriteGasStation">Marca de Gasolinera Favorita:</label>
-            <select id="favoriteGasStation" [(ngModel)]="favoriteGasStation" name="favoriteGasStation">
-                <option value="">Ninguna</option>
-                @for (option of gasStationOptions; track option) {
-                <option [value]="option">{{ option }}</option>
+            <label for="brandSearch">Añadir Marca de Gasolinera Favorita:</label>
+            <input type="text" [value]="brandSearch()" (input)="setBrandSearch($event)" placeholder="Buscar marca">
+            @if (showBrandDropdown() && filteredBrands().length > 0) {
+            <ul class="dropdown-list">
+                @for (brand of filteredBrands(); track $index) {
+                <li (click)="addPreferredBrand(brand)">{{ capitalize(brand) }}</li>
                 }
-            </select>
+            </ul>
+            }
         </div>
 
+        <div class="form-group">
+            <label>Marcas de Gasolinera Favoritas:</label>
+            <ul>
+                @for (brand of preferredBrands(); track $index) {
+                <li>{{ capitalize(brand) }} <button type="button" (click)="removePreferredBrand(brand)">Eliminar</button></li>
+                }
+            </ul>
+        </div>
+
+        @if (fuelType() !== 'ELECTRIC') {
         <div class="form-group">
             <label for="precioMaximo">Precio Máximo de Combustible:</label>
-            <input id="precioMaximo" type="number" [(ngModel)]="precioMaximo" name="precioMaximo" min="0" step="0.01">
+            <input id="precioMaximo" type="number" [value]="maxPrice()" (input)="setMaxPrice($event)" min="0" step="0.01">
         </div>
+        }
 
         <div class="form-group">
             <label for="mapType">Tipo de Mapa:</label>
-            <select id="mapType" [(ngModel)]="mapType" name="mapType">
-                @for (option of mapTypeOptions; track option) {
-                <option [value]="option">{{ option }}</option>
+            <select id="mapType" [value]="mapType()" (change)="setMapType($event)">
+                @for (option of mapTypeOptions(); track $index) {
+                <option [value]="option">{{ capitalize(option) }}</option>
                 }
             </select>
         </div>
 
         <div class="form-group">
             <label for="avoidTolls">Evitar Peajes:</label>
-            <input id="avoidTolls" type="checkbox" [(ngModel)]="avoidTolls" name="avoidTolls">
+            <input id="avoidTolls" type="checkbox" [checked]="avoidTolls()" (change)="setAvoidTolls($event)">
         </div>
 
         <div class="form-group">
             <label for="emissionLabel">Etiqueta Medioambiental:</label>
-            <select id="emissionLabel" [(ngModel)]="emissionLabel" name="emissionLabel">
-                @for (option of emissionLabelOptions; track option) {
-                <option [value]="option">{{ option }}</option>
+            <select id="emissionLabel" [value]="emissionType()" (change)="setEmissionLabel($event)">
+                @for (option of emissionLabelOptions(); track $index) {
+                <option [value]="option">{{ capitalize(option) }}</option>
                 }
             </select>
         </div>
 
         <div class="form-group">
             <label for="theme">Tema:</label>
-            <select id="theme" [(ngModel)]="theme" name="theme">
-                @for (option of themeOptions; track option) {
-                <option [value]="option">{{ option }}</option>
+            <select id="theme" [value]="theme()" (change)="setTheme($event)">
+                @for (option of themeOptions(); track $index) {
+                <option [value]="option">{{ capitalize(option) }}</option>
                 }
             </select>
         </div>
 
         <div class="form-group">
             <label for="language">Idioma:</label>
-            <select id="language" [(ngModel)]="language" name="language">
-                @for (option of languageOptions; track option) {
-                <option [value]="option">{{ option }}</option>
+            <select id="language" [value]="language()" (change)="setLanguage($event)">
+                @for (option of languageOptions(); track $index) {
+                <option [value]="option">{{ capitalize(option) }}</option>
                 }
             </select>
         </div>
@@ -70,10 +83,10 @@
         <div class="form-group radio-slider">
             <label for="radioKm">Radio KM: <span (click)="toggleInfo()" class="info-icon">ℹ️</span></label>
             <div class="slider-container">
-                <input id="radioKm" type="range" [(ngModel)]="radioKm" name="radioKm" min="1" max="30" step="1">
+                <input id="radioKm" type="range" [value]="radioKm()" (input)="setRadioKm($event)" min="1" max="15" step="1">
                 <span>{{ radioKm() }} km</span>
             </div>
-            @if (showInfo()) {
+            @if (showRadiusInfo()) {
             <div class="info-tooltip">
                 El radio en kilómetros define el área de búsqueda alrededor de la dirección especificada para encontrar gasolineras cercanas.
             </div>
@@ -81,11 +94,23 @@
         </div>
 
         <div class="form-group" id="add-gas-stations">
-            <label>Añadir Gasolineras Favoritas:</label>
-            <input type="text" [(ngModel)]="searchAddress" name="searchAddress" placeholder="Escribe una dirección">
+            <label>Añadir Gasolineras Favoritas: <span (click)="toggleGasInfo()" class="info-icon">ℹ️</span></label>
+            <input type="text" [value]="searchAddress()" (input)="setSearchAddress($event)" placeholder="Escribe una dirección">
+            @if (showAddressDropdown() && filteredMunicipalities().length > 0) {
+            <ul class="dropdown-list">
+                @for (municipality of filteredMunicipalities(); track $index) {
+                <li (click)="setMunicipality(municipality)">{{ capitalize(municipality) }}</li>
+                }
+            </ul>
+            }
             <button type="button" (click)="searchGasStations()" [disabled]="isLoading()">Buscar</button>
             @if (isLoading()) {
             <span>Cargando...</span>
+            }
+            @if (showGasInfo()) {
+            <div class="info-tooltip">
+                El autocompletado solo sugiere lugares con gasolineras. Puedes ingresar cualquier dirección y aumentar el radio KM para buscar más opciones.
+            </div>
             }
         </div>
 
@@ -108,8 +133,10 @@
                 }
                 }
             </ul>
-            <button type="button" (click)="addSelectedGasStations()" [disabled]="!selectedStation()">Añadir
-                Seleccionada</button>
+            <div class="add-favorite-container">
+                <input type="text" [value]="alias()" (input)="setAlias($event)" placeholder="Alias para la gasolinera">
+                <button type="button" (click)="addSelectedGasStations()" [disabled]="!selectedStation() || !alias().trim()">Añadir Seleccionada</button>
+            </div>
         </div>
         } @else if (!isLoading() && hasSearched() && searchResults().length === 0) {
         <div class="form-group">
@@ -117,7 +144,7 @@
         </div>
         }
 
-        @if (allStations().length > 0) {
+        @if (favoriteGasStations().length > 0) {
         <div class="map-container">
             <app-map-page [showWeather]="false" [showControls]="false" 
                 [gasStations]="allStations()"
@@ -132,7 +159,7 @@
             <ul>
                 @for (station of favoriteGasStations(); track station.idEstacion) {
                 <li (click)="setSelectedStation(station)" class="clickable-favorite">
-                    {{ station.nombreEstacion }} - {{ station.direccion }}
+                    {{ station.alias }} - {{ station.nombreEstacion }} - {{ station.direccion }}
                     <button type="button" (click)="removeFavoriteGasStation(station)">Eliminar</button>
                 </li>
                 }

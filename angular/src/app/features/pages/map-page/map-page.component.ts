@@ -33,7 +33,7 @@ export class MapPageComponent implements OnDestroy, AfterViewInit {
   showControls = input<boolean>(true);
   gasStations = input<GasStation[]>([]);
   selectedStation = input<string | null>(null);
-  mapType = input<string>('Mapa');  // Nuevo input para el tipo de mapa, por defecto 'Mapa'
+  mapType = input<string>('Mapa');
 
   constructor(private mapComm: MapCommunicationService) {
     effect(() => {
