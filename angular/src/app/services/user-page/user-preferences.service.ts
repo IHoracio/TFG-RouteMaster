@@ -1,9 +1,9 @@
-import { Injectable } from '@angular/core';
+import { Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Preferences } from '../../Dto/preferences';
+import { DefaultUserPreferences, Preferences, ThemeLangPreferences } from '../../Dto/preferences';
 import { Municipalitie } from '../../Dto/municipalities';
-import { GasStation, GasStationFavourite } from '../../Dto/gas-station';
+import { GasStation, FavouriteGasStation } from '../../Dto/gas-station';
 
 @Injectable({
   providedIn: 'root'
@@ -11,34 +11,50 @@ import { GasStation, GasStationFavourite } from '../../Dto/gas-station';
 export class UserPreferencesService {
   private baseUrl = 'http://localhost:8080';
 
+  private favoriteGasStationsSignal = signal<FavouriteGasStation[]>([]);
+
+
   constructor(private http: HttpClient) { }
 
-  getUserPreferences(userId: string, email: string): Observable<any> {
-    return this.http.get(`${this.baseUrl}/api/users/${userId}/preferences`, {
+  getFavoriteGasStationsSignal() { return this.favoriteGasStationsSignal; }
+  setFavoriteGasStations(data: FavouriteGasStation[]) { this.favoriteGasStationsSignal.set(data); }
+
+  getUserPreferences(email: string): Observable<any> {
+    return this.http.get(`${this.baseUrl}/api/users/0/preferences`, {
       params: { email }
     });
   }
 
-  updateUserPreferences(userId: string, email: string, radioKm: number, fuelType: string, emissionType: string,  maxPrice: number, mapView: string, preferredBrands: string[], theme: string, language: string): Observable<any> {
-    const body = { preferredBrands };
-    return this.http.put(`${this.baseUrl}/api/users/${userId}/preferences`, body, {
-      params: { email, radioKm: radioKm.toString(), fuelType, emissionType, maxPrice: maxPrice.toString(), mapView, theme, language }
+  getDefaultPreferences(): Observable<DefaultUserPreferences> {
+    return this.http.get<DefaultUserPreferences>(`${this.baseUrl}/api/users/defaultPreferences`);
+  }
+
+  getUserThemeLanguage(email: string): Observable<ThemeLangPreferences> {
+    return this.http.get<ThemeLangPreferences>(`${this.baseUrl}/api/users/0/preferences/user`, {
+      params: { email }
     });
   }
 
-  updateUserThemeLanguage(userId: string, email: string, theme: string, language: string): Observable<any> {
-    return this.http.put(`${this.baseUrl}/api/users/${userId}/preferences/user`, {}, {
+  updateUserPreferences(email: string, radioKm: number, fuelType: string, emissionType: string, maxPrice: number, mapType: string, avoidTolls: boolean, preferredBrands: string[]): Observable<any> {
+    const body = { preferredBrands };
+    return this.http.put(`${this.baseUrl}/api/users/0/preferences`, body, {
+      params: { email, radioKm: radioKm.toString(), fuelType, vehicleEmissionType: emissionType, maxPrice: maxPrice.toString(), mapView: mapType, avoidTolls }
+    });
+  }
+
+  updateUserThemeLanguage(email: string, theme: string, language: string): Observable<any> {
+    return this.http.put(`${this.baseUrl}/api/users/0/preferences/user`, null, {
       params: { email, theme, language }
     });
   }
 
-  updateGasStationFavourites(email: string, alias: string, idEstacion: number): Observable<GasStationFavourite[]> {
-    return this.http.put<GasStationFavourite[]>(`${this.baseUrl}/api/users/favourites/${idEstacion}`, {}, {
+  updateFavouriteGasStations(email: string, alias: string, idEstacion: number): Observable<FavouriteGasStation[]> {
+    return this.http.put<FavouriteGasStation[]>(`${this.baseUrl}/api/users/favourites/${idEstacion}`, {}, {
       params: { email, alias, idEstacion }
     });
   }
 
-  deleteGasStationFavourites(email: string, alias: string, idEstacion: number): Observable<any> {
+  deleteFavouriteGasStations(email: string, alias: string, idEstacion: number): Observable<any> {
     return this.http.delete(`${this.baseUrl}/api/users/favourites/${idEstacion}`, {
       params: { email, alias }
     });
@@ -48,9 +64,9 @@ export class UserPreferencesService {
     return this.http.get<string[]>(`${this.baseUrl}/api/oil/gasolineras/marcas`);
   }
 
-  getUserGasStationFavourites(email: string): Observable<GasStationFavourite[]> {
-    return this.http.get<GasStationFavourite[]>(`${this.baseUrl}/api/users/favourites`,{
-      params: {email}
+  getUserFavouriteGasStations(email: string): Observable<FavouriteGasStation[]> {
+    return this.http.get<FavouriteGasStation[]>(`${this.baseUrl}/api/users/favourites`, {
+      params: { email }
     });
   }
 
@@ -78,7 +94,7 @@ export class UserPreferencesService {
     return this.http.get<Preferences[]>(`${this.baseUrl}/api/preferences/languages`);
   }
 
-  getMunicipalities(): Observable<Municipalitie[]>{
+  getMunicipalities(): Observable<Municipalitie[]> {
     return this.http.get<Municipalitie[]>(`${this.baseUrl}/api/oil/municipios`);
   }
 }
