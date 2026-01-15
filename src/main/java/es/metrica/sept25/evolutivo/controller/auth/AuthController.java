@@ -53,9 +53,9 @@ public class AuthController {
     public ResponseEntity<String> register(@RequestBody UserDTO userDTO) {
         Optional<User> created = userService.createUser(userDTO);
         if (created.isPresent()) {
-            return ResponseEntity.status(HttpStatus.CREATED).body("User created");
+			return ResponseEntity.status(HttpStatus.CREATED).build();
         }
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Could not create user");
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
 
     @PostMapping("/login")
@@ -75,29 +75,29 @@ public class AuthController {
     		HttpServletResponse response) {
     	
         if (login == null || login.getUser() == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Missing credentials");
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
         
         Optional<String> getCookie = cookieService.getCookieValue(request, "sesionActiva");
         if (getCookie.isPresent()) {
         	String clean = getCookie.get().replaceAll("\\[|\\]", "");
         	if (login.getUser().equals(clean)) {
-        		return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Already logged in");
+				return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         	}
         }
 
         Optional<User> userOpt = userService.getEntityByEmail(login.getUser());
         if (userOpt.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
         User user = userOpt.get();
         if (!passwordEncoder.matches(login.getPassword(), user.getPassword())) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
         cookieService.createSessionCookie(response, user.getEmail());
-        return ResponseEntity.ok("Logged in");
+		return ResponseEntity.ok().build();
     }
 
     @PostMapping("/logout")
@@ -118,6 +118,6 @@ public class AuthController {
         }
         
         cookieService.closeSession(response, "sesionActiva");
-        return ResponseEntity.ok("Logged out");
+		return ResponseEntity.ok().build();
     }
 }
