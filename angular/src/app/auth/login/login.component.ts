@@ -1,9 +1,10 @@
 import { NgIf } from '@angular/common';
 import { Component } from '@angular/core';
 import { FormsModule, ReactiveFormsModule, FormBuilder, Validators, FormGroup } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { UserLoginDTO } from '../../Dto/user-dtos';
 import { UserService } from '../../services/user/user.service';
+import { AuthService } from '../../services/auth/auth-service.service';
 
 @Component({
   selector: 'app-login',
@@ -18,42 +19,37 @@ export class LoginComponent {
     user: "",
     password: ""
   }
-  constructor(private formBuilder: FormBuilder, private userService: UserService) {
+  constructor(private formBuilder: FormBuilder, private userService: UserService, private router: Router, private authService: AuthService) {
     this.form = formBuilder.group({
       user: ['',
         [
           Validators.required,
+          Validators.pattern(/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/)
         ]],
       password: ['', [
         Validators.required,
-        //Validators.minLength(8),
-        //Validators.pattern(/(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*\W)/)
+        Validators.minLength(8),
+        Validators.pattern(/(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*\W)/)
       ]]
     })
   }
   get user() { return this.form.get('user'); }
   get password() { return this.form.get('password'); }
-
-
-  message: string = "";
   error: string = "";
   onSubmit() {
-    if(this.form.valid){
       console.log(this.form.value)
       this.userLogin.user = this.user?.value
       this.userLogin.password = this.password?.value
-      this.userService.loginUser(this.userLogin).subscribe(response => {
-          this.message = "Usuario creado con éxito."
-          this.error = "";
-          console.log(response)
-      }, (err)=>{
-          this.error = "Ha occurido un error con los datos introducidos."
-          this.message = ""
-          console.log(err)
-      });
-    } else{
-      console.log("El formulario tiene errores.")
-    }
+      this.authService.loginUser(this.userLogin).subscribe({
+        next: user => {
+          this.router.navigate(['/']);
+          this.authService.sendUserSession(true);
+
+      }, error: () => {
+          this.error = "Ha occurido un error con los datos introducidos.";
+      }
+    });
+
    }
 
    hasError(controlName: string, errorName: string) {

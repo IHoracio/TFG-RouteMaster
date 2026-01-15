@@ -4,6 +4,7 @@ import { User } from '../../Dto/user-dtos';
 import { NgIf } from '@angular/common';
 import { UserService } from '../../services/user/user.service';
 import { RouterLink } from "@angular/router";
+import { AuthService } from '../../services/auth/auth-service.service';
 
 @Component({
   selector: 'app-create-user',
@@ -23,7 +24,7 @@ export class CreateUserComponent {
     surname: ""
   }
 
-  constructor(private formBuilder: FormBuilder, private userService: UserService) {
+  constructor(private formBuilder: FormBuilder, private userService: UserService, private authService: AuthService) {
     this.form = formBuilder.group({
       email: ['',
         [
@@ -79,14 +80,14 @@ export class CreateUserComponent {
       this.user.surname = this.surname?.value;
 
       console.log(this.user)
-      this.userService.saveUser(this.user).subscribe(response => {
+      this.authService.saveUser(this.user).subscribe({
+        next: () => {
           this.message = "Usuario creado con éxito."
           this.error = "";
-      }, (err)=>{
+      }, error: ()=>{
           this.error = "Ha occurido un error con los datos introducidos."
           this.message = ""
-          console.log(err)
-      });
+      }});
     } else{
       console.log("El formulario tiene errores.")
     }

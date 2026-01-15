@@ -1,8 +1,12 @@
 <header>
   <a routerLink="/" class="logo">RouteMaster</a>
-
   <nav>
-    <a routerLink="/login">Iniciar sesión</a>
+    @if(isLoggedIn===false){
+      <a routerLink="/login">Iniciar sesión</a>
+    } @else {
+      <a routerLink="/logout">Cerrar sesión</a>
+    } 
+    
     <a routerLink="/user-info">Área personal</a>
   </nav>
 </header>
