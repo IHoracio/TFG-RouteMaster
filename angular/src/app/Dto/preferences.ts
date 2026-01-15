@@ -4,12 +4,16 @@ export interface Preferences {
 }
 
 export interface DefaultUserPreferences {
-    preferredBrands: string[],
-    radioKm: number,
-    fuelType: string,
-    emissionType: string,
-    maxPrice: number,
-    mapView: string,
-    theme: string,
-    language: string
+  avoidTolls: boolean,
+  emissionType: string,
+  fuelType: string,
+  mapView: string,
+  maxPrice: number,
+  preferredBrands: [],
+  radioKm: number
+}
+
+export interface ThemeLangPreferences {
+    language: string,
+    theme: string
 }
