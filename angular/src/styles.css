@@ -1,1 +1,55 @@
-/* You can add global styles to this file, and also import other style files */
+:root {
+  /*Gradients*/
+  --color-primary: #6a11cb;
+  --color-secondary: #2323FF;
+
+  --color-primary-light: #7e3dff;
+  --color-secondary-light: #525aff;
+
+  --color-title: #F2F2F2;
+  --color-title-dark: #252525;
+  /*Background*/
+  --color-bg: #e2e1eb ;
+
+  /*Cards*/
+  --color-card: #d3d3ff;
+  --color-text: #0f172a;
+  --color-p: #545454;
+  --border-radius: 8px;
+  --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+
+  /*Messages*/
+  --color-error: red;
+  --color-success: #28a745;
+  
+}
+
+html, body {
+  height: 100%;
+  margin: 0;
+}
+
+app-root {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+router-outlet {
+  flex: 1;
+  display: block;
+  padding-top: 100px;
+}
+body {
+  margin: 0;
+  font-family: 'Inter', 'Roboto', sans-serif;
+  background-color: var(--color-bg);
+  color: var(--color-text);
+}
+
+footer, header{
+    /*background: #8866DE;*/
+    background: linear-gradient(90deg, var(--color-primary), var(--color-secondary));
+    text-decoration: none;
+}
+

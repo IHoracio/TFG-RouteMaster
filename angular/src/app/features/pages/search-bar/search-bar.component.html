@@ -1,135 +1,144 @@
-<section>
-  <form (ngSubmit)="onSubmit()" #form="ngForm">
+<div class="container">
+  <section class="card">
+    <h2>Tipo de Búsqueda</h2>
+    <div class="tabs_wrap">
+      <ul>
+        <li [ngClass]="{ active: activeTab === 'destination' }" (click)="setTab('destination')">
+          Origen y destino
+        </li>
 
+        <li [ngClass]="{ active: activeTab === 'gas' }" (click)="setTab('gas')">
+          Gasolinera favorita
+        </li>
 
-    <p>
-      <select name="destinationType" id="destinationType" [(ngModel)]="destinationType" required>
-        <option value="">¿Qué quieres introducir?</option>
-        @for(destination of destinationTypeOptions | keyvalue; track destination.key){
-        <option [value]="destination.key">{{destination.value}}</option>
+        <li [ngClass]="{ active: activeTab === 'route' }" (click)="setTab('route')">
+          Ruta guardada
+        </li>
+      </ul>
+    </div>
+    <form (ngSubmit)="onSubmit()" #form="ngForm">
+      @if(activeTab === "destination" || activeTab === "gas"){
+      <p>
+        <label for="origin">Origen</label>
+        <input class="form-control" type="text" id="origin" name="origin" [(ngModel)]="routeFormResponse.origin" placeholder="¿Desde dónde?"
+          required #originField="ngModel" />
+
+        @if(originField && originField.touched){
+          <div class="error">
+            @if(originField.errors?.['required']){
+            Tienes que introducir un origen.
+            }
+          </div>
         }
-      </select>
-    </p>
-
-
-    @if(destinationType === "coordinates" || destinationType === "favouriteGasStations"){
-    <p>
-      <label for="origin">Elige el origen:</label>
-      <input type="text" id="origin" name="origin" [(ngModel)]="routeFormResponse.origin" placeholder="¿Desde dónde?"
-        required #originField="ngModel" />
-
-      @if(originField && originField.touched){
-    <div class="error">
-      @if(originField.errors?.['required']){
-      Tienes que introducir un origen.
+      </p>
       }
-    </div>
-    }
-    </p>
-    }
 
-    @if(destinationType === "coordinates"){
-    <p>
-      <label for="destination">Elige el destino:</label>
-      <input type="text" id="destination" name="destination" [(ngModel)]="routeFormResponse.destination"
-        placeholder="¿A dónde quieres ir?" required #destinationField="ngModel" />
+      @if(activeTab === "destination"){
+      <p>
+        <label for="destination">Destino</label>
+        <input class="form-control" type="text" id="destination" name="destination" [(ngModel)]="routeFormResponse.destination"
+          placeholder="¿A dónde?" required #destinationField="ngModel" />
 
-      @if(destinationField && destinationField.touched){
-    <div class="error">
-      @if(destinationField.errors?.['required']){
-      Tienes que introducir un destino.
-      }
-    </div>
-    }
-    </p>
-    }
-    @if(destinationType === "favouriteGasStations"){
-    <p>
-      <select name="gasStation" id="gasStation" [(ngModel)]="routeFormResponse.destination" required>
-        <option value="">Elige una gasolinera</option>
-        <option *ngFor="let gasStation of favouriteGasStations()" [value]="gasStation.direccion">
-          {{ gasStation.alias }} — {{ gasStation.marca }}
-        </option>
-      </select>
-    </p>
-    }
-    @if(destinationType === "savedRoute"){
-    <p>
-      <select name="savedRoute" id="savedRoute" [(ngModel)]="selectedRouteOption" required="">
-        <option [ngValue]="">Elige una ruta guardada</option>
-        <option (click)="savedRouteSelected()" *ngFor="let route of savedRoute()"
-          [ngValue]="{ origin: route.points[0].address, destination: route.points[1].address}">
-          {{ route.name }}:
-          {{route.points[0].address}}
-          —
-          {{route.points[1].address}}
-        </option>
-      </select>
-    </p>
-    }
-
-    @if (destinationType === "coordinates" || destinationType === "favouriteGasStations"){
-    <button type="button" (click)="addWaypoint()">Añadir punto intermedio</button>
-
-
-    <div *ngFor="let waypoint of routeFormResponse.waypoints; let i = index; trackBy: trackByIndex">
-      <input type="text" [name]="'waypoint' + i" [(ngModel)]="routeFormResponse.waypoints[i]" />
-    </div>
-    <button type="button" (click)="deleteWaypoint()">Eliminar punto intermedio</button>
-
-    <p>
-      <label for="optimizeRoute">Optimizar puntos intermedios</label>
-      <input type="checkbox" [(ngModel)]="routeFormResponse.optimizeWaypoints" name="optimizeWaypoints"
-        id="optimizeWaypoints">
-    </p>
-
-    <p>
-      <label for="optimizeRoute">Optimizar la ruta</label>
-      <input type="checkbox" [(ngModel)]="routeFormResponse.optimizeRoute" name="optimizeRoute" id="optimizeRoute">
-    </p>
-    }
-
-
-
-    <p>
-      <label for="avoidTolls">Evitar peajes</label>
-      <input type="checkbox" [(ngModel)]="routeFormResponse.avoidTolls" name="avoidTolls" id="avoidTolls">
-    </p>
-
-    <p>
-      <label for="vehiculeEmissionType">Tipo de combustible</label>
-      <select [(ngModel)]="routeFormResponse.vehiculeEmissionType" name="vehiculeEmissionType"
-        id="vehiculeEmissionType">
-        @for (item of vehiculeEmissionTypeOptions | keyvalue; track item.key){
-        <option [value]="item.key">{{item.value}}</option>
+        @if(destinationField && destinationField.touched){
+      <div class="error">
+        @if(destinationField.errors?.['required']){
+        Tienes que introducir un destino.
         }
-      </select>
-    </p>
+      </div>
+      }
+      </p>
 
-    <button type="submit" [disabled]="!form.valid">Enviar</button>
+      <!-- From Uiverse.io by andrew-demchenk0 --> 
+
+      <p>Puntos intermedios</p>
+
+    <button (click)="addWaypoint()" type="button" class="button">
+      <span class="button__text">Añadir</span>
+      <span class="button__icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" viewBox="0 0 24 24" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" stroke="currentColor" height="24" fill="none" class="svg"><line y2="19" y1="5" x2="12" x1="12"></line><line y2="12" y1="12" x2="19" x1="5"></line></svg></span>
+    </button>
+
+    <button (click)="deleteWaypoint()" type="button" class="button">
+      <span class="button__text">Eliminar</span>
+      <span class="button__icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" viewBox="0 0 24 24" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" stroke="currentColor" height="24" fill="none" class="svg"><line y2="19" y1="5" x2="12" x1="12"></line><line y2="12" y1="12" x2="19" x1="5"></line></svg></span>
+    </button>
+
+      <div *ngFor="let waypoint of routeFormResponse.waypoints; let i = index; trackBy: trackByIndex">
+        <input type="text" [name]="'waypoint' + i" [(ngModel)]="routeFormResponse.waypoints[i]" />
+      </div>
+
+      <p>
+        <label for="optimizeRoute">Optimizar puntos intermedios</label>
+        <input type="checkbox" [(ngModel)]="routeFormResponse.optimizeWaypoints" name="optimizeWaypoints"
+          id="optimizeWaypoints">
+      </p>
+
+      <p>
+        <label for="optimizeRoute">Optimizar la ruta</label>
+        <input type="checkbox" [(ngModel)]="routeFormResponse.optimizeRoute" name="optimizeRoute" id="optimizeRoute">
+      </p>
+
+      <p>
+        <label for="avoidTolls">Evitar peajes</label>
+        <input type="checkbox" [(ngModel)]="routeFormResponse.avoidTolls" name="avoidTolls" id="avoidTolls">
+      </p>
+
+      <p>
+        <label for="vehiculeEmissionType">Tipo de combustible</label>
+        <select [(ngModel)]="routeFormResponse.vehiculeEmissionType" name="vehiculeEmissionType"
+          id="vehiculeEmissionType">
+          @for (item of vehiculeEmissionTypeOptions | keyvalue; track item.key){
+          <option [value]="item.key">{{item.value}}</option>
+          }
+        </select>
+      </p>
+
+      }
+      @if(activeTab === "gas"){
+      <p>
+        <select name="gasStation" id="gasStation" [(ngModel)]="routeFormResponse.destination" required>
+          <option value="">Elige una gasolinera</option>
+          <option *ngFor="let gasStation of favouriteGasStations()" [value]="gasStation.direccion">
+            {{ gasStation.alias }} — {{ gasStation.marca }}
+          </option>
+        </select>
+      </p>
+      }
+      @if(activeTab === "route"){
+      <p>
+        <select name="savedRoute" id="savedRoute" [(ngModel)]="selectedRouteOption" required="">
+          <option [ngValue]="">Elige una ruta guardada</option>
+          <option (click)="savedRouteSelected()" *ngFor="let route of savedRoute()"
+            [ngValue]="{ origin: route.points[0].address, destination: route.points[1].address}">
+            {{ route.name }}:
+            {{route.points[0].address}}
+            —
+            {{route.points[1].address}}
+          </option>
+        </select>
+      </p>
+      }
+
+      <button type="submit" [disabled]="!form.valid">Enviar</button>
 
 
 
-    @if (submitted && destinationType==="coordinates"){
-    <label for="routeAlias">Guardar ruta</label>
-    <input type="text" id="routeAlias" name="routeAlias" [(ngModel)]="routeAlias" placeholder="Alias de la ruta" />
+      @if (form.valid && activeTab==="destination"){
+      <label for="routeAlias">Guardar ruta</label>
+      <input type="text" id="routeAlias" name="routeAlias" [(ngModel)]="routeAlias" placeholder="Alias de la ruta" />
 
-    <button type="button" (click)="saveRoute()">Guardar ruta</button>
-    }
+      <button type="button" (click)="saveRoute()">Guardar ruta</button>
+      }
 
-    <!-- Mostrar mensaje de éxito -->
-    <div *ngIf="successfulMessage" class="success">
-      {{ successfulMessage }}
-    </div>
+      <!-- Mostrar mensaje de éxito -->
+      <div *ngIf="successfulMessage" class="success">
+        {{ successfulMessage }}
+      </div>
 
-    <!-- Mostrar mensaje de error -->
-    <div *ngIf="errorMessage" class="error">
-      {{ errorMessage }}
-    </div>
-  </form>
-
-
-  <app-map-page></app-map-page>
-
-
-</section>
+      <!-- Mostrar mensaje de error -->
+      <div *ngIf="errorMessage" class="error">
+        {{ errorMessage }}
+      </div>
+    </form>
+    <app-map-page></app-map-page>
+  </section>
+</div>

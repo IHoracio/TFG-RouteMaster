@@ -1,0 +1,107 @@
+<div class="container">
+  <section class="card">
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+      <div class="form-header">
+        <h2>Crea Tu Cuenta</h2>
+        <p>¡Regístrate para desbloquear nuevas funciones!</p>
+      </div>
+
+      <!--EMAIL FIELD-->
+      <div class="mb-3">
+        <span class="asterisk">*</span>
+        <label for="email">Email</label>
+        <input class="form-control" type="email" name="email" id="email" formControlName="email"
+          placeholder="Introduzca su email">
+
+        <!--Error messages-->
+        <div *ngIf="hasError('email', 'required')">
+          <p class="error">El email es obligatorio</p>
+        </div>
+        <div *ngIf="hasError('email', 'pattern')">
+          <p class="error">El formato es incorrecto.</p>
+        </div>
+      </div>
+
+
+      <!--PASSWORD FIELD-->
+      <div class="mb-3">
+        <span class="asterisk">*</span>
+        <label for="password">Contraseña</label>
+        <input class="form-control" type="password" name="password" id="password" formControlName="password"
+          placeholder="Introduzca una contraseña segura">
+
+        <!--Error messages-->
+        <div *ngIf="hasError('password', 'required')">
+          <p class="error">La contraseña es obligatoria.</p>
+        </div>
+
+        <div *ngIf="hasError('password', 'minLength')">
+          <p class="error">La contraseña debe tener mínimo 8 caracteres.</p>
+        </div>
+        <div *ngIf="hasError('password', 'pattern')">
+          <p class="error">La contraseña debe tener al menos 8 carácteres, un número, una mayuscula, una minúscula y un
+            símbolo.</p>
+        </div>
+      </div>
+
+      <!--CONFIRM PASSWORD FIELD-->
+      <div class="mb-3">
+        <span class="asterisk">*</span>
+        <label for="passwordConfirmation">Confirmación de contraseña</label>
+        <input class="form-control" type="password" name="passwordConfirmation" id="passwordConfirmation"
+          formControlName="passwordConfirmation" placeholder="Confirme su contraseña">
+
+        <!--Error messages-->
+        <div *ngIf="hasError('passwordConfirmation', 'required')">
+          <p class="error">La confirmación de contraseña es obligatoria.</p>
+        </div>
+
+        <div *ngIf="form.errors?.['passwordMismatch'] && form.get('passwordConfirmation')?.touched">
+          <p class="error">Las contraseñas no coinciden.</p>
+        </div>
+      </div>
+
+      <!--NAME FIELD-->
+      <div class="mb-3">
+        <span class="asterisk">*</span>
+        <label for="name">Nombre</label>
+        <input class="form-control" type="text" name="name" id="name" formControlName="name"
+          placeholder="Introduzca su nombre">
+
+        <!--Error messages-->
+        <div *ngIf="hasError('name', 'required')">
+          <p class="error">El nombre es obligatorio.</p>
+        </div>
+      </div>
+
+      <!--SURNAME FIELD-->
+      <div class="mb-3">
+        <span class="asterisk">*</span>
+        <label for="surname">Apellidos</label>
+        <input class="form-control" type="text" name="surname" id="surname" formControlName="surname"
+          placeholder="Introduzca sus apellidos">
+
+        <!--Error messages-->
+        <div *ngIf="hasError('surname', 'required')">
+          <p class="error">El nombre es obligatorio.</p>
+        </div>
+      </div>
+
+      <!-- Mostrar mensaje de éxito -->
+      <div *ngIf="message" class="success">
+        {{ message }}
+      </div>
+
+      <!-- Mostrar mensaje de error -->
+      <div *ngIf="error" class="error">
+        {{ error }}
+      </div>
+
+      <input class="btn-custom" type="submit" [disabled]="form.invalid" />
+
+      <div class="text-muted">
+        <p>¿Ya tienes una cuenta? <a routerLink="/login">Inicia sesión</a></p>
+      </div>
+    </form>
+  </section>
+</div>
