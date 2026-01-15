@@ -24,43 +24,39 @@ public class SessionCookieFilter extends OncePerRequestFilter {
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
-            throws ServletException, IOException {
+    protected boolean shouldNotFilter(HttpServletRequest request) {
 
         String path = request.getRequestURI();
 
-        // Only protect API endpoints, skip login/logout and static resources
-        if (path.startsWith("/api/")
-//                && !path.equals("/api/register")
-//                && !path.equals("/api/login")
-//                && !path.equals("/api/logout")
-                ) {
+        return "OPTIONS".equalsIgnoreCase(request.getMethod())
+                || !path.startsWith("/api/")
+                || path.startsWith("/api/routes");
+    }
 
-            Cookie[] cookies = request.getCookies();
-            if (cookies == null) {
-                response.setStatus(HttpServletResponse.SC_FOUND);
-                response.setHeader("Location", "/login");
-                return;
-            }
+    @Override
+    protected void doFilterInternal(HttpServletRequest request,
+                                    HttpServletResponse response,
+                                    FilterChain filterChain)
+            throws ServletException, IOException {
 
-            Optional<Cookie> sessionCookie = Arrays.stream(cookies)
-                    .filter(c -> "sesionActiva".equals(c.getName()))
-                    .findFirst();
+        Cookie[] cookies = request.getCookies();
 
-            if (sessionCookie.isEmpty()) {
-                response.setStatus(HttpServletResponse.SC_FOUND);
-                response.setHeader("Location", "/login");
-                return;
-            }
-
-            String rawValue = sessionCookie.get().getValue();
-            if (rawValue == null || rawValue.isEmpty() || !cookieService.validate(rawValue)) {
-                response.setStatus(HttpServletResponse.SC_FOUND);
-                response.setHeader("Location", "/login");
-                return;
-            }
+        if (cookies == null) {
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+            return;
         }
 
+        Optional<Cookie> sessionCookie = Arrays.stream(cookies)
+                .filter(c -> "sesionActiva".equals(c.getName()))
+                .findFirst();
+
+        if (sessionCookie.isEmpty()
+                || !cookieService.validate(sessionCookie.get().getValue())) {
+
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+            return;
+        }
         filterChain.doFilter(request, response);
     }
 }
+

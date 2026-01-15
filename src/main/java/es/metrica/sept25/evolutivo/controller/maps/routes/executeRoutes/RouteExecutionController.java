@@ -18,7 +18,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
-@Tag(name = "Rutas Guardadas")
+@Tag(name = "Rutas guardadas")
 @RequestMapping("/api/savedRoute")
 public class RouteExecutionController {
 

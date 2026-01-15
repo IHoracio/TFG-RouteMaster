@@ -5,7 +5,10 @@ export interface User {
     name: string,
     surname: string
 }
-
+export interface UserLoginDTO{
+  user: string,
+  password: string
+}
 export interface UserDto {
   id: number;
   email: string;

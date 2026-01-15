@@ -307,6 +307,45 @@ public class UserServiceImpl implements UserService {
 	    return Optional.empty();
 	}
 	
+	@Override
+	@Transactional
+	public boolean renameGasStation(String email, String oldAlias, String newAlias) {
+		boolean existsNewAlias = getSavedGasStations(email)
+				.stream()
+				.filter(gStation -> gStation.getAlias().equals(newAlias))
+				.count() > 0;
+			
+		if (existsNewAlias) {
+			return false;
+		}
+
+		Optional<UserSavedGasStationDto> objective = getSavedGasStations(email)
+				.stream()
+				.filter(gStation -> gStation.getAlias().equals(oldAlias))
+				.findFirst();
+		
+	    Optional<User> user = userRepository.findByEmail(email);
+	    
+	    if (user.isEmpty() || objective.isEmpty()) {
+            log.warn("[user-service] [" + LocalDateTime.now().toString() + "] "
+                    + "No user or gas station found while removing gas station "
+                    + "for email: " + email);
+            return false;
+        }
+
+	    UserSavedGasStation oldGS = user.get().getSavedGasStations()
+	    		.stream()
+	    		.filter(gs -> gs.getAlias().equals(oldAlias))
+	    		.findFirst().get();
+
+	    oldGS.setAlias(newAlias);
+	    user.get().getSavedGasStations().removeIf(sg -> sg.getAlias().equalsIgnoreCase(oldAlias));
+	    user.get().getSavedGasStations().add(oldGS);
+	    userRepository.save(user.get());
+
+		return true;
+	}
+	
 	private UserResponseDTO mapToResponseDTO(User user) {
 	    return new UserResponseDTO(
 	        user.getEmail(),

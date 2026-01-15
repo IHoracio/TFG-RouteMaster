@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -279,14 +280,17 @@ public class UserController {
 		    		description = "Usuario o gasolinera no encontrada"
 		    		)
 		})
-	@PutMapping("/favourites/{idEstacion}")
+	@PutMapping("/favouriteStations")
 	public ResponseEntity<Void> saveGasStation(
 	        HttpServletRequest request,
 	        @RequestParam String alias,
 	        @PathVariable Long idEstacion) {
 
 		String email = cookieService.getCookieValue(request, "sesionActiva").get();
-		service.saveGasStation(email, alias, idEstacion);
+		Optional<String> opValue = service.saveGasStation(email, alias, idEstacion);
+		if (opValue.isPresent()) {
+			return ResponseEntity.notFound().build();
+		}
 	    return ResponseEntity.ok().build();
 	}
 
@@ -304,7 +308,7 @@ public class UserController {
 		    		description = "Usuario o gasolinera no encontrada"
 		    		)
 		})
-	@DeleteMapping("/favourites/{idEstacion}")
+	@DeleteMapping("/favouriteStations")
 	public ResponseEntity<Void> removeGasStation(
 	        HttpServletRequest request,
 	        @RequestParam String alias
@@ -312,6 +316,34 @@ public class UserController {
 		String email = cookieService.getCookieValue(request, "sesionActiva").get();
 		service.removeGasStation(email, alias);
 	    return ResponseEntity.noContent().build();
+	}
+	
+	@Operation(
+		    summary = "Renombrar gasolinera en favoritos",
+		    description = "Renombra una gasolinera cambiándole el alias"
+		)
+		@ApiResponses({
+		    @ApiResponse(
+		    		responseCode = "200",
+		    		description = "Gasolinera renombrada correctamente"
+		    		),
+		    @ApiResponse(
+		    		responseCode = "404",
+		    		description = "Usuario o gasolinera no encontrada"
+		    		)
+		})
+	@PostMapping("/favouriteStations")
+	public ResponseEntity<Void> renameGasStation(
+	        HttpServletRequest request,
+	        @RequestParam String oldAlias,
+	        @RequestParam String newAlias
+	        ) {
+
+		String email = cookieService.getCookieValue(request, "sesionActiva").get();
+		if (service.renameGasStation(email, oldAlias, newAlias)) {
+			return ResponseEntity.ok().build();
+		}
+	    return ResponseEntity.notFound().build();
 	}
 	
 	@Operation(
@@ -323,7 +355,7 @@ public class UserController {
 		    @ApiResponse(responseCode = "200", description = "Listado de gasolineras favoritas"),
 		    @ApiResponse(responseCode = "404", description = "Usuario no encontrado")
 		})
-	@GetMapping("/favourites")
+	@GetMapping("/favouriteStations")
 		public ResponseEntity<List<UserSavedGasStationDto>> getSavedGasStations(
 				HttpServletRequest request) {
 			String email = cookieService.getCookieValue(request, "sesionActiva").get();

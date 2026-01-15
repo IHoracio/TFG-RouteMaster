@@ -4,15 +4,15 @@
             <h2>Inicio de Sesión</h2>
         </div>
         <form [formGroup]="form" (ngSubmit)="onSubmit()">
-            <!--USERNAME FIELD-->
+            <!--USER FIELD-->
             <div>
                 <span class="asterisk">*</span>
-                <label for="username">Introduzca el nombre de usuario.</label>
-                <input class="form-control" type="username" name="username" id="username" formControlName="username">
+                <label for="user">Introduzca el nombre de usuario.</label>
+                <input class="form-control" type="user" name="user" id="user" formControlName="user">
 
 
                 <!--Error messages-->
-                <div *ngIf="hasError('username', 'required')">
+                <div *ngIf="hasError('user', 'required')">
                     <p class="error">El nombre de usuario es obligatorio</p>
                 </div>
             </div>
