@@ -12,12 +12,23 @@
     @if (favoriteRoutes().length > 0) {
       <ul>
         @for (route of favoriteRoutes(); track route.routeId) {
-          <li>
-            {{ route.name }} - Origen: {{ route.points[0]?.address || 'N/A' }}, Destino: {{ route.points[1]?.address || 'N/A' }} - Distancia: {{ route.distanceKm }} km, Duración: {{ route.durationFormatted }}
-            @if (route.canShare) {
-              <button (click)="shareRoute(route)">Compartir</button>
-            }
-            <button (click)="deleteRoute(route)">Eliminar</button>
+          <li class="route-item" (click)="toggleRouteSelection(route)">
+            <div style="display: flex; justify-content: space-between;">
+              <div>
+                <div>{{ route.name }}</div>
+                <div>Distancia: {{ route.distanceKm }} km</div>
+                <div>Origen: {{ route.points[0]?.address || 'N/A' }}, Destino: {{ route.points[1]?.address || 'N/A' }}</div>
+                @if (route.canShare) {
+                  <button (click)="shareRoute(route)">Compartir</button>
+                }
+              </div>
+              @if (selectedRoute() === route.routeId) {
+                <div style="display: flex; flex-direction: column;">
+                  <button (click)="deleteRoute(route)">Eliminar</button>
+                  <button (click)="renameRoute(route)">Renombrar</button>
+                </div>
+              }
+            </div>
           </li>
         }
       </ul>
