@@ -1,4 +1,4 @@
-import { Component, signal, inject, OnInit, computed } from '@angular/core';
+import { Component, signal, inject, OnInit, computed, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { UserPreferencesService } from '../../../../services/user-page/user-preferences.service';
@@ -8,6 +8,7 @@ import { forkJoin } from 'rxjs';
 import { GasStationService } from '../../../../services/user-page/gas-station/gas-station.service';
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-user-info',
   imports: [CommonModule],
   templateUrl: './user-info.component.html',

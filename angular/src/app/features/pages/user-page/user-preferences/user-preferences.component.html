@@ -152,15 +152,17 @@
         }
 
         @if (favoriteGasStations().length > 0 || searchResults().length > 0) {
-        <div class="map-container">
-            <app-map-page 
-                [showWeather]="false" 
-                [showControls]="false" 
-                [gasStations]="allStations()"
-                [selectedStation]="selectedStation()" 
-                [mapType]="mapType()">
-            </app-map-page>
-        </div>
+            @if (allStations().length <= 50) {
+                      <app-map-page 
+                            [showWeather]="false" 
+                            [showControls]="false" 
+                            [gasStations]="allStations()"
+                            [selectedStation]="selectedStation()" 
+                            [mapType]="mapType()">
+                    </app-map-page>
+            } @else {
+                <p>Demasiadas gasolineras para mostrar en el mapa. Reduce el radio Km</p>
+            }
         }
 
         <div class="form-group">

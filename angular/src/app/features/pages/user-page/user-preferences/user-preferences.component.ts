@@ -1,4 +1,4 @@
-import { Component, signal, inject, effect, computed, OnInit } from '@angular/core';
+import { Component, signal, inject, effect, computed, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { GasStationService } from '../../../../services/user-page/gas-station/gas-station.service';
@@ -10,6 +10,7 @@ import { forkJoin } from 'rxjs';
 import { Router } from '@angular/router';
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-user-preferences',
   imports: [CommonModule, FormsModule, MapPageComponent],
   templateUrl: './user-preferences.component.html',
@@ -75,11 +76,12 @@ export class UserPreferencesComponent implements OnInit {
     return this.spainMunicipalities().filter(municipalities => municipalities.toLowerCase().includes(search)).slice(0, 4);
   });
 
-  allStations = computed(() =>
-    [...this.favoriteGasStations(), ...this.newFavorites(), ...this.searchResults()]
-      .filter((s, i, arr) => arr.findIndex(x => x.idEstacion === s.idEstacion) === i)
-      .filter(s => s.latitud !== undefined && s.longitud !== undefined)
-  );
+allStations = computed(() =>
+  [...this.favoriteGasStations(), ...this.newFavorites(), ...this.searchResults()]
+    .filter((s, i, arr) => arr.findIndex(x => x.idEstacion === s.idEstacion) === i)
+    .filter(s => s.latitud !== undefined && s.longitud !== undefined)
+    .slice(0, 50)
+);
 
   ngOnInit(): void {
     this.loadOptions();

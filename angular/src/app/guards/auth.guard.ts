@@ -8,10 +8,12 @@ import { catchError, map, Observable, of } from 'rxjs';
 })
 export class AuthGuard implements CanActivate {
 
+    private baseUrl = 'http://localhost:8080';
+
     constructor(private router: Router, private http: HttpClient) { }
 
     canActivate(): Observable<boolean> {
-        return this.http.get('/api/auth/check', { withCredentials: true }).pipe(
+        return this.http.post(`${this.baseUrl}/auth/check`, {}, { withCredentials: true }).pipe(
             map(() => true),
             catchError(() => {
                 this.router.navigate(['/login']);

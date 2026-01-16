@@ -1,4 +1,4 @@
-import { Component, OnDestroy, signal, input, effect, AfterViewInit } from '@angular/core';
+import { Component, OnDestroy, signal, input, effect, AfterViewInit, ChangeDetectionStrategy } from '@angular/core';
 import { setOptions, importLibrary } from '@googlemaps/js-api-loader';
 import { MarkerClusterer } from '@googlemaps/markerclusterer';
 
@@ -11,6 +11,7 @@ import { WeatherData } from '../../../Dto/weather-dtos';
 import { GasStation } from '../../../Dto/gas-station';
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-map-page',
   standalone: true,
   imports: [CommonModule, WeatherOverlayHostComponent],
@@ -236,6 +237,11 @@ export class MapPageComponent implements OnDestroy, AfterViewInit {
 private updateMarkers(): void {
   const stations = this.gasStations();
   this.clearGasStations();
+
+  if (stations.length > 100) {
+    console.warn('Limiting gas stations to 100 to prevent performance issues');
+    stations.splice(100);
+  }
 
   if (stations.length > 0 && this.map) {
     let hasValid = false;
