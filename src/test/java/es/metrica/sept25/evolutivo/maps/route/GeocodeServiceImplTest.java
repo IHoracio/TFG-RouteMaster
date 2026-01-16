@@ -29,7 +29,7 @@ import es.metrica.sept25.evolutivo.domain.dto.maps.routes.Coords;
 import es.metrica.sept25.evolutivo.service.maps.geocode.GeocodeServiceImpl;
 
 @ExtendWith(MockitoExtension.class)
-public class GeocodePruebaTest {
+public class GeocodeServiceImplTest {
 
 	 @Mock
 	    private RestTemplate restTemplate;
