@@ -8,6 +8,7 @@ import { UserPreferencesService } from '../../../../services/user-page/user-pref
 import { DefaultUserPreferences } from '../../../../Dto/preferences';
 import { forkJoin } from 'rxjs';
 import { Router } from '@angular/router';
+import { GasStationSelectionService } from '../../../../services/user-page/gas-station-selection/gas-station-selection.service';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -19,6 +20,7 @@ import { Router } from '@angular/router';
 export class UserPreferencesComponent implements OnInit {
   private gasStationService = inject(GasStationService);
   private userPreferencesService = inject(UserPreferencesService);
+  private gasStationSelectionService = inject(GasStationSelectionService);
   private router = inject(Router);
 
   defaultUserPreferences: DefaultUserPreferences | null = null;
@@ -41,6 +43,7 @@ export class UserPreferencesComponent implements OnInit {
   mapTypeOptions = signal<string[]>([]);
   emissionLabelOptions = signal<string[]>([]);
 
+  selectedStation = this.gasStationSelectionService.selectedStation;
   favoriteGasStations = this.userPreferencesService.getFavoriteGasStationsSignal();
   deletedFavourites = signal<FavouriteGasStation[]>([]);
   newFavorites = signal<FavouriteGasStation[]>([]);
@@ -48,7 +51,6 @@ export class UserPreferencesComponent implements OnInit {
 
   searchAddress = signal<string>('');
   searchResults = signal<GasStation[]>([]);
-  selectedStation = signal<string | null>(null);
   isLoading = signal<boolean>(false);
   hasSearched = signal<boolean>(false);
 

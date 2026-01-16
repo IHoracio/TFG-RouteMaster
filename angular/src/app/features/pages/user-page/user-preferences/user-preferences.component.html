@@ -124,7 +124,7 @@
         <div class="form-group">
             <label>Seleccionar Gasolinera:</label>
             <ul class="gas-stations-list">
-                @for (station of searchResults(); track station.idEstacion) {
+                @for (station of allStations(); track station.idEstacion) {
                 @if (isFavorite(station)) {
                 <li class="added-station">
                     {{ station.nombreEstacion }} - {{ station.direccion }}
@@ -152,36 +152,36 @@
         }
 
         @if (favoriteGasStations().length > 0 || searchResults().length > 0) {
-            @if (allStations().length <= 50) {
-                      <app-map-page 
-                            [showWeather]="false" 
-                            [showControls]="false" 
-                            [gasStations]="allStations()"
-                            [selectedStation]="selectedStation()" 
-                            [mapType]="mapType()">
-                    </app-map-page>
+        @if (allStations().length <= 50) { 
+            <app-map-page 
+                [showWeather]="false" 
+                [showControls]="false"
+                [gasStations]="allStations()" 
+                [selectedStation]="selectedStation()" 
+                [mapType]="mapType()">
+            </app-map-page>
             } @else {
-                <p>Demasiadas gasolineras para mostrar en el mapa. Reduce el radio Km</p>
+            <p>Demasiadas gasolineras para mostrar en el mapa. Reduce el radio Km</p>
             }
-        }
+            }
 
-        <div class="form-group">
-            <label>Gasolineras Favoritas:</label>
-            <ul>
-                @for (station of favoriteGasStations(); track station.idEstacion) {
-                <li (click)="setSelectedStation(station)" class="clickable-favorite">
-                    {{ station.alias }} - {{ station.nombreEstacion }} - {{ station.direccion }}
-                    <button type="button" (click)="removeFavoriteGasStation(station)">Eliminar</button>
-                    <button type="button" (click)="renameFavoriteGasStation(station)">Renombrar</button>
-                </li>
-                }
-            </ul>
-        </div>
+            <div class="form-group">
+                <label>Gasolineras Favoritas:</label>
+                <ul>
+                    @for (station of favoriteGasStations(); track station.idEstacion) {
+                    <li (click)="setSelectedStation(station)" class="clickable-favorite">
+                        {{ station.alias }} - {{ station.nombreEstacion }} - {{ station.direccion }}
+                        <button type="button" (click)="removeFavoriteGasStation(station)">Eliminar</button>
+                        <button type="button" (click)="renameFavoriteGasStation(station)">Renombrar</button>
+                    </li>
+                    }
+                </ul>
+            </div>
 
-        <div class="buttons">
-            <button type="button" (click)="savePreferences()">Guardar Cambios</button>
-            <button type="button" (click)="resetPreferences()" [disabled]="!defaultsLoaded()">Reiniciar a Por
-                Defecto</button>
-        </div>
+            <div class="buttons">
+                <button type="button" (click)="savePreferences()">Guardar Cambios</button>
+                <button type="button" (click)="resetPreferences()" [disabled]="!defaultsLoaded()">Reiniciar a Por
+                    Defecto</button>
+            </div>
     </form>
 </div>
