@@ -80,7 +80,7 @@ public class SavedRouteServiceImpl implements SavedRouteService {
 		log.info("[route-save-service] [" + LocalDateTime.now().toString() + "] "
 				+ "Attempting to delete saved route with ID: " + id + 
 				" for user with email: " + user.getEmail() + " .");
-		Optional<SavedRoute> route = repository.findById(id);
+		Optional<SavedRoute> route = repository.findByRouteId(id);
 		
 		if (route.isEmpty()) {
 			log.error("[route-save-service] [" + LocalDateTime.now().toString() + "] "
