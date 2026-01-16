@@ -120,10 +120,11 @@ export class UserInfoComponent implements OnInit {
 
   deleteRoute(route: any): void {
     if (confirm(`¿Estás seguro de que quieres eliminar la ruta "${route.name}"?`)) {
+      console.log(route.routeId)
       this.userInfoService.deleteRoute(route.routeId).subscribe({
         next: () => {
           this.favoriteRoutes.update(routes => routes.filter(r => r.routeId !== route.routeId));
-          this.selectedRoute.set(''); // Reset selection after delete
+          this.selectedRoute.set('');
         },
         error: (err) => {
           console.error('Error eliminando ruta:', err);
