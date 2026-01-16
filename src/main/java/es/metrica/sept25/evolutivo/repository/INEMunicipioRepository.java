@@ -6,5 +6,5 @@ import org.springframework.stereotype.Repository;
 import es.metrica.sept25.evolutivo.entity.ine.INEMunicipio;
 
 @Repository
-public interface INEMunicipioRepository extends JpaRepository<INEMunicipio, Long>{
+public interface INEMunicipioRepository extends JpaRepository<INEMunicipio, Long> {
 }

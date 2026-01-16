@@ -6,9 +6,9 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 public class SecurityConfig implements WebMvcConfigurer {
-    
-    @Override
-	//Allows Angular to access Spring Boot's endpoints, without CORS errors
+
+	@Override
+	// Allows Angular to access Spring Boot's endpoints, without CORS errors
 	public void addCorsMappings(CorsRegistry registry) {
 		registry.addMapping("/**")
 				.allowedOrigins("http://localhost:4200")

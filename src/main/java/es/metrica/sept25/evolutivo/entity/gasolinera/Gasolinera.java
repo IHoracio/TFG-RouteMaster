@@ -372,12 +372,18 @@ public class Gasolinera {
 		if (getClass() != obj.getClass())
 			return false;
 		Gasolinera other = (Gasolinera) obj;
-		return Objects.equals(codPostal, other.codPostal) && Objects.equals(direccion, other.direccion)
-				&& Objects.equals(horario, other.horario) && Objects.equals(id, other.id)
-				&& Objects.equals(idEstacion, other.idEstacion) && Objects.equals(idMunicipio, other.idMunicipio)
-				&& Objects.equals(lastUpdate, other.lastUpdate) && Objects.equals(latitud, other.latitud)
-				&& Objects.equals(localidad, other.localidad) && Objects.equals(longitud, other.longitud)
-				&& Objects.equals(marca, other.marca) && Objects.equals(nombreEstacion, other.nombreEstacion)
+		return Objects.equals(codPostal, other.codPostal) 
+				&& Objects.equals(direccion, other.direccion)
+				&& Objects.equals(horario, other.horario) 
+				&& Objects.equals(id, other.id)
+				&& Objects.equals(idEstacion, other.idEstacion) 
+				&& Objects.equals(idMunicipio, other.idMunicipio)
+				&& Objects.equals(lastUpdate, other.lastUpdate) 
+				&& Objects.equals(latitud, other.latitud)
+				&& Objects.equals(longitud, other.longitud)
+				&& Objects.equals(localidad, other.localidad) 
+				&& Objects.equals(marca, other.marca) 
+				&& Objects.equals(nombreEstacion, other.nombreEstacion)
 				&& Objects.equals(precioDiesel, other.precioDiesel)
 				&& Objects.equals(precioDieselMedia, other.precioDieselMedia)
 				&& Objects.equals(precioDieselB, other.precioDieselB)
@@ -388,11 +394,10 @@ public class Gasolinera {
 				&& Objects.equals(precioGasolina95Media, other.precioGasolina95Media)
 				&& Objects.equals(precioGasolina98, other.precioGasolina98)
 				&& Objects.equals(precioGasolina98Media, other.precioGasolina98Media)
-				&& Objects.equals(precioGlp, other.precioGlp) && Objects.equals(precioGlpMedia, other.precioGlpMedia)
+				&& Objects.equals(precioGlp, other.precioGlp) 
+				&& Objects.equals(precioGlpMedia, other.precioGlpMedia)
 				&& Objects.equals(provincia, other.provincia)
 				&& Objects.equals(provinciaDistrito, other.provinciaDistrito)
 				&& Objects.equals(tipoVenta, other.tipoVenta);
 	}
-	
-	
 }

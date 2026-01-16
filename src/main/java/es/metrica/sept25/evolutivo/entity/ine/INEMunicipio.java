@@ -12,27 +12,26 @@ public class INEMunicipio {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-	
+
 	@JsonProperty("Nombre")
-    private String nombre;
+	private String nombre;
 
-    @JsonProperty("Codigo")
-    private String codigoINE;
+	@JsonProperty("Codigo")
+	private String codigoINE;
 
-    public String getNombre() {
-        return nombre;
-    }
+	public String getNombre() {
+		return nombre;
+	}
 
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
-    }
+	public void setNombre(String nombre) {
+		this.nombre = nombre;
+	}
 
-    public String getCodigoINE() {
-        return codigoINE;
-    }
+	public String getCodigoINE() {
+		return codigoINE;
+	}
 
-    public void setCodigoINE(String codigoINE) {
-        this.codigoINE = codigoINE;
-    }
+	public void setCodigoINE(String codigoINE) {
+		this.codigoINE = codigoINE;
+	}
 }
-
