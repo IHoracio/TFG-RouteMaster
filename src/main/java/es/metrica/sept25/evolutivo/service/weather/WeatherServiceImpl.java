@@ -14,6 +14,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.resilience.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpClientErrorException.TooManyRequests;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -34,7 +35,6 @@ public class WeatherServiceImpl implements WeatherService {
 
 	private static final Logger log = LoggerFactory.getLogger(WeatherServiceImpl.class);
 
-	
 	private static final String API_URL = "https://opendata.aemet.es/opendata/api/prediccion/especifica/municipio/horaria/";
 
 	@Autowired
@@ -42,7 +42,7 @@ public class WeatherServiceImpl implements WeatherService {
 
 	@Autowired
 	private ObjectMapper objectMapper;
-	
+
 	@Value("${evolutivo.api_key_aemet}")
 	private String API_KEY_AEMET;
 
@@ -51,30 +51,30 @@ public class WeatherServiceImpl implements WeatherService {
 			delay = 1000,
 			multiplier = 1.5,
 			value = HttpClientErrorException.TooManyRequests.class
-			)
+	)
 	@Cacheable(value = "weather", cacheManager = "climateCacheManager")
 	public Optional<Weather> getWeather(String code) {
 		log.info("[weather-service] [" + LocalDateTime.now().toString() + "] "
-				+ "Attempting to get the weather object for a given INE code: "
+				+ "Attempting to get the weather object for a given INE code: " 
 				+ code + ".");
 		String url = UriComponentsBuilder
-    			.fromUriString(API_URL)
-    			.path(code)
-    		    .queryParam("api_key", API_KEY_AEMET)
-    		    .toUriString();
+				.fromUriString(API_URL)
+				.path(code)
+				.queryParam("api_key", API_KEY_AEMET)
+				.toUriString();
 
 		WeatherLink weather = restTemplate.getForObject(url, WeatherLink.class);
 		return getFirstWeatherDay(getWeatherData(weather.getDatos()));
 	}
 
 	@Retryable(
-			maxRetries = 60,
-			delay = 1000,
-			multiplier = 1.5,
-			value = HttpClientErrorException.TooManyRequests.class
-			)
+			maxRetries = 60, 
+			delay = 1000, 
+			multiplier = 1.5, 
+			value = TooManyRequests.class
+	)
 	@Qualifier("climateCacheManager")
-	@Cacheable(value = "weatherData",  cacheManager = "climateCacheManager")
+	@Cacheable(value = "weatherData", cacheManager = "climateCacheManager")
 	private List<Weather> getWeatherData(String url) {
 		log.info("[weather-service] [" + LocalDateTime.now().toString() + "] "
 				+ "Attempting to get Weather data for the given URL: " + url);
@@ -86,7 +86,7 @@ public class WeatherServiceImpl implements WeatherService {
 			});
 		} catch (JsonMappingException e) {
 			log.error("[weather-service] [" + LocalDateTime.now().toString() + "] "
-				+ "Failed to map the Weather JSON to the Java object. Stacktrace:");
+					+ "Failed to map the Weather JSON to the Java object. Stacktrace:");
 			e.printStackTrace();
 		} catch (JsonProcessingException e) {
 			log.error("[weather-service] [" + LocalDateTime.now().toString() + "] "

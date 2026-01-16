@@ -33,8 +33,8 @@ public class RouteWeatherController {
 					+ "con una lista del clima por horas para cada punto.")
 	@ApiResponses(value = { 
 			@ApiResponse(responseCode = "200", description = "Pasos y clima encontrados para la ruta dada."),
-			@ApiResponse(responseCode = "404", description = "Solicitud errónea: no se pudieron calcular los pasos de la ruta.")
-			})
+			@ApiResponse(responseCode = "400", description = "Solicitud errónea: no se pudieron calcular los pasos de la ruta.")
+	})
 	@GetMapping("/api/routes/weather")
 	public ResponseEntity<List<CoordsWithWeather>> getRouteWeather(
 			@RequestParam(required = true, defaultValue = "El Vellon") String origin,

@@ -25,11 +25,11 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @Tag(
-	name = "Gasolineras", 
-	description = "Conjunto de endpoints relacionados con la API "
+		name = "Gasolineras", 
+		description = "Conjunto de endpoints relacionados con la API "
 				+ "de Precioil. Los municipios y provincias proporcionados "
 				+ "provienen también de dicha API."
-)
+		)
 @RequestMapping("/api/oil")
 public class OilController {
 
@@ -46,7 +46,7 @@ public class OilController {
 	@ApiResponses(value = { 
 			@ApiResponse(responseCode = "200", description = "Provincias recuperadas"),
 			@ApiResponse(responseCode = "404", description = "No se encontraron provincias") 
-			})
+	})
 	@GetMapping("/provincias")
 	public ResponseEntity<List<Provincia>> getProvincias() {
 		List<Provincia> list = provinciaService.getProvincias();
@@ -62,7 +62,7 @@ public class OilController {
 	@ApiResponses(value = { 
 			@ApiResponse(responseCode = "200", description = "Provincias recuperadas"),
 			@ApiResponse(responseCode = "404", description = "No se encontraron provincias") 
-			})
+	})
 	@GetMapping("/municipios")
 	public ResponseEntity<List<Municipio>> getMunicipios() {
 		List<Municipio> list = municipioService.getMunicipios();
@@ -87,7 +87,7 @@ public class OilController {
 		if (gasolinera.isEmpty()) {
 			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 		}
-			
+
 		return new ResponseEntity<List<Gasolinera>>(gasolinera, HttpStatus.OK);
 	}
 
@@ -95,7 +95,7 @@ public class OilController {
 	@ApiResponses(value = { 
 			@ApiResponse(responseCode = "200", description = "Gasolinera encontrada"),
 			@ApiResponse(responseCode = "404", description = "No se encontró la gasolinera indicada") 
-			})
+	})
 	@GetMapping("/id/{idEstacion}")
 	public ResponseEntity<Gasolinera> getGasolineraForId(@PathVariable Long idEstacion) {
 		Optional<Gasolinera> gasolinera = gasolineraService.getGasolineraForId(idEstacion);
@@ -125,15 +125,15 @@ public class OilController {
 		if (gasolinera.isEmpty()) {
 			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 		}
-			
+
 		return new ResponseEntity<List<Gasolinera>>(gasolinera, HttpStatus.OK);
 	}
 
 	@Operation(
 			summary = "Devuelve una lista de gasolineras en un cierto radio de unas coordenadas",
 			description = "Ejecuta una llamada a la API de Precioil con las coordenadas y el radio"
-						+ "dadas"
-					)
+					+ "dadas"
+			)
 	@ApiResponses(value = { 
 			@ApiResponse(responseCode = "200", description = "Gasolineras encontradas"), 
 			@ApiResponse(responseCode = "404", description = "No se encontraron gasolineras en ese radio") })
@@ -147,28 +147,28 @@ public class OilController {
 		if (gasolinera.isEmpty()) {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
-			
+
 		return new ResponseEntity<List<Gasolinera>>(gasolinera, HttpStatus.OK);
 	}
-	
+
 	@Operation(
-		    summary = "Devuelve todas las marcas de gasolineras disponibles",
-		    description = "Obtiene un listado único de marcas de gasolineras a partir de todas las estaciones disponibles. "
-		                + "El resultado se devuelve sin duplicados y se sirve desde caché."
-		)
-		@ApiResponses(value = {
-		    @ApiResponse(responseCode = "200", description = "Marcas recuperadas correctamente"),
-		    @ApiResponse(responseCode = "204", description = "No se encontraron marcas")
-		})
-		@GetMapping("/gasolineras/marcas")
-		public ResponseEntity<List<String>> getMarcasGasolineras() {
+			summary = "Devuelve todas las marcas de gasolineras disponibles",
+			description = "Obtiene un listado único de marcas de gasolineras a partir de todas las estaciones disponibles. "
+					+ "El resultado se devuelve sin duplicados y se sirve desde caché."
+			)
+	@ApiResponses(value = {
+			@ApiResponse(responseCode = "200", description = "Marcas recuperadas correctamente"),
+			@ApiResponse(responseCode = "204", description = "No se encontraron marcas")
+	})
+	@GetMapping("/gasolineras/marcas")
+	public ResponseEntity<List<String>> getMarcasGasolineras() {
 
-		    List<String> marcas = gasolineraService.getMarcasFromAllGasolineras();
+		List<String> marcas = gasolineraService.getMarcasFromAllGasolineras();
 
-		    if (marcas == null || marcas.isEmpty()) {
-		        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-		    }
-
-		    return new ResponseEntity<>(marcas, HttpStatus.OK);
+		if (marcas == null || marcas.isEmpty()) {
+			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 		}
+
+		return new ResponseEntity<>(marcas, HttpStatus.OK);
+	}
 }
