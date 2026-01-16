@@ -40,3 +40,12 @@
 .favorites-section button:hover {
   background: #0056b3;
 }
+
+.route-item {
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.route-item:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+}
