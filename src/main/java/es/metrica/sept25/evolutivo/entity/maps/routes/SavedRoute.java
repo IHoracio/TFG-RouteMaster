@@ -2,6 +2,9 @@ package es.metrica.sept25.evolutivo.entity.maps.routes;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import es.metrica.sept25.evolutivo.entity.user.User;
 import es.metrica.sept25.evolutivo.enums.EmissionType;
 import jakarta.persistence.CascadeType;
@@ -17,30 +20,32 @@ import jakarta.persistence.PrePersist;
 
 @Entity
 public class SavedRoute {
+
 	@Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
 
 	@Column(name = "route_id", nullable = false, updatable = false, unique = true)
-    private Long routeId;
+	private Long routeId;
 
-    private String name;
+	private String name;
 
-    @OneToMany(mappedBy = "savedRoute", cascade = CascadeType.ALL, orphanRemoval = true)
-    // TODO: Cambiar a @OrderBy
-    @OrderColumn(name = "order_index")
-    private List<Point> puntos;
+	@OneToMany(mappedBy = "savedRoute", cascade = CascadeType.ALL, orphanRemoval = true)
+	// TODO: Cambiar a @OrderBy
+	@OrderColumn(name = "order_index")
+	@JsonManagedReference("route-puntos")
+	private List<Point> puntos;
 
-    @ManyToOne
-    private User user;
-    
-    private boolean optimizeWaypoints;
-    private boolean optimizeRoute;
-    private String language;
-    private boolean avoidTolls;
-    private EmissionType vehicleEmissionType;
-    
-    
+	@ManyToOne
+	@JsonBackReference("user-routes")
+	private User user;
+
+	private boolean optimizeWaypoints;
+	private boolean optimizeRoute;
+	private String language;
+	private boolean avoidTolls;
+	private EmissionType vehicleEmissionType;
+
 	public void setRouteId(Long routeId) {
 		this.routeId = routeId;
 	}
@@ -96,8 +101,7 @@ public class SavedRoute {
 	public void setLanguage(String language) {
 		this.language = language;
 	}
-	
-	
+
 	public boolean isAvoidTolls() {
 		return avoidTolls;
 	}
@@ -116,9 +120,8 @@ public class SavedRoute {
 
 	@PrePersist
 	private void generateRouteId() {
-	    if (this.routeId == null) {
-	        this.routeId = System.currentTimeMillis();
-	    }
+		if (this.routeId == null) {
+			this.routeId = System.currentTimeMillis();
+		}
 	}
 }
-

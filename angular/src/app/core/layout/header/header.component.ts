@@ -1,5 +1,7 @@
 import { Component } from '@angular/core';
-import { RouterModule} from '@angular/router';
+import { RouterModule } from '@angular/router';
+import { UserService } from '../../../services/user/user.service';
+import { AuthService } from '../../../services/auth/auth-service.service';
 
 @Component({
   selector: 'app-header',
@@ -9,4 +11,14 @@ import { RouterModule} from '@angular/router';
 })
 export class HeaderComponent {
 
+  isLoggedIn: boolean = false;
+  constructor(private authService: AuthService) {
+  }
+  ngOnInit() {
+    this.authService.getUserSession().subscribe(
+      loggedIn => this.isLoggedIn = loggedIn
+    );
+    console.log(this.isLoggedIn)
+
+  }
 }

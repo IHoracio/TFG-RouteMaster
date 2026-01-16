@@ -1,5 +1,7 @@
 package es.metrica.sept25.evolutivo.entity.maps.routes;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -10,24 +12,23 @@ import jakarta.persistence.ManyToOne;
 
 @Entity
 public class Point {
-	
-	public enum TypePoint{
-		ORIGIN,
-	    WAYPOINT,
-	    DESTINATION
+
+	public enum TypePoint {
+		ORIGIN, WAYPOINT, DESTINATION
 	}
 
 	@Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
 
-    @Enumerated(EnumType.STRING)
-    private TypePoint type;
+	@Enumerated(EnumType.STRING)
+	private TypePoint type;
 
-    private String address;
+	private String address;
 
-    @ManyToOne
-    private SavedRoute savedRoute;
+	@ManyToOne
+	@JsonBackReference("route-puntos")
+	private SavedRoute savedRoute;
 
 	public Long getId() {
 		return id;

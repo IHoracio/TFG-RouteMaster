@@ -15,6 +15,9 @@
                 <div *ngIf="hasError('user', 'required')">
                     <p class="error">El nombre de usuario es obligatorio</p>
                 </div>
+                <div *ngIf="hasError('email', 'pattern')">
+                    <p class="error">El formato es incorrecto.</p>
+                </div>
             </div>
 
             <!--PASSWORD FIELD-->
@@ -26,7 +29,16 @@
 
                 <!--Error messages-->
                 <div *ngIf="hasError('password', 'required')">
-                    <p class="error">La contraseña es obligatoria</p>
+                    <p class="error">La contraseña es obligatoria.</p>
+                </div>
+
+                <div *ngIf="hasError('password', 'minLength')">
+                    <p class="error">La contraseña debe tener mínimo 8 caracteres.</p>
+                </div>
+                <div *ngIf="hasError('password', 'pattern')">
+                    <p class="error">La contraseña debe tener al menos 8 carácteres, un número, una mayuscula, una
+                        minúscula y un
+                        símbolo.</p>
                 </div>
             </div>
 

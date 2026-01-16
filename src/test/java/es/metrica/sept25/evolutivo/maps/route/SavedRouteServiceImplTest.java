@@ -9,6 +9,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,6 +27,7 @@ import es.metrica.sept25.evolutivo.entity.maps.routes.SavedRoute;
 import es.metrica.sept25.evolutivo.entity.user.User;
 import es.metrica.sept25.evolutivo.enums.EmissionType;
 import es.metrica.sept25.evolutivo.repository.SavedRouteRepository;
+import es.metrica.sept25.evolutivo.repository.UserRepository;
 import es.metrica.sept25.evolutivo.service.maps.routes.savedRoutes.SavedRouteServiceImpl;
 
 @ExtendWith(MockitoExtension.class)
@@ -33,6 +35,9 @@ public class SavedRouteServiceImplTest {
 
 	@Mock
     private SavedRouteRepository repository;
+	
+	@Mock
+	private UserRepository userRepository;
 
     @InjectMocks
     private SavedRouteServiceImpl service;
@@ -79,7 +84,7 @@ public class SavedRouteServiceImplTest {
         route.setRouteId(1L);
         route.setUser(testUser);
 
-        when(repository.findById(1L)).thenReturn(Optional.of(route));
+        when(repository.findByRouteId(1L)).thenReturn(Optional.of(route));
 
         service.deleteRoute(1L, testUser);
 
@@ -88,7 +93,7 @@ public class SavedRouteServiceImplTest {
 
     @Test
     void deleteRoute_routeNotFound() {
-        when(repository.findById(1L)).thenReturn(Optional.empty());
+        when(repository.findByRouteId(1L)).thenReturn(Optional.empty());
 
         service.deleteRoute(1L, testUser);
 
@@ -105,7 +110,7 @@ public class SavedRouteServiceImplTest {
         route.setRouteId(1L);
         route.setUser(otherUser);
 
-        when(repository.findById(1L)).thenReturn(Optional.of(route));
+        when(repository.findByRouteId(1L)).thenReturn(Optional.of(route));
 
         service.deleteRoute(1L, testUser);
 
@@ -146,4 +151,71 @@ public class SavedRouteServiceImplTest {
 
         assertTrue(result.isEmpty());
     }
+    
+    @Test
+    void getAllSavedRoutes_userExists_returnsRoutes() {
+        SavedRoute route1 = new SavedRoute();
+        route1.setRouteId(1L);
+        route1.setName("Ruta 1");
+        route1.setPuntos(new ArrayList<>());
+
+        SavedRoute route2 = new SavedRoute();
+        route2.setRouteId(2L);
+        route2.setName("Ruta 2");
+        route2.setPuntos(new ArrayList<>());
+
+        testUser.setSavedRoutes(List.of(route1, route2));
+
+        when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.of(testUser));
+
+        Optional<List<SavedRouteDTO>> resultOpt = service.getAllSavedRoutes("test@example.com");
+
+        assertTrue(resultOpt.isPresent());
+        assertEquals(2, resultOpt.get().size());
+        assertEquals("Ruta 1", resultOpt.get().get(0).getName());
+        assertEquals("Ruta 2", resultOpt.get().get(1).getName());
+    }
+
+    @Test
+    void getAllSavedRoutes_userNotFound_returnsEmpty() {
+        when(userRepository.findByEmail("noexiste@example.com")).thenReturn(Optional.empty());
+
+        Optional<List<SavedRouteDTO>> resultOpt = service.getAllSavedRoutes("noexiste@example.com");
+
+        assertTrue(resultOpt.isEmpty());
+    }
+    
+    @Test
+    void renameRoute_existingRoute_returnsRenamedDTO() {
+
+        SavedRoute route = new SavedRoute();
+        route.setRouteId(1L);
+        route.setName("Nombre Antiguo");
+
+        Point p = new Point();
+        p.setType(Point.TypePoint.ORIGIN);
+        p.setAddress("Calle Test");
+        route.setPuntos(List.of(p));
+
+        SavedRouteDTO inputDto = new SavedRouteDTO();
+        inputDto.setRouteId(1L);
+
+        when(repository.findByRouteId(1L))
+                .thenReturn(Optional.of(route));
+
+        when(repository.save(any(SavedRoute.class)))
+                .thenAnswer(inv -> inv.getArgument(0));
+
+        SavedRouteDTO result = service.renameRoute("Nombre Nuevo", inputDto);
+
+        assertNotNull(result);
+        assertEquals(1L, result.getRouteId());
+        assertEquals("Nombre Nuevo", result.getName());
+        assertEquals(1, result.getPoints().size());
+        assertEquals("ORIGIN", result.getPoints().get(0).getType());
+
+        verify(repository).findByRouteId(1L);
+        verify(repository).save(route);
+    }
+
 }

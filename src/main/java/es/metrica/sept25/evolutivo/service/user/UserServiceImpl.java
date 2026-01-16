@@ -364,14 +364,12 @@ public class UserServiceImpl implements UserService {
             return false;
         }
 
-	    UserSavedGasStation oldGS = user.get().getSavedGasStations()
+	    Optional<UserSavedGasStation> oldGS = user.get().getSavedGasStations()
 	    		.stream()
 	    		.filter(gs -> gs.getAlias().equals(oldAlias))
-	    		.findFirst().get();
+	    		.findFirst();
 
-	    oldGS.setAlias(newAlias);
-	    user.get().getSavedGasStations().removeIf(sg -> sg.getAlias().equalsIgnoreCase(oldAlias));
-	    user.get().getSavedGasStations().add(oldGS);
+	    oldGS.get().setAlias(newAlias);
 	    userRepository.save(user.get());
 
 		return true;

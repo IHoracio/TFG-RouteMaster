@@ -9,6 +9,8 @@ import es.metrica.sept25.evolutivo.entity.gasolinera.Provincia;
 
 @Repository
 public interface ProvinciaRepository extends JpaRepository<Provincia, Long> {
+
 	long count();
+
 	List<Provincia> findAll();
 }

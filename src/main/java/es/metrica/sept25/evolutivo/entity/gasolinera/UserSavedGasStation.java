@@ -1,5 +1,7 @@
 package es.metrica.sept25.evolutivo.entity.gasolinera;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import es.metrica.sept25.evolutivo.entity.user.User;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -14,18 +16,19 @@ import jakarta.persistence.Table;
 @Table(name = "user_saved_gas_stations")
 public class UserSavedGasStation {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
 
-    @Column(nullable = false)
-    private String alias;
+	@Column(nullable = false)
+	private String alias;
 
-    @ManyToOne
-    private User user;
+	@ManyToOne
+	@JsonBackReference("user-gasStations")
+	private User user;
 
-    @ManyToOne(cascade = CascadeType.PERSIST)
-    private Gasolinera gasolinera;
+	@ManyToOne(cascade = CascadeType.PERSIST)
+	private Gasolinera gasolinera;
 
 	public String getAlias() {
 		return alias;
@@ -51,5 +54,4 @@ public class UserSavedGasStation {
 		this.gasolinera = gasolinera;
 	}
 
-    
 }
