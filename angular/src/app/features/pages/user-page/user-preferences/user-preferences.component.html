@@ -170,6 +170,7 @@
                 <li (click)="setSelectedStation(station)" class="clickable-favorite">
                     {{ station.alias }} - {{ station.nombreEstacion }} - {{ station.direccion }}
                     <button type="button" (click)="removeFavoriteGasStation(station)">Eliminar</button>
+                    <button type="button" (click)="renameFavoriteGasStation(station)">Renombrar</button>
                 </li>
                 }
             </ul>

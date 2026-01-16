@@ -13,88 +13,81 @@ export class UserPreferencesService {
 
   private favoriteGasStationsSignal = signal<FavouriteGasStation[]>([]);
 
-
   constructor(private http: HttpClient) { }
 
   getFavoriteGasStationsSignal() { return this.favoriteGasStationsSignal; }
   setFavoriteGasStations(data: FavouriteGasStation[]) { this.favoriteGasStationsSignal.set(data); }
 
-  getUserPreferences(email: string): Observable<any> {
-    return this.http.get(`${this.baseUrl}/api/users/0/preferences`, {
-      params: { email }
-    });
+  getUserPreferences(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/api/users/preferences/get`, { withCredentials: true });
   }
 
   getDefaultPreferences(): Observable<DefaultUserPreferences> {
-    return this.http.get<DefaultUserPreferences>(`${this.baseUrl}/api/users/defaultPreferences`);
+    return this.http.get<DefaultUserPreferences>(`${this.baseUrl}/api/users/preferences/default`, { withCredentials: true });
   }
 
-  getUserThemeLanguage(email: string): Observable<ThemeLangPreferences> {
-    return this.http.get<ThemeLangPreferences>(`${this.baseUrl}/api/users/0/preferences/user`, {
-      params: { email }
-    });
+  getUserThemeLanguage(): Observable<ThemeLangPreferences> {
+    return this.http.get<ThemeLangPreferences>(`${this.baseUrl}/api/users/preferences/user/get`, { withCredentials: true });
   }
 
-  updateUserPreferences(email: string, radioKm: number, fuelType: string, emissionType: string, maxPrice: number, mapType: string, avoidTolls: boolean, preferredBrands: string[]): Observable<any> {
+  updateUserPreferences(radioKm: number, fuelType: string, emissionType: string, maxPrice: number, mapType: string, avoidTolls: boolean, preferredBrands: string[]): Observable<any> {
     const body = { preferredBrands };
-    return this.http.put(`${this.baseUrl}/api/users/0/preferences`, body, {
-      params: { email, radioKm: radioKm.toString(), fuelType, vehicleEmissionType: emissionType, maxPrice: maxPrice.toString(), mapView: mapType, avoidTolls }
+    return this.http.put(`${this.baseUrl}/api/users/preferences/update`, body, {
+      params: { radioKm: radioKm.toString(), fuelType, vehicleEmissionType: emissionType, maxPrice: maxPrice.toString(), mapView: mapType, avoidTolls: avoidTolls.toString() },
+      withCredentials: true
     });
   }
 
-  updateUserThemeLanguage(email: string, theme: string, language: string): Observable<any> {
-    return this.http.put(`${this.baseUrl}/api/users/0/preferences/user`, null, {
-      params: { email, theme, language }
+  updateUserThemeLanguage(theme: string, language: string): Observable<any> {
+    return this.http.put(`${this.baseUrl}/api/users/preferences/user/update`, null, {
+      params: { theme, language },
+      withCredentials: true
     });
   }
 
-  updateFavouriteGasStations(email: string, alias: string, idEstacion: number): Observable<FavouriteGasStation[]> {
-    return this.http.put<FavouriteGasStation[]>(`${this.baseUrl}/api/users/favourites/${idEstacion}`, {}, {
-      params: { email, alias, idEstacion }
+  updateFavouriteGasStations(alias: string, idEstacion: number): Observable<FavouriteGasStation[]> {
+    return this.http.put<FavouriteGasStation[]>(`${this.baseUrl}/api/users/favouriteStations`, {}, {
+      params: { alias, idEstacion: idEstacion.toString() },
+      withCredentials: true
     });
   }
 
-  deleteFavouriteGasStations(email: string, alias: string, idEstacion: number): Observable<any> {
-    return this.http.delete(`${this.baseUrl}/api/users/favourites/${idEstacion}`, {
-      params: { email, alias }
+  deleteFavouriteGasStations(alias: string): Observable<any> {
+    return this.http.delete(`${this.baseUrl}/api/users/favouriteStations`, {
+      params: { alias },
+      withCredentials: true
     });
   }
 
-  getGasStationBrands(): Observable<string[]> {
-    return this.http.get<string[]>(`${this.baseUrl}/api/oil/gasolineras/marcas`);
-  }
-
-  getUserFavouriteGasStations(email: string): Observable<FavouriteGasStation[]> {
-    return this.http.get<FavouriteGasStation[]>(`${this.baseUrl}/api/users/favourites`, {
-      params: { email }
+  renameFavouriteGasStations(oldAlias: string, newAlias: string): Observable<any> {
+    return this.http.post(`${this.baseUrl}/api/users/favouriteStations`, null, {
+      params: { oldAlias, newAlias },
+      withCredentials: true
     });
   }
 
-  getGasStation(idEstacion: number): Observable<GasStation> {
-    return this.http.get<GasStation>(`${this.baseUrl}/api/oil/id/${idEstacion}`);
+  getUserFavouriteGasStations(): Observable<FavouriteGasStation[]> {
+    return this.http.get<FavouriteGasStation[]>(`${this.baseUrl}/api/users/favouriteStations`, { withCredentials: true });
   }
 
   getMapTypes(): Observable<Preferences[]> {
-    return this.http.get<Preferences[]>(`${this.baseUrl}/api/route-options/map-types`);
+    return this.http.get<Preferences[]>(`${this.baseUrl}/api/route-options/map-types`, { withCredentials: true });
   }
 
   getFuelTypes(): Observable<Preferences[]> {
-    return this.http.get<Preferences[]>(`${this.baseUrl}/api/route-options/fuels`);
+    return this.http.get<Preferences[]>(`${this.baseUrl}/api/route-options/fuels`, { withCredentials: true });
   }
 
   getEmissionLabels(): Observable<Preferences[]> {
-    return this.http.get<Preferences[]>(`${this.baseUrl}/api/route-options/emissions`);
+    return this.http.get<Preferences[]>(`${this.baseUrl}/api/route-options/emissions`, { withCredentials: true });
   }
 
   getThemes(): Observable<Preferences[]> {
-    return this.http.get<Preferences[]>(`${this.baseUrl}/api/preferences/themes`);
+    return this.http.get<Preferences[]>(`${this.baseUrl}/api/preferences/themes`, { withCredentials: true });
   }
 
   getLanguages(): Observable<Preferences[]> {
-    return this.http.get<Preferences[]>(`${this.baseUrl}/api/preferences/languages`);
+    return this.http.get<Preferences[]>(`${this.baseUrl}/api/preferences/languages`, { withCredentials: true });
   }
-
-  getMunicipalities(): Observable<Municipalitie[]> {
-    return this.http.get<Municipalitie[]>(`${this.baseUrl}/api/oil/municipios`);
-  }
+  
 }

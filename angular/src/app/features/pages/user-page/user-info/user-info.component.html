@@ -1,27 +1,34 @@
 <div class="user-info">
   <h2>Información del Usuario</h2>
   
-  @if (loadingUser()) {
-    <p>Cargando información del usuario...</p>
-  } @else {
     <div class="user-details">
       <p><strong>Email:</strong> {{ user().email }}</p>
       <p><strong>Nombre:</strong> {{ user().name }}</p>
       <p><strong>Apellido:</strong> {{ user().surname }}</p>
     </div>
-  }
   
   <div class="favorites-section">
     <h3>Rutas Favoritas</h3>
     @if (favoriteRoutes().length > 0) {
       <ul>
         @for (route of favoriteRoutes(); track route.routeId) {
-          <li (click)="selectRoute(route)" class="clickable">
-            {{ route.name }} - Origen: {{ route.points[0]?.address || 'N/A' }}, Destino: {{ route.points[1]?.address || 'N/A' }} - Distancia: {{ route.distanceKm }} km, Duración: {{ route.durationFormatted }}
-            @if (route.canShare) {
-              <button (click)="shareRoute(route)">Compartir</button>
-            }
-            <button (click)="deleteRoute(route)">Eliminar</button>
+          <li class="route-item" (click)="toggleRouteSelection(route)">
+            <div style="display: flex; justify-content: space-between;">
+              <div>
+                <div>{{ route.name }}</div>
+                <div>Distancia: {{ route.distanceKm }} km</div>
+                <div>Origen: {{ route.points[0]?.address || 'N/A' }}, Destino: {{ route.points[1]?.address || 'N/A' }}</div>
+                @if (route.canShare) {
+                  <button (click)="shareRoute(route)">Compartir</button>
+                }
+              </div>
+              @if (selectedRoute() === route.routeId) {
+                <div style="display: flex; flex-direction: column; gap: 5px;">
+                  <button (click)="deleteRoute(route)">Eliminar</button>
+                  <button (click)="renameRoute(route)">Renombrar</button>
+                </div>
+              }
+            </div>
           </li>
         }
       </ul>
@@ -33,11 +40,22 @@
   
   <div class="favorites-section">
     <h3>Gasolineras Favoritas</h3>
+    <button (click)="toggleSortByPrice()">{{ sortByPrice() ? 'Desactivar ordenar por precio' : 'Activar ordenar por precio' }}</button>
     @if (favoriteGasStations().length > 0) {
       <ul>
-        @for (station of favoriteGasStations(); track station.idEstacion) {
-          <li (click)="selectStation(station)" class="clickable">
-            {{ station.alias || 'Sin alias' }} - {{ station.nombreEstacion }} - {{ station.direccion }}
+        @for (station of (sortByPrice() ? sortedStations() : favoriteGasStations()); track station.idEstacion) {
+          <li class="gas-station-item" (click)="toggleGasStationSelection(station)">
+            <div>{{ station.alias || 'Sin alias' }} - {{ station.nombreEstacion }} - {{ station.direccion }}</div>
+            @if (selectedGasStations().has(station.idEstacion)) {
+              <div class="gas-station-details">
+                <p><strong>Horario:</strong> {{ station.horario }}</p>
+                <p><strong>Tipo Venta:</strong> {{ getTipoVentaText(station.tipoVenta) }}</p>
+                <p><strong>Gasolina 95:</strong> {{ station.Gasolina95 !== null ? station.Gasolina95 + ' €' : 'N/A' }} (Media: {{ station.Gasolina95_media !== null ? station.Gasolina95_media + ' €' : 'N/A' }})</p>
+                <p><strong>Gasolina 98:</strong> {{ station.Gasolina98 !== null ? station.Gasolina98 + ' €' : 'N/A' }} (Media: {{ station.Gasolina98_media !== null ? station.Gasolina98_media + ' €' : 'N/A' }})</p>
+                <p><strong>Diesel:</strong> {{ station.Diesel !== null ? station.Diesel + ' €' : 'N/A' }} (Media: {{ station.Diesel_media !== null ? station.Diesel_media + ' €' : 'N/A' }})</p>
+                <p><strong>Diesel B:</strong> {{ station.DieselB !== null ? station.DieselB + ' €' : 'N/A' }} (Media: {{ station.DieselB_media !== null ? station.DieselB_media + ' €' : 'N/A' }})</p>
+              </div>
+            }
           </li>
         }
       </ul>

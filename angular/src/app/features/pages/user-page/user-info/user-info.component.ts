@@ -1,10 +1,11 @@
-import { Component, signal, inject, OnInit } from '@angular/core';
+import { Component, signal, inject, OnInit, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { UserPreferencesService } from '../../../../services/user-page/user-preferences.service';
 import { FavouriteGasStation, GasStation } from '../../../../Dto/gas-station';
 import { UserInfoService } from '../../../../services/user-page/user-info.service';
 import { forkJoin } from 'rxjs';
+import { GasStationService } from '../../../../services/user-page/gas-station/gas-station.service';
 
 @Component({
   selector: 'app-user-info',
@@ -16,35 +17,49 @@ export class UserInfoComponent implements OnInit {
   private router = inject(Router);
   private userInfoService = inject(UserInfoService);
   private userPreferencesService = inject(UserPreferencesService);
+  private gasStationService = inject(GasStationService);
 
   favoriteRoutes = this.userInfoService.getRoutesSignal();
 
   user = this.userInfoService.getUserSignal();
   favoriteGasStations = this.userPreferencesService.getFavoriteGasStationsSignal();
 
-  private mail: string = 'prueba@gmail.com';
+  selectedRoute = signal<string>('');
+  selectedGasStations = signal<Set<number>>(new Set());
+  sortByPrice = signal<boolean>(false);
+  userPreferences = signal<any>({});
 
-  loadingUser = signal<boolean>(true);
+  sortedStations = computed(() => {
+    const fuel = this.userPreferences().fuelType || 'GASOLINE';
+    const priceField = (fuel === 'GASOLINE' || fuel === 'ALL' || fuel === 'ELECTRIC') ? 'Gasolina95' : 'Diesel';
+    return [...this.favoriteGasStations()].sort((a, b) => (a[priceField] || Infinity) - (b[priceField] || Infinity));
+  });
 
   ngOnInit(): void {
-    this.loadingUser.set(true);
-    this.userInfoService.getUserInfo(this.mail).subscribe({
+    this.userInfoService.getUserInfo().subscribe({
       next: (data) => {
         this.user.set({
           email: data.email || 'N/A',
           name: data.name || 'N/A',
           surname: data.surname || 'N/A'
         });
-        this.loadingUser.set(false);
       },
       error: (error) => {
         console.error('Error fetching user info:', error);
         this.user.set({ email: 'Error', name: 'Error', surname: 'Error' });
-        this.loadingUser.set(false);
       }
     });
 
-    this.userInfoService.getUserRoutes(this.mail).subscribe({
+    this.userPreferencesService.getUserPreferences().subscribe({
+      next: (data) => {
+        this.userPreferences.set(data || {});
+      },
+      error: (error) => {
+        console.error('Error fetching user preferences:', error);
+      }
+    });
+
+    this.userInfoService.getUserRoutes().subscribe({
       next: (data: any[]) => {
         this.favoriteRoutes.set(data || []);
         if (data && data.length > 0) {
@@ -71,12 +86,12 @@ export class UserInfoComponent implements OnInit {
       }
     });
 
-    this.userPreferencesService.getUserFavouriteGasStations(this.mail).subscribe({
+    this.userPreferencesService.getUserFavouriteGasStations().subscribe({
       next: (data: FavouriteGasStation[]) => {
         this.favoriteGasStations.set(data || []);
         this.favoriteGasStations().forEach(favorite => {
           if (!favorite.latitud || !favorite.longitud) {
-            this.userPreferencesService.getGasStation(favorite.idEstacion).subscribe({
+            this.gasStationService.getGasStation(favorite.idEstacion).subscribe({
               next: (fullStation: GasStation) => {
                 this.favoriteGasStations.update(stations =>
                   stations.map(s => s.idEstacion === favorite.idEstacion ? { ...fullStation, alias: favorite.alias } as FavouriteGasStation : s)
@@ -95,10 +110,6 @@ export class UserInfoComponent implements OnInit {
     });
   }
 
-  selectRoute(route: any): void {
-    this.router.navigate(['/buscador'], { state: { selectedRoute: route } });
-  }
-
   selectStation(station: FavouriteGasStation): void {
     this.router.navigate(['/user-preferences'], { state: { selectedStation: station } });
   }
@@ -109,9 +120,11 @@ export class UserInfoComponent implements OnInit {
 
   deleteRoute(route: any): void {
     if (confirm(`¿Estás seguro de que quieres eliminar la ruta "${route.name}"?`)) {
-      this.userInfoService.deleteRoute(route.routeId, this.mail).subscribe({
+      console.log(route.routeId)
+      this.userInfoService.deleteRoute(route.routeId).subscribe({
         next: () => {
           this.favoriteRoutes.update(routes => routes.filter(r => r.routeId !== route.routeId));
+          this.selectedRoute.set('');
         },
         error: (err) => {
           console.error('Error eliminando ruta:', err);
@@ -119,6 +132,51 @@ export class UserInfoComponent implements OnInit {
         }
       });
     }
+  }
+
+  renameRoute(route: any): void {
+    const newName = prompt('Ingresa el nuevo nombre para la ruta:', route.name);
+    if (newName && newName.trim()) {
+      this.userInfoService.renameRoute(route.routeId, newName.trim()).subscribe({
+        next: () => {
+          this.favoriteRoutes.update(routes => routes.map(r => r.routeId === route.routeId ? { ...r, name: newName.trim() } : r));
+        },
+        error: (err) => {
+          console.error('Error renombrando ruta:', err);
+          alert('Error al renombrar la ruta. Inténtalo de nuevo.');
+        }
+      });
+    }
+  }
+
+  toggleRouteSelection(route: any): void {
+    if (this.selectedRoute() === route.routeId) {
+      this.selectedRoute.set('');
+    } else {
+      this.selectedRoute.set(route.routeId);
+    }
+  }
+
+  toggleGasStationSelection(station: FavouriteGasStation): void {
+    this.selectedGasStations.update(set => {
+      if (set.has(station.idEstacion)) {
+        set.delete(station.idEstacion);
+      } else {
+        set.add(station.idEstacion);
+      }
+      return new Set(set);
+    });
+  }
+
+  toggleSortByPrice(): void {
+    this.sortByPrice.update(v => !v);
+  }
+
+  getTipoVentaText(tipo: string): string {
+    if (tipo === 'A') return 'Autoservicio';
+    if (tipo === 'S') return 'Servicio Asistido';
+    if (tipo === 'P' || tipo === 'R') return 'Convencional';
+    return tipo;
   }
 
   goToLanding(): void {

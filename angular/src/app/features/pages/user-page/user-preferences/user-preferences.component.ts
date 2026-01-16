@@ -6,8 +6,7 @@ import { GasStation, FavouriteGasStation } from '../../../../Dto/gas-station';
 import { MapPageComponent } from '../../map-page/map-page.component';
 import { UserPreferencesService } from '../../../../services/user-page/user-preferences.service';
 import { DefaultUserPreferences } from '../../../../Dto/preferences';
-import { forkJoin, of } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-user-preferences',
@@ -41,6 +40,8 @@ export class UserPreferencesComponent implements OnInit {
 
   favoriteGasStations = this.userPreferencesService.getFavoriteGasStationsSignal();
   deletedFavourites = signal<FavouriteGasStation[]>([]);
+  newFavorites = signal<FavouriteGasStation[]>([]);
+  renamedFavourites = signal<{oldAlias: string, newAlias: string}[]>([]);
 
   searchAddress = signal<string>('');
   searchResults = signal<GasStation[]>([]);
@@ -62,8 +63,6 @@ export class UserPreferencesComponent implements OnInit {
 
   alias = signal<string>('');
 
-  private email: string = 'prueba@gmail.com';
-
   filteredBrands = computed(() => {
     const search = this.brandSearch().toLowerCase();
     return this.gasStationBrandsOptions().filter(brand => brand.toLowerCase().includes(search)).slice(0, 4);
@@ -75,41 +74,44 @@ export class UserPreferencesComponent implements OnInit {
   });
 
   allStations = computed(() =>
-    [...this.favoriteGasStations(), ...this.searchResults()].filter((s, i, arr) =>
-      arr.findIndex(x => x.idEstacion === s.idEstacion) === i
-    )
+    [...this.favoriteGasStations(), ...this.newFavorites(), ...this.searchResults()]
+      .filter((s, i, arr) => arr.findIndex(x => x.idEstacion === s.idEstacion) === i)
+      .filter(s => s.latitud !== undefined && s.longitud !== undefined)
   );
 
   ngOnInit(): void {
     this.loadOptions();
+
     this.userPreferencesService.getDefaultPreferences().subscribe({
       next: (defaults) => {
         this.defaultUserPreferences = defaults;
         this.defaultsLoaded.set(true);
+
+        this.userPreferencesService.getUserPreferences().subscribe({
+          next: (data) => {
+            this.preferredBrands.set(data?.preferredBrands ?? defaults?.preferredBrands ?? []);
+            this.avoidTolls.set(data?.avoidTolls ?? defaults?.avoidTolls ?? false);
+            this.radioKm.set(data?.radioKm ?? defaults?.radioKm ?? 1);
+            this.fuelType.set(data?.fuelType ?? defaults?.fuelType ?? 'GASOLINE');
+            this.emissionType.set(data?.emissionType ?? defaults?.emissionType ?? 'B');
+            this.maxPrice.set(data?.maxPrice ?? defaults?.maxPrice ?? 1.5);
+            this.mapType.set(data?.mapView ?? defaults?.mapView ?? 'MAP');
+            this.isLoadingPreferences.set(false);
+            this.previousMaxPrice.set(data?.maxPrice ?? 0);
+          },
+          error: (error) => {
+            this.isLoadingPreferences.set(false);
+            console.error('Error loading user preferences:', error);
+          }
+        });
       },
       error: (error) => {
         console.error('Error loading default preferences:', error);
         this.defaultsLoaded.set(true);
       }
     });
-    this.userPreferencesService.getUserPreferences(this.email).subscribe({
-      next: (data) => {
-        this.preferredBrands.set(data.preferredBrands || []);
-        this.avoidTolls.set(data.avoidTolls || false);
-        this.radioKm.set(data.radioKm || 1);
-        this.fuelType.set(data.fuelType || 'GASOLINE');
-        this.emissionType.set(data.emissionType || 'B');
-        this.maxPrice.set(data.maxPrice || 0);
-        this.mapType.set(data.mapView || 'MAP');
-        this.isLoadingPreferences.set(false);
-        this.previousMaxPrice.set(data.maxPrice || 0);
-      },
-      error: (error) => {
-        this.isLoadingPreferences.set(false);
-      }
-    });
 
-    this.userPreferencesService.getUserThemeLanguage(this.email).subscribe({
+    this.userPreferencesService.getUserThemeLanguage().subscribe({
       next: (data) => {
         this.theme.set(data.theme || 'LIGHT');
         this.language.set(data.language || 'ES');
@@ -119,12 +121,12 @@ export class UserPreferencesComponent implements OnInit {
       }
     });
 
-    this.userPreferencesService.getUserFavouriteGasStations(this.email).subscribe({
+    this.userPreferencesService.getUserFavouriteGasStations().subscribe({
       next: (data) => {
         this.favoriteGasStations.set(data || []);
         this.favoriteGasStations().forEach(favorite => {
           if (!favorite.latitud || !favorite.longitud) {
-            this.userPreferencesService.getGasStation(favorite.idEstacion).subscribe({
+            this.gasStationService.getGasStation(favorite.idEstacion).subscribe({
               next: (fullStation) => {
                 this.favoriteGasStations.update(stations =>
                   stations.map(s => s.idEstacion === favorite.idEstacion ? { ...fullStation, alias: favorite.alias } : s)
@@ -148,10 +150,10 @@ export class UserPreferencesComponent implements OnInit {
     this.userPreferencesService.getFuelTypes().subscribe(options => this.fuelOptions.set(options?.map(p => p.code) || []));
     this.userPreferencesService.getThemes().subscribe(options => this.themeOptions.set(options?.map(p => p.code) || []));
     this.userPreferencesService.getLanguages().subscribe(options => this.languageOptions.set(options?.map(p => p.code) || []));
-    this.userPreferencesService.getGasStationBrands().subscribe(options => this.gasStationBrandsOptions.set(options || []));
+    this.gasStationService.getGasStationBrands().subscribe(options => this.gasStationBrandsOptions.set(options || []));
     this.userPreferencesService.getMapTypes().subscribe(options => this.mapTypeOptions.set(options?.map(p => p.code) || []));
     this.userPreferencesService.getEmissionLabels().subscribe(options => this.emissionLabelOptions.set(options?.map(p => p.code) || []));
-    this.userPreferencesService.getMunicipalities().subscribe(municipalities => this.spainMunicipalities.set(municipalities?.map(m => m.nombreMunicipio) || []));
+    this.gasStationService.getMunicipalities().subscribe(municipalities => this.spainMunicipalities.set(municipalities?.map(m => m.nombreMunicipio) || []));
   }
 
   constructor() {
@@ -241,7 +243,7 @@ export class UserPreferencesComponent implements OnInit {
     this.isLoading.set(true);
     this.hasSearched.set(true);
     const normalizedAddress = this.normalize(this.searchAddress());
-    this.gasStationService.searchGasStations(normalizedAddress, this.radioKm()).subscribe({
+    this.gasStationService.getGasStationFromDirectionInRadius(normalizedAddress, this.radioKm()).subscribe({
       next: (results) => {
         this.searchResults.set(results || []);
         this.selectedStation.set(null);
@@ -259,12 +261,12 @@ export class UserPreferencesComponent implements OnInit {
     if (this.selectedStation() && this.alias().trim()) {
       const station = this.searchResults().find(s => `${s.nombreEstacion} - ${s.direccion}` === this.selectedStation());
       if (station && !this.isFavorite(station)) {
-        if (this.favoriteGasStations().some(f => f.alias === this.alias())) {
+        if (this.favoriteGasStations().some(f => f.alias === this.alias()) || this.newFavorites().some(f => f.alias === this.alias())) {
           alert('El alias ya existe. Elige uno diferente.');
           return;
         }
         const favorite: FavouriteGasStation = { ...station, alias: this.alias() };
-        this.favoriteGasStations.update(stations => [...stations, favorite]);
+        this.newFavorites.update(n => [...n, favorite]); // Add to new favorites instead of existing
         this.alias.set('');
         this.selectedStation.set(null);
       }
@@ -272,7 +274,7 @@ export class UserPreferencesComponent implements OnInit {
   }
 
   isFavorite(station: GasStation): boolean {
-    return this.favoriteGasStations().some(f => f.idEstacion === station.idEstacion);
+    return this.favoriteGasStations().some(f => f.idEstacion === station.idEstacion) || this.newFavorites().some(f => f.idEstacion === station.idEstacion);
   }
 
   toggleInfo(): void {
@@ -293,10 +295,13 @@ export class UserPreferencesComponent implements OnInit {
   }
 
   savePreferences(): void {
-    if (!this.email) return;
+
+    if (this.isLoadingPreferences() || !this.defaultUserPreferences) {
+      alert('Cargando preferencias, intenta de nuevo en unos segundos.');
+      return;
+    }
 
     console.log('Sending preferences update with:', {
-      email: this.email,
       radioKm: this.radioKm(),
       fuelType: this.fuelType(),
       emissionType: this.emissionType(),
@@ -307,59 +312,56 @@ export class UserPreferencesComponent implements OnInit {
     });
 
     const updatePrefs$ = this.userPreferencesService.updateUserPreferences(
-      this.email, this.radioKm(), this.fuelType(), this.emissionType(), this.maxPrice(), this.mapType(), this.avoidTolls(), this.preferredBrands()
+      this.radioKm(), this.fuelType(), this.emissionType(), this.maxPrice(), this.mapType(), this.avoidTolls(), this.preferredBrands()
     );
 
     const updateTheme$ = this.userPreferencesService.updateUserThemeLanguage(
-      this.email, this.theme(), this.language()
-    ).pipe(
-      catchError(err => {
-        console.error('Theme update failed:', err);
-        return of(null);
-      })
+      this.theme(), this.language()
     );
 
-    const updateFavorites$ = this.favoriteGasStations().map(f =>
-      this.userPreferencesService.updateFavouriteGasStations(this.email, f.alias, f.idEstacion).pipe(
-        catchError(err => {
-          console.error('Favorite update failed for', f.alias, ':', err);
-          return of(null);
-        })
-      )
+    const updateFavorites$ = this.newFavorites().map(f =>
+      this.userPreferencesService.updateFavouriteGasStations(f.alias, f.idEstacion)
     );
 
     const deleteFavorites$ = this.deletedFavourites().map(f =>
-      this.userPreferencesService.deleteFavouriteGasStations(this.email, f.alias, f.idEstacion).pipe(
-        catchError(err => {
-          console.error('Delete favorite failed for', f.alias, ':', err);
-          return of(null);
-        })
-      )
+      this.userPreferencesService.deleteFavouriteGasStations(f.alias)
+    );
+
+    const renameFavorites$ = this.renamedFavourites().map(r =>
+      this.userPreferencesService.renameFavouriteGasStations(r.oldAlias, r.newAlias)
     );
 
     console.log('Sending theme/language update with:', {
-      email: this.email,
       theme: this.theme(),
       language: this.language()
     });
 
-    forkJoin([updatePrefs$, updateTheme$, ...updateFavorites$, ...deleteFavorites$]).subscribe({
+    forkJoin([updatePrefs$, updateTheme$, ...updateFavorites$, ...deleteFavorites$, ...renameFavorites$]).subscribe({
       next: () => {
         console.log('All updates completed');
+        this.newFavorites.set([]);
         this.deletedFavourites.set([]);
+        this.renamedFavourites.set([]);
+        history.scrollRestoration = 'manual';
         window.scrollTo(0, 0);
         window.location.reload();
       },
       error: (err) => {
         console.error('Error saving preferences:', err);
         alert('Error saving preferences: ' + (err?.message || 'Unknown error'));
+        this.newFavorites.set([]);
         this.deletedFavourites.set([]);
+        this.renamedFavourites.set([]);
       }
     });
   }
 
   resetPreferences(): void {
-    if (!this.defaultUserPreferences) return;
+    if (this.isLoadingPreferences() || !this.defaultUserPreferences) {
+      alert('Cargando preferencias, intenta de nuevo en unos segundos.');
+      return;
+    }
+    
     this.fuelType.set(this.defaultUserPreferences.fuelType || 'GASOLINE');
     this.theme.set('LIGHT');
     this.language.set('ES');
@@ -369,26 +371,25 @@ export class UserPreferencesComponent implements OnInit {
     this.avoidTolls.set(this.defaultUserPreferences.avoidTolls || false);
     this.emissionType.set(this.defaultUserPreferences.emissionType || 'B');
     this.preferredBrands.set(this.defaultUserPreferences.preferredBrands || []);
+    this.newFavorites.set([]);
+    this.deletedFavourites.set([]);
+    this.renamedFavourites.set([]);
 
     console.log('Resetting to defaults:', this.defaultUserPreferences);
     console.log('Values being sent:');
 
     const updatePrefs$ = this.userPreferencesService.updateUserPreferences(
-      this.email, this.radioKm(), this.fuelType(), this.emissionType(), this.maxPrice(), this.mapType(), this.avoidTolls(), this.preferredBrands()
+      this.radioKm(), this.fuelType(), this.emissionType(), this.maxPrice(), this.mapType(), this.avoidTolls(), this.preferredBrands()
     );
 
     const updateTheme$ = this.userPreferencesService.updateUserThemeLanguage(
-      this.email, this.theme(), this.language()
-    ).pipe(
-      catchError(err => {
-        console.error('Theme reset failed:', err);
-        return of(null);
-      })
+      this.theme(), this.language()
     );
 
     forkJoin([updatePrefs$, updateTheme$]).subscribe({
       next: () => {
         console.log('Reset successful, reloading...');
+        history.scrollRestoration = 'manual';
         window.scrollTo(0, 0);
         window.location.reload();
       },
@@ -404,6 +405,23 @@ export class UserPreferencesComponent implements OnInit {
     if (favorite) {
       this.favoriteGasStations.update(stations => stations.filter(s => s.idEstacion !== station.idEstacion));
       this.deletedFavourites.update(deleted => [...deleted, favorite]);
+    } else {
+      const newFav = this.newFavorites().find(f => f.idEstacion === station.idEstacion);
+      if (newFav) {
+        this.newFavorites.update(n => n.filter(s => s.idEstacion !== station.idEstacion));
+      }
+    }
+  }
+
+  renameFavoriteGasStation(station: FavouriteGasStation): void {
+    const newAlias = prompt('Ingresa el nuevo alias para la gasolinera:', station.alias);
+    if (newAlias && newAlias.trim() && newAlias.trim() !== station.alias) {
+      if (this.favoriteGasStations().some(f => f.alias === newAlias.trim()) || this.newFavorites().some(f => f.alias === newAlias.trim())) {
+        alert('El alias ya existe. Elige uno diferente.');
+        return;
+      }
+      this.favoriteGasStations.update(stations => stations.map(s => s.alias === station.alias ? { ...s, alias: newAlias.trim() } : s));
+      this.renamedFavourites.update(r => [...r, { oldAlias: station.alias, newAlias: newAlias.trim() }]);
     }
   }
 

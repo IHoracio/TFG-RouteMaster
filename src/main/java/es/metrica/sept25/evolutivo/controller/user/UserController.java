@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -17,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import es.metrica.sept25.evolutivo.domain.dto.gasolineras.UserSavedGasStationDto;
 import es.metrica.sept25.evolutivo.domain.dto.maps.routes.PreferredBrandsDTO;
+import es.metrica.sept25.evolutivo.domain.dto.user.UserBasicInfoDTO;
 import es.metrica.sept25.evolutivo.domain.dto.user.UserResponseDTO;
 import es.metrica.sept25.evolutivo.entity.maps.routes.RoutePreferences;
 import es.metrica.sept25.evolutivo.entity.user.User;
@@ -48,25 +48,27 @@ public class UserController {
 	private UserService service;
 
 	// TODO: Comentado para evitar creación de nuevos usuarios accidentalmente
-//	@Operation(summary = "Crear un nuevo usuario")
-//	@ApiResponses(value = { 
-//		@ApiResponse(responseCode = "200", description = "Usuario creado correctamente"),
-//		@ApiResponse(responseCode = "400", description = "Datos inválidos") 
-//	})
-//	@PostMapping("/create")
-//	public ResponseEntity<User> createUser(@RequestBody(required = true) UserDTO userDTO) 
-//	{
-//		log.debug(userDTO.toString());
-//		Optional<User> user = service.createUser(userDTO);
-//		if (user.isEmpty()) {
-//			return ResponseEntity.badRequest().build();
-//		}
-//
-//		log.debug(user.toString());
-//		return ResponseEntity.ok(user.get());
-//	}
+	/*
+	@Operation(summary = "Crear un nuevo usuario")
+	@ApiResponses(value = { 
+		@ApiResponse(responseCode = "200", description = "Usuario creado correctamente"),
+		@ApiResponse(responseCode = "400", description = "Datos inválidos") 
+	})
+	@PostMapping("/create")
+	public ResponseEntity<User> createUser(@RequestBody(required = true) UserDTO userDTO) 
+	{
+		log.debug(userDTO.toString());
+		Optional<User> user = service.createUser(userDTO);
+		if (user.isEmpty()) {
+			return ResponseEntity.badRequest().build();
+		}
 
-	@Operation(summary = "Obtener un usuario por mail")
+		log.debug(user.toString());
+		return ResponseEntity.ok(user.get());
+	}
+
+	*/
+	@Operation(summary = "Obtener datos base de un usuario por mail")
 	@ApiResponses(value = { 
 		@ApiResponse(
 				responseCode = "200",
@@ -78,9 +80,9 @@ public class UserController {
 		) 
 	})
 	@GetMapping("/get")
-	public ResponseEntity<UserResponseDTO> getUser(HttpServletRequest request) {
+	public ResponseEntity<UserBasicInfoDTO> getUser(HttpServletRequest request) {
 		String email = cookieService.getCookieValue(request, "sesionActiva").get();
-		return service.getByEmail(email)
+		return service.getSimpleInfo(email)
 				.map(ResponseEntity::ok)
 				.orElse(ResponseEntity.notFound().build());
 	}
@@ -284,7 +286,7 @@ public class UserController {
 	public ResponseEntity<Void> saveGasStation(
 	        HttpServletRequest request,
 	        @RequestParam String alias,
-	        @PathVariable Long idEstacion) {
+	        @RequestParam Long idEstacion) {
 
 		String email = cookieService.getCookieValue(request, "sesionActiva").get();
 		Optional<String> opValue = service.saveGasStation(email, alias, idEstacion);
