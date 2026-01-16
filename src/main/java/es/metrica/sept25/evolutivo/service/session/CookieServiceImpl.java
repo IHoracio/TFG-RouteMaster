@@ -31,6 +31,7 @@ public class CookieServiceImpl implements CookieService {
 
 	private SecretKeySpec secretKeySpec;
 
+	@Override
 	public SecretKeySpec getSecretKey() {
 		if (Objects.isNull(secretKeySpec)) {
 			secretKeySpec = new SecretKeySpec(secretString.getBytes(StandardCharsets.UTF_8), "AES");

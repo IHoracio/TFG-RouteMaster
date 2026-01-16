@@ -7,29 +7,28 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+
 @Entity
 @Table(name = "user_preferences")
 public class UserPreferences {
-	
+
 	public enum Language {
-	    ES,
-	    EN
+		ES, EN
 	}
-	
+
 	public enum Theme {
-	    LIGHT,
-	    DARK
+		LIGHT, DARK
 	}
 
 	@Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-	
-	@Enumerated(EnumType.STRING)
-    private Theme theme;
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
 
-    @Enumerated(EnumType.STRING)
-    private Language language;
+	@Enumerated(EnumType.STRING)
+	private Theme theme;
+
+	@Enumerated(EnumType.STRING)
+	private Language language;
 
 	public Theme getTheme() {
 		return theme;
@@ -46,10 +45,5 @@ public class UserPreferences {
 	public void setLanguage(Language language) {
 		this.language = language;
 	}
-
-	
-
-
-    
 
 }

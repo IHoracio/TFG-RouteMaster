@@ -3,6 +3,8 @@ package es.metrica.sept25.evolutivo.entity.user;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import es.metrica.sept25.evolutivo.entity.gasolinera.UserSavedGasStation;
 import es.metrica.sept25.evolutivo.entity.maps.routes.RoutePreferences;
 import es.metrica.sept25.evolutivo.entity.maps.routes.SavedRoute;
@@ -25,9 +27,7 @@ import jakarta.persistence.Transient;
 public class User {
 
 	public enum PrioridadGasolineras {
-		PRICE, 
-		DISTANCE, 
-		BOTH
+		PRICE, DISTANCE, BOTH
 	}
 
 	@Id
@@ -36,12 +36,12 @@ public class User {
 
 	@Column(name = "email", unique = true)
 	private String email;
-	
+
 	private String password;
-	
+
 	@Transient
 	private String passwordConfirmation;
-	
+
 	private String name;
 	private String surname;
 
@@ -49,17 +49,19 @@ public class User {
 	private UserPreferences userPreferences;
 
 	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+	@JsonManagedReference("user-routes")
 	private List<SavedRoute> savedRoutes = new LinkedList<SavedRoute>();
-	
+
 	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+	@JsonManagedReference("user-gasStations")
 	private List<UserSavedGasStation> savedGasStations = new LinkedList<>();
 
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false)
 	private PrioridadGasolineras gasStationPriority = PrioridadGasolineras.PRICE;
-	
+
 	@Embedded
-    private RoutePreferences routePreferences;
+	private RoutePreferences routePreferences;
 
 	public Long getId() {
 		return id;
@@ -125,8 +127,6 @@ public class User {
 		this.savedRoutes = savedRoutes;
 	}
 
-
-
 	public List<UserSavedGasStation> getSavedGasStations() {
 		return savedGasStations;
 	}
@@ -150,6 +150,5 @@ public class User {
 	public void setRoutePreferences(RoutePreferences routePreferences) {
 		this.routePreferences = routePreferences;
 	}
-	
-	
+
 }

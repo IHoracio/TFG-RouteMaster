@@ -1,5 +1,6 @@
 package es.metrica.sept25.evolutivo.controller.auth;
 
+import java.util.Arrays;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -50,7 +52,7 @@ public class AuthController {
         @ApiResponse(responseCode = "201", description = "User created", content = @Content(mediaType = "application/json", schema = @Schema(implementation = String.class))),
         @ApiResponse(responseCode = "400", description = "Invalid input or user exists", content = @Content)
     })
-    public ResponseEntity<String> register(@RequestBody UserDTO userDTO) {
+    public ResponseEntity<Void> register(@RequestBody UserDTO userDTO) {
         Optional<User> created = userService.createUser(userDTO);
         if (created.isPresent()) {
 			return ResponseEntity.status(HttpStatus.CREATED).build();
@@ -69,7 +71,7 @@ public class AuthController {
         @ApiResponse(responseCode = "400", description = "Missing credentials", content = @Content),
         @ApiResponse(responseCode = "401", description = "Invalid credentials", content = @Content)
     })
-    public ResponseEntity<String> login(
+    public ResponseEntity<Void> login(
     		@RequestBody UserLoginDto login, 
     		HttpServletRequest request, 
     		HttpServletResponse response) {
@@ -109,7 +111,7 @@ public class AuthController {
         @ApiResponse(responseCode = "200", description = "Logged out", content = @Content),
         @ApiResponse(responseCode = "204", description = "No active session", content = @Content)
     })
-    public ResponseEntity<String> logout(HttpServletRequest request, HttpServletResponse response) {
+    public ResponseEntity<Void> logout(HttpServletRequest request, HttpServletResponse response) {
         boolean hasSession = cookieService.getCookieValue(request, "sesionActiva").isPresent();
         
         if (!hasSession) {
@@ -118,6 +120,39 @@ public class AuthController {
         }
         
         cookieService.closeSession(response, "sesionActiva");
+		return ResponseEntity.ok().build();
+    }
+    
+    
+    @PostMapping("/check")
+    @Operation(
+    		summary = "Check if the user has a session", 
+    		description = "Attempts to retrieve the current user from the session."
+    				+ " If no session is found or no user is logged in, it sends "
+    				+ "an error HTTP status."
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "User is logged in", content = @Content),
+        @ApiResponse(responseCode = "401", description = "No active session / user", content = @Content)
+    })
+    public ResponseEntity<Void> check(HttpServletRequest request, HttpServletResponse response) {
+		Cookie[] cookies = request.getCookies();
+
+		if (cookies == null) {
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+		}
+
+		Optional<Cookie> sessionCookie = Arrays.stream(cookies)
+				.filter(c -> "sesionActiva".equals(c.getName()))
+				.findFirst();
+
+		if (sessionCookie.isEmpty()
+				|| !cookieService.validate(sessionCookie.get().getValue())) {
+
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+		}
+        
+        // Send 401 if cookie is not in session
 		return ResponseEntity.ok().build();
     }
 }

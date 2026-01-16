@@ -10,8 +10,9 @@ import es.metrica.sept25.evolutivo.entity.maps.routes.SavedRoute;
 import es.metrica.sept25.evolutivo.entity.user.User;
 
 @Repository
-public interface SavedRouteRepository extends JpaRepository<SavedRoute, Long>{
+public interface SavedRouteRepository extends JpaRepository<SavedRoute, Long> {
 
 	List<SavedRoute> findByUser(User user);
+
 	Optional<SavedRoute> findByRouteId(Long routeId);
 }

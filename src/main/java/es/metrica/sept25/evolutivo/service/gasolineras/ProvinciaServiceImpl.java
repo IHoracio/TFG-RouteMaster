@@ -50,7 +50,8 @@ public class ProvinciaServiceImpl implements ProvinciaService {
 					+ "Fetching all provinces from the external API.");
 			Provincia[] provArr = restTemplate.getForObject(API_URL, Provincia[].class);
 			if (!(Objects.isNull(provArr))) {
-				provList = Arrays.asList(provArr);
+//				provList = Arrays.asList(provArr);
+				provList = Arrays.stream(provArr).collect(Collectors.toList());
 				provinciaRepository.saveAllAndFlush(
 						provList.stream().filter(p -> p.getIdProvincia() < 100).collect(Collectors.toList()));
 				log.info("[prov-service] [" + LocalDateTime.now().toString() + "] "
@@ -60,6 +61,7 @@ public class ProvinciaServiceImpl implements ProvinciaService {
 
 		// Devolvemos las españolas
 		return provList;
+		
 	}
 
 	@Override

@@ -17,46 +17,46 @@ import jakarta.servlet.http.HttpServletResponse;
 @Component
 public class SessionCookieFilter extends OncePerRequestFilter {
 
-    private final CookieService cookieService;
+	private final CookieService cookieService;
 
-    public SessionCookieFilter(CookieService cookieService) {
-        this.cookieService = cookieService;
-    }
+	public SessionCookieFilter(CookieService cookieService) {
+		this.cookieService = cookieService;
+	}
 
-    @Override
-    protected boolean shouldNotFilter(HttpServletRequest request) {
+	@Override
+	protected boolean shouldNotFilter(HttpServletRequest request) {
 
-        String path = request.getRequestURI();
+		String path = request.getRequestURI();
 
-        return "OPTIONS".equalsIgnoreCase(request.getMethod())
-                || !path.startsWith("/api/")
-                || path.startsWith("/api/routes");
-    }
+		return "OPTIONS".equalsIgnoreCase(request.getMethod())
+				|| !path.startsWith("/api/")
+				|| path.startsWith("/api/routes");
+	}
 
-    @Override
-    protected void doFilterInternal(HttpServletRequest request,
-                                    HttpServletResponse response,
-                                    FilterChain filterChain)
-            throws ServletException, IOException {
+	@Override
+	protected void doFilterInternal(HttpServletRequest request,
+			HttpServletResponse response,
+			FilterChain filterChain)
+					throws ServletException, IOException {
 
-        Cookie[] cookies = request.getCookies();
+		Cookie[] cookies = request.getCookies();
 
-        if (cookies == null) {
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
-            return;
-        }
+		if (cookies == null) {
+			response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+			return;
+		}
 
-        Optional<Cookie> sessionCookie = Arrays.stream(cookies)
-                .filter(c -> "sesionActiva".equals(c.getName()))
-                .findFirst();
+		Optional<Cookie> sessionCookie = Arrays.stream(cookies)
+				.filter(c -> "sesionActiva".equals(c.getName()))
+				.findFirst();
 
-        if (sessionCookie.isEmpty()
-                || !cookieService.validate(sessionCookie.get().getValue())) {
+		if (sessionCookie.isEmpty()
+				|| !cookieService.validate(sessionCookie.get().getValue())) {
 
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
-            return;
-        }
-        filterChain.doFilter(request, response);
-    }
+			response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+			return;
+		}
+		filterChain.doFilter(request, response);
+	}
 }
 

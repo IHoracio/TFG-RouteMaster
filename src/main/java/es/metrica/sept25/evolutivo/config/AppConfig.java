@@ -21,9 +21,9 @@ public class AppConfig {
 	public ObjectMapper objectMapper() {
 		return new ObjectMapper();
 	}
-	
+
 	@Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+	public PasswordEncoder passwordEncoder() {
+		return new BCryptPasswordEncoder();
+	}
 }

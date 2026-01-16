@@ -13,15 +13,15 @@ import jakarta.persistence.Table;
 @Table(name = "brands")
 public class Brand {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
 
-    @Column(name = "name", unique = true, nullable = false)
-    private String name;
+	@Column(name = "name", unique = true, nullable = false)
+	private String name;
 
-    @Column(name = "last_updated", nullable = false)
-    private LocalDateTime lastUpdated;
+	@Column(name = "last_updated", nullable = false)
+	private LocalDateTime lastUpdated;
 
 	public Long getId() {
 		return id;
@@ -47,5 +47,4 @@ public class Brand {
 		this.lastUpdated = lastUpdated;
 	}
 
-    
 }

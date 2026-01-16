@@ -11,26 +11,25 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 
 @Embeddable
-public class RoutePreferences  {
+public class RoutePreferences {
 
-	
 	@ElementCollection
-    private List<String> preferredBrands;
+	private List<String> preferredBrands;
 
-    private Integer radioKm;
+	private Integer radioKm;
 
-    @Enumerated(EnumType.STRING)
-    private FuelType fuelType;
-    
-    @Enumerated(EnumType.STRING)
-    private EmissionType emissionType;
+	@Enumerated(EnumType.STRING)
+	private FuelType fuelType;
 
-    private Double maxPrice;
+	@Enumerated(EnumType.STRING)
+	private EmissionType emissionType;
 
-    @Enumerated(EnumType.STRING)
-    private MapViewType mapView;
-    
-    private boolean avoidTolls;
+	private Double maxPrice;
+
+	@Enumerated(EnumType.STRING)
+	private MapViewType mapView;
+
+	private boolean avoidTolls;
 
 	public List<String> getPreferredBrands() {
 		return preferredBrands;
@@ -88,9 +87,4 @@ public class RoutePreferences  {
 		this.avoidTolls = avoidTolls;
 	}
 
-	
-
-	
-    
-    
 }
