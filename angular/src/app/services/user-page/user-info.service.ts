@@ -18,27 +18,23 @@ export class UserInfoService {
   getRoutesSignal() { return this.routesSignal; }
   setRoutes(data: any[]) { this.routesSignal.set(data); }
 
-  getUserInfo(mail: string): Observable<any> {
-    return this.http.get(`${this.baseUrl}/api/users/get`, {
-      params: { mail }
-    });
+  getUserInfo(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/api/users/get`, { withCredentials: true });
   }
 
-  getUserRoutes(email: string): Observable<any[]> {
-    return this.http.get<any[]>(`${this.baseUrl}/api/ruta`, {
-      params: { email }
-    });
+  getUserRoutes(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.baseUrl}/api/savedRoute`, { withCredentials: true });
   }
 
   executeRoute(id: number): Observable<any> {
-    return this.http.get(`${this.baseUrl}/api/ruta/execute`, {
-      params: { id: id.toString() }
+    return this.http.get(`${this.baseUrl}/api/savedRoute/execute`, {
+      params: { id: id.toString() },
+      withCredentials: true
     });
   }
 
-  deleteRoute(id: number, email: string): Observable<any> {
-    return this.http.delete(`${this.baseUrl}/api/ruta/delete/${id}`, {
-      params: { email }
-    });
+  deleteRoute(id: number): Observable<any> {
+    return this.http.delete(`${this.baseUrl}/api/savedRoute/delete/${id}`, {
+      params: { id }, withCredentials: true });
   }
 }
