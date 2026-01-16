@@ -47,8 +47,16 @@ public class SavedRouteController {
 	
 
 	@Operation(summary = "Guarda una ruta calculada")
-	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Ruta guardada correctamente"),
-			@ApiResponse(responseCode = "404", description = "Usuario no encontrado") })
+	@ApiResponses(value = { 
+		@ApiResponse(
+				responseCode = "200", 
+				description = "Ruta guardada correctamente"
+			),
+		@ApiResponse(
+				responseCode = "404",
+				description = "Usuario no encontrado"
+			) 
+	})
 	@PostMapping("/save")
 	public ResponseEntity<SavedRouteDTO> saveRoute(
 			HttpServletRequest request,
