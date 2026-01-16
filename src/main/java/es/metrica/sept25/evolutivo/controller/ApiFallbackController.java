@@ -22,18 +22,18 @@ import jakarta.servlet.http.HttpServletRequest;
 @RequestMapping("/api")
 public class ApiFallbackController {
 
-    private static final DateTimeFormatter ISO = DateTimeFormatter.ISO_DATE_TIME;
+	private static final DateTimeFormatter ISO = DateTimeFormatter.ISO_DATE_TIME;
 
-    @RequestMapping("/**")
-    public ResponseEntity<Map<String, Object>> fallback(HttpServletRequest request) {
-        Map<String, Object> body = new HashMap<>();
-        body.put("timestamp", LocalDateTime.now().format(ISO));
-        body.put("status", HttpStatus.NOT_FOUND.value());
-        body.put("error", HttpStatus.NOT_FOUND.getReasonPhrase());
-        body.put("message", "API endpoint not found");
-        body.put("path", request.getRequestURI());
-        body.put("method", request.getMethod());
+	@RequestMapping("/**")
+	public ResponseEntity<Map<String, Object>> fallback(HttpServletRequest request) {
+		Map<String, Object> body = new HashMap<>();
+		body.put("timestamp", LocalDateTime.now().format(ISO));
+		body.put("status", HttpStatus.NOT_FOUND.value());
+		body.put("error", HttpStatus.NOT_FOUND.getReasonPhrase());
+		body.put("message", "API endpoint not found");
+		body.put("path", request.getRequestURI());
+		body.put("method", request.getMethod());
 
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
-    }
+		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
+	}
 }

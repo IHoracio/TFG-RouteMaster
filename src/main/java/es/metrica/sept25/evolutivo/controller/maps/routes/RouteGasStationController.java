@@ -23,20 +23,18 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RestController
 @Tag(name = "Direcciones")
 public class RouteGasStationController {
-	
+
 	@Autowired
 	private RoutesService routesService;
-	
 
 	@Operation(
-			summary = "Lista de coordenadas de las gasolineras en un radio de los pasos de una ruta", 
+			summary = "Lista de coordenadas de las gasolineras en un radio de los pasos de una ruta",
 			description = "Devuelve una lista de coordenadas para cada uno de las gasolineras encontradas"
 					+ "un radio de cada punto de la ruta.")
-	@ApiResponses(value = { 
+	@ApiResponses(value = {
 			@ApiResponse(responseCode = "200", description = "Pasos encontrados para la ruta dada."),
-			@ApiResponse(responseCode = "204", description = "Solicitud errónea: no se pudieron calcular los pasos de la ruta."),
-			@ApiResponse(responseCode = "404", description = "Solicitud errónea: no se pudieron calcular los pasos de la ruta.")
-			})
+			@ApiResponse(responseCode = "400", description = "Solicitud errónea: no se pudieron calcular los pasos de la ruta.")
+	})
 	@GetMapping("/api/routes/gasStations")
 	public ResponseEntity<List<Coords>> getGasolineras(
 			@Parameter(example = "El Vellon") @RequestParam(required = true) String origin,
@@ -47,11 +45,11 @@ public class RouteGasStationController {
 			@RequestParam(required = false, defaultValue = "es") String language,
 			@Parameter(example = "5") @RequestParam(required = true) Long radius,
 			@RequestParam(required = false, defaultValue = "false") boolean avoidTolls,
-			@RequestParam(required = false, defaultValue = "C")EmissionType vehicleEmissionType
+			@RequestParam(required = false, defaultValue = "C") EmissionType vehicleEmissionType
 			) {
-		
+
 		Optional<RouteGroup> routeGroupOpt = routesService.getDirections(origin, destination, waypoints, optimizeWaypoints, optimizeRoute, language, avoidTolls, vehicleEmissionType);
-		
+
 		if (routeGroupOpt.isEmpty()) {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
