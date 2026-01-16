@@ -191,16 +191,19 @@ public class UserServiceImpl implements UserService {
 		log.info("[user-service] [" + LocalDateTime.now().toString() + "] "
                 + "Attempting to update route preferences for user: " + user.getEmail());
 		
-        RoutePreferences prefs = new RoutePreferences();
-        prefs.setPreferredBrands(preferredBrands);
-        prefs.setRadioKm(radioKm);
-        prefs.setFuelType(fuelType);
-        prefs.setMaxPrice(maxPrice);
-        prefs.setMapView(mapView);
-        prefs.setAvoidTolls(avoidTolls);
-        prefs.setEmissionType(vehicleEmissionType);
+	    RoutePreferences prefs = user.getRoutePreferences();
+	    if (prefs == null) {
+	        prefs = new RoutePreferences();
+	        user.setRoutePreferences(prefs);
+	    }
+	    prefs.setPreferredBrands(preferredBrands);
+	    prefs.setRadioKm(radioKm);
+	    prefs.setFuelType(fuelType);
+	    prefs.setMaxPrice(maxPrice);
+	    prefs.setMapView(mapView);
+	    prefs.setAvoidTolls(avoidTolls);
+	    prefs.setEmissionType(vehicleEmissionType);
 
-        user.setRoutePreferences(prefs);
         userRepository.save(user);
     }
 	
@@ -214,11 +217,14 @@ public class UserServiceImpl implements UserService {
 		log.info("[user-service] [" + LocalDateTime.now().toString() + "] "
                 + "Attempting to update user preferences for user: " + user.getEmail());
 		
-	    UserPreferences prefs = new UserPreferences();
+	    UserPreferences prefs = user.getUserPreferences();
+	    if (prefs == null) {
+	        prefs = new UserPreferences();
+	        user.setUserPreferences(prefs);
+	    }
 	    prefs.setTheme(theme);
 	    prefs.setLanguage(language);
-
-	    user.setUserPreferences(prefs);
+	    
 	    userRepository.save(user);
 	}
 	
