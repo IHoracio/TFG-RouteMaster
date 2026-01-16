@@ -5,6 +5,7 @@ import { UserPreferencesService } from '../../../../services/user-page/user-pref
 import { FavouriteGasStation, GasStation } from '../../../../Dto/gas-station';
 import { UserInfoService } from '../../../../services/user-page/user-info.service';
 import { forkJoin } from 'rxjs';
+import { GasStationService } from '../../../../services/user-page/gas-station/gas-station.service';
 
 @Component({
   selector: 'app-user-info',
@@ -16,35 +17,29 @@ export class UserInfoComponent implements OnInit {
   private router = inject(Router);
   private userInfoService = inject(UserInfoService);
   private userPreferencesService = inject(UserPreferencesService);
+  private gasStationService = inject(GasStationService);
 
   favoriteRoutes = this.userInfoService.getRoutesSignal();
 
   user = this.userInfoService.getUserSignal();
   favoriteGasStations = this.userPreferencesService.getFavoriteGasStationsSignal();
 
-  private mail: string = 'prueba@gmail.com';
-
-  loadingUser = signal<boolean>(true);
-
   ngOnInit(): void {
-    this.loadingUser.set(true);
-    this.userInfoService.getUserInfo(this.mail).subscribe({
+    this.userInfoService.getUserInfo().subscribe({
       next: (data) => {
         this.user.set({
           email: data.email || 'N/A',
           name: data.name || 'N/A',
           surname: data.surname || 'N/A'
         });
-        this.loadingUser.set(false);
       },
       error: (error) => {
         console.error('Error fetching user info:', error);
         this.user.set({ email: 'Error', name: 'Error', surname: 'Error' });
-        this.loadingUser.set(false);
       }
     });
 
-    this.userInfoService.getUserRoutes(this.mail).subscribe({
+    this.userInfoService.getUserRoutes().subscribe({
       next: (data: any[]) => {
         this.favoriteRoutes.set(data || []);
         if (data && data.length > 0) {
@@ -71,12 +66,12 @@ export class UserInfoComponent implements OnInit {
       }
     });
 
-    this.userPreferencesService.getUserFavouriteGasStations(this.mail).subscribe({
+    this.userPreferencesService.getUserFavouriteGasStations().subscribe({
       next: (data: FavouriteGasStation[]) => {
         this.favoriteGasStations.set(data || []);
         this.favoriteGasStations().forEach(favorite => {
           if (!favorite.latitud || !favorite.longitud) {
-            this.userPreferencesService.getGasStation(favorite.idEstacion).subscribe({
+            this.gasStationService.getGasStation(favorite.idEstacion).subscribe({
               next: (fullStation: GasStation) => {
                 this.favoriteGasStations.update(stations =>
                   stations.map(s => s.idEstacion === favorite.idEstacion ? { ...fullStation, alias: favorite.alias } as FavouriteGasStation : s)
@@ -95,10 +90,6 @@ export class UserInfoComponent implements OnInit {
     });
   }
 
-  selectRoute(route: any): void {
-    this.router.navigate(['/buscador'], { state: { selectedRoute: route } });
-  }
-
   selectStation(station: FavouriteGasStation): void {
     this.router.navigate(['/user-preferences'], { state: { selectedStation: station } });
   }
@@ -109,7 +100,7 @@ export class UserInfoComponent implements OnInit {
 
   deleteRoute(route: any): void {
     if (confirm(`¿Estás seguro de que quieres eliminar la ruta "${route.name}"?`)) {
-      this.userInfoService.deleteRoute(route.routeId, this.mail).subscribe({
+      this.userInfoService.deleteRoute(route.routeId).subscribe({
         next: () => {
           this.favoriteRoutes.update(routes => routes.filter(r => r.routeId !== route.routeId));
         },

@@ -18,6 +18,8 @@ import { GasStation } from '../../../Dto/gas-station';
   styleUrl: './map-page.component.css'
 })
 export class MapPageComponent implements OnDestroy, AfterViewInit {
+  private static mapsOptionsSet = false;
+
   public map?: google.maps.Map;
   private routePolyline?: google.maps.Polyline;
   private startMarker?: any;
@@ -55,10 +57,13 @@ export class MapPageComponent implements OnDestroy, AfterViewInit {
   }
 
   private async initMap(): Promise<void> {
-    setOptions({
-      key: environment.googleMapsApiKey,
-      v: 'weekly'
-    });
+    if (!MapPageComponent.mapsOptionsSet) {
+      setOptions({
+        key: environment.googleMapsApiKey,
+        v: 'weekly'
+      });
+      MapPageComponent.mapsOptionsSet = true;
+    }
 
     const mapsLib = (await importLibrary('maps')) as unknown as any;
     (await importLibrary('marker')) as unknown as any;
@@ -73,7 +78,7 @@ export class MapPageComponent implements OnDestroy, AfterViewInit {
       fullscreenControl: this.showControls(),
       streetViewControl: false,
       mapId: environment.googleMapsMapId,
-      mapTypeId: this.getMapTypeId()  // Aplicar el tipo de mapa basado en el input
+      mapTypeId: this.getMapTypeId()
     };
 
     this.map = new Map(document.getElementById('map') as HTMLElement, mapOptions);
@@ -93,8 +98,6 @@ export class MapPageComponent implements OnDestroy, AfterViewInit {
       default: return google.maps.MapTypeId.ROADMAP;
     }
   }
-
-  /* ---------- Map helpers (route / markers / weather) ---------- */
 
   public drawRoute(coords: Coords[]): void {
     if (!this.map) {
@@ -220,7 +223,7 @@ export class MapPageComponent implements OnDestroy, AfterViewInit {
       container.style.transform = 'translateY(-6px)';
 
       const marker = new google.maps.marker.AdvancedMarkerElement({
-        map: null, // cluster handle it
+        map: null,
         position: { lat: c.lat, lng: c.lng },
         content: container,
         title: (c as any).name || 'Gasolinera'
@@ -243,10 +246,9 @@ private updateMarkers(): void {
       const lng = Number(station.longitud);
       if (isNaN(lat) || isNaN(lng) || lat < -90 || lat > 90 || lng < -180 || lng > 180) {
         console.warn('Invalid coords for station:', station.nombreEstacion, 'lat:', station.latitud, 'lng:', station.longitud);
-        return;  // Salta esta station
+        return;
       }
 
-      // Crea marker si coords válidas
       const size = 36;
       const fillColor = '#e71616';
       const gasStationPointSvg = `
