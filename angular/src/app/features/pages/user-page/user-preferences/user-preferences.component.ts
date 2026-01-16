@@ -41,6 +41,7 @@ export class UserPreferencesComponent implements OnInit {
   favoriteGasStations = this.userPreferencesService.getFavoriteGasStationsSignal();
   deletedFavourites = signal<FavouriteGasStation[]>([]);
   newFavorites = signal<FavouriteGasStation[]>([]);
+  renamedFavourites = signal<{oldAlias: string, newAlias: string}[]>([]);
 
   searchAddress = signal<string>('');
   searchResults = signal<GasStation[]>([]);
@@ -326,16 +327,21 @@ export class UserPreferencesComponent implements OnInit {
       this.userPreferencesService.deleteFavouriteGasStations(f.alias)
     );
 
+    const renameFavorites$ = this.renamedFavourites().map(r =>
+      this.userPreferencesService.renameFavouriteGasStations(r.oldAlias, r.newAlias)
+    );
+
     console.log('Sending theme/language update with:', {
       theme: this.theme(),
       language: this.language()
     });
 
-    forkJoin([updatePrefs$, updateTheme$, ...updateFavorites$, ...deleteFavorites$]).subscribe({
+    forkJoin([updatePrefs$, updateTheme$, ...updateFavorites$, ...deleteFavorites$, ...renameFavorites$]).subscribe({
       next: () => {
         console.log('All updates completed');
         this.newFavorites.set([]);
         this.deletedFavourites.set([]);
+        this.renamedFavourites.set([]);
         history.scrollRestoration = 'manual';
         window.scrollTo(0, 0);
         window.location.reload();
@@ -345,6 +351,7 @@ export class UserPreferencesComponent implements OnInit {
         alert('Error saving preferences: ' + (err?.message || 'Unknown error'));
         this.newFavorites.set([]);
         this.deletedFavourites.set([]);
+        this.renamedFavourites.set([]);
       }
     });
   }
@@ -366,6 +373,7 @@ export class UserPreferencesComponent implements OnInit {
     this.preferredBrands.set(this.defaultUserPreferences.preferredBrands || []);
     this.newFavorites.set([]);
     this.deletedFavourites.set([]);
+    this.renamedFavourites.set([]);
 
     console.log('Resetting to defaults:', this.defaultUserPreferences);
     console.log('Values being sent:');
@@ -402,6 +410,18 @@ export class UserPreferencesComponent implements OnInit {
       if (newFav) {
         this.newFavorites.update(n => n.filter(s => s.idEstacion !== station.idEstacion));
       }
+    }
+  }
+
+  renameFavoriteGasStation(station: FavouriteGasStation): void {
+    const newAlias = prompt('Ingresa el nuevo alias para la gasolinera:', station.alias);
+    if (newAlias && newAlias.trim() && newAlias.trim() !== station.alias) {
+      if (this.favoriteGasStations().some(f => f.alias === newAlias.trim()) || this.newFavorites().some(f => f.alias === newAlias.trim())) {
+        alert('El alias ya existe. Elige uno diferente.');
+        return;
+      }
+      this.favoriteGasStations.update(stations => stations.map(s => s.alias === station.alias ? { ...s, alias: newAlias.trim() } : s));
+      this.renamedFavourites.update(r => [...r, { oldAlias: station.alias, newAlias: newAlias.trim() }]);
     }
   }
 

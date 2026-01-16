@@ -59,6 +59,13 @@ export class UserPreferencesService {
     });
   }
 
+  renameFavouriteGasStations(oldAlias: string, newAlias: string): Observable<any> {
+    return this.http.post(`${this.baseUrl}/api/users/favouriteStations`, null, {
+      params: { oldAlias, newAlias },
+      withCredentials: true
+    });
+  }
+
   getUserFavouriteGasStations(): Observable<FavouriteGasStation[]> {
     return this.http.get<FavouriteGasStation[]>(`${this.baseUrl}/api/users/favouriteStations`, { withCredentials: true });
   }

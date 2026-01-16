@@ -1,4 +1,4 @@
-import { Component, signal, inject, OnInit } from '@angular/core';
+import { Component, signal, inject, OnInit, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { UserPreferencesService } from '../../../../services/user-page/user-preferences.service';
@@ -25,6 +25,15 @@ export class UserInfoComponent implements OnInit {
   favoriteGasStations = this.userPreferencesService.getFavoriteGasStationsSignal();
 
   selectedRoute = signal<string>('');
+  selectedGasStations = signal<Set<number>>(new Set());
+  sortByPrice = signal<boolean>(false);
+  userPreferences = signal<any>({});
+
+  sortedStations = computed(() => {
+    const fuel = this.userPreferences().fuelType || 'GASOLINE';
+    const priceField = (fuel === 'GASOLINE' || fuel === 'ALL' || fuel === 'ELECTRIC') ? 'Gasolina95' : 'Diesel';
+    return [...this.favoriteGasStations()].sort((a, b) => (a[priceField] || Infinity) - (b[priceField] || Infinity));
+  });
 
   ngOnInit(): void {
     this.userInfoService.getUserInfo().subscribe({
@@ -38,6 +47,15 @@ export class UserInfoComponent implements OnInit {
       error: (error) => {
         console.error('Error fetching user info:', error);
         this.user.set({ email: 'Error', name: 'Error', surname: 'Error' });
+      }
+    });
+
+    this.userPreferencesService.getUserPreferences().subscribe({
+      next: (data) => {
+        this.userPreferences.set(data || {});
+      },
+      error: (error) => {
+        console.error('Error fetching user preferences:', error);
       }
     });
 
@@ -102,11 +120,10 @@ export class UserInfoComponent implements OnInit {
 
   deleteRoute(route: any): void {
     if (confirm(`¿Estás seguro de que quieres eliminar la ruta "${route.name}"?`)) {
-      console.log(route.routeId)
       this.userInfoService.deleteRoute(route.routeId).subscribe({
         next: () => {
           this.favoriteRoutes.update(routes => routes.filter(r => r.routeId !== route.routeId));
-          this.selectedRoute.set('');
+          this.selectedRoute.set(''); // Reset selection after delete
         },
         error: (err) => {
           console.error('Error eliminando ruta:', err);
@@ -137,6 +154,28 @@ export class UserInfoComponent implements OnInit {
     } else {
       this.selectedRoute.set(route.routeId);
     }
+  }
+
+  toggleGasStationSelection(station: FavouriteGasStation): void {
+    this.selectedGasStations.update(set => {
+      if (set.has(station.idEstacion)) {
+        set.delete(station.idEstacion);
+      } else {
+        set.add(station.idEstacion);
+      }
+      return new Set(set);
+    });
+  }
+
+  toggleSortByPrice(): void {
+    this.sortByPrice.update(v => !v);
+  }
+
+  getTipoVentaText(tipo: string): string {
+    if (tipo === 'A') return 'Autoservicio';
+    if (tipo === 'S') return 'Servicio Asistido';
+    if (tipo === 'P' || tipo === 'R') return 'Convencional';
+    return tipo;
   }
 
   goToLanding(): void {
