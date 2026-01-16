@@ -19,9 +19,14 @@ export class AuthService {
     return this.http.post<User>(this.authUrl + "/login", user, { withCredentials: true });
   }
 
-  logout(){
-    return this.http.post<User>(this.authUrl + "/logout", { withCredentials: true });
-  }
+  logout() {
+  return this.http.post(
+    this.authUrl + "/logout",
+    {},
+    { withCredentials: true }
+  );
+  } 
+
 
   
   sendUserSession(isLoggedIn: boolean){

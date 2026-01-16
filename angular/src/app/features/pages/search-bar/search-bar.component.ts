@@ -38,6 +38,9 @@ export class SearchBarComponent {
     avoidTolls: false,
     vehiculeEmissionType: "DIESEL"
   }
+  waypointTypes: string[] = [];
+
+
 
   destinationTypeOptions: Record<string, string> = {
     coordinates: "Destino",
@@ -68,12 +71,12 @@ export class SearchBarComponent {
 
   initializeUser() {
     this.searchBarService
-      .saveFavouriteGasStations('prueba@gmail.com')
+      .saveFavouriteGasStations()
       .subscribe(gas => this.favouriteGasStations.set(JSON.parse(gas))
       );
 
     this.searchBarService
-      .saveSavedRoutes("prueba@gmail.com")
+      .saveSavedRoutes()
       .subscribe(route => {
         console.log(route)
         this.savedRoute.set(JSON.parse(route))
@@ -81,23 +84,26 @@ export class SearchBarComponent {
   }
   addWaypoint() {
     this.routeFormResponse.waypoints.push('')
+    this.waypointTypes.push('text');
   }
   deleteWaypoint() {
     this.routeFormResponse.waypoints.pop()
+    this.waypointTypes.pop();
   }
-  savedRouteSelected(){
+  savedRouteSelected() {
     this.routeFormResponse.origin = this.selectedRouteOption.origin
     this.routeFormResponse.destination = this.selectedRouteOption.destination
   }
-  
+
 
 
   submitted: boolean = false;
   onSubmit() {
+    console.log(this.routeFormResponse)
     this.searchBarService.onSubmit(this.routeFormResponse)
     this.submitted = true;
     this.initializeUser()
-    
+
   }
   trackByIndex(index: number) {
     return index;
@@ -106,7 +112,7 @@ export class SearchBarComponent {
   successfulMessage: string = "";
   errorMessage: string = "";
   saveRoute() {
-    this.searchBarService.saveFavouriteRoute(this.routeAlias, "prueba@gmail.com", this.routeFormResponse)
+    this.searchBarService.saveFavouriteRoute(this.routeAlias, this.routeFormResponse)
       .subscribe({
         next: (response) => {
           this.successfulMessage = "Se ha guardado la ruta como favorita."

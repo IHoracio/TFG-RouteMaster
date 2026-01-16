@@ -93,7 +93,7 @@ export class RouteService {
     return this.http.get(this.apiUrl + "/weather", { headers: headers, params: parameters, responseType: 'text' });
   }
 
-  saveFavouriteRoute(alias: string, email:string, routeFormResponse: RouteFormResponse) {
+  saveFavouriteRoute(alias: string, routeFormResponse: RouteFormResponse) {
 
     const headers = new HttpHeaders({
       'Content-Type': 'application/json',
@@ -106,7 +106,6 @@ export class RouteService {
       .set('waypoints', waypointsString)
       .set('optimizeWaypoints', routeFormResponse.optimizeWaypoints)
       .set('optimizeRoute', routeFormResponse.optimizeRoute)
-      .set('email', email)
 
     console.log(params)
     return this.http.post(

@@ -69,20 +69,20 @@ export class SearchBarService {
     })
   }
 
-  saveUserData(mail: string): Observable<string> {
-    return this.userService.receiveUserData(mail);
+  saveUserData(): Observable<string> {
+    return this.userService.receiveUserData();
   }
-  saveFavouriteGasStations(mail: string): Observable<string>{
-    return this.userService.receiveFavouriteGasStations(mail)
+  saveFavouriteGasStations(): Observable<string>{
+    return this.userService.receiveFavouriteGasStations()
   }
-  saveSavedRoutes(mail: string): Observable<string>{
-    return this.userService.receiveSavedRoutes(mail)
+  saveSavedRoutes(): Observable<string>{
+    return this.userService.receiveSavedRoutes()
   }
   
 
 
-  saveFavouriteRoute(alias: string, email:string, routeFormResponse: RouteFormResponse) {
-    return this.routeService.saveFavouriteRoute(alias, email, routeFormResponse)
+  saveFavouriteRoute(alias: string, routeFormResponse: RouteFormResponse) {
+    return this.routeService.saveFavouriteRoute(alias, routeFormResponse)
   }
   giveCoords(coords: Coords[]){
     this.mapCommunication.sendRoute(coords)

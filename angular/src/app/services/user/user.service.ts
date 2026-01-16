@@ -14,23 +14,16 @@ export class UserService {
   private routeUrl = 'http://localhost:8080/api/savedRoute'
   constructor(private http: HttpClient) { }
 
-  receiveUserData(mail: string): Observable<string> {
-    const headers = new HttpHeaders().set('key', environment.googleMapsMapId);
-    let parameters = new HttpParams()
-      .set('mail', mail)
-
-    return this.http.get(this.userUrl + "/get", { headers: headers, params: parameters, responseType: 'text', withCredentials: true });
+  receiveUserData(): Observable<string> {
+    return this.http.get(this.userUrl + "/get", { responseType: 'text', withCredentials: true });
   }
 
-  receiveFavouriteGasStations(email: string): Observable<string> {
-    let parameters = new HttpParams()
-
-    return this.http.get(this.userUrl + "/favouriteStations", { params: parameters, responseType: 'text', withCredentials: true });
+  receiveFavouriteGasStations(): Observable<string> {
+    return this.http.get(this.userUrl + "/favouriteStations", { responseType: 'text', withCredentials: true });
   }
 
-  receiveSavedRoutes(email: string): Observable<string> {
-    let parameters = new HttpParams()
-    return this.http.get(this.routeUrl, { params: parameters, responseType: 'text', withCredentials: true });
+  receiveSavedRoutes(): Observable<string> {
+    return this.http.get(this.routeUrl, {responseType: 'text', withCredentials: true });
   }
 
 }

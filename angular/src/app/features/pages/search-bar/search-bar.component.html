@@ -20,24 +20,24 @@
       @if(activeTab === "destination" || activeTab === "gas"){
       <p>
         <label for="origin">Origen</label>
-        <input class="form-control" type="text" id="origin" name="origin" [(ngModel)]="routeFormResponse.origin" placeholder="¿Desde dónde?"
-          required #originField="ngModel" />
+        <input class="form-control" type="text" id="origin" name="origin" [(ngModel)]="routeFormResponse.origin"
+          placeholder="¿Desde dónde?" required #originField="ngModel" />
 
         @if(originField && originField.touched){
-          <div class="error">
-            @if(originField.errors?.['required']){
-            Tienes que introducir un origen.
-            }
-          </div>
+      <div class="error">
+        @if(originField.errors?.['required']){
+        Tienes que introducir un origen.
         }
+      </div>
+      }
       </p>
       }
 
       @if(activeTab === "destination"){
       <p>
         <label for="destination">Destino</label>
-        <input class="form-control" type="text" id="destination" name="destination" [(ngModel)]="routeFormResponse.destination"
-          placeholder="¿A dónde?" required #destinationField="ngModel" />
+        <input class="form-control" type="text" id="destination" name="destination"
+          [(ngModel)]="routeFormResponse.destination" placeholder="¿A dónde?" required #destinationField="ngModel" />
 
         @if(destinationField && destinationField.touched){
       <div class="error">
@@ -48,26 +48,86 @@
       }
       </p>
 
-      <!-- From Uiverse.io by andrew-demchenk0 --> 
-
+      <!-- From Uiverse.io by andrew-demchenk0 -->
       <p>Puntos intermedios</p>
 
-    <button (click)="addWaypoint()" type="button" class="button">
-      <span class="button__text">Añadir</span>
-      <span class="button__icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" viewBox="0 0 24 24" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" stroke="currentColor" height="24" fill="none" class="svg"><line y2="19" y1="5" x2="12" x1="12"></line><line y2="12" y1="12" x2="19" x1="5"></line></svg></span>
-    </button>
 
-    <button (click)="deleteWaypoint()" type="button" class="button-delete">
-      <span class="button__text">Eliminar</span>
-      <span class="button__icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" viewBox="0 0 24 24" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" stroke="currentColor" height="24" fill="none" class="svg"><line y2="19" y1="5" x2="12" x1="12"></line><line y2="12" y1="12" x2="19" x1="5"></line></svg></span>
-    </button>
+
+      <button (click)="addWaypoint()" type="button" class="button">
+        <span class="button__text">Añadir</span>
+        <span class="button__icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" viewBox="0 0 24 24"
+            stroke-width="2" stroke-linejoin="round" stroke-linecap="round" stroke="currentColor" height="24"
+            fill="none" class="svg">
+            <line y2="19" y1="5" x2="12" x1="12"></line>
+            <line y2="12" y1="12" x2="19" x1="5"></line>
+          </svg></span>
+      </button>
+
+
+
 
       <div *ngFor="let waypoint of routeFormResponse.waypoints; let i = index; trackBy: trackByIndex">
-        <input type="text" [name]="'waypoint' + i" [(ngModel)]="routeFormResponse.waypoints[i]" />
+
+        <select [(ngModel)]="waypointTypes[i]" [name]="'type' + i">
+          <option value="text">Dirección</option>
+          <option value="gas">Gasolinera favorita</option>
+        </select>
+        @if(waypointTypes[i]==="text"){
+        <input class="form-control" type="text" [name]="'waypoint' + i" [(ngModel)]="routeFormResponse.waypoints[i]"
+          placeholder="Introduce una direccion" />
+        }
+        @if(waypointTypes[i]==="gas"){
+        <select [name]="'waypoint' + i" [(ngModel)]="routeFormResponse.waypoints[i]">
+          <option *ngFor="let gasStation of favouriteGasStations()" [value]="gasStation.direccion">
+            {{ gasStation.alias }} — {{ gasStation.marca }}
+          </option>
+        </select>
+        }
+
+
       </div>
 
+      <button (click)="deleteWaypoint()" type="button" class="button-delete">
+        <span class="button__text">Eliminar</span>
+        <span class="button__icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" viewBox="0 0 24 24"
+            stroke-width="2" stroke-linejoin="round" stroke-linecap="round" stroke="currentColor" height="24"
+            fill="none" class="svg">
+            <line y2="19" y1="5" x2="12" x1="12"></line>
+            <line y2="12" y1="12" x2="19" x1="5"></line>
+          </svg></span>
+      </button>
+
+
+      <div class="checkbox-wrapper-46">
+        <input [(ngModel)]="routeFormResponse.optimizeWaypoints" type="checkbox" id="optimizeWaypoints" class="inp-cbx" name="optimizeWaypoints" />
+        <label for="optimizeWaypoints" class="cbx"><span>
+            <svg viewBox="0 0 12 10" height="10px" width="12px">
+              <polyline points="1.5 6 4.5 9 10.5 1"></polyline>
+            </svg></span><span>Optimizar puntos intermedios</span>
+        </label>
+      </div>
+
+      <div class="checkbox-wrapper-46">
+        <input [(ngModel)]="routeFormResponse.optimizeRoute" type="checkbox" id="optimizeRoute" class="inp-cbx" name="optimizeRoute" />
+        <label for="optimizeRoute" class="cbx"><span>
+            <svg viewBox="0 0 12 10" height="10px" width="12px">
+              <polyline points="1.5 6 4.5 9 10.5 1"></polyline>
+            </svg></span><span>Optimizar la ruta</span>
+        </label>
+      </div>
+
+      <div class="checkbox-wrapper-46">
+        <input [(ngModel)]="routeFormResponse.avoidTolls" type="checkbox" id="avoidTolls" class="inp-cbx" name="avoidTolls" />
+        <label for="avoidTolls" class="cbx"><span>
+            <svg viewBox="0 0 12 10" height="10px" width="12px">
+              <polyline points="1.5 6 4.5 9 10.5 1"></polyline>
+            </svg></span><span>Evitar peajes</span>
+        </label>
+      </div>
+
+      <!--
       <p>
-        <label for="optimizeRoute">Optimizar puntos intermedios</label>
+        <label for="optimizeWaypoints">Optimizar puntos intermedios</label>
         <input type="checkbox" [(ngModel)]="routeFormResponse.optimizeWaypoints" name="optimizeWaypoints"
           id="optimizeWaypoints">
       </p>
@@ -81,7 +141,7 @@
         <label for="avoidTolls">Evitar peajes</label>
         <input type="checkbox" [(ngModel)]="routeFormResponse.avoidTolls" name="avoidTolls" id="avoidTolls">
       </p>
-
+    -->
       <p>
         <label for="vehiculeEmissionType">Tipo de combustible</label>
         <select [(ngModel)]="routeFormResponse.vehiculeEmissionType" name="vehiculeEmissionType"
