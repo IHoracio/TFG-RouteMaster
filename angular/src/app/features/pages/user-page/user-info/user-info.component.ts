@@ -24,6 +24,8 @@ export class UserInfoComponent implements OnInit {
   user = this.userInfoService.getUserSignal();
   favoriteGasStations = this.userPreferencesService.getFavoriteGasStationsSignal();
 
+  selectedRoute = signal<string>('');
+
   ngOnInit(): void {
     this.userInfoService.getUserInfo().subscribe({
       next: (data) => {
@@ -100,15 +102,40 @@ export class UserInfoComponent implements OnInit {
 
   deleteRoute(route: any): void {
     if (confirm(`¿Estás seguro de que quieres eliminar la ruta "${route.name}"?`)) {
+      console.log(route.routeId)
       this.userInfoService.deleteRoute(route.routeId).subscribe({
         next: () => {
           this.favoriteRoutes.update(routes => routes.filter(r => r.routeId !== route.routeId));
+          this.selectedRoute.set('');
         },
         error: (err) => {
           console.error('Error eliminando ruta:', err);
           alert('Error al eliminar la ruta. Inténtalo de nuevo.');
         }
       });
+    }
+  }
+
+  renameRoute(route: any): void {
+    const newName = prompt('Ingresa el nuevo nombre para la ruta:', route.name);
+    if (newName && newName.trim()) {
+      this.userInfoService.renameRoute(route.routeId, newName.trim()).subscribe({
+        next: () => {
+          this.favoriteRoutes.update(routes => routes.map(r => r.routeId === route.routeId ? { ...r, name: newName.trim() } : r));
+        },
+        error: (err) => {
+          console.error('Error renombrando ruta:', err);
+          alert('Error al renombrar la ruta. Inténtalo de nuevo.');
+        }
+      });
+    }
+  }
+
+  toggleRouteSelection(route: any): void {
+    if (this.selectedRoute() === route.routeId) {
+      this.selectedRoute.set('');
+    } else {
+      this.selectedRoute.set(route.routeId);
     }
   }
 

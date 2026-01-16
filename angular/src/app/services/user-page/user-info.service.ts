@@ -37,4 +37,11 @@ export class UserInfoService {
     return this.http.delete(`${this.baseUrl}/api/savedRoute/delete/${id}`, {
       params: { id }, withCredentials: true });
   }
+
+  renameRoute(routeId: number, newName: string): Observable<any> {
+    return this.http.post(`${this.baseUrl}/api/savedRoute/rename`, null, {
+      params: { routeId: routeId.toString(), newName },
+      withCredentials: true
+    });
+  }
 }
