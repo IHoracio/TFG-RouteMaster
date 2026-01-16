@@ -20,6 +20,7 @@ import es.metrica.sept25.evolutivo.domain.dto.maps.routes.Coords;
 import es.metrica.sept25.evolutivo.entity.gasolinera.Brand;
 import es.metrica.sept25.evolutivo.entity.gasolinera.Gasolinera;
 import es.metrica.sept25.evolutivo.entity.gasolinera.Municipio;
+import es.metrica.sept25.evolutivo.enums.BrandEnum;
 import es.metrica.sept25.evolutivo.repository.BrandRepository;
 import es.metrica.sept25.evolutivo.repository.GasolineraRepository;
 import es.metrica.sept25.evolutivo.service.gasolineras.GasolineraServiceImpl;
@@ -170,100 +171,22 @@ public class GasolineraServiceImplTest {
     }
     
     @Test
-    void syncBrandsFromGasStations_collectsBrandsAndSavesThem() {
-
-        Municipio mun = new Municipio();
-        mun.setNombreMunicipio("Madrid");
-
-        when(municipioService.getMunicipios()).thenReturn(List.of(mun));
-
-        Gasolinera g1 = new Gasolinera();
-        g1.setMarca("Repsol");
-
-        Gasolinera g2 = new Gasolinera();
-        g2.setMarca("Cepsa");
-
-        GasolineraServiceImpl spyService = spy(service);
-
-        doReturn(List.of(g1, g2))
-                .when(spyService)
-                .getGasolinerasForMunicipio("Madrid");
-
-        when(brandRepository.findByName(anyString()))
-                .thenReturn(Optional.empty());
-
-        when(brandRepository.save(any(Brand.class)))
-                .thenAnswer(inv -> inv.getArgument(0));
-
-        spyService.syncBrandsFromGasStations();
-
-        verify(brandRepository, times(2)).save(any(Brand.class));
-    }
-
-    @Test
-    void getMarcasFromAllGasolineras_returnsSortedNames() {
-        Brand b1 = new Brand();
-        b1.setName("Cepsa");
-        Brand b2 = new Brand();
-        b2.setName("Repsol");
-
-        when(brandRepository.findAll()).thenReturn(List.of(b1, b2));
-
+    void getMarcasFromAllGasolineras_returnsEnumBrandsSorted() {
         List<String> marcas = service.getMarcasFromAllGasolineras();
 
-        assertEquals(2, marcas.size());
-        assertEquals("Cepsa", marcas.get(0));
-        assertEquals("Repsol", marcas.get(1));
-    }
+        // Verifica que el tamaño coincide con el enum
+        assertEquals(BrandEnum.values().length, marcas.size());
 
-    @Test
-    void syncBrands_savesNewBrand() {
-        Brand savedBrand = new Brand();
-        savedBrand.setName("Shell");
+        // Verifica que contenga algunas marcas conocidas
+        assertTrue(marcas.contains("Repsol"));
+        assertTrue(marcas.contains("Cepsa"));
 
-        when(brandRepository.findByName("Shell")).thenReturn(Optional.empty());
-        when(brandRepository.save(any(Brand.class))).thenReturn(savedBrand);
-
-        service.syncBrands(Set.of("Shell"));
-
-        verify(brandRepository).save(any(Brand.class));
+        // Verifica que esté ordenado alfabéticamente
+        List<String> sorted = marcas.stream().sorted().toList();
+        assertEquals(sorted, marcas);
     }
     
-    @Test
-    void initBrandsAtStartup_whenNoBrands_triggersSyncAndFetch() {
 
-        // Spy para interceptar llamadas internas
-        GasolineraServiceImpl spyService = spy(service);
-
-        when(brandRepository.count()).thenReturn(0L);
-
-        doNothing().when(spyService).syncBrandsFromGasStations();
-        doReturn(List.of("Repsol", "Cepsa"))
-                .when(spyService)
-                .getMarcasFromAllGasolineras();
-
-        // Ejecutar
-        spyService.initBrandsAtStartup();
-
-        // Verificar
-        verify(spyService).syncBrandsFromGasStations();
-        verify(spyService).getMarcasFromAllGasolineras();
-    }
-    
-    @Test
-    void initBrandsAtStartup_whenBrandsExist_doesNothing() {
-
-        GasolineraServiceImpl spyService = spy(service);
-
-        when(brandRepository.count()).thenReturn(5L);
-
-        // Ejecutar
-        spyService.initBrandsAtStartup();
-
-        // Verificar que NO se llaman
-        verify(spyService, never()).syncBrandsFromGasStations();
-        verify(spyService, never()).getMarcasFromAllGasolineras();
-    }
 
 
 }

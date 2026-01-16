@@ -16,5 +16,4 @@ public interface GasolineraService {
 
 	List<String> getMarcasFromAllGasolineras();
 
-	void syncBrandsFromGasStations();
 }

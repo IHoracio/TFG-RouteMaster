@@ -24,6 +24,7 @@ import es.metrica.sept25.evolutivo.domain.dto.maps.routes.Coords;
 import es.metrica.sept25.evolutivo.entity.gasolinera.Brand;
 import es.metrica.sept25.evolutivo.entity.gasolinera.Gasolinera;
 import es.metrica.sept25.evolutivo.entity.gasolinera.Municipio;
+import es.metrica.sept25.evolutivo.enums.BrandEnum;
 import es.metrica.sept25.evolutivo.repository.BrandRepository;
 import es.metrica.sept25.evolutivo.repository.GasolineraRepository;
 import es.metrica.sept25.evolutivo.service.maps.geocode.GeocodeService;
@@ -195,76 +196,13 @@ public class GasolineraServiceImpl implements GasolineraService {
 	}
 
 	@Override
-	// @Scheduled(cron = "0 0 */6 * * *") // cada 6 horas
-	@Transactional
-	@CacheEvict(value = "brands", allEntries = true)
-	public void syncBrandsFromGasStations() {
-		log.info("[gas-service] [" + LocalDateTime.now().toString() + "] "
-				+ "Attempting to retrieve all brands for all gas stations.");
-	    List<Municipio> municipios = municipioService.getMunicipios();
-	    Set<String> marcas = new HashSet<>();
-
-	    for (Municipio municipio : municipios) {
-
-	        List<Gasolinera> gasolineras =
-	                getGasolinerasForMunicipio(municipio.getNombreMunicipio());
-
-	        for (Gasolinera gasolinera : gasolineras) {
-	        	String marca = gasolinera.getMarca();
-
-	        	if (marca != null && !marca.isBlank()) {
-	        	    marca = marca.replaceFirst("^\"[^\"]*\"\\s*", "").trim();
-	        	    
-	        	    if (marca.matches(".*[a-zA-Z].*")) {
-	        	        marcas.add(marca);
-	        	    }
-	        	}
-	        }
-	    }
-	    syncBrands(marcas);
-
-		log.info("[gas-service] [" + LocalDateTime.now().toString() + "] "
-				+ "Sync brands finished. Total brands: {}", marcas.size());
-
-	}
-	@Override
 	@Cacheable(value = "brands", cacheManager = "staticCacheManager")
 	public List<String> getMarcasFromAllGasolineras() {
 
-	    log.info("[gas-service] [" + LocalDateTime.now().toString() + "] "
-	    		+ "Fetching brands from database");
-
-	    return brandRepository.findAll()
-	        .stream()
-	        .map(Brand::getName)
-	        .sorted()
-	        .toList();
+		log.info("[gas-service] [" + LocalDateTime.now() + "] Fetching famous brands from enum");
+	    return Arrays.stream(BrandEnum.values())
+	                 .map(BrandEnum::getDisplayName)
+	                 .sorted()
+	                 .toList();
 	}
-	
-	@Transactional
-	public void syncBrands(Set<String> marcas) {
-
-	    LocalDateTime now = LocalDateTime.now();
-
-	    for (String marca : marcas) {
-	        brandRepository.findByName(marca)
-	            .orElseGet(() -> {
-	                Brand brand = new Brand();
-	                brand.setName(marca);
-	                brand.setLastUpdated(now);
-	                return brandRepository.save(brand);
-	            });
-	    }
-	}
-	
-	@PostConstruct
-    public void initBrandsAtStartup() {
-        if (brandRepository.count() == 0) {
-            log.info("[gas-service] [ " + LocalDateTime.now().toString() + "] "
-            		+ "Initial brand sync at startup");
-            syncBrandsFromGasStations();
-
-           getMarcasFromAllGasolineras();
-        }
-    }
 }
