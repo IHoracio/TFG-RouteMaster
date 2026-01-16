@@ -2,7 +2,7 @@
   position: absolute !important;
   top: 0 !important;
   right: 60px !important;
-  z-index: 11000 !important;
+  z-index: 999 !important;
   transition: right .12s ease, top .08s ease, opacity .12s ease, visibility .12s !important;
   opacity: 1 !important;
   visibility: visible !important;
@@ -13,7 +13,7 @@
   position: absolute !important;
   top: 0 !important;
   right: 64px !important;
-  z-index: 10990 !important;
+  z-index: 999 !important;
   width: 40px !important;
   height: 40px !important;
   margin: 10px !important;
