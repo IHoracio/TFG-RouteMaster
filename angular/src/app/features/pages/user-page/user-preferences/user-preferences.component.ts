@@ -7,6 +7,7 @@ import { MapPageComponent } from '../../map-page/map-page.component';
 import { UserPreferencesService } from '../../../../services/user-page/user-preferences.service';
 import { DefaultUserPreferences } from '../../../../Dto/preferences';
 import { forkJoin } from 'rxjs';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-user-preferences',
@@ -17,6 +18,7 @@ import { forkJoin } from 'rxjs';
 export class UserPreferencesComponent implements OnInit {
   private gasStationService = inject(GasStationService);
   private userPreferencesService = inject(UserPreferencesService);
+  private router = inject(Router);
 
   defaultUserPreferences: DefaultUserPreferences | null = null;
 
@@ -344,7 +346,7 @@ export class UserPreferencesComponent implements OnInit {
         this.renamedFavourites.set([]);
         history.scrollRestoration = 'manual';
         window.scrollTo(0, 0);
-        window.location.reload();
+        this.router.navigate(['/user-preferences'])
       },
       error: (err) => {
         console.error('Error saving preferences:', err);
@@ -388,10 +390,9 @@ export class UserPreferencesComponent implements OnInit {
 
     forkJoin([updatePrefs$, updateTheme$]).subscribe({
       next: () => {
-        console.log('Reset successful, reloading...');
         history.scrollRestoration = 'manual';
         window.scrollTo(0, 0);
-        window.location.reload();
+        this.router.navigate(['/user-preferences']);
       },
       error: (err) => {
         console.error('Error resetting preferences:', err);

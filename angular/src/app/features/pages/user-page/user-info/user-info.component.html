@@ -48,8 +48,9 @@
             <div>{{ station.alias || 'Sin alias' }} - {{ station.nombreEstacion }} - {{ station.direccion }}</div>
             @if (selectedGasStations().has(station.idEstacion)) {
               <div class="gas-station-details">
+                <p><strong>Marca:</strong> {{ station.marca }}</p>
                 <p><strong>Horario:</strong> {{ station.horario }}</p>
-                <p><strong>Tipo Venta:</strong> {{ getTipoVentaText(station.tipoVenta) }}</p>
+                <p><strong>Tipo Venta:</strong> {{ getStationType(station.tipoVenta) }}</p>
                 <p><strong>Gasolina 95:</strong> {{ station.Gasolina95 !== null ? station.Gasolina95 + ' €' : 'N/A' }} (Media: {{ station.Gasolina95_media !== null ? station.Gasolina95_media + ' €' : 'N/A' }})</p>
                 <p><strong>Gasolina 98:</strong> {{ station.Gasolina98 !== null ? station.Gasolina98 + ' €' : 'N/A' }} (Media: {{ station.Gasolina98_media !== null ? station.Gasolina98_media + ' €' : 'N/A' }})</p>
                 <p><strong>Diesel:</strong> {{ station.Diesel !== null ? station.Diesel + ' €' : 'N/A' }} (Media: {{ station.Diesel_media !== null ? station.Diesel_media + ' €' : 'N/A' }})</p>

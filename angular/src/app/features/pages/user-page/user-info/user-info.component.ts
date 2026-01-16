@@ -172,11 +172,11 @@ export class UserInfoComponent implements OnInit {
     this.sortByPrice.update(v => !v);
   }
 
-  getTipoVentaText(tipo: string): string {
-    if (tipo === 'A') return 'Autoservicio';
-    if (tipo === 'S') return 'Servicio Asistido';
-    if (tipo === 'P' || tipo === 'R') return 'Convencional';
-    return tipo;
+  getStationType(type: string): string {
+    if (type === 'A') return 'Autoservicio';
+    if (type === 'S') return 'Servicio Asistido';
+    if (type === 'P' || type === 'R') return 'Convencional';
+    return type;
   }
 
   goToLanding(): void {
