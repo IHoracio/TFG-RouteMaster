@@ -23,23 +23,23 @@ public class PreferencesController {
 	@Autowired
 	private PreferencesService preferencesService;
 
-    @Operation(
-    		summary = "Devuelve los lenguajes disponibles para la API"
-    )
-    @ApiResponses({
-        @ApiResponse(responseCode = "200", description = "Datos recuperados con éxito"),
-    })
+	@Operation(
+			summary = "Devuelve los lenguajes disponibles para la API"
+			)
+	@ApiResponses({
+		@ApiResponse(responseCode = "200", description = "Datos recuperados con éxito"),
+	})
 	@GetMapping("/languages")
 	public List<EnumOptionDTO> getLanguages() {
 		return preferencesService.getLanguages(LocaleContextHolder.getLocale());
 	}
 
-    @Operation(
-    		summary = "Devuelve los temas disponibles en la API"
-    )
-    @ApiResponses({
-        @ApiResponse(responseCode = "200", description = "Datos recuperados con éxito"),
-    })
+	@Operation(
+			summary = "Devuelve los temas disponibles en la API"
+			)
+	@ApiResponses({
+		@ApiResponse(responseCode = "200", description = "Datos recuperados con éxito"),
+	})
 	@GetMapping("/themes")
 	public List<EnumOptionDTO> getThemes() {
 		return preferencesService.getThemes(LocaleContextHolder.getLocale());

@@ -3,32 +3,26 @@ package es.metrica.sept25.evolutivo.service.gasolineras;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import es.metrica.sept25.evolutivo.domain.dto.maps.routes.Coords;
-import es.metrica.sept25.evolutivo.entity.gasolinera.Brand;
 import es.metrica.sept25.evolutivo.entity.gasolinera.Gasolinera;
 import es.metrica.sept25.evolutivo.entity.gasolinera.Municipio;
 import es.metrica.sept25.evolutivo.enums.BrandEnum;
 import es.metrica.sept25.evolutivo.repository.BrandRepository;
 import es.metrica.sept25.evolutivo.repository.GasolineraRepository;
 import es.metrica.sept25.evolutivo.service.maps.geocode.GeocodeService;
-import jakarta.annotation.PostConstruct;
 
 @Service
 public class GasolineraServiceImpl implements GasolineraService {

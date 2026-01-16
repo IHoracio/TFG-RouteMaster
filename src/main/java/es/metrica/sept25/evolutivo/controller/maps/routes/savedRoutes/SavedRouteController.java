@@ -31,7 +31,7 @@ import jakarta.servlet.http.HttpServletRequest;
 @Tag(
 		name = "Rutas guardadas", 
 		description = "Endpoints que hacen CRUD sobre las rutas que se guardan"
-				+ " asociadas a un usuario."
+					+ " asociadas a un usuario."
 )
 @RequestMapping("/api/savedRoute")
 public class SavedRouteController {
@@ -44,18 +44,18 @@ public class SavedRouteController {
 
 	@Autowired
 	private UserService userService;
-	
+
 
 	@Operation(summary = "Guarda una ruta calculada")
 	@ApiResponses(value = { 
-		@ApiResponse(
-				responseCode = "200", 
-				description = "Ruta guardada correctamente"
-			),
-		@ApiResponse(
-				responseCode = "404",
-				description = "Usuario no encontrado"
-			) 
+			@ApiResponse(
+					responseCode = "200", 
+					description = "Ruta guardada correctamente"
+					),
+			@ApiResponse(
+					responseCode = "404",
+					description = "Usuario no encontrado"
+					) 
 	})
 	@PostMapping("/save")
 	public ResponseEntity<SavedRouteDTO> saveRoute(
@@ -69,7 +69,7 @@ public class SavedRouteController {
 			@RequestParam(required = false, defaultValue = "es") String language, 
 			@RequestParam(required = false, defaultValue = "false") boolean avoidTolls,
 			@RequestParam(required = false, defaultValue = "C") EmissionType vehicleEmissionType) {
-		
+
 		String email = cookieService.getCookieValue(request, "sesionActiva").get();
 		Optional<User> userOpt = userService.getEntityByEmail(email);
 
@@ -121,8 +121,7 @@ public class SavedRouteController {
 
 	@Operation(summary = "Elimina una ruta guardada")
 	@ApiResponses(value = { @ApiResponse(responseCode = "204", description = "Ruta eliminada con éxito"),
-			@ApiResponse(responseCode = "404", description = "Ruta no encontrada."),
-			@ApiResponse(responseCode = "403", description = "No autorizada") })
+			@ApiResponse(responseCode = "404", description = "Ruta no encontrada.") })
 	@DeleteMapping("/delete/{id}")
 	public ResponseEntity<Void> deleteRoute(@PathVariable Long id, HttpServletRequest request) {
 
@@ -136,7 +135,7 @@ public class SavedRouteController {
 		savedRouteService.deleteRoute(id, user.get());
 		return ResponseEntity.noContent().build();
 	}
-	
+
 	@Operation(summary = "Obtiene todas las rutas guardadas")
 	@ApiResponses(value = { 
 			@ApiResponse(
@@ -149,21 +148,21 @@ public class SavedRouteController {
 					) 
 	})
 	@GetMapping
-    public ResponseEntity<List<SavedRouteDTO>> getAllSavedRoutes(
-            HttpServletRequest request) {
+	public ResponseEntity<List<SavedRouteDTO>> getAllSavedRoutes(
+			HttpServletRequest request) {
 
 		String email = cookieService.getCookieValue(request, "sesionActiva").get();
-        Optional<List<SavedRouteDTO>> routes = savedRouteService.getAllSavedRoutes(email);
+		Optional<List<SavedRouteDTO>> routes = savedRouteService.getAllSavedRoutes(email);
 
-        if (routes.isPresent()) {
+		if (routes.isPresent()) {
 
-            return ResponseEntity.ok(routes.get());
-        }
+			return ResponseEntity.ok(routes.get());
+		}
 
-         return ResponseEntity.notFound().build();
-        
-    }
-	
+		return ResponseEntity.notFound().build();
+
+	}
+
 	@Operation(summary = "Cambia de nombre la ruta dada (por ID) al nuevo nombre")
 	@ApiResponses(value = {
 			@ApiResponse(
@@ -172,15 +171,15 @@ public class SavedRouteController {
 					),
 			@ApiResponse(
 					responseCode = "404",
-					description = "Renombrada con éxito"
+					description = "Ruta no encontrada o nombre duplicado"
 					)
 	})
 	@PostMapping("/rename")
-    public ResponseEntity<SavedRouteDTO> renameSavedRoute(
-    		@RequestParam String newName, 
-    		@RequestParam Long routeId,
-            HttpServletRequest request
-            ) {
+	public ResponseEntity<SavedRouteDTO> renameSavedRoute(
+			@RequestParam String newName, 
+			@RequestParam Long routeId,
+			HttpServletRequest request
+			) {
 
 		String email = cookieService.getCookieValue(request, "sesionActiva").get();
 		Optional<List<SavedRouteDTO>> routes = savedRouteService.getAllSavedRoutes(email);
@@ -192,7 +191,7 @@ public class SavedRouteController {
 
 		// Extract them
 		List<SavedRouteDTO> routesList = routes.get();
-		
+
 		// Amount of routes with the same name
 		Long routesWithSameName = routesList.stream()
 				.filter(sRoute -> sRoute.getName().equals(newName))
@@ -201,14 +200,14 @@ public class SavedRouteController {
 		Optional<SavedRouteDTO> savedRouteOpt = routesList.stream()
 				.filter(sRoute -> sRoute.getRouteId().equals(routeId))
 				.findFirst();
-		
+
 		if (routesWithSameName > 0 || savedRouteOpt.isEmpty()) {
 			return ResponseEntity.notFound().build();
 		}
-		
+
 		SavedRouteDTO renamedRoute = 
 				savedRouteService.renameRoute(newName, savedRouteOpt.get());
-		
+
 		return ResponseEntity.ok(renamedRoute);
-    }
+	}
 }
