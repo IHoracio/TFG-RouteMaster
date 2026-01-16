@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import es.metrica.sept25.evolutivo.domain.dto.gasolineras.UserSavedGasStationDto;
+import es.metrica.sept25.evolutivo.domain.dto.user.UserBasicInfoDTO;
 import es.metrica.sept25.evolutivo.domain.dto.user.UserDTO;
 import es.metrica.sept25.evolutivo.domain.dto.user.UserResponseDTO;
 import es.metrica.sept25.evolutivo.entity.gasolinera.Gasolinera;
@@ -59,6 +60,29 @@ public class UserServiceImpl implements UserService {
 		}
 		return userRepository.save(user);
 	}
+	
+	@Override
+	public Optional<UserBasicInfoDTO> getSimpleInfo(String email) {
+		log.info("[user-service] [" + LocalDateTime.now().toString() + "] "
+                + "Attempting to retrieve user by email: " + email);
+		
+		Optional<User> user = userRepository.findByEmail(email);
+		
+		if (user.isEmpty()) {
+	        log.warn("[user-service] [" + LocalDateTime.now().toString() + "] "
+	                + "User not found with email: " + email);
+			return Optional.empty();
+		}
+		
+		UserBasicInfoDTO simpleUser = new UserBasicInfoDTO(
+				email, 
+				user.get().getName(), 
+				user.get().getSurname()
+		);
+		log.info("[user-service] [" + LocalDateTime.now().toString() + "] "
+				+ "User found with email: " + email);
+		return Optional.of(simpleUser);
+	}
 
 	@Override
 	public Optional<UserResponseDTO> getByEmail(String email) {
@@ -78,6 +102,7 @@ public class UserServiceImpl implements UserService {
 	        return Optional.empty();
 	    }
 	}
+
 	@Override
 	public Optional<User> getEntityByEmail(String email) {
 	    log.info("[user-service] Attempting to retrieve USER ENTITY by email: {}", email);
@@ -166,16 +191,19 @@ public class UserServiceImpl implements UserService {
 		log.info("[user-service] [" + LocalDateTime.now().toString() + "] "
                 + "Attempting to update route preferences for user: " + user.getEmail());
 		
-        RoutePreferences prefs = new RoutePreferences();
-        prefs.setPreferredBrands(preferredBrands);
-        prefs.setRadioKm(radioKm);
-        prefs.setFuelType(fuelType);
-        prefs.setMaxPrice(maxPrice);
-        prefs.setMapView(mapView);
-        prefs.setAvoidTolls(avoidTolls);
-        prefs.setEmissionType(vehicleEmissionType);
+	    RoutePreferences prefs = user.getRoutePreferences();
+	    if (prefs == null) {
+	        prefs = new RoutePreferences();
+	        user.setRoutePreferences(prefs);
+	    }
+	    prefs.setPreferredBrands(preferredBrands);
+	    prefs.setRadioKm(radioKm);
+	    prefs.setFuelType(fuelType);
+	    prefs.setMaxPrice(maxPrice);
+	    prefs.setMapView(mapView);
+	    prefs.setAvoidTolls(avoidTolls);
+	    prefs.setEmissionType(vehicleEmissionType);
 
-        user.setRoutePreferences(prefs);
         userRepository.save(user);
     }
 	
@@ -189,11 +217,14 @@ public class UserServiceImpl implements UserService {
 		log.info("[user-service] [" + LocalDateTime.now().toString() + "] "
                 + "Attempting to update user preferences for user: " + user.getEmail());
 		
-	    UserPreferences prefs = new UserPreferences();
+	    UserPreferences prefs = user.getUserPreferences();
+	    if (prefs == null) {
+	        prefs = new UserPreferences();
+	        user.setUserPreferences(prefs);
+	    }
 	    prefs.setTheme(theme);
 	    prefs.setLanguage(language);
-
-	    user.setUserPreferences(prefs);
+	    
 	    userRepository.save(user);
 	}
 	

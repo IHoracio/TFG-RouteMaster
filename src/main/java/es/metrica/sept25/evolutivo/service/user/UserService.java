@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import es.metrica.sept25.evolutivo.domain.dto.gasolineras.UserSavedGasStationDto;
+import es.metrica.sept25.evolutivo.domain.dto.user.UserBasicInfoDTO;
 import es.metrica.sept25.evolutivo.domain.dto.user.UserDTO;
 import es.metrica.sept25.evolutivo.domain.dto.user.UserResponseDTO;
 import es.metrica.sept25.evolutivo.enums.EmissionType;
@@ -16,6 +17,8 @@ import es.metrica.sept25.evolutivo.entity.user.UserPreferences.Theme;
 
 public interface UserService {
     User save(User user);
+    
+    Optional<UserBasicInfoDTO> getSimpleInfo(String email);
 
     Optional<UserResponseDTO> getByEmail(String mail);
 
