@@ -2,15 +2,15 @@
   <a routerLink="/" class="logo">RouteMaster</a>
   <nav>
     @if(!isLoggedIn()){
-      <a routerLink="/login">{{ translation.translate('header.login') }}</a>
+      <a routerLink="/login">{{ loginText() }}</a>
     } @else {
-      <a routerLink="/logout">{{ translation.translate('header.logout') }}</a>
+      <a (click)="logout()" style="cursor: pointer;">{{ logoutText() }}</a>
     }
     
-    <a routerLink="/user-info">{{ translation.translate('header.userArea') }}</a>
+    <a routerLink="/user-info">{{ userAreaText() }}</a>
 
     <button (click)="switchLanguage()" class="lang-btn">
-      {{ translation.translate('header.language') }}: {{ currentLangDisplay() }}
+      {{ languageText() }}: {{ currentLangDisplay() }}
     </button>
 
     <button (click)="switchTheme()" class="theme-btn">

@@ -5,6 +5,7 @@ import { HttpParams } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
 import { RouteFormResponse } from '../../Dto/route-form-response';
 import { Coords, RouteGroupResponse } from '../../Dto/maps-dtos';
+import { GasStation } from '../../Dto/gas-station';
 
 
 @Injectable({
@@ -73,9 +74,16 @@ export class RouteService {
       .set('waypoints', waypointsString)
       .set('optimizeWaypoints', routeFormResponse.optimizeWaypoints)
       .set('optimizeRoute', routeFormResponse.optimizeRoute)
-      .set('radius', 5)
+      .set('radius', routeFormResponse.radioKm || 2)
 
     return this.http.get(this.apiUrl + "/api/routes/gasStations", { headers: headers, params: parameters, responseType: 'text' });
+  }
+
+    getGasStationsByCoords(lat: number, lng: number, radio: number = 1): Observable<GasStation[]> {
+    return this.http.get<GasStation[]>(`${this.apiUrl}/api/oil/gasolineras/radio/coords`, {
+      params: { latitud: lat, longitud: lng, radio: radio },
+      withCredentials: true
+    });
   }
 
   calculateWeatherRoute(routeFormResponse: RouteFormResponse): Observable<string> {

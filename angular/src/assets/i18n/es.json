@@ -1,8 +1,8 @@
 {
     "auth": {
-        "loginRequired": "Debes iniciar sesión primero para acceder a esta página.",
-        "login": "Iniciar sesión",
-        "logout": "Cerrar sesión"
+        "login": "Iniciar Sesión",
+        "logout": "Cerrar Sesión",
+        "loginRequired": "Debes iniciar sesión para acceder a esta función."
     },
     "header": {
         "login": "Iniciar sesión",
@@ -46,7 +46,9 @@
         "submit": "Enviar",
         "saveRoute": "Guardar ruta",
         "routeAlias": "Alias de la ruta",
-        "routeAliasPlaceholder": "Alias de la ruta"
+        "routeAliasPlaceholder": "Alias de la ruta",
+        "routeSaved": "Se ha guardado la ruta como favorita.",
+        "saveError": "Ha ocurrido un error."
     },
     "fuelTypes": {
         "GASOLINE": "Gasolina",

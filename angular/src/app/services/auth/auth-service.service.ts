@@ -27,12 +27,15 @@ export class AuthService {
   );
   } 
 
-
-  
   sendUserSession(isLoggedIn: boolean){
-    this.userSessionSubject.next(isLoggedIn)
-    
+    if (isLoggedIn) {
+      localStorage.setItem('isLoggedIn', 'true');
+    } else {
+      localStorage.removeItem('isLoggedIn');
+    }
+    this.userSessionSubject.next(isLoggedIn);
   }
+
   getUserSession(): Observable<boolean>{
     return this.userSessionSubject.asObservable()
   }
