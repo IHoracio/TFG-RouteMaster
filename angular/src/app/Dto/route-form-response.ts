@@ -5,5 +5,6 @@ export interface RouteFormResponse {
     optimizeWaypoints: boolean,
     optimizeRoute: boolean,
     avoidTolls: boolean,
-    vehiculeEmissionType: string
+    vehiculeEmissionType: string,
+    radioKm?: number;
 }

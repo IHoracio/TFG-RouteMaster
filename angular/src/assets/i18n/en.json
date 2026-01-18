@@ -1,8 +1,8 @@
 {
     "auth": {
-        "loginRequired": "You must log in first to access this page.",
-        "login": "Log in",
-        "logout": "Log out"
+        "login": "Login",
+        "logout": "Logout",
+        "loginRequired": "You must log in to access this feature."
     },
     "header": {
         "login": "Log in",
@@ -46,7 +46,9 @@
         "submit": "Submit",
         "saveRoute": "Save route",
         "routeAlias": "Route alias",
-        "routeAliasPlaceholder": "Route alias"
+        "routeAliasPlaceholder": "Route alias",
+        "routeSaved": "The route has been saved as favorite.",
+        "saveError": "An error has occurred."
     },
     "fuelTypes": {
         "GASOLINE": "Gasoline",

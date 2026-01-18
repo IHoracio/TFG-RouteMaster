@@ -46,10 +46,9 @@ export class LoginComponent {
       this.userLogin.password = this.password?.value
       this.authService.loginUser(this.userLogin).subscribe({
         next: user => {
-          this.message = "Login exitoso.";
-          this.router.navigate(['/']);
+          console.log('Login component: login successful');
           this.authService.sendUserSession(true);
-
+          this.router.navigate(['/']);
       }, error: () => {
           this.error = "Ha occurido un error con los datos introducidos.";
       }

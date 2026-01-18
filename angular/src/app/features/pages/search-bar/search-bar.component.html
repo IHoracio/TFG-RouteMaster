@@ -36,7 +36,8 @@
       <p>
         <label for="destination">{{ translation.translate('search.destination') }}</label>
         <input class="form-control" type="text" id="destination" name="destination"
-          [(ngModel)]="routeFormResponse.destination" [placeholder]="translation.translate('search.destinationPlaceholder')" required #destinationField="ngModel" />
+          [(ngModel)]="routeFormResponse.destination"
+          [placeholder]="translation.translate('search.destinationPlaceholder')" required #destinationField="ngModel" />
 
         @if(destinationField && destinationField.touched){
       <div class="error">
@@ -90,7 +91,8 @@
       </button>
 
       <div class="checkbox-wrapper-46">
-        <input [(ngModel)]="routeFormResponse.optimizeWaypoints" type="checkbox" id="optimizeWaypoints" class="inp-cbx" name="optimizeWaypoints" />
+        <input [(ngModel)]="routeFormResponse.optimizeWaypoints" type="checkbox" id="optimizeWaypoints" class="inp-cbx"
+          name="optimizeWaypoints" />
         <label for="optimizeWaypoints" class="cbx"><span>
             <svg viewBox="0 0 12 10" height="10px" width="12px">
               <polyline points="1.5 6 4.5 9 10.5 1"></polyline>
@@ -99,7 +101,8 @@
       </div>
 
       <div class="checkbox-wrapper-46">
-        <input [(ngModel)]="routeFormResponse.optimizeRoute" type="checkbox" id="optimizeRoute" class="inp-cbx" name="optimizeRoute" />
+        <input [(ngModel)]="routeFormResponse.optimizeRoute" type="checkbox" id="optimizeRoute" class="inp-cbx"
+          name="optimizeRoute" />
         <label for="optimizeRoute" class="cbx"><span>
             <svg viewBox="0 0 12 10" height="10px" width="12px">
               <polyline points="1.5 6 4.5 9 10.5 1"></polyline>
@@ -108,7 +111,8 @@
       </div>
 
       <div class="checkbox-wrapper-46">
-        <input [(ngModel)]="routeFormResponse.avoidTolls" type="checkbox" id="avoidTolls" class="inp-cbx" name="avoidTolls" />
+        <input [(ngModel)]="routeFormResponse.avoidTolls" type="checkbox" id="avoidTolls" class="inp-cbx"
+          name="avoidTolls" />
         <label for="avoidTolls" class="cbx"><span>
             <svg viewBox="0 0 12 10" height="10px" width="12px">
               <polyline points="1.5 6 4.5 9 10.5 1"></polyline>
@@ -155,7 +159,8 @@
 
       @if (form.valid && activeTab==="destination"){
       <label for="routeAlias">{{ translation.translate('search.saveRoute') }}</label>
-      <input type="text" id="routeAlias" name="routeAlias" [(ngModel)]="routeAlias" [placeholder]="translation.translate('search.routeAliasPlaceholder')" />
+      <input type="text" id="routeAlias" name="routeAlias" [(ngModel)]="routeAlias"
+        [placeholder]="translation.translate('search.routeAliasPlaceholder')" />
 
       <button type="button" (click)="saveRoute()">{{ translation.translate('search.saveRoute') }}</button>
       }
@@ -168,6 +173,6 @@
         {{ errorMessage }}
       </div>
     </form>
-    <app-map-page></app-map-page>
+    <app-map-page [gasStations]="filteredGasStations()"[fitToStations]="false"></app-map-page>
   </section>
 </div>
