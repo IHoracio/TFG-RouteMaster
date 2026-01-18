@@ -1,7 +1,10 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, computed, signal } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { UserService } from '../../../services/user/user.service';
 import { AuthService } from '../../../services/auth/auth-service.service';
+import { TranslationService } from '../../../services/translation.service';
+import { ThemeService } from '../../../services/theme.service';
+import { UserPreferencesService } from '../../../services/user-page/user-preferences.service';
 
 @Component({
   selector: 'app-header',
@@ -9,16 +12,43 @@ import { AuthService } from '../../../services/auth/auth-service.service';
   templateUrl: './header.component.html',
   styleUrl: './header.component.css'
 })
-export class HeaderComponent {
+export class HeaderComponent implements OnInit {
 
-  isLoggedIn: boolean = false;
-  constructor(private authService: AuthService) {
-  }
+  isLoggedIn = signal<boolean>(false);
+
+  loginText = computed(() => this.translation.translate('auth.login'));
+  logoutText = computed(() => this.translation.translate('auth.logout'));
+  userAreaText = computed(() => this.translation.translate('header.userArea'));
+  languageText = computed(() => this.translation.translate('header.language'));
+  currentLangDisplay = computed(() => this.translation.getCurrentLang());
+
+  constructor(
+    private authService: AuthService,
+    private userPreferencesService: UserPreferencesService,
+    public translation: TranslationService,
+    public theme: ThemeService
+  ) { }
+
   ngOnInit() {
     this.authService.getUserSession().subscribe(
-      loggedIn => this.isLoggedIn = loggedIn
+      loggedIn => {
+        this.isLoggedIn.set(loggedIn);
+        if (loggedIn) {
+          this.userPreferencesService.getUserThemeLanguage().subscribe(prefs => {
+            this.translation.setLanguage(prefs.language);
+            this.theme.setTheme(prefs.theme);
+          });
+        }
+      }
     );
-    console.log(this.isLoggedIn)
+  }
 
+  switchLanguage() {
+    const newLang = this.translation.getCurrentLang() === 'ES' ? 'EN' : 'ES';
+    this.translation.setLanguage(newLang);
+  }
+
+  switchTheme() {
+    this.theme.toggleTheme();
   }
 }

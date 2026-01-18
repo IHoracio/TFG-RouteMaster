@@ -1,8 +1,8 @@
-<div class="weather-overlay" role="region" aria-label="Weather route overlay">
+<div class="weather-overlay" role="region" [attr.aria-label]="translation.translate('weather.title')">
   <header class="weather-header">
-    <div class="weather-title">Información meteorológica de la ruta</div>
+    <div class="weather-title">{{ translation.translate('weather.title') }}</div>
     <div class="weather-actions">
-      <button class="btn close" (click)="close.emit()" aria-label="Cerrar overlay">✕</button>
+      <button class="btn close" (click)="close.emit()" [attr.aria-label]="translation.translate('weather.close')">✕</button>
     </div>
   </header>
 
@@ -20,35 +20,35 @@
 
             <div class="weather-summary-compact">
               @if (getForHour(weatherPoint.weatherDescription, currentHourStr); as desc) {
-                <div class="weather-desc">{{ desc }}</div>
+                <div class="weather-desc">{{ translateWeatherDesc(desc) }}</div>
               } @else {
-                <div class="weather-desc weather-empty-value">(sin descripción)</div>
+                <div class="weather-desc weather-empty-value">{{ translation.translate('weather.noDescription') }}</div>
               }
 
               @if (hasForHour(weatherPoint.temperatures, currentHourStr)) {
                 <div class="weather-temp">{{ getForHour(weatherPoint.temperatures, currentHourStr) }}°C</div>
               } @else {
-                <div class="weather-temp weather-empty-value">(sin temperatura)</div>
+                <div class="weather-temp weather-empty-value">{{ translation.translate('weather.noTemperature') }}</div>
               }
             </div>
 
             <details class="weather-details">
-              <summary class="weather-summary">Ver horario completo</summary>
+              <summary class="weather-summary">{{ translation.translate('weather.viewFullSchedule') }}</summary>
 
               <div class="weather-content">
-                <div class="weather-current-hour-line">Hora actual: <strong>{{ currentHourStr }}</strong> @if (currentHour() < 13) { <strong> AM</strong> } @else { <strong> PM</strong> }</div>
+                <div class="weather-current-hour-line">{{ translation.translate('weather.currentHour') }}: <strong>{{ currentHourStr }}</strong> @if (currentHour() < 13) { <strong>{{ translation.translate('weather.am') }}</strong> } @else { <strong>{{ translation.translate('weather.pm') }}</strong> }</div>
 
-                <h4 class="weather-section-title">Descripción por hora</h4>
+                <h4 class="weather-section-title">{{ translation.translate('weather.descriptionByHour') }}</h4>
                 <ul class="weather-hour-list">
                   @for (entry of hourEntries(weatherPoint.weatherDescription); track entry[0]) {
                     <li [class.weather-hour-current]="entry[0] === currentHourStr">
                       <span class="hour-key">{{ entry[0] }}:00</span>
-                      <span class="hour-val">{{ entry[1] }}</span>
+                      <span class="hour-val">{{ translateWeatherDesc(entry[1]) }}</span>
                     </li>
                   }
                 </ul>
 
-                <h4 class="weather-section-title">Temperaturas por hora</h4>
+                <h4 class="weather-section-title">{{ translation.translate('weather.temperaturesByHour') }}</h4>
                 <ul class="weather-hour-list">
                   @for (entry of hourEntries(weatherPoint.temperatures); track entry[0]) {
                     <li [class.weather-hour-current]="entry[0] === currentHourStr">
@@ -64,6 +64,6 @@
       </div>
     }
   } @else {
-    <div class="weather-empty">No hay datos meteorológicos disponibles.</div>
+    <div class="weather-empty">{{ translation.translate('weather.noData') }}</div>
   }
 </div>

@@ -1,60 +1,56 @@
 <div class="container">
   <section class="card">
-    <h2>Tipo de Búsqueda</h2>
+    <h2>{{ translation.translate('search.title') }}</h2>
     <div class="tabs_wrap">
       <ul>
         <li [ngClass]="{ active: activeTab === 'destination' }" (click)="setTab('destination')">
-          Origen y destino
+          {{ translation.translate('search.tabs.destination') }}
         </li>
 
         <li [ngClass]="{ active: activeTab === 'gas' }" (click)="setTab('gas')">
-          Gasolinera favorita
+          {{ translation.translate('search.tabs.gas') }}
         </li>
 
         <li [ngClass]="{ active: activeTab === 'route' }" (click)="setTab('route')">
-          Ruta guardada
+          {{ translation.translate('search.tabs.route') }}
         </li>
       </ul>
     </div>
     <form (ngSubmit)="onSubmit()" #form="ngForm">
       @if(activeTab === "destination" || activeTab === "gas"){
       <p>
-        <label for="origin">Origen</label>
+        <label for="origin">{{ translation.translate('search.origin') }}</label>
         <input class="form-control" type="text" id="origin" name="origin" [(ngModel)]="routeFormResponse.origin"
-          placeholder="¿Desde dónde?" required #originField="ngModel" />
+          [placeholder]="translation.translate('search.originPlaceholder')" required #originField="ngModel" />
 
         @if(originField && originField.touched){
       <div class="error">
         @if(originField.errors?.['required']){
-        Tienes que introducir un origen.
+        {{ translation.translate('search.originRequired') }}
         }
       </div>
       }
-      </p>
       }
 
       @if(activeTab === "destination"){
       <p>
-        <label for="destination">Destino</label>
+        <label for="destination">{{ translation.translate('search.destination') }}</label>
         <input class="form-control" type="text" id="destination" name="destination"
-          [(ngModel)]="routeFormResponse.destination" placeholder="¿A dónde?" required #destinationField="ngModel" />
+          [(ngModel)]="routeFormResponse.destination" [placeholder]="translation.translate('search.destinationPlaceholder')" required #destinationField="ngModel" />
 
         @if(destinationField && destinationField.touched){
       <div class="error">
         @if(destinationField.errors?.['required']){
-        Tienes que introducir un destino.
+        {{ translation.translate('search.destinationRequired') }}
         }
       </div>
       }
-      </p>
+      }
 
-      <!-- From Uiverse.io by andrew-demchenk0 -->
-      <p>Puntos intermedios</p>
-
-
+      <p>{{ translation.translate('search.waypoints') }}</p>
 
       <button (click)="addWaypoint()" type="button" class="button">
-        <span class="button__text">Añadir</span>
+        <span class="button__text">{{ translation.translate('search.add') }}</span>
         <span class="button__icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" viewBox="0 0 24 24"
             stroke-width="2" stroke-linejoin="round" stroke-linecap="round" stroke="currentColor" height="24"
             fill="none" class="svg">
@@ -63,18 +59,15 @@
           </svg></span>
       </button>
 
-
-
-
       <div *ngFor="let waypoint of routeFormResponse.waypoints; let i = index; trackBy: trackByIndex">
 
         <select [(ngModel)]="waypointTypes[i]" [name]="'type' + i">
-          <option value="text">Dirección</option>
-          <option value="gas">Gasolinera favorita</option>
+          <option value="text">{{ translation.translate('search.address') }}</option>
+          <option value="gas">{{ translation.translate('search.favoriteGas') }}</option>
         </select>
         @if(waypointTypes[i]==="text"){
         <input class="form-control" type="text" [name]="'waypoint' + i" [(ngModel)]="routeFormResponse.waypoints[i]"
-          placeholder="Introduce una direccion" />
+          [placeholder]="translation.translate('search.addressPlaceholder')" />
         }
         @if(waypointTypes[i]==="gas"){
         <select [name]="'waypoint' + i" [(ngModel)]="routeFormResponse.waypoints[i]">
@@ -84,11 +77,10 @@
         </select>
         }
 
-
       </div>
 
       <button (click)="deleteWaypoint()" type="button" class="button-delete">
-        <span class="button__text">Eliminar</span>
+        <span class="button__text">{{ translation.translate('search.delete') }}</span>
         <span class="button__icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" viewBox="0 0 24 24"
             stroke-width="2" stroke-linejoin="round" stroke-linecap="round" stroke="currentColor" height="24"
             fill="none" class="svg">
@@ -97,13 +89,12 @@
           </svg></span>
       </button>
 
-
       <div class="checkbox-wrapper-46">
         <input [(ngModel)]="routeFormResponse.optimizeWaypoints" type="checkbox" id="optimizeWaypoints" class="inp-cbx" name="optimizeWaypoints" />
         <label for="optimizeWaypoints" class="cbx"><span>
             <svg viewBox="0 0 12 10" height="10px" width="12px">
               <polyline points="1.5 6 4.5 9 10.5 1"></polyline>
-            </svg></span><span>Optimizar puntos intermedios</span>
+            </svg></span><span>{{ translation.translate('search.optimizeWaypoints') }}</span>
         </label>
       </div>
 
@@ -112,7 +103,7 @@
         <label for="optimizeRoute" class="cbx"><span>
             <svg viewBox="0 0 12 10" height="10px" width="12px">
               <polyline points="1.5 6 4.5 9 10.5 1"></polyline>
-            </svg></span><span>Optimizar la ruta</span>
+            </svg></span><span>{{ translation.translate('search.optimizeRoute') }}</span>
         </label>
       </div>
 
@@ -121,42 +112,24 @@
         <label for="avoidTolls" class="cbx"><span>
             <svg viewBox="0 0 12 10" height="10px" width="12px">
               <polyline points="1.5 6 4.5 9 10.5 1"></polyline>
-            </svg></span><span>Evitar peajes</span>
+            </svg></span><span>{{ translation.translate('search.avoidTolls') }}</span>
         </label>
       </div>
 
-      <!--
       <p>
-        <label for="optimizeWaypoints">Optimizar puntos intermedios</label>
-        <input type="checkbox" [(ngModel)]="routeFormResponse.optimizeWaypoints" name="optimizeWaypoints"
-          id="optimizeWaypoints">
-      </p>
-
-      <p>
-        <label for="optimizeRoute">Optimizar la ruta</label>
-        <input type="checkbox" [(ngModel)]="routeFormResponse.optimizeRoute" name="optimizeRoute" id="optimizeRoute">
-      </p>
-
-      <p>
-        <label for="avoidTolls">Evitar peajes</label>
-        <input type="checkbox" [(ngModel)]="routeFormResponse.avoidTolls" name="avoidTolls" id="avoidTolls">
-      </p>
-    -->
-      <p>
-        <label for="vehiculeEmissionType">Tipo de combustible</label>
+        <label for="vehiculeEmissionType">{{ translation.translate('search.fuelType') }}</label>
         <select [(ngModel)]="routeFormResponse.vehiculeEmissionType" name="vehiculeEmissionType"
           id="vehiculeEmissionType">
           @for (item of vehiculeEmissionTypeOptions | keyvalue; track item.key){
-          <option [value]="item.key">{{item.value}}</option>
+          <option [value]="item.key">{{ translation.translate('fuelTypes.' + item.key) }}</option>
           }
         </select>
       </p>
 
-      }
       @if(activeTab === "gas"){
       <p>
         <select name="gasStation" id="gasStation" [(ngModel)]="routeFormResponse.destination" required>
-          <option value="">Elige una gasolinera</option>
+          <option value="">{{ translation.translate('search.chooseGas') }}</option>
           <option *ngFor="let gasStation of favouriteGasStations()" [value]="gasStation.direccion">
             {{ gasStation.alias }} — {{ gasStation.marca }}
           </option>
@@ -166,7 +139,7 @@
       @if(activeTab === "route"){
       <p>
         <select name="savedRoute" id="savedRoute" [(ngModel)]="selectedRouteOption" required="">
-          <option [ngValue]="">Elige una ruta guardada</option>
+          <option [ngValue]=""> {{ translation.translate('search.chooseRoute') }}</option>
           <option (click)="savedRouteSelected()" *ngFor="let route of savedRoute()"
             [ngValue]="{ origin: route.points[0].address, destination: route.points[1].address}">
             {{ route.name }}:
@@ -178,23 +151,19 @@
       </p>
       }
 
-      <button type="submit" [disabled]="!form.valid">Enviar</button>
-
-
+      <button type="submit" [disabled]="!form.valid">{{ translation.translate('search.submit') }}</button>
 
       @if (form.valid && activeTab==="destination"){
-      <label for="routeAlias">Guardar ruta</label>
-      <input type="text" id="routeAlias" name="routeAlias" [(ngModel)]="routeAlias" placeholder="Alias de la ruta" />
+      <label for="routeAlias">{{ translation.translate('search.saveRoute') }}</label>
+      <input type="text" id="routeAlias" name="routeAlias" [(ngModel)]="routeAlias" [placeholder]="translation.translate('search.routeAliasPlaceholder')" />
 
-      <button type="button" (click)="saveRoute()">Guardar ruta</button>
+      <button type="button" (click)="saveRoute()">{{ translation.translate('search.saveRoute') }}</button>
       }
 
-      <!-- Mostrar mensaje de éxito -->
       <div *ngIf="successfulMessage" class="success">
         {{ successfulMessage }}
       </div>
 
-      <!-- Mostrar mensaje de error -->
       <div *ngIf="errorMessage" class="error">
         {{ errorMessage }}
       </div>

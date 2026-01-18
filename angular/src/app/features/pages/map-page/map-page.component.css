@@ -4,15 +4,13 @@
   width: 100%;
 }
 
-/* Wrapper principal del mapa (el host usará map?.getDiv() para insertar overlay/tab) */
 .map-wrapper {
   position: relative;
   width: 100%;
-  height: 600px; /* ajusta según tu layout; puedes usar 70vh por ejemplo */
+  height: 600px;
   overflow: hidden;
 }
 
-/* El mapa ocupa todo el wrapper */
 #map, .map-canvas {
   width: 100%;
   height: 100%;

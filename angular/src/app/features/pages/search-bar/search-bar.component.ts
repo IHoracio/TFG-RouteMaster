@@ -1,4 +1,4 @@
-import { Component, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouteFormResponse } from '../../../Dto/route-form-response';
 import { MapPageComponent } from '../map-page/map-page.component';
@@ -9,6 +9,7 @@ import { RouteGroupResponse } from '../../../Dto/maps-dtos';
 import { FavouriteGasStation } from '../../../Dto/gas-station';
 import { SavedRoute } from '../../../Dto/saved-route';
 import { Parser } from '@angular/compiler';
+import { TranslationService } from '../../../services/translation.service';
 
 
 
@@ -19,6 +20,8 @@ import { Parser } from '@angular/compiler';
   styleUrl: './search-bar.component.css'
 })
 export class SearchBarComponent {
+
+  translation = inject(TranslationService)
 
   favouriteGasStations = signal<FavouriteGasStation[]>([]);
   savedRoute = signal<SavedRoute[]>([])

@@ -9,6 +9,7 @@ import { DefaultUserPreferences } from '../../../../Dto/preferences';
 import { forkJoin } from 'rxjs';
 import { Router } from '@angular/router';
 import { GasStationSelectionService } from '../../../../services/user-page/gas-station-selection/gas-station-selection.service';
+import { TranslationService } from '../../../../services/translation.service';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -18,6 +19,9 @@ import { GasStationSelectionService } from '../../../../services/user-page/gas-s
   styleUrl: './user-preferences.component.css'
 })
 export class UserPreferencesComponent implements OnInit {
+
+  translation = inject(TranslationService);
+
   private gasStationService = inject(GasStationService);
   private userPreferencesService = inject(UserPreferencesService);
   private gasStationSelectionService = inject(GasStationSelectionService);

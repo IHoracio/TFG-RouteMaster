@@ -1,10 +1,11 @@
 import { NgIf } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { FormsModule, ReactiveFormsModule, FormBuilder, Validators, FormGroup } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { UserLoginDTO } from '../../Dto/user-dtos';
 import { UserService } from '../../services/user/user.service';
 import { AuthService } from '../../services/auth/auth-service.service';
+import { TranslationService } from '../../services/translation.service';
 
 @Component({
   selector: 'app-login',
@@ -13,6 +14,8 @@ import { AuthService } from '../../services/auth/auth-service.service';
   styleUrl: './login.component.css'
 })
 export class LoginComponent {
+
+  translation = inject(TranslationService);
 
   form: FormGroup;
   userLogin: UserLoginDTO = {
@@ -36,12 +39,14 @@ export class LoginComponent {
   get user() { return this.form.get('user'); }
   get password() { return this.form.get('password'); }
   error: string = "";
+  message: string = "";
   onSubmit() {
       console.log(this.form.value)
       this.userLogin.user = this.user?.value
       this.userLogin.password = this.password?.value
       this.authService.loginUser(this.userLogin).subscribe({
         next: user => {
+          this.message = "Login exitoso.";
           this.router.navigate(['/']);
           this.authService.sendUserSession(true);
 

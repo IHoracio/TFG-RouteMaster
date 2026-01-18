@@ -2,88 +2,86 @@
   <section class="card">
     <form [formGroup]="form" (ngSubmit)="onSubmit()">
       <div class="form-header">
-        <h2>Crea Tu Cuenta</h2>
-        <p>¡Regístrate para desbloquear nuevas funciones!</p>
+        <h2>{{ translation.translate('register.title') }}</h2>
+        <p>{{ translation.translate('register.subtitle') }}</p>
       </div>
 
       <!--EMAIL FIELD-->
       <div class="mb-3">
         <span class="asterisk">*</span>
-        <label for="email">Email</label>
+        <label for="email">{{ translation.translate('register.email') }}</label>
         <input class="form-control" type="email" name="email" id="email" formControlName="email"
-          placeholder="Introduzca su email">
+          [placeholder]="translation.translate('register.emailPlaceholder')">
 
         <!--Error messages-->
         <div *ngIf="hasError('email', 'required')">
-          <p class="error">El email es obligatorio</p>
+          <p class="error">{{ translation.translate('register.emailRequired') }}</p>
         </div>
         <div *ngIf="hasError('email', 'pattern')">
-          <p class="error">El formato es incorrecto.</p>
+          <p class="error">{{ translation.translate('register.emailPattern') }}</p>
         </div>
       </div>
-
 
       <!--PASSWORD FIELD-->
       <div class="mb-3">
         <span class="asterisk">*</span>
-        <label for="password">Contraseña</label>
+        <label for="password">{{ translation.translate('register.password') }}</label>
         <input class="form-control" type="password" name="password" id="password" formControlName="password"
-          placeholder="Introduzca una contraseña segura">
+          [placeholder]="translation.translate('register.passwordPlaceholder')">
 
         <!--Error messages-->
         <div *ngIf="hasError('password', 'required')">
-          <p class="error">La contraseña es obligatoria.</p>
+          <p class="error">{{ translation.translate('register.passwordRequired') }}</p>
         </div>
 
         <div *ngIf="hasError('password', 'minLength')">
-          <p class="error">La contraseña debe tener mínimo 8 caracteres.</p>
+          <p class="error">{{ translation.translate('register.passwordMinLength') }}</p>
         </div>
         <div *ngIf="hasError('password', 'pattern')">
-          <p class="error">La contraseña debe tener al menos 8 carácteres, un número, una mayuscula, una minúscula y un
-            símbolo.</p>
+          <p class="error">{{ translation.translate('register.passwordPattern') }}</p>
         </div>
       </div>
 
       <!--CONFIRM PASSWORD FIELD-->
       <div class="mb-3">
         <span class="asterisk">*</span>
-        <label for="passwordConfirmation">Confirmación de contraseña</label>
+        <label for="passwordConfirmation">{{ translation.translate('register.passwordConfirmation') }}</label>
         <input class="form-control" type="password" name="passwordConfirmation" id="passwordConfirmation"
-          formControlName="passwordConfirmation" placeholder="Confirme su contraseña">
+          formControlName="passwordConfirmation" [placeholder]="translation.translate('register.passwordConfirmationPlaceholder')">
 
         <!--Error messages-->
         <div *ngIf="hasError('passwordConfirmation', 'required')">
-          <p class="error">La confirmación de contraseña es obligatoria.</p>
+          <p class="error">{{ translation.translate('register.passwordConfirmationRequired') }}</p>
         </div>
 
         <div *ngIf="form.errors?.['passwordMismatch'] && form.get('passwordConfirmation')?.touched">
-          <p class="error">Las contraseñas no coinciden.</p>
+          <p class="error">{{ translation.translate('register.passwordMismatch') }}</p>
         </div>
       </div>
 
       <!--NAME FIELD-->
       <div class="mb-3">
         <span class="asterisk">*</span>
-        <label for="name">Nombre</label>
+        <label for="name">{{ translation.translate('register.name') }}</label>
         <input class="form-control" type="text" name="name" id="name" formControlName="name"
-          placeholder="Introduzca su nombre">
+          [placeholder]="translation.translate('register.namePlaceholder')">
 
         <!--Error messages-->
         <div *ngIf="hasError('name', 'required')">
-          <p class="error">El nombre es obligatorio.</p>
+          <p class="error">{{ translation.translate('register.nameRequired') }}</p>
         </div>
       </div>
 
       <!--SURNAME FIELD-->
       <div class="mb-3">
         <span class="asterisk">*</span>
-        <label for="surname">Apellidos</label>
+        <label for="surname">{{ translation.translate('register.surname') }}</label>
         <input class="form-control" type="text" name="surname" id="surname" formControlName="surname"
-          placeholder="Introduzca sus apellidos">
+          [placeholder]="translation.translate('register.surnamePlaceholder')">
 
         <!--Error messages-->
         <div *ngIf="hasError('surname', 'required')">
-          <p class="error">El nombre es obligatorio.</p>
+          <p class="error">{{ translation.translate('register.surnameRequired') }}</p>
         </div>
       </div>
 
@@ -97,10 +95,10 @@
         {{ error }}
       </div>
 
-      <input class="btn-custom" type="submit" [disabled]="form.invalid" />
+      <input class="btn" type="submit" [value]="translation.translate('register.submit')" [disabled]="form.invalid" />
 
       <div class="text-muted">
-        <p>¿Ya tienes una cuenta? <a routerLink="/login">Inicia sesión</a></p>
+        <p>{{ translation.translate('register.alreadyHaveAccount') }} <a routerLink="/login">{{ translation.translate('register.login') }}</a></p>
       </div>
     </form>
   </section>

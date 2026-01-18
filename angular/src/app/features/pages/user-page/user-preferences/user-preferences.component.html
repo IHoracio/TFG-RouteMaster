@@ -1,19 +1,19 @@
 <div class="user-preferences">
-    <h2>Preferencias de Usuario</h2>
+    <h2>{{ translation.translate('preferences.title') }}</h2>
 
     <form class="preferences-form">
         <div class="form-group">
-            <label for="fuelType">Tipo de Combustible:</label>
+            <label for="fuelType">{{ translation.translate('preferences.fuelType') }}</label>
             <select id="fuelType" [value]="fuelType()" (change)="setFuelType($event)">
                 @for (option of fuelOptions(); track $index) {
-                <option [value]="option">{{ capitalize(option) }}</option>
+                <option [value]="option">{{ translation.translate('fuelOptions.' + option) }}</option>
                 }
             </select>
         </div>
 
         <div class="form-group">
-            <label for="brandSearch">Añadir Marca de Gasolinera Favorita:</label>
-            <input type="text" [value]="brandSearch()" (input)="setBrandSearch($event)" placeholder="Buscar marca">
+            <label for="brandSearch">{{ translation.translate('preferences.addBrand') }}</label>
+            <input type="text" [value]="brandSearch()" (input)="setBrandSearch($event)" placeholder="{{ translation.translate('preferences.searchBrand') }}">
             @if (showBrandDropdown() && filteredBrands().length > 0) {
             <ul class="dropdown-list">
                 @for (brand of filteredBrands(); track $index) {
@@ -24,66 +24,66 @@
         </div>
 
         <div class="form-group">
-            <label>Marcas de Gasolinera Favoritas:</label>
+            <label>{{ translation.translate('preferences.favoriteBrands') }}</label>
             <ul>
                 @for (brand of preferredBrands(); track $index) {
-                <li>{{ capitalize(brand) }} <button type="button"
-                        (click)="removePreferredBrand(brand)">Eliminar</button></li>
+                <li>{{ capitalize(brand) }} <button type="button" class="btn"
+                        (click)="removePreferredBrand(brand)">{{ translation.translate('preferences.remove') }}</button></li>
                 }
             </ul>
         </div>
 
         @if (fuelType() !== 'ELECTRIC') {
         <div class="form-group">
-            <label for="precioMaximo">Precio Máximo de Combustible:</label>
+            <label for="precioMaximo">{{ translation.translate('preferences.maxPrice') }}</label>
             <input id="precioMaximo" type="number" [value]="maxPrice()" (input)="setMaxPrice($event)" min="0"
                 step="0.01">
         </div>
         }
 
         <div class="form-group">
-            <label for="mapType">Tipo de Mapa:</label>
+            <label for="mapType">{{ translation.translate('preferences.mapType') }}</label>
             <select id="mapType" [value]="mapType()" (change)="setMapType($event)">
                 @for (option of mapTypeOptions(); track $index) {
-                <option [value]="option">{{ capitalize(option) }}</option>
+                <option [value]="option">{{ translation.translate('mapTypeOptions.' + option) }}</option>
                 }
             </select>
         </div>
 
         <div class="form-group">
-            <label for="avoidTolls">Evitar Peajes:</label>
+            <label for="avoidTolls">{{ translation.translate('preferences.avoidTolls') }}</label>
             <input id="avoidTolls" type="checkbox" [checked]="avoidTolls()" (change)="setAvoidTolls($event)">
         </div>
 
         <div class="form-group">
-            <label for="emissionLabel">Etiqueta Medioambiental:</label>
+            <label for="emissionLabel">{{ translation.translate('preferences.emissionLabel') }}</label>
             <select id="emissionLabel" [value]="emissionType()" (change)="setEmissionLabel($event)">
                 @for (option of emissionLabelOptions(); track $index) {
-                <option [value]="option">{{ capitalize(option) }}</option>
+                <option [value]="option">{{ translation.translate('emissionLabelOptions.' + option) }}</option>
                 }
             </select>
         </div>
 
         <div class="form-group">
-            <label for="theme">Tema:</label>
+            <label for="theme">{{ translation.translate('preferences.theme') }}</label>
             <select id="theme" [value]="theme()" (change)="setTheme($event)">
                 @for (option of themeOptions(); track $index) {
-                <option [value]="option">{{ capitalize(option) }}</option>
+                <option [value]="option">{{ translation.translate('themeOptions.' + option) }}</option>
                 }
             </select>
         </div>
 
         <div class="form-group">
-            <label for="language">Idioma:</label>
+            <label for="language">{{ translation.translate('preferences.language') }}</label>
             <select id="language" [value]="language()" (change)="setLanguage($event)">
                 @for (option of languageOptions(); track $index) {
-                <option [value]="option">{{ capitalize(option) }}</option>
+                <option [value]="option">{{ translation.translate('languages.' + option) }}</option>
                 }
             </select>
         </div>
 
         <div class="form-group radio-slider">
-            <label for="radioKm">Radio KM: <span (click)="toggleInfo()" class="info-icon">ℹ️</span></label>
+            <label for="radioKm">{{ translation.translate('preferences.radioKm') }} <span (click)="toggleInfo()" class="info-icon">ℹ️</span></label>
             <div class="slider-container">
                 <input id="radioKm" type="range" [value]="radioKm()" (input)="setRadioKm($event)" min="1" max="15"
                     step="1">
@@ -91,16 +91,15 @@
             </div>
             @if (showRadiusInfo()) {
             <div class="info-tooltip">
-                El radio en kilómetros define el área de búsqueda alrededor de la dirección especificada para encontrar
-                gasolineras cercanas.
+                {{ translation.translate('preferences.radiusInfo') }}
             </div>
             }
         </div>
 
         <div class="form-group" id="add-gas-stations">
-            <label>Añadir Gasolineras Favoritas: <span (click)="toggleGasInfo()" class="info-icon">ℹ️</span></label>
+            <label>{{ translation.translate('preferences.addGasStations') }} <span (click)="toggleGasInfo()" class="info-icon">ℹ️</span></label>
             <input type="text" [value]="searchAddress()" (input)="setSearchAddress($event)"
-                placeholder="Escribe una dirección">
+                placeholder="{{ translation.translate('preferences.searchAddress') }}">
             @if (showAddressDropdown() && filteredMunicipalities().length > 0) {
             <ul class="dropdown-list">
                 @for (municipality of filteredMunicipalities(); track $index) {
@@ -108,27 +107,26 @@
                 }
             </ul>
             }
-            <button type="button" (click)="searchGasStations()" [disabled]="isLoading()">Buscar</button>
+            <button type="button" class="btn" (click)="searchGasStations()" [disabled]="isLoading()">{{ translation.translate('preferences.search') }}</button>
             @if (isLoading()) {
-            <span>Cargando...</span>
+            <span>{{ translation.translate('preferences.loading') }}</span>
             }
             @if (showGasInfo()) {
             <div class="info-tooltip">
-                El autocompletado solo sugiere lugares con gasolineras. Puedes ingresar cualquier dirección y aumentar
-                el radio KM para buscar más opciones.
+                {{ translation.translate('preferences.gasInfo') }}
             </div>
             }
         </div>
 
         @if (searchResults().length > 0) {
         <div class="form-group">
-            <label>Seleccionar Gasolinera:</label>
+            <label>{{ translation.translate('preferences.selectGas') }}</label>
             <ul class="gas-stations-list">
                 @for (station of allStations(); track station.idEstacion) {
                 @if (isFavorite(station)) {
                 <li class="added-station">
                     {{ station.nombreEstacion }} - {{ station.direccion }}
-                    <button type="button" (click)="removeFavoriteGasStation(station)">Eliminar</button>
+                    <button type="button" class="btn" (click)="removeFavoriteGasStation(station)">{{ translation.translate('preferences.remove') }}</button>
                 </li>
                 } @else {
                 <li (click)="toggleSelection(station)"
@@ -140,14 +138,14 @@
                 }
             </ul>
             <div class="add-favorite-container">
-                <input type="text" [value]="alias()" (input)="setAlias($event)" placeholder="Alias para la gasolinera">
-                <button type="button" (click)="addSelectedGasStations()"
-                    [disabled]="!selectedStation() || !alias().trim()">Añadir Seleccionada</button>
+                <input type="text" [value]="alias()" (input)="setAlias($event)" placeholder="{{ translation.translate('preferences.alias') }}">
+                <button type="button" class="btn" (click)="addSelectedGasStations()"
+                    [disabled]="!selectedStation() || !alias().trim()">{{ translation.translate('preferences.addSelected') }}</button>
             </div>
         </div>
         } @else if (!isLoading() && hasSearched() && searchResults().length === 0) {
         <div class="form-group">
-            <p>No existen gasolineras en {{ searchAddress() }} en un radio de {{ radioKm() }} km</p>
+            <p>{{ translation.translate('preferences.noGas').replace('[address]', searchAddress()).replace('[km]', radioKm().toString()) }}</p>
         </div>
         }
 
@@ -161,27 +159,26 @@
                 [mapType]="mapType()">
             </app-map-page>
             } @else {
-            <p>Demasiadas gasolineras para mostrar en el mapa. Reduce el radio Km</p>
+            <p>{{ translation.translate('preferences.tooMany') }}</p>
             }
             }
 
             <div class="form-group">
-                <label>Gasolineras Favoritas:</label>
+                <label>{{ translation.translate('preferences.favoriteGas') }}</label>
                 <ul>
                     @for (station of favoriteGasStations(); track station.idEstacion) {
                     <li (click)="setSelectedStation(station)" class="clickable-favorite">
                         {{ station.alias }} - {{ station.nombreEstacion }} - {{ station.direccion }}
-                        <button type="button" (click)="removeFavoriteGasStation(station)">Eliminar</button>
-                        <button type="button" (click)="renameFavoriteGasStation(station)">Renombrar</button>
+                        <button type="button" class="btn" (click)="removeFavoriteGasStation(station)">{{ translation.translate('preferences.remove') }}</button>
+                        <button type="button" class="btn" (click)="renameFavoriteGasStation(station)">{{ translation.translate('preferences.rename') }}</button>
                     </li>
                     }
                 </ul>
             </div>
 
             <div class="buttons">
-                <button type="button" (click)="savePreferences()">Guardar Cambios</button>
-                <button type="button" (click)="resetPreferences()" [disabled]="!defaultsLoaded()">Reiniciar a Por
-                    Defecto</button>
+                <button type="button" (click)="savePreferences()">{{ translation.translate('preferences.save') }}</button>
+                <button type="button" (click)="resetPreferences()" [disabled]="!defaultsLoaded()">{{ translation.translate('preferences.reset') }}</button>
             </div>
     </form>
 </div>

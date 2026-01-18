@@ -6,6 +6,7 @@ import { FavouriteGasStation, GasStation } from '../../../../Dto/gas-station';
 import { UserInfoService } from '../../../../services/user-page/user-info.service';
 import { forkJoin } from 'rxjs';
 import { GasStationService } from '../../../../services/user-page/gas-station/gas-station.service';
+import { TranslationService } from '../../../../services/translation.service';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -15,6 +16,9 @@ import { GasStationService } from '../../../../services/user-page/gas-station/ga
   styleUrls: ['./user-info.component.css']
 })
 export class UserInfoComponent implements OnInit {
+
+  translation = inject(TranslationService);
+
   private router = inject(Router);
   private userInfoService = inject(UserInfoService);
   private userPreferencesService = inject(UserPreferencesService);
