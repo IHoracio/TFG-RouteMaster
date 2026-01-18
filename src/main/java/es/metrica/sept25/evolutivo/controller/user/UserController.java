@@ -51,7 +51,6 @@ public class UserController {
 	@Autowired
 	private UserService service;
 
-	// FIXME: Escondido para evitar creación de nuevos usuarios accidentalmente
 	@Hidden
 	@Operation(summary = "Crear un nuevo usuario")
 	@ApiResponses(value = {
@@ -112,7 +111,6 @@ public class UserController {
 	})
 	@Hidden
 	@GetMapping("/all")
-	// TODO: Esconder bajo un usuario admin
 	public ResponseEntity<List<UserResponseDTO>> getAllUsers() {
 		List<UserResponseDTO> usuarios = service.getAll();
 

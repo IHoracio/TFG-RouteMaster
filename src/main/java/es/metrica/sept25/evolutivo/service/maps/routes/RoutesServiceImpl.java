@@ -70,8 +70,6 @@ public class RoutesServiceImpl implements RoutesService {
 	
 	@Autowired
 	private GeocodeService geocodeService;
-	
-
 
 	@Override
 	public Optional<RouteGroup> getDirections(String origin, String destination, List<String> waypoints,

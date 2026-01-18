@@ -2,8 +2,8 @@ package es.metrica.sept25.evolutivo.domain.dto.user.preferences;
 
 public class EnumOptionDTO {
 
-	private String code;   // ES, EN, DARK
-    private String label;  // Español, English, Oscuro
+	private String code;
+    private String label;
 
     public EnumOptionDTO(String code, String label) {
         this.code = code;
