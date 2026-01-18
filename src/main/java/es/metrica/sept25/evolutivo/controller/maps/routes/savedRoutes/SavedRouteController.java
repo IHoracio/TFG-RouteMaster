@@ -184,15 +184,12 @@ public class SavedRouteController {
 		String email = cookieService.getCookieValue(request, "sesionActiva").get();
 		Optional<List<SavedRouteDTO>> routes = savedRouteService.getAllSavedRoutes(email);
 
-		// Check if the user has routes / that they were retrieved correctly
 		if (routes.isEmpty() || routes.get().isEmpty()) {
 			return ResponseEntity.notFound().build();
 		}
 
-		// Extract them
 		List<SavedRouteDTO> routesList = routes.get();
 
-		// Amount of routes with the same name
 		Long routesWithSameName = routesList.stream()
 				.filter(sRoute -> sRoute.getName().equals(newName))
 				.count();

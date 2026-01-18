@@ -40,7 +40,6 @@ public class GeocodeServiceImpl implements GeocodeService {
 				+ "Attempting to get coordinates for the given address: "
 				+ address + ".");
 		address = address.replaceAll(" ", "");
-//		address = normalizarMunicipioParaGeocode(address);
 
 		String url = UriComponentsBuilder.fromUriString(GEOCODE_URL).queryParam("address", address)
 				.queryParam("key", API_KEY_GOOGLE).toUriString();
@@ -100,25 +99,6 @@ public class GeocodeServiceImpl implements GeocodeService {
 				+ "[lat=(" + lat + "), lng=("+ lng +")].");
 		return Optional.empty();
 	}
-
-//	public String normalizarMunicipioParaGeocode(String municipio) {
-//		if (municipio == null)
-//			return "";
-//
-//		municipio = municipio.trim();
-//		municipio = municipio.replaceAll(" ", "");
-//
-//		if (municipio.toLowerCase().startsWith("el ")) {
-//			municipio = municipio.substring(3);
-//		} else if (municipio.toLowerCase().startsWith("la ")) {
-//			municipio = municipio.substring(3);
-//		} else if (municipio.toLowerCase().startsWith("los ")) {
-//			municipio = municipio.substring(4);
-//		} else if (municipio.toLowerCase().startsWith("las ")) {
-//			municipio = municipio.substring(4);
-//		}
-//		return municipio;
-//	}
 
 	private String formatearMunicipioParaINE(String municipio) {
 		if (municipio == null || municipio.isBlank())

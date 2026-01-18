@@ -31,7 +31,6 @@ public class SavedRoute {
 	private String name;
 
 	@OneToMany(mappedBy = "savedRoute", cascade = CascadeType.ALL, orphanRemoval = true)
-	// TODO: Cambiar a @OrderBy
 	@OrderColumn(name = "order_index")
 	@JsonManagedReference("route-puntos")
 	private List<Point> puntos;
