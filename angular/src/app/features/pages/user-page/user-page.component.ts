@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { UserInfoComponent } from './user-info/user-info.component';
 import { UserPreferencesComponent } from './user-preferences/user-preferences.component';
+import { TranslationService } from '../../../services/translation.service';
 
 @Component({
   selector: 'app-user-page',
@@ -9,5 +10,7 @@ import { UserPreferencesComponent } from './user-preferences/user-preferences.co
   styleUrl: './user-page.component.css'
 })
 export class UserPageComponent {
+
+  translation = inject(TranslationService);
 
 }

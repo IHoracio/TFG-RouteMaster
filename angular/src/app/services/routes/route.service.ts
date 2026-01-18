@@ -12,7 +12,7 @@ import { Coords, RouteGroupResponse } from '../../Dto/maps-dtos';
 })
 export class RouteService {
 
-  private apiUrl = 'http://localhost:8080/api/routes';
+  private apiUrl = 'http://localhost:8080';
   private routeUrl = 'http://localhost:8080/api/savedRoute'
   constructor(private http: HttpClient) { }
 
@@ -44,7 +44,7 @@ export class RouteService {
       .set('optimizeRoute', routeFormResponse.optimizeRoute)
       .set('avoidTolls', routeFormResponse.avoidTolls)
       .set('vehiculeEmissionType', routeFormResponse.vehiculeEmissionType)
-    return this.http.get(this.apiUrl + "/polylineCoords", { headers: headers, params: parameters, responseType: 'text' });
+    return this.http.get(this.apiUrl + "/api/route/polylineCords", { headers: headers, params: parameters, responseType: 'text' });
   }
 
   calculatePointCoords(routeFormResponse: RouteFormResponse): Observable<string> {
@@ -60,7 +60,7 @@ export class RouteService {
       .set('avoidTolls', routeFormResponse.avoidTolls)
       .set('vehiculeEmissionType', routeFormResponse.vehiculeEmissionType)
 
-    return this.http.get(this.apiUrl + "/legCoords", { headers: headers, params: parameters, responseType: 'text' });
+    return this.http.get(this.apiUrl + "/api/route/legCoords", { headers: headers, params: parameters, responseType: 'text' });
   }
 
   calculateGasStations(routeFormResponse: RouteFormResponse): Observable<string> {
@@ -75,7 +75,7 @@ export class RouteService {
       .set('optimizeRoute', routeFormResponse.optimizeRoute)
       .set('radius', 5)
 
-    return this.http.get(this.apiUrl + "/gasStations", { headers: headers, params: parameters, responseType: 'text' });
+    return this.http.get(this.apiUrl + "/api/routes/gasStations", { headers: headers, params: parameters, responseType: 'text' });
   }
 
   calculateWeatherRoute(routeFormResponse: RouteFormResponse): Observable<string> {
@@ -90,7 +90,7 @@ export class RouteService {
       .set('avoidTolls', routeFormResponse.avoidTolls)
       .set('vehiculeEmissionType', routeFormResponse.vehiculeEmissionType)
 
-    return this.http.get(this.apiUrl + "/weather", { headers: headers, params: parameters, responseType: 'text' });
+    return this.http.get(this.apiUrl + "/api/routes/weather", { headers: headers, params: parameters, responseType: 'text' });
   }
 
   saveFavouriteRoute(alias: string, routeFormResponse: RouteFormResponse) {
