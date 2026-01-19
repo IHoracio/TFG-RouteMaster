@@ -16,13 +16,12 @@ export class SearchBarService {
 
   constructor(private routeService: RouteService, private mapCommunication: MapCommunicationService, private userService: UserService) { }
 
-  onSubmit(routeFormResponse: RouteFormResponse) {
-     this.saveCoordinates(routeFormResponse)
-     setTimeout(()=>{
-        this.saveWaypointCoordinates(routeFormResponse)    
-     }, 1000)
-    this.saveGasStationsCoordinates(routeFormResponse)
-    this.saveWeatherRoute(routeFormResponse)
+  async onSubmit(routeFormResponse: RouteFormResponse) {
+    await this.saveCoordinates(routeFormResponse);
+    await this.saveWaypointCoordinates(routeFormResponse);
+
+    await this.saveGasStationsCoordinates(routeFormResponse);
+    await this.saveWeatherRoute(routeFormResponse);
   }
 
   saveCoordinates(routeFormResponse: RouteFormResponse){
@@ -45,7 +44,7 @@ export class SearchBarService {
       coords = parsedData;
       this.giveWaypointCoords(coords)
     })
-    
+
   }
   saveGasStationsCoordinates(routeFormResponse: RouteFormResponse){
     let coords: Coords[] = []
@@ -56,7 +55,7 @@ export class SearchBarService {
       console.log(coords)
       this.giveGasStationCoords(coords)
     })
-    
+
   }
 
   saveWeatherRoute(routeFormResponse: RouteFormResponse){
@@ -78,7 +77,7 @@ export class SearchBarService {
   saveSavedRoutes(): Observable<string>{
     return this.userService.receiveSavedRoutes()
   }
-  
+
 
 
   saveFavouriteRoute(alias: string, routeFormResponse: RouteFormResponse) {
