@@ -60,6 +60,7 @@ export class UserPreferencesComponent implements OnInit {
 
   showRadiusInfo = signal<boolean>(false);
   showGasInfo = signal<boolean>(false);
+  showGeneralInfo = signal<boolean>(false);
 
   isLoadingPreferences = signal<boolean>(true);
   defaultsLoaded = signal<boolean>(false);
@@ -276,7 +277,7 @@ allStations = computed(() =>
           return;
         }
         const favorite: FavouriteGasStation = { ...station, alias: this.alias() };
-        this.newFavorites.update(n => [...n, favorite]); // Add to new favorites instead of existing
+        this.newFavorites.update(n => [...n, favorite]);
         this.alias.set('');
         this.selectedStation.set(null);
       }
@@ -285,6 +286,10 @@ allStations = computed(() =>
 
   isFavorite(station: GasStation): boolean {
     return this.favoriteGasStations().some(f => f.idEstacion === station.idEstacion) || this.newFavorites().some(f => f.idEstacion === station.idEstacion);
+  }
+
+  toggleGeneralInfo(): void {
+    this.showGeneralInfo.update(v => !v);
   }
 
   toggleInfo(): void {

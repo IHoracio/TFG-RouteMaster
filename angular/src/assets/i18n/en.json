@@ -237,7 +237,8 @@
         "save": "Save Changes",
         "reset": "Reset to Default",
         "radiusInfo": "The radius in kilometers defines the search area around the specified address to find nearby gas stations.",
-        "gasInfo": "Autocomplete only suggests places with gas stations. You can enter any address and increase the KM radius to search for more options."
+        "gasInfo": "Autocomplete only suggests places with gas stations. You can enter any address and increase the KM radius to search for more options.",    "generalInfo": "General information",
+    "generalInfoText": "The km radius, fuel type, and maximum price are used to filter gas stations in routes."
     },
     "languages": {
         "ES": "Spanish",

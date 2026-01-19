@@ -237,7 +237,8 @@
         "save": "Guardar Cambios",
         "reset": "Reiniciar a Por Defecto",
         "radiusInfo": "El radio en kilómetros define el área de búsqueda alrededor de la dirección especificada para encontrar gasolineras cercanas.",
-        "gasInfo": "El autocompletado solo sugiere lugares con gasolineras. Puedes ingresar cualquier dirección y aumentar el radio KM para buscar más opciones."
+        "gasInfo": "El autocompletado solo sugiere lugares con gasolineras. Puedes ingresar cualquier dirección y aumentar el radio KM para buscar más opciones.",    "generalInfo": "Información general",
+    "generalInfoText": "El radio en km, tipo de combustible y precio máximo se usan para filtrar gasolineras en rutas."
     },
     "languages": {
         "ES": "Español",

@@ -1,6 +1,11 @@
 <div class="user-preferences">
     <h2>{{ translation.translate('preferences.title') }}</h2>
-
+    <label>{{ translation.translate('preferences.generalInfo') }} <span (click)="toggleGeneralInfo()" class="info-icon">ℹ️</span></label>
+    @if (showGeneralInfo()) {
+    <div class="info-tooltip">
+        {{ translation.translate('preferences.generalInfoText') }}
+    </div>
+    }
     <form class="preferences-form">
         <div class="form-group">
             <label for="fuelType">{{ translation.translate('preferences.fuelType') }}</label>
