@@ -1,54 +1,82 @@
 package es.metrica.sept25.evolutivo.entity.user;
 
+import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
+import es.metrica.sept25.evolutivo.entity.gasolinera.UserSavedGasStation;
+import es.metrica.sept25.evolutivo.entity.maps.routes.RoutePreferences;
 import es.metrica.sept25.evolutivo.entity.maps.routes.SavedRoute;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
-import jakarta.persistence.ElementCollection;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 
 @Entity
 @Table(name = "users")
 public class User {
 
 	public enum PrioridadGasolineras {
-		PRICE, 
-		DISTANCE, 
-		BOTH
-
+		PRICE, DISTANCE, BOTH
 	}
 
 	@Id
-	private String mail;
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
+
+	@Column(name = "email", unique = true)
+	private String email;
+
 	private String password;
+
+	@Transient
+	private String passwordConfirmation;
+
 	private String name;
 	private String surname;
 
-	@ElementCollection
-	private Map<String, String> preferences;
+	@OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+	private UserPreferences userPreferences;
 
 	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<SavedRoute> savedRoutes;
+	@JsonManagedReference("user-routes")
+	private List<SavedRoute> savedRoutes = new LinkedList<SavedRoute>();
+
+	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+	@JsonManagedReference("user-gasStations")
+	private List<UserSavedGasStation> savedGasStations = new LinkedList<>();
 
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false)
-	private PrioridadGasolineras priorityGasstations = PrioridadGasolineras.PRICE;
+	private PrioridadGasolineras gasStationPriority = PrioridadGasolineras.PRICE;
 
-	public String getMail() {
-		return mail;
+	@Embedded
+	private RoutePreferences routePreferences;
+
+	public Long getId() {
+		return id;
 	}
 
-	public void setMail(String mail) {
-		this.mail = mail;
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
 	}
 
 	public String getPassword() {
@@ -56,8 +84,15 @@ public class User {
 	}
 
 	public void setPassword(String password) {
-		BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-		this.password = encoder.encode(password);
+		this.password = password;
+	}
+
+	public String getPasswordConfirmation() {
+		return passwordConfirmation;
+	}
+
+	public void setPasswordConfirmation(String passwordConfirmation) {
+		this.passwordConfirmation = passwordConfirmation;
 	}
 
 	public String getName() {
@@ -76,12 +111,12 @@ public class User {
 		this.surname = surname;
 	}
 
-	public Map<String, String> getPreferences() {
-		return preferences;
+	public UserPreferences getUserPreferences() {
+		return userPreferences;
 	}
 
-	public void setPreferences(Map<String, String> preferencias) {
-		this.preferences = preferencias;
+	public void setUserPreferences(UserPreferences userPreferences) {
+		this.userPreferences = userPreferences;
 	}
 
 	public List<SavedRoute> getSavedRoutes() {
@@ -92,11 +127,28 @@ public class User {
 		this.savedRoutes = savedRoutes;
 	}
 
-	public PrioridadGasolineras getPriorityGasstations() {
-		return priorityGasstations;
+	public List<UserSavedGasStation> getSavedGasStations() {
+		return savedGasStations;
 	}
 
-	public void setPriorityGasstations(PrioridadGasolineras prioridadGasolineras) {
-		this.priorityGasstations = prioridadGasolineras;
+	public void setSavedGasStations(List<UserSavedGasStation> savedGasStations) {
+		this.savedGasStations = savedGasStations;
 	}
+
+	public PrioridadGasolineras getGasStationPriority() {
+		return gasStationPriority;
+	}
+
+	public void setGasStationPriority(PrioridadGasolineras gasStationPriority) {
+		this.gasStationPriority = gasStationPriority;
+	}
+
+	public RoutePreferences getRoutePreferences() {
+		return routePreferences;
+	}
+
+	public void setRoutePreferences(RoutePreferences routePreferences) {
+		this.routePreferences = routePreferences;
+	}
+
 }

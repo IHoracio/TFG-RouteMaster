@@ -13,9 +13,6 @@ public class Weather {
 	@JsonProperty("prediccion")
 	private Prediccion prediccion;
 
-
-	// Getters and Setters
-
 	public String getNombre() {
 		return nombre;
 	}

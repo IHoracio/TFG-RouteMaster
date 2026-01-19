@@ -1,5 +1,7 @@
 package es.metrica.sept25.evolutivo.controller.maps.geocode;
 
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -8,70 +10,62 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import es.metrica.sept25.evolutivo.entity.maps.routes.Coords;
+import es.metrica.sept25.evolutivo.domain.dto.maps.routes.Coords;
 import es.metrica.sept25.evolutivo.service.maps.geocode.GeocodeService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import jakarta.servlet.http.HttpServletRequest;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
-@RequestMapping("/geocode")
+@Tag(name = "Geocode", description = "Conjunto de endpoints que emplean la API "
+								   + "de Geocoding de Google Maps para hacer "
+		                           + "traslaciones de coordenadas a direcciones "
+		                           + "y viceversa.")
+@RequestMapping("/api/geocode")
 public class GeocodeController {
 
 	@Autowired
 	private GeocodeService geocodeService;
 
-	@Operation(summary = "Obtiene las coordenadas de una dirección", description = "Devuelve las coordenadas (latitud y longitud) del lugar indicado usando la API de Google Geocoding.")
+	@Operation(
+			summary = "Obtiene las coordenadas de una dirección", 
+			description = "Devuelve las coordenadas (latitud y longitud) de la ubicación "
+					    + "proporcionada usando la API de Google Geocoding."
+			)
 	@ApiResponses(value = { 
-			@ApiResponse(responseCode = "401", description = "apiKey no encontrada"),
-			@ApiResponse(responseCode = "400", description = "Solicitud incorrecta"),
-			@ApiResponse(responseCode = "200", description = "Coordenadas encontradas") 
+			@ApiResponse(responseCode = "200", description = "Coordenadas encontradas"),
+			@ApiResponse(responseCode = "404", description = "Solicitud incorrecta: no se pudo efectuar la traslación")
 	})
-	@SecurityRequirement(name = "googleApiKey")
-	@GetMapping
-	public ResponseEntity<Coords> getCoordinates(@RequestParam String address, HttpServletRequest request) {
+	@GetMapping("/normal")
+	public ResponseEntity<Coords> getCoordinates(@RequestParam String address) {
 
-		String apiKey = request.getHeader("key");
-
-		if (apiKey == null || apiKey.isEmpty()) {
-			return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-		}
-
-		Coords coords = geocodeService.getCoordinates(address, apiKey);
-		if (coords == null) {
+		Optional<Coords> coords = geocodeService.getCoordinates(address);
+		if (coords.isEmpty()) {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
 
-		return new ResponseEntity<>(coords, HttpStatus.OK);
+		return new ResponseEntity<>(coords.get(), HttpStatus.OK);
 	}
 	
-	@Operation(summary = "Obtiene el municipio de una dirección", description = "Devuelve el municpio del lugar indicado usando la API de Google Geocoding.")
+	@Operation(
+			summary = "Obtiene el municipio de una dirección", 
+			description = "Devuelve el municipio del las coordenadas indicadas usando la "
+					    + "API de Google Geocoding."
+			)
 	@ApiResponses(value = { 
-			@ApiResponse(responseCode = "401", description = "apiKey no encontrada"),
-			@ApiResponse(responseCode = "400", description = "Solicitud incorrecta"),
-			@ApiResponse(responseCode = "200", description = "Coordenadas encontradas") 
+			@ApiResponse(responseCode = "200", description = "Coordenadas encontradas"),
+			@ApiResponse(responseCode = "404", description = "Solicitud incorrecta: no se pudo efectuar la traslación")
 	})
-	@SecurityRequirement(name = "googleApiKey")
 	@GetMapping("/municipio")
-	public ResponseEntity<String> getMunicipio(
-	        @RequestParam double lat,
-	        @RequestParam double lng,
-	        HttpServletRequest request) {
+	public ResponseEntity<String> getMunicipio(@RequestParam double lat, @RequestParam double lng) {
 
-	    String apiKey = request.getHeader("key");
+		Optional<String> municipio = geocodeService.getMunicipio(lat, lng);
 
-	    if (apiKey == null || apiKey.isEmpty()) {
-	        return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-	    }
+		if (municipio == null) {
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
 
-	    String municipio = geocodeService.getMunicipio(lat, lng, apiKey);
-
-	    if (municipio == null) {
-	        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-	    }
-
-	    return new ResponseEntity<>(municipio, HttpStatus.OK);
+		return new ResponseEntity<>(municipio.get(), HttpStatus.OK);
 	}
 }
