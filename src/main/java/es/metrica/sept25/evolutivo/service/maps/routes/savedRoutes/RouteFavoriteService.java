@@ -8,7 +8,7 @@ import es.metrica.sept25.evolutivo.domain.dto.maps.routes.savedRoutes.SavedRoute
 import es.metrica.sept25.evolutivo.entity.user.User;
 import es.metrica.sept25.evolutivo.enums.EmissionType;
 
-public interface SavedRouteService {
+public interface RouteFavoriteService {
 
 	Optional<SavedRouteDTO> getSavedRoute(Long id);
 

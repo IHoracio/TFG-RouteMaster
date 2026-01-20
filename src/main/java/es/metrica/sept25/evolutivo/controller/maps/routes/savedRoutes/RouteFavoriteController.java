@@ -18,7 +18,7 @@ import es.metrica.sept25.evolutivo.domain.dto.maps.routes.savedRoutes.PointDTO;
 import es.metrica.sept25.evolutivo.domain.dto.maps.routes.savedRoutes.SavedRouteDTO;
 import es.metrica.sept25.evolutivo.entity.user.User;
 import es.metrica.sept25.evolutivo.enums.EmissionType;
-import es.metrica.sept25.evolutivo.service.maps.routes.savedRoutes.SavedRouteService;
+import es.metrica.sept25.evolutivo.service.maps.routes.savedRoutes.RouteFavoriteService;
 import es.metrica.sept25.evolutivo.service.session.CookieService;
 import es.metrica.sept25.evolutivo.service.user.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -34,10 +34,10 @@ import jakarta.servlet.http.HttpServletRequest;
 					+ " asociadas a un usuario."
 )
 @RequestMapping("/api/savedRoute")
-public class SavedRouteController {
+public class RouteFavoriteController {
 
 	@Autowired
-	private SavedRouteService savedRouteService;
+	private RouteFavoriteService routerFavoriteService;
 
 	@Autowired
 	private CookieService cookieService;
@@ -100,7 +100,7 @@ public class SavedRouteController {
 		destinationPoint.setType("DESTINATION");
 		puntos.add(destinationPoint);
 
-		SavedRouteDTO saved = savedRouteService.saveRoute(name, puntos, user, optimizeWaypoints, optimizeRoute,
+		SavedRouteDTO saved = routerFavoriteService.saveRoute(name, puntos, user, optimizeWaypoints, optimizeRoute,
 				language, avoidTolls, vehicleEmissionType);
 		return ResponseEntity.ok(saved);
 	}
@@ -110,7 +110,7 @@ public class SavedRouteController {
 			@ApiResponse(responseCode = "404", description = "Ruta no encontrada") })
 	@GetMapping("/get/{routeId}")
 	public ResponseEntity<SavedRouteDTO> getSavedRoute(@PathVariable Long routeId) {
-		Optional<SavedRouteDTO> routeDTO = savedRouteService.getSavedRoute(routeId);
+		Optional<SavedRouteDTO> routeDTO = routerFavoriteService.getSavedRoute(routeId);
 
 		if (routeDTO.isEmpty()) {
 			return ResponseEntity.notFound().build();
@@ -132,7 +132,7 @@ public class SavedRouteController {
 			return ResponseEntity.notFound().build();
 		}
 
-		savedRouteService.deleteRoute(id, user.get());
+		routerFavoriteService.deleteRoute(id, user.get());
 		return ResponseEntity.noContent().build();
 	}
 
@@ -147,12 +147,13 @@ public class SavedRouteController {
 					description = "Ruta no encontrada"
 					) 
 	})
+	
 	@GetMapping
 	public ResponseEntity<List<SavedRouteDTO>> getAllSavedRoutes(
 			HttpServletRequest request) {
 
 		String email = cookieService.getCookieValue(request, "sesionActiva").get();
-		Optional<List<SavedRouteDTO>> routes = savedRouteService.getAllSavedRoutes(email);
+		Optional<List<SavedRouteDTO>> routes = routerFavoriteService.getAllSavedRoutes(email);
 
 		if (routes.isPresent()) {
 
@@ -182,7 +183,7 @@ public class SavedRouteController {
 			) {
 
 		String email = cookieService.getCookieValue(request, "sesionActiva").get();
-		Optional<List<SavedRouteDTO>> routes = savedRouteService.getAllSavedRoutes(email);
+		Optional<List<SavedRouteDTO>> routes = routerFavoriteService.getAllSavedRoutes(email);
 
 		if (routes.isEmpty() || routes.get().isEmpty()) {
 			return ResponseEntity.notFound().build();
@@ -203,7 +204,7 @@ public class SavedRouteController {
 		}
 
 		SavedRouteDTO renamedRoute = 
-				savedRouteService.renameRoute(newName, savedRouteOpt.get());
+				routerFavoriteService.renameRoute(newName, savedRouteOpt.get());
 
 		return ResponseEntity.ok(renamedRoute);
 	}
