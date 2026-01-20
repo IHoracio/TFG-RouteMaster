@@ -18,9 +18,10 @@ export class UserInfoService {
 
   isLoggedIn(): Observable<boolean> {
     if (this.checked) {
+      this.checked = true;
       return this.loggedInSubject.asObservable();
     }
-    this.checked = true;
+    
     const stored = localStorage.getItem('isLoggedIn');
     if (stored === 'true') {
       this.loggedInSubject.next(true);
@@ -40,7 +41,6 @@ export class UserInfoService {
       shareReplay(1)
     );
   }
-
   getUserSignal() { return this.userSignal; }
   setUser(data: any) { this.userSignal.set(data); }
   getRoutesSignal() { return this.routesSignal; }
