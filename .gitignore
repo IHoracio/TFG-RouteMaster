@@ -42,3 +42,6 @@ angular/yarn-error.log
 src/main/resources/application-dev.properties
 angular/src/environments
 count_commits_by_contributor.sh
+
+# Archivos de configuración de aplicación
+application.properties
