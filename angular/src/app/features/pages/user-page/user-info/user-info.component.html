@@ -17,7 +17,7 @@
               <div>
                 <div>{{ route.name }}</div>
                 <div>{{ translation.translate('userInfo.distance') }} {{ route.distanceKm }} km</div>
-                <div>{{ translation.translate('userInfo.origin') }} {{ route.points[0]?.address || translation.translate('userInfo.na') }}, {{ translation.translate('userInfo.destination') }} {{ route.points[1]?.address || translation.translate('userInfo.na') }}</div>
+                <div>{{ translation.translate('userInfo.origin') }} {{ getOrigin(route) }}, {{ translation.translate('userInfo.destination') }} {{ getDestination(route) }}</div>
                 @if (route.canShare) {
                   <button (click)="shareRoute(route)">{{ translation.translate('userInfo.share') }}</button>
                 }

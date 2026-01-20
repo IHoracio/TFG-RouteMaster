@@ -123,6 +123,15 @@ export class UserInfoComponent implements OnInit {
 
   }
 
+  getOrigin(route: any): string {
+    return route.points.find((p: any) => p.type === 'ORIGIN')?.address || this.translation.translate('userInfo.na');
+  }
+
+  getDestination(route: any): string {
+    return route.points.find((p: any) => p.type === 'DESTINATION')?.address || this.translation.translate('userInfo.na');
+  }
+
+
   deleteRoute(route: any): void {
     if (confirm(`¿Estás seguro de que quieres eliminar la ruta "${route.name}"?`)) {
       console.log(route.routeId)
