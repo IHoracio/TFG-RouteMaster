@@ -1,6 +1,6 @@
 HELP.md
-target/
-.mvn/wrapper/maven-wrapper.jar
+backend/target/
+backend/.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
 
@@ -33,12 +33,15 @@ build/
 .vscode/
 
 ### Angular
-angular/node_modules
-angular/npm-debug.log
-angular/yarn-error.log
+frontend/node_modules
+frontend/npm-debug.log
+frontend/yarn-error.log
 
 
 # SECRETS
-src/main/resources/application-dev.properties
-angular/src/environments
+backend/src/main/resources/application-dev.properties
+frontend/src/environments
 count_commits_by_contributor.sh
+
+# Archivos de configuración de aplicación
+backend/application.properties
