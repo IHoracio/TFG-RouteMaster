@@ -34,10 +34,11 @@ La motivación surge de la necesidad de soluciones digitales para movilidad sost
 4. **APIs**: Obtén claves de Google Cloud Console y configúralas en `application.properties` dentro del backend y `src/environments/environment.ts` en el frontend.
 
 ## Uso
-- Regístrate y configura preferencias de vehículo.
+- (Opcional) Regístrate y configura preferencias de vehículo.
 - Ingresa origen/destino, calcula ruta.
 - Visualiza gasolineras y clima en el mapa.
-- Compartir rutas.
+- Comparte la ruta creada.
+- (Necesitas tener sesion iniciada) Guardala como favorita 
 
 ## Licencia
 Este proyecto es para fines educativos.
