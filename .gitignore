@@ -19,6 +19,9 @@ backend/.mvn/wrapper/maven-wrapper.jar
 *.iml
 *.ipr
 
+### ECLIPSE ###
+/backend/bin/
+
 ### NetBeans ###
 /nbproject/private/
 /nbbuild/
