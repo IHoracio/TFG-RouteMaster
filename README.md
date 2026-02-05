@@ -31,7 +31,9 @@ La motivación surge de la necesidad de soluciones digitales para movilidad sost
    - Ejecuta: `ng serve`
    - Abre en `http://localhost:4200`
 
-4. **APIs**: Obtén claves de Google Cloud Console y configúralas en `application.properties` dentro del backend y `src/environments/environment.ts` en el frontend.
+4. **APIs**: Obtén claves de Google y configúrala en `application.properties` dentro del backend y `src/environments/environment.ts` en el frontend.
+   
+   Tienes de ejemplo el `backend/src/main/resources/application-example.properties` y `frontend/src/environments/environment-example.ts`
 
 ## Uso
 - (Opcional) Regístrate y configura preferencias de vehículo.
