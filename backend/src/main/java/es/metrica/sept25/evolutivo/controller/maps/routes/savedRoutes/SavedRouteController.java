@@ -18,7 +18,7 @@ import es.metrica.sept25.evolutivo.domain.dto.maps.routes.savedRoutes.PointDTO;
 import es.metrica.sept25.evolutivo.domain.dto.maps.routes.savedRoutes.SavedRouteDTO;
 import es.metrica.sept25.evolutivo.entity.user.User;
 import es.metrica.sept25.evolutivo.enums.EmissionType;
-import es.metrica.sept25.evolutivo.service.maps.routes.savedRoutes.RouteFavoriteService;
+import es.metrica.sept25.evolutivo.service.maps.routes.savedRoutes.SavedRouteService;
 import es.metrica.sept25.evolutivo.service.session.CookieService;
 import es.metrica.sept25.evolutivo.service.user.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -37,7 +37,7 @@ import jakarta.servlet.http.HttpServletRequest;
 public class SavedRouteController {
 
 	@Autowired
-	private RouteFavoriteService routerFavoriteService;
+	private SavedRouteService routerFavoriteService;
 
 	@Autowired
 	private CookieService cookieService;

@@ -26,13 +26,13 @@ import es.metrica.sept25.evolutivo.domain.dto.maps.routes.savedRoutes.SavedRoute
 import es.metrica.sept25.evolutivo.enums.EmissionType;
 import es.metrica.sept25.evolutivo.service.maps.routes.RoutesService;
 import es.metrica.sept25.evolutivo.service.maps.routes.executeRoutes.RouteExecutionServiceImpl;
-import es.metrica.sept25.evolutivo.service.maps.routes.savedRoutes.RouteFavoriteService;
+import es.metrica.sept25.evolutivo.service.maps.routes.savedRoutes.SavedRouteService;
 
 @ExtendWith(MockitoExtension.class)
 class RouteExecutionServiceImplTest {
 
 	@Mock
-	private RouteFavoriteService savedRouteService;
+	private SavedRouteService savedRouteService;
 
 	@Mock
 	private RoutesService routesService;

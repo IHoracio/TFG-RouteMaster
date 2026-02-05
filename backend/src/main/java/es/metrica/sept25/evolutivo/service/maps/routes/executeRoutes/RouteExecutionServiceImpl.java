@@ -15,7 +15,8 @@ import es.metrica.sept25.evolutivo.domain.dto.maps.routes.savedRoutes.PointDTO;
 import es.metrica.sept25.evolutivo.domain.dto.maps.routes.savedRoutes.SavedRouteDTO;
 import es.metrica.sept25.evolutivo.enums.EmissionType;
 import es.metrica.sept25.evolutivo.service.maps.routes.RoutesService;
-import es.metrica.sept25.evolutivo.service.maps.routes.savedRoutes.RouteFavoriteService;
+import es.metrica.sept25.evolutivo.service.maps.routes.savedRoutes.SavedRouteService;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,7 +26,7 @@ public class RouteExecutionServiceImpl implements RouteExecutionService{
 	private static final Logger log = LoggerFactory.getLogger(RouteExecutionServiceImpl.class);
 
 	@Autowired
-	private RouteFavoriteService savedRouteService;
+	private SavedRouteService savedRouteService;
 
 	@Autowired
 	private RoutesService routesService;
