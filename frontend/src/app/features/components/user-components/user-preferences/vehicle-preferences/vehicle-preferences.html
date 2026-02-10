@@ -1,0 +1,31 @@
+<div class="vehicle-preferences">
+  <div class="form-group">
+    <label for="fuelType">{{ translation.translate('preferences.fuelType') }}</label>
+    <select id="fuelType" [value]="userPreferencesService.getUserPreferencesSignal()().fuelType" (change)="setFuelType($event)">
+      @for (option of userPreferencesService.getFuelOptionsSignal()(); track $index) {
+      <option [value]="option">{{ translation.translate('fuelOptions.' + option) }}</option>
+      }
+    </select>
+  </div>
+
+  @if (userPreferencesService.getUserPreferencesSignal()().fuelType !== 'ELECTRIC') {
+  <div class="form-group">
+    <label for="maxPrice">{{ translation.translate('preferences.maxPrice') }}</label>
+    <input id="maxPrice" type="number" [value]="userPreferencesService.getUserPreferencesSignal()().maxPrice" (input)="setMaxPrice($event)" min="0" step="0.01">
+  </div>
+  }
+
+  <div class="form-group">
+    <label for="avoidTolls">{{ translation.translate('preferences.avoidTolls') }}</label>
+    <input id="avoidTolls" type="checkbox" [checked]="userPreferencesService.getUserPreferencesSignal()().avoidTolls" (change)="setAvoidTolls($event)">
+  </div>
+
+  <div class="form-group">
+    <label for="emissionType">{{ translation.translate('preferences.emissionLabel') }}</label>
+    <select id="emissionType" [value]="userPreferencesService.getUserPreferencesSignal()().emissionType" (change)="setEmissionType($event)">
+      @for (option of userPreferencesService.getEmissionLabelOptionsSignal()(); track $index) {
+      <option [value]="option">{{ translation.translate('emissionLabelOptions.' + option) }}</option>
+      }
+    </select>
+  </div>
+</div>

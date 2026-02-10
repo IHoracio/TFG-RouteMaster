@@ -1,11 +1,10 @@
 import { Component, OnInit, computed, signal, ChangeDetectorRef } from '@angular/core';
 import { RouterModule } from '@angular/router';
-import { UserService } from '../../../services/user/user.service';
 import { AuthService } from '../../../services/auth/auth-service.service';
 import { TranslationService } from '../../../services/translation.service';
 import { ThemeService } from '../../../services/theme.service';
 import { UserPreferencesService } from '../../../services/user-page/user-preferences.service';
-import { UserInfoService } from '../../../services/user-page/user-info.service';
+import { AuthGuard } from '../../../guards/auth.guard';
 
 @Component({
   selector: 'app-header',
@@ -25,7 +24,7 @@ export class HeaderComponent implements OnInit {
 
   constructor(
     private userPreferencesService: UserPreferencesService,
-    private userInfo: UserInfoService,
+    private authGuard: AuthGuard,
     public translation: TranslationService,
     public theme: ThemeService,
     private authService: AuthService,
@@ -33,7 +32,7 @@ export class HeaderComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-    this.userInfo.isLoggedIn().subscribe(logged => {
+    this.authGuard.isLoggedIn().subscribe(logged => {
       this.authService.sendUserSession(logged);
     });
 

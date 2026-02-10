@@ -15,6 +15,7 @@ import { UserInfoService } from '../../../services/user-page/user-info.service';
 import { UserPreferencesService } from '../../../services/user-page/user-preferences.service';
 import { of } from 'rxjs';
 import { AuthService } from '../../../services/auth/auth-service.service';
+import { AuthGuard } from '../../../guards/auth.guard';
 
 @Component({
   selector: 'app-search-bar',
@@ -70,10 +71,10 @@ export class SearchBarComponent implements OnInit {
 
   activeTab: string = 'destination';
 
-  constructor(private searchBarService: SearchBarService, private routeService: RouteService, private authService: AuthService) { }
+  constructor(private searchBarService: SearchBarService, private routeService: RouteService, private authService: AuthService, private authGuard: AuthGuard) { }
 
   ngOnInit(): void {
-    this.userInfo.isLoggedIn().subscribe(logged => {
+    this.authGuard.isLoggedIn().subscribe(logged => {
       this.authService.sendUserSession(logged);
     });
 

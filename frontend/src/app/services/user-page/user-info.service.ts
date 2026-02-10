@@ -1,7 +1,6 @@
 import { Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, of, ReplaySubject } from 'rxjs';
-import { map, catchError, shareReplay } from 'rxjs/operators';
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -11,40 +10,28 @@ export class UserInfoService {
 
   private userSignal = signal<any>({});
   private routesSignal = signal<any[]>([]);
-  private loggedInSubject = new ReplaySubject<boolean>(1);
-  private checked = false;
 
-  constructor(private http: HttpClient) { }
-
-  isLoggedIn(): Observable<boolean> {
-    if (this.checked) {
-      this.checked = true;
-      return this.loggedInSubject.asObservable();
+  constructor(private http: HttpClient) {
+    const savedUser = localStorage.getItem('user');
+    if (savedUser) {
+      this.userSignal.set(JSON.parse(savedUser));
     }
-    
-    const stored = localStorage.getItem('isLoggedIn');
-    if (stored === 'true') {
-      this.loggedInSubject.next(true);
-      return this.loggedInSubject.asObservable();
+    const savedRoutes = localStorage.getItem('routes');
+    if (savedRoutes) {
+      this.routesSignal.set(JSON.parse(savedRoutes));
     }
-    return this.http.post<boolean>(`${this.baseUrl}/auth/check`, {}, { withCredentials: true }).pipe(
-      map(() => {
-        localStorage.setItem('isLoggedIn', 'true');
-        this.loggedInSubject.next(true);
-        return true;
-      }),
-      catchError(() => {
-        localStorage.removeItem('isLoggedIn');
-        this.loggedInSubject.next(false);
-        return of(false);
-      }),
-      shareReplay(1)
-    );
   }
+
   getUserSignal() { return this.userSignal; }
-  setUser(data: any) { this.userSignal.set(data); }
+  setUser(data: any) { 
+    this.userSignal.set(data); 
+    localStorage.setItem('user', JSON.stringify(data));
+  }
   getRoutesSignal() { return this.routesSignal; }
-  setRoutes(data: any[]) { this.routesSignal.set(data); }
+  setRoutes(data: any[]) { 
+    this.routesSignal.set(data); 
+    localStorage.setItem('routes', JSON.stringify(data));
+  }
 
   getUserInfo(): Observable<any> {
     return this.http.get(`${this.baseUrl}/api/users/get`, { withCredentials: true });

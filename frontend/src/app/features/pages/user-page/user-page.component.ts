@@ -1,6 +1,6 @@
 import { Component, inject } from '@angular/core';
-import { UserInfoComponent } from './user-info/user-info.component';
-import { UserPreferencesComponent } from './user-preferences/user-preferences.component';
+import { UserInfoComponent } from '../../components/user-components/user-info/user-info.component';
+import { UserPreferencesComponent } from '../../components/user-components/user-preferences/user-preferences.component';
 import { TranslationService } from '../../../services/translation.service';
 
 @Component({
