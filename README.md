@@ -22,16 +22,18 @@ La motivación surge de la necesidad de soluciones digitales para movilidad sost
 ## Instalación y Configuración
 1. **Clona el repositorio**: `git clone https://github.com/IHoracio/TFG-RouteMaster.git`
 
-2. **Backend (Spring Boot)**:
+2. **Moverte al diectorio creado**: `cd TFG-RouteMaster`
+
+3. **Backend (Spring Boot)**:
    - Configura MySQL local o AWS RDS.
    - Ejecuta: `mvn spring-boot:run`
 
-3. **Frontend (Angular)**:
+4. **Frontend (Angular)**:
    - Instala dependencias: `npm install`
    - Ejecuta: `ng serve`
    - Abre en `http://localhost:4200`
 
-4. **APIs**: Obtén claves de Google y configúrala en `backend/src/main/resources/application.properties` dentro del backend y `frontend/src/environments/environment.ts` en el frontend.
+5. **APIs**: Obtén claves de Google y configúrala en `backend/src/main/resources/application.properties` dentro del backend y `frontend/src/environments/environment.ts` en el frontend.
    
    Tienes de ejemplo el `backend/src/main/resources/application-example.properties` y `frontend/src/environments/environment-example.ts`
 
