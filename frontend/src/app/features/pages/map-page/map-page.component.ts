@@ -6,13 +6,14 @@ import { MapCommunicationService } from '../../../services/map/map-communication
 import { environment } from '../../../../environments/environment';
 import { Coords } from '../../../Dto/maps-dtos';
 import { CommonModule } from '@angular/common';
-import { WeatherOverlayHostComponent } from './weather-overlay/weather-overlay-host/weather-overlay-host.component';
 import { WeatherData } from '../../../Dto/weather-dtos';
 import { GasStation } from '../../../Dto/gas-station';
 import { GasStationSelectionService } from '../../../services/user-page/gas-station-selection/gas-station-selection.service';
 import { TranslationService } from '../../../services/translation.service';
 import { UserInfoService } from '../../../services/user-page/user-info.service';
 import { UserPreferencesService } from '../../../services/user-page/user-preferences.service';
+import { WeatherOverlayHostComponent } from '../../components/map-components/weather-overlay/weather-overlay-host/weather-overlay-host.component';
+import { AuthGuard } from '../../../guards/auth.guard';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -49,7 +50,7 @@ export class MapPageComponent implements OnDestroy, AfterViewInit {
     private mapComm: MapCommunicationService,
     private gasStationSelectionService: GasStationSelectionService,
     protected translation: TranslationService,
-    private userInfo: UserInfoService,
+    private authGuard: AuthGuard,
     private userPreferences: UserPreferencesService
   ) {
     effect(() => {
@@ -123,7 +124,7 @@ export class MapPageComponent implements OnDestroy, AfterViewInit {
   }
 
   private checkUserPreferences(): void {
-    this.userInfo.isLoggedIn().subscribe(logged => {
+    this.authGuard.isLoggedIn().subscribe(logged => {
       if (logged) {
         this.userPreferences.getUserPreferences().subscribe(pref => {
           const mapView = pref.mapView;

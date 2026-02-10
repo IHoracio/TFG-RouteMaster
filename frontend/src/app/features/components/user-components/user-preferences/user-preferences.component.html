@@ -1,0 +1,29 @@
+<div class="user-preferences">
+  <h2>{{ translation.translate('preferences.title') }}</h2>
+
+  <div class="collapsible">
+    <h3 (click)="toggleGeneric()">{{ translation.translate('preferences.generic') }}</h3>
+    @if (showGeneric()) {
+      <app-generic-preferences></app-generic-preferences>
+    }
+  </div>
+
+  <div class="collapsible">
+    <h3 (click)="toggleVehicle()">{{ translation.translate('preferences.vehicle') }}</h3>
+    @if (showVehicle()) {
+      <app-vehicle-preferences></app-vehicle-preferences>
+    }
+  </div>
+
+  <div class="collapsible">
+    <h3 (click)="toggleGasStations()">{{ translation.translate('preferences.gasStations') }}</h3>
+    @if (showGasStations()) {
+      <app-gas-stations-preferences></app-gas-stations-preferences>
+    }
+  </div>
+
+  <div class="buttons">
+    <button type="button" (click)="savePreferences()">{{ translation.translate('preferences.save') }}</button>
+    <button type="button" (click)="resetPreferences()">{{ translation.translate('preferences.reset') }}</button>
+  </div>
+</div>

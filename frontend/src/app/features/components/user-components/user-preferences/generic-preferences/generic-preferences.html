@@ -1,0 +1,28 @@
+<div class="generic-preferences">
+  <div class="form-group">
+    <label for="mapType">{{ translation.translate('preferences.mapType') }}</label>
+    <select id="mapType" [value]="userPreferencesService.getUserPreferencesSignal()().mapView" (change)="setMapType($event)">
+      @for (option of userPreferencesService.getMapTypeOptionsSignal()(); track $index) {
+      <option [value]="option">{{ translation.translate('mapTypeOptions.' + option) }}</option>
+      }
+    </select>
+  </div>
+
+  <div class="form-group">
+    <label for="theme">{{ translation.translate('preferences.theme') }}</label>
+    <select id="theme" [value]="userPreferencesService.getThemeLanguageSignal()().theme" (change)="setTheme($event)">
+      @for (option of userPreferencesService.getThemeOptionsSignal()(); track $index) {
+      <option [value]="option">{{ translation.translate('themeOptions.' + option) }}</option>
+      }
+    </select>
+  </div>
+
+  <div class="form-group">
+    <label for="language">{{ translation.translate('preferences.language') }}</label>
+    <select id="language" [value]="userPreferencesService.getThemeLanguageSignal()().language" (change)="setLanguage($event)">
+      @for (option of userPreferencesService.getLanguageOptionsSignal()(); track $index) {
+      <option [value]="option">{{ translation.translate('languages.' + option) }}</option>
+      }
+    </select>
+  </div>
+</div>

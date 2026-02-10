@@ -25,4 +25,11 @@ export class AuthGuard implements CanActivate {
 
     }
 
+    isLoggedIn(): Observable<boolean> {
+        return this.http.post(`${this.baseUrl}/auth/check`, {}, { withCredentials: true }).pipe(
+            map(() => true),
+            catchError(() => of(false))
+        );
+    }
+
 }
