@@ -6,6 +6,7 @@ import { UserLoginDTO } from '../../Dto/user-dtos';
 import { UserService } from '../../services/user/user.service';
 import { AuthService } from '../../services/auth/auth-service.service';
 import { TranslationService } from '../../services/translation.service';
+import { UserDataService } from '../../services/singleton/user-data.service';
 
 @Component({
   selector: 'app-login',
@@ -16,6 +17,7 @@ import { TranslationService } from '../../services/translation.service';
 export class LoginComponent {
 
   translation = inject(TranslationService);
+  userDataService = inject(UserDataService);
 
   form: FormGroup;
   userLogin: UserLoginDTO = {
@@ -45,9 +47,9 @@ export class LoginComponent {
       this.userLogin.user = this.user?.value
       this.userLogin.password = this.password?.value
       this.authService.loginUser(this.userLogin).subscribe({
-        next: user => {
-          console.log('Login component: login successful');
+        next: () => {
           this.authService.sendUserSession(true);
+          this.userDataService.loadInitialData();
           this.router.navigate(['/']);
       }, error: () => {
           this.error = "Ha occurido un error con los datos introducidos.";
