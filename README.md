@@ -46,4 +46,4 @@ La motivación surge de la necesidad de soluciones digitales para movilidad sost
 Este proyecto es para fines educativos.
 
 ---
-**Proyecto desarrollado inicialmente en equipo (4 personas, incluyéndome) durante mi formacion en Metrica, desde inicios de diciembre de 2025 hasta el 20 de enero de 2026, y continuado de forma individual para el TFG.**  
+**Proyecto desarrollado inicialmente en equipo (4 personas, incluyéndome) durante mi formacion en Metrica, una duracion de mes y medio, y continuado de forma individual para el TFG, cumpliendo los siguientes nuevos objetivos [Backlog Sprint](https://github.com/users/IHoracio/projects/2).**  
