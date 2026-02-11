@@ -18,7 +18,7 @@ export class GasStationsPreferencesComponent {
   gasStationSelectionService = inject(GasStationSelectionService);
   translation = inject(TranslationService);
 
-  selectedStation = this.gasStationSelectionService.selectedStation;
+  selectedGasStation = signal<GasStation | null>(null);
   favoriteGasStations = this.userPreferencesService.getFavoriteGasStationsSignal();
   searchAddress = signal<string>('');
   searchResults = signal<GasStation[]>([]);
@@ -48,6 +48,10 @@ export class GasStationsPreferencesComponent {
     effect(() => {
       this.brandSearch();
       this.showBrandDropdown.set(this.brandSearch().length > 0);
+    });
+
+    effect(() => {
+      this.gasStationSelectionService.selectedStation.set(this.selectedGasStation());
     });
   }
 
@@ -91,7 +95,7 @@ export class GasStationsPreferencesComponent {
     this.gasStationService.getGasStationFromDirectionInRadius(normalized, this.userPreferencesService.getUserPreferencesSignal()().radioKm || 0).subscribe({
       next: (results) => {
         this.searchResults.set(results || []);
-        this.selectedStation.set(null);
+        this.selectedGasStation.set(null);
         this.isLoading.set(false);
       },
       error: () => {
@@ -102,12 +106,11 @@ export class GasStationsPreferencesComponent {
   }
 
   toggleSelection(station: GasStation): void {
-    const key = `${station.nombreEstacion} - ${station.direccion}`;
-    this.selectedStation.set(this.selectedStation() === key ? null : key);
+    this.selectedGasStation.set(this.selectedGasStation() === station ? null : station);
   }
 
   setSelectedStation(station: GasStation | FavouriteGasStation): void {
-    this.selectedStation.set(`${station.nombreEstacion} - ${station.direccion}`);
+    this.selectedGasStation.set(station);
   }
 
   setAlias(event: Event): void {
@@ -115,8 +118,8 @@ export class GasStationsPreferencesComponent {
   }
 
   addSelectedGasStations(): void {
-    if (this.selectedStation() && this.alias().trim()) {
-      const station = this.searchResults().find(s => `${s.nombreEstacion} - ${s.direccion}` === this.selectedStation());
+    if (this.selectedGasStation() && this.alias().trim()) {
+      const station = this.selectedGasStation();
       if (station && !this.isFavorite(station)) {
         const alias = this.alias();
         if (this.favoriteGasStations().some(f => f.alias === alias)) {
@@ -126,7 +129,7 @@ export class GasStationsPreferencesComponent {
         const favorite: FavouriteGasStation = { ...station, alias };
         this.favoriteGasStations.update(stations => [...stations, favorite]);
         this.alias.set('');
-        this.selectedStation.set(null);
+        this.selectedGasStation.set(null);
       }
     }
   }

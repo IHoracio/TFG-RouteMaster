@@ -20,15 +20,15 @@ export class SearchBarService {
     const observables = [
       this.saveCoordinates(routeFormResponse),
       this.saveWaypointCoordinates(routeFormResponse),
-      this.saveGasStationsCoordinates(routeFormResponse, preferredBrands, fuelType, maxPrice, radioKm),
+      this.saveGasStations(routeFormResponse, preferredBrands, fuelType, maxPrice, radioKm),
       this.saveWeatherRoute(routeFormResponse)
     ];
     return forkJoin(observables).pipe(
       map((results) => {
-        const [coordsRoute, coordsWaypoints, coordsGas, weather] = results as [Coords[], Coords[], Coords[], WeatherData[]];
+        const [coordsRoute, coordsWaypoints, gasStations, weather] = results as [Coords[], Coords[], GasStation[], WeatherData[]];
         this.giveCoords(coordsRoute);
         this.giveWaypointCoords(coordsWaypoints);
-        this.giveGasStationCoords(coordsGas);
+        this.giveGasStations(gasStations);
         this.giveWeatherCoords(weather);
       })
     );
@@ -46,31 +46,19 @@ export class SearchBarService {
     );
   }
 
-  saveGasStationsCoordinates(routeFormResponse: RouteFormResponse, preferredBrands: string[], fuelType: string, maxPrice: number, radioKm: number): Observable<Coords[]> {
+  saveGasStations(routeFormResponse: RouteFormResponse, preferredBrands: string[], fuelType: string, maxPrice: number, radioKm: number): Observable<GasStation[]> {
     return this.authGuard.isLoggedIn().pipe(
-      switchMap(logged => logged ? this.getFilteredGasStationCoords(routeFormResponse, preferredBrands, fuelType, maxPrice, radioKm) : this.getBasicGasStationCoords(routeFormResponse))
-    );
-  }
-
-  private getFilteredGasStationCoords(routeFormResponse: RouteFormResponse, preferredBrands: string[], fuelType: string, maxPrice: number, radioKm: number): Observable<Coords[]> {
-    return this.routeService.calculateGasStations(routeFormResponse).pipe(
-      switchMap(coordsStr => {
-        const coords: { lat: number, lng: number }[] = JSON.parse(coordsStr);
-        const observables = coords.map(coord => this.routeService.getGasStationsByCoords(coord.lat, coord.lng, radioKm));
-        return forkJoin(observables).pipe(
-          map(results => {
-            const allStations = results.flat();
-            const filtered = this.filterGasStations(allStations, preferredBrands, fuelType, maxPrice);
-            return filtered.map(station => ({ lat: station.latitud, lng: station.longitud }));
+      switchMap(logged => {
+        return this.routeService.calculateGasStations(routeFormResponse).pipe(
+          map(data => {
+            let gasStations: GasStation[] = JSON.parse(data);
+            if (logged) {
+              gasStations = this.filterGasStations(gasStations, preferredBrands, fuelType, maxPrice);
+            }
+            return gasStations;
           })
         );
       })
-    );
-  }
-
-  private getBasicGasStationCoords(routeFormResponse: RouteFormResponse): Observable<Coords[]> {
-    return this.routeService.calculateGasStations(routeFormResponse).pipe(
-      map(data => JSON.parse(data) as Coords[])
     );
   }
 
@@ -121,8 +109,8 @@ export class SearchBarService {
     this.mapCommunication.sendPoints(coords);
   }
 
-  giveGasStationCoords(coords: Coords[]) {
-    this.mapCommunication.sendGasStations(coords);
+  giveGasStations(gasStations: GasStation[]) {
+    this.mapCommunication.sendGasStations(gasStations);
   }
 
   giveWeatherCoords(weather: WeatherData[]) {

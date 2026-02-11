@@ -33,7 +33,6 @@ export class SearchBarComponent implements OnInit {
 
   favouriteGasStations = signal<FavouriteGasStation[]>([]);
   savedRoute = signal<SavedRoute[]>([]);
-  filteredGasStations = signal<GasStation[]>([]);
   preferredBrands: string[] = [];
   fuelType: string = 'ALL';
   maxPrice: number = 0;

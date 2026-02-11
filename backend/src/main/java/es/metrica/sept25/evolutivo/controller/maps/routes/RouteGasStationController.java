@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import es.metrica.sept25.evolutivo.domain.dto.maps.routes.Coords;
 import es.metrica.sept25.evolutivo.domain.dto.maps.routes.RouteGroup;
+import es.metrica.sept25.evolutivo.entity.gasolinera.Gasolinera;
 import es.metrica.sept25.evolutivo.enums.EmissionType;
 import es.metrica.sept25.evolutivo.service.maps.routes.RoutesService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -28,7 +29,7 @@ public class RouteGasStationController {
 	private RoutesService routesService;
 
 	@Operation(
-			summary = "Lista de coordenadas de las gasolineras en un radio de los pasos de una ruta",
+			summary = "Lista de las gasolineras en un radio de los pasos de una ruta",
 			description = "Devuelve una lista de coordenadas para cada uno de las gasolineras encontradas"
 					+ "un radio de cada punto de la ruta.")
 	@ApiResponses(value = {
@@ -36,7 +37,7 @@ public class RouteGasStationController {
 			@ApiResponse(responseCode = "400", description = "Solicitud errónea: no se pudieron calcular los pasos de la ruta.")
 	})
 	@GetMapping("/api/routes/gasStations")
-	public ResponseEntity<List<Coords>> getGasolineras(
+	public ResponseEntity<List<Gasolinera>> getGasolineras(
 			@Parameter(example = "El Vellon") @RequestParam(required = true) String origin,
 			@Parameter(example = "El Molar") @RequestParam(required = true) String destination,
 			@RequestParam(required = false, defaultValue = "") List<String> waypoints,
@@ -54,8 +55,8 @@ public class RouteGasStationController {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 
-		List<Coords> coordsForStations = routesService.getGasStationsCoordsForRoute(routeGroupOpt.get(), radius);
+		List<Gasolinera> gasStations = routesService.getGasStationsCoordsForRoute(routeGroupOpt.get(), radius);
 
-		return new ResponseEntity<>(coordsForStations, HttpStatus.OK);
+		return new ResponseEntity<>(gasStations, HttpStatus.OK);
 	}
 }
