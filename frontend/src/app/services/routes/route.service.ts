@@ -4,7 +4,6 @@ import { Observable } from 'rxjs';
 import { HttpParams } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
 import { RouteFormResponse } from '../../Dto/route-form-response';
-import { Coords, RouteGroupResponse } from '../../Dto/maps-dtos';
 import { GasStation } from '../../Dto/gas-station';
 
 
