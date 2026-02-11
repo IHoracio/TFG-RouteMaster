@@ -32,6 +32,7 @@ import es.metrica.sept25.evolutivo.domain.dto.weather.Dia;
 import es.metrica.sept25.evolutivo.domain.dto.weather.EstadoCielo;
 import es.metrica.sept25.evolutivo.domain.dto.weather.Temperatura;
 import es.metrica.sept25.evolutivo.domain.dto.weather.Weather;
+import es.metrica.sept25.evolutivo.entity.gasolinera.Gasolinera;
 import es.metrica.sept25.evolutivo.enums.EmissionType;
 import es.metrica.sept25.evolutivo.service.gasolineras.GasolineraService;
 import es.metrica.sept25.evolutivo.service.ine.INEService;
@@ -335,7 +336,7 @@ public class RoutesServiceImpl implements RoutesService {
 	}
 	
 	@Override
-	public List<Coords> getGasStationsCoordsForRoute(RouteGroup routeGroup, Long radius) {
+	public List<Gasolinera> getGasStationsCoordsForRoute(RouteGroup routeGroup, Long radius) {
 		log.info("[routes-service] [" + LocalDateTime.now().toString() + "] "
 				+ "Attempting to extract coordinates for all gas stations in the route's radius: " 
 				+ radius + ".");
@@ -345,12 +346,11 @@ public class RoutesServiceImpl implements RoutesService {
 	        return List.of();
 	    }
 		
-	    List<Coords> stationsForRoute = sampledRoutePoints.stream()
+	    List<Gasolinera> stationsForRoute = sampledRoutePoints.stream()
 	    	    .flatMap(point -> gasolineraService
 	    	                        .getGasolinerasInRadiusCoords(point.getLat(), point.getLng(), radius)
 	    	                        .stream()
 	    	    )
-	    	    .map(station -> new Coords(station.getLatitud(), station.getLongitud()))
 	    	    .distinct()
 	    	    .collect(Collectors.toList());
 		

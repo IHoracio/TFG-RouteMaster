@@ -52,13 +52,13 @@
       @if (isFavorite(station)) {
       <li class="added-station">{{ station.nombreEstacion }} - {{ station.direccion }} <button type="button" class="btn" (click)="removeFavoriteGasStation(station)">{{ translation.translate('preferences.remove') }}</button></li>
       } @else {
-      <li (click)="toggleSelection(station)" [class.selected]="selectedStation() === station.nombreEstacion + ' - ' + station.direccion" class="clickable-station">{{ station.nombreEstacion }} - {{ station.direccion }}</li>
+      <li (click)="toggleSelection(station)" [class.selected]="selectedGasStation() === station" class="clickable-station">{{ station.nombreEstacion }} - {{ station.direccion }}</li>
       }
       }
     </ul>
     <div class="add-favorite-container">
       <input type="text" [value]="alias()" (input)="setAlias($event)" placeholder="{{ translation.translate('preferences.alias') }}">
-      <button type="button" class="btn" (click)="addSelectedGasStations()" [disabled]="!selectedStation() || !alias().trim()">{{ translation.translate('preferences.addSelected') }}</button>
+      <button type="button" class="btn" (click)="addSelectedGasStations()" [disabled]="!selectedGasStation() || !alias().trim()">{{ translation.translate('preferences.addSelected') }}</button>
     </div>
   </div>
   } @else if (!isLoading() && hasSearched() && searchResults().length === 0) {
@@ -69,7 +69,7 @@
 
   @if (userPreferencesService.getFavoriteGasStationsSignal()().length > 0 || searchResults().length > 0) {
   @if (allStations().length <= 50) {
-    <app-map-page [showWeather]="false" [showControls]="false" [gasStations]="allStations()" [selectedStation]="selectedStation()" [mapType]="userPreferencesService.getUserPreferencesSignal()().mapView"></app-map-page>
+    <app-map-page [showWeather]="false" [showControls]="false" [gasStationsFromInput]="allStations()" [mapType]="userPreferencesService.getUserPreferencesSignal()().mapView"></app-map-page>
   } @else {
     <p>{{ translation.translate('preferences.tooMany') }}</p>
   }

@@ -8,11 +8,12 @@ import org.springframework.web.util.UriComponentsBuilder;
 import es.metrica.sept25.evolutivo.domain.dto.maps.routes.Coords;
 import es.metrica.sept25.evolutivo.domain.dto.maps.routes.CoordsWithWeather;
 import es.metrica.sept25.evolutivo.domain.dto.maps.routes.RouteGroup;
+import es.metrica.sept25.evolutivo.entity.gasolinera.Gasolinera;
 import es.metrica.sept25.evolutivo.enums.EmissionType;
 
 public interface RoutesService {
 
-	List<Coords> getGasStationsCoordsForRoute(RouteGroup routeGroup, Long radius);
+	List<Gasolinera> getGasStationsCoordsForRoute(RouteGroup routeGroup, Long radius);
 
 	String getUrl(List<Coords> waypoints, UriComponentsBuilder url);
 
