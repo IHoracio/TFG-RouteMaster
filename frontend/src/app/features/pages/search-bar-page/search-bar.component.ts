@@ -137,65 +137,33 @@ export class SearchBarComponent implements OnInit {
 
   submitted: boolean = false;
   onSubmit() {
-    this.searchBarService.onSubmit(this.routeFormResponse);
     this.submitted = true;
-
-    this.routeService.calculateGasStations(this.routeFormResponse).subscribe(coordsStr => {
-      const coords: { lat: number, lng: number }[] = JSON.parse(coordsStr);
-      const allStationsMap = new Map<number, GasStation>();
-      const promises = coords.map(coord =>
-        this.routeService.getGasStationsByCoords(coord.lat, coord.lng, this.radioKm).toPromise()
-      );
-      Promise.all(promises).then(results => {
-        results.forEach(stations => {
-          if (stations) {
-            stations.forEach(station => {
-              allStationsMap.set(station.idEstacion, station);
-            });
-          }
-        });
-        const allStations = Array.from(allStationsMap.values());
-        let filtered = allStations;
-
-        if (this.preferredBrands.length > 0) {
-          filtered = filtered.filter(station => 
-            this.preferredBrands.some(brand => brand.toLowerCase() === station.marca.toLowerCase())
-          );
-        }
-
-        if (this.fuelType !== 'ELECTRIC') {
-          const fuelKey = (this.fuelType === 'ALL' || this.fuelType === 'GASOLINE') ? 'Gasolina95' : 'Diesel';
-          filtered = filtered.filter(station => {
-            const price = station[fuelKey];
-            return price != null && price <= this.maxPrice;
-          });
-        }
-
-        this.filteredGasStations.set(filtered);
-      }).catch(err => {
-        console.error('Error fetching gas stations:', err);
-      });
+    this.searchBarService.onSubmit(this.routeFormResponse, this.preferredBrands, this.fuelType, this.maxPrice, this.radioKm).subscribe({
+      next: () => {
+      },
+      error: (err) => {
+        console.error('Error en onSubmit:', err);
+      }
     });
   }
 
   trackByIndex(index: number) {
-      return index;
-    }
+    return index;
+  }
 
   successfulMessage: string = "";
-    errorMessage: string = "";
-    saveRoute() {
-      this.searchBarService.saveFavouriteRoute(this.routeAlias, this.routeFormResponse)
-        .subscribe({
-          next: (response) => {
-            this.successfulMessage = this.translation.translate('search.routeSaved');
-            this.errorMessage = "";
-            console.log(response);
-          }, error: (err) => {
-            this.errorMessage = this.translation.translate('search.saveError');
-            this.successfulMessage = "";
-            console.log(err);
-          },
-        });
-    }
+  errorMessage: string = "";
+  saveRoute() {
+    this.searchBarService.saveFavouriteRoute(this.routeAlias, this.routeFormResponse)
+      .subscribe({
+        next: (response) => {
+          this.successfulMessage = this.translation.translate('search.routeSaved');
+          this.errorMessage = "";
+        }, error: (err) => {
+          this.errorMessage = this.translation.translate('search.saveError');
+          this.successfulMessage = "";
+          console.log(err);
+        },
+      });
   }
+}

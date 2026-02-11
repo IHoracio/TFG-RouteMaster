@@ -324,7 +324,7 @@ export class MapPageComponent implements OnDestroy, AfterViewInit {
           title: `${station.nombreEstacion} - ${station.direccion}`
         });
 
-        marker.addListener('click', () => {
+        marker.addListener('gmp-click', () => {
           this.selectedGasStation.set(station);
           this.gasStationSelectionService.selectedStation.set(`${station.nombreEstacion} - ${station.direccion}`);
         });
