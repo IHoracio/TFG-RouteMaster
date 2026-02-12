@@ -16,11 +16,11 @@ export class SearchBarService {
 
   constructor(private routeService: RouteService, private mapCommunication: MapCommunicationService, private userService: UserService, private authGuard: AuthGuard) { }
 
-  onSubmit(routeFormResponse: RouteFormResponse, preferredBrands: string[], fuelType: string, maxPrice: number, radioKm: number): Observable<void> {
+  onSubmit(routeFormResponse: RouteFormResponse): Observable<GasStation[]> {
     const observables = [
       this.saveCoordinates(routeFormResponse),
       this.saveWaypointCoordinates(routeFormResponse),
-      this.saveGasStations(routeFormResponse, preferredBrands, fuelType, maxPrice, radioKm),
+      this.saveGasStations(routeFormResponse),
       this.saveWeatherRoute(routeFormResponse)
     ];
     return forkJoin(observables).pipe(
@@ -28,8 +28,8 @@ export class SearchBarService {
         const [coordsRoute, coordsWaypoints, gasStations, weather] = results as [Coords[], Coords[], GasStation[], WeatherData[]];
         this.giveCoords(coordsRoute);
         this.giveWaypointCoords(coordsWaypoints);
-        this.giveGasStations(gasStations);
         this.giveWeatherCoords(weather);
+        return gasStations;
       })
     );
   }
@@ -46,37 +46,10 @@ export class SearchBarService {
     );
   }
 
-  saveGasStations(routeFormResponse: RouteFormResponse, preferredBrands: string[], fuelType: string, maxPrice: number, radioKm: number): Observable<GasStation[]> {
-    return this.authGuard.isLoggedIn().pipe(
-      switchMap(logged => {
-        return this.routeService.calculateGasStations(routeFormResponse).pipe(
-          map(data => {
-            let gasStations: GasStation[] = JSON.parse(data);
-            if (logged) {
-              gasStations = this.filterGasStations(gasStations, preferredBrands, fuelType, maxPrice);
-            }
-            return gasStations;
-          })
-        );
-      })
+  saveGasStations(routeFormResponse: RouteFormResponse): Observable<GasStation[]> {
+    return this.routeService.calculateGasStations(routeFormResponse).pipe(
+      map(data => JSON.parse(data) as GasStation[])
     );
-  }
-
-  private filterGasStations(stations: GasStation[], preferredBrands: string[], fuelType: string, maxPrice: number): GasStation[] {
-    let filtered = stations;
-    if (preferredBrands.length > 0) {
-      filtered = filtered.filter(station =>
-        preferredBrands.some(brand => brand.toLowerCase() === station.marca.toLowerCase())
-      );
-    }
-    if (fuelType !== 'ELECTRIC') {
-      const fuelKey = (fuelType === 'ALL' || fuelType === 'GASOLINE') ? 'Gasolina95' : 'Diesel';
-      filtered = filtered.filter(station => {
-        const price = station[fuelKey];
-        return price != null && price <= maxPrice;
-      });
-    }
-    return filtered;
   }
 
   saveWeatherRoute(routeFormResponse: RouteFormResponse): Observable<WeatherData[]> {
