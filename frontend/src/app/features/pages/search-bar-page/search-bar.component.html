@@ -72,9 +72,13 @@
         }
         @if(waypointTypes[i]==="gas"){
         <select [name]="'waypoint' + i" [(ngModel)]="routeFormResponse.waypoints[i]">
+          @if (isLoggedIn()) {
           <option *ngFor="let gasStation of favouriteGasStations()" [value]="gasStation.direccion">
             {{ gasStation.alias }} — {{ gasStation.marca }}
           </option>
+          } @else {
+          <option disabled>{{ translation.translate('search.loginToSeeGas') }}</option>
+          }
         </select>
         }
 
@@ -134,9 +138,13 @@
       <p>
         <select name="gasStation" id="gasStation" [(ngModel)]="routeFormResponse.destination" required>
           <option value="">{{ translation.translate('search.chooseGas') }}</option>
+          @if (isLoggedIn()) {
           <option *ngFor="let gasStation of favouriteGasStations()" [value]="gasStation.direccion">
             {{ gasStation.alias }} — {{ gasStation.marca }}
           </option>
+          } @else {
+          <option disabled>{{ translation.translate('search.loginToSeeGas') }}</option>
+          }
         </select>
       </p>
       }
@@ -144,6 +152,7 @@
       <p>
         <select name="savedRoute" id="savedRoute" [(ngModel)]="selectedRouteOption" required="">
           <option [ngValue]=""> {{ translation.translate('search.chooseRoute') }}</option>
+          @if (isLoggedIn()) {
           <option (click)="savedRouteSelected()" *ngFor="let route of savedRoute()"
             [ngValue]="{ origin: route.points[0].address, destination: route.points[1].address}">
             {{ route.name }}:
@@ -151,6 +160,9 @@
             —
             {{route.points[1].address}}
           </option>
+          } @else {
+          <option disabled>{{ translation.translate('search.loginToSeeRoutes') }}</option>
+          }
         </select>
       </p>
       }
@@ -173,6 +185,21 @@
         {{ errorMessage }}
       </div>
     </form>
+    <details class="filter-dropdown">
+      <summary>{{ translation.translate('search.gasFilters') }}</summary>
+      <div class="filter-buttons">
+        <button (click)="toggleFilterByCheapest()" [class.active]="filterByCheapest()">{{ translation.translate('search.cheapest') }}</button>
+        @if(isLoggedIn()) {
+        <button (click)="toggleFilterByBrands()" [class.active]="filterByBrands()">{{ translation.translate('search.favoriteBrands') }}</button>
+        <button (click)="toggleFilterByMaxPrice()" [class.active]="filterByMaxPrice()">{{ translation.translate('search.maxPrice') }}</button>
+        } @else {
+        <button (click)="showLoginPrompt.set(true)">{{ translation.translate('search.favoriteBrands') }}</button>
+        <button (click)="showLoginPrompt.set(true)">{{ translation.translate('search.maxPrice') }}</button>
+        }
+      </div>
+    </details>
+    <app-login-prompt [show]="showLoginPrompt()" (close)="showLoginPrompt.set(false)"></app-login-prompt>
+
     <app-map-page></app-map-page>
   </section>
 </div>

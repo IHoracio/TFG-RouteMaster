@@ -1,4 +1,4 @@
-import { Component, inject, signal, OnInit } from '@angular/core';
+import { Component, inject, signal, OnInit, computed, effect } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouteFormResponse } from '../../../Dto/route-form-response';
 import { MapPageComponent } from '../map-page/map-page.component';
@@ -16,16 +16,24 @@ import { UserPreferencesService } from '../../../services/user-page/user-prefere
 import { of } from 'rxjs';
 import { AuthService } from '../../../services/auth/auth-service.service';
 import { AuthGuard } from '../../../guards/auth.guard';
+import { MapCommunicationService } from '../../../services/map/map-communication.service';
+import { LoginPromptComponent } from '../../components/search-bar-components/login-prompt/login-prompt.component';
 
 @Component({
   selector: 'app-search-bar',
-  imports: [FormsModule, MapPageComponent, NgFor, KeyValuePipe, NgIf, NgClass],
+  imports: [FormsModule, MapPageComponent, NgFor, KeyValuePipe, NgIf, NgClass, LoginPromptComponent],
   templateUrl: './search-bar.component.html',
   styleUrl: './search-bar.component.css'
 })
 export class SearchBarComponent implements OnInit {
 
   isLoggedIn = signal<boolean>(false);
+  showLoginPrompt = signal(false);
+
+  allGasStations = signal<GasStation[]>([]);
+  filterByBrands = signal<boolean>(false);
+  filterByCheapest = signal<boolean>(false);
+  filterByMaxPrice = signal<boolean>(false);
 
   translation = inject(TranslationService);
   userInfo = inject(UserInfoService);
@@ -70,7 +78,7 @@ export class SearchBarComponent implements OnInit {
 
   activeTab: string = 'destination';
 
-  constructor(private searchBarService: SearchBarService, private routeService: RouteService, private authService: AuthService, private authGuard: AuthGuard) { }
+  constructor(private searchBarService: SearchBarService, private routeService: RouteService, private authService: AuthService, private authGuard: AuthGuard, private mapCommunication: MapCommunicationService) { }
 
   ngOnInit(): void {
     this.authGuard.isLoggedIn().subscribe(logged => {
@@ -107,17 +115,21 @@ export class SearchBarComponent implements OnInit {
         this.routeFormResponse.radioKm = 2;
       }
     });
+    effect(() => {
+      this.mapCommunication.sendGasStations(this.filteredGasStations());
+    });
   }
 
   setTab(tab: string) {
     if (tab === 'gas' || tab === 'route') {
       if (!this.isLoggedIn()) {
-        alert(this.translation.translate('auth.loginRequired'));
+        this.showLoginPrompt.set(true);
         return;
       }
     }
     this.activeTab = tab;
   }
+
 
   addWaypoint() {
     this.routeFormResponse.waypoints.push('');
@@ -137,8 +149,9 @@ export class SearchBarComponent implements OnInit {
   submitted: boolean = false;
   onSubmit() {
     this.submitted = true;
-    this.searchBarService.onSubmit(this.routeFormResponse, this.preferredBrands, this.fuelType, this.maxPrice, this.radioKm).subscribe({
-      next: () => {
+    this.searchBarService.onSubmit(this.routeFormResponse).subscribe({
+      next: (gasStations) => {
+        this.allGasStations.set(gasStations);
       },
       error: (err) => {
         console.error('Error en onSubmit:', err);
@@ -146,8 +159,46 @@ export class SearchBarComponent implements OnInit {
     });
   }
 
+  filteredGasStations = computed(() => {
+    let stations = this.allGasStations();
+    if (this.isLoggedIn() && this.filterByBrands()) {
+      stations = stations.filter(station =>
+        this.preferredBrands.some(brand => brand.toLowerCase() === station.marca.toLowerCase())
+      );
+    }
+    if (this.isLoggedIn() && this.filterByCheapest()) {
+      const fuelKey = (this.fuelType === 'ALL' || this.fuelType === 'GASOLINE') ? 'Gasolina95' : 'Diesel';
+      const cheapest = stations.reduce((min, station) => {
+        const price = station[fuelKey];
+        return price != null && (min.price == null || price < min.price) ? { station, price } : min;
+      }, { station: null as GasStation | null, price: null as number | null });
+      stations = cheapest.station ? [cheapest.station] : [];
+    }
+    if (this.isLoggedIn() && this.filterByMaxPrice()) {
+      const fuelKey = (this.fuelType === 'ALL' || this.fuelType === 'GASOLINE') ? 'Gasolina95' : 'Diesel';
+      stations = stations.filter(station => {
+        const price = station[fuelKey];
+        return price != null && price <= this.maxPrice;
+      });
+    }
+    return stations;
+  });
+
+
   trackByIndex(index: number) {
     return index;
+  }
+
+  toggleFilterByBrands() {
+    this.filterByBrands.update(v => !v);
+  }
+
+  toggleFilterByCheapest() {
+    this.filterByCheapest.update(v => !v);
+  }
+
+  toggleFilterByMaxPrice() {
+    this.filterByMaxPrice.update(v => !v);
   }
 
   successfulMessage: string = "";
@@ -165,4 +216,5 @@ export class SearchBarComponent implements OnInit {
         },
       });
   }
+
 }

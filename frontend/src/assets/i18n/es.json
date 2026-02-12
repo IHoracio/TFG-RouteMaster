@@ -4,6 +4,9 @@
         "logout": "Cerrar Sesión",
         "loginRequired": "Debes iniciar sesión para acceder a esta función."
     },
+    "common": {
+        "close": "Cerrar"
+    },
     "header": {
         "login": "Iniciar sesión",
         "logout": "Cerrar sesión",
@@ -48,7 +51,16 @@
         "routeAlias": "Alias de la ruta",
         "routeAliasPlaceholder": "Alias de la ruta",
         "routeSaved": "Se ha guardado la ruta como favorita.",
-        "saveError": "Ha ocurrido un error."
+        "saveError": "Ha ocurrido un error.",
+        "needLogin": "Debes iniciar sesión para acceder a esta función.",
+        "loginToSeeRoutes": "Inicia sesión para ver rutas guardadas.",
+        "loginToSeeGas": "Inicia sesion para ver las gasolineras guardadas",
+        "loginForAdvancedFilters": "Inicia sesion para poder usar los filtros avanzados",
+        "gasFilters": "Filtros Gasolineras",
+        "cheapest": "Más barata",
+        "favoriteBrands": "Marcas favoritas",
+        "maxPrice": "Máximo precio",
+        "loginPromptMessage": "Inicia sesión para acceder a estas funciones."
     },
     "fuelTypes": {
         "GASOLINE": "Gasolina",
@@ -237,8 +249,9 @@
         "save": "Guardar Cambios",
         "reset": "Reiniciar a Por Defecto",
         "radiusInfo": "El radio en kilómetros define el área de búsqueda alrededor de la dirección especificada para encontrar gasolineras cercanas.",
-        "gasInfo": "El autocompletado solo sugiere lugares con gasolineras. Puedes ingresar cualquier dirección y aumentar el radio KM para buscar más opciones.",    "generalInfo": "Información general",
-    "generalInfoText": "El radio en km, tipo de combustible y precio máximo se usan para filtrar gasolineras en rutas."
+        "gasInfo": "El autocompletado solo sugiere lugares con gasolineras. Puedes ingresar cualquier dirección y aumentar el radio KM para buscar más opciones.",
+        "generalInfo": "Información general",
+        "generalInfoText": "El radio en km, tipo de combustible y precio máximo se usan para filtrar gasolineras en rutas."
     },
     "languages": {
         "ES": "Español",

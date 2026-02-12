@@ -4,6 +4,9 @@
         "logout": "Logout",
         "loginRequired": "You must log in to access this feature."
     },
+    "common": {
+        "close": "Close"
+    },
     "header": {
         "login": "Log in",
         "logout": "Log out",
@@ -48,7 +51,16 @@
         "routeAlias": "Route alias",
         "routeAliasPlaceholder": "Route alias",
         "routeSaved": "The route has been saved as favorite.",
-        "saveError": "An error has occurred."
+        "saveError": "An error has occurred.",
+        "needLogin": "You must log in to access this feature.",
+        "loginToSeeRoutes": "Log in to see saved routes.",
+        "loginToSeeGas": "Log in to see favorite gas stations.",
+        "loginForAdvancedFilters": "Log in to use this advanced filter.",
+        "gasFilters": "Gas Station Filters",
+        "cheapest": "Cheapest",
+        "favoriteBrands": "Favorite Brands",
+        "maxPrice": "Maximum Price",
+        "loginPromptMessage": "Log in to access these features."
     },
     "fuelTypes": {
         "GASOLINE": "Gasoline",
@@ -237,8 +249,9 @@
         "save": "Save Changes",
         "reset": "Reset to Default",
         "radiusInfo": "The radius in kilometers defines the search area around the specified address to find nearby gas stations.",
-        "gasInfo": "Autocomplete only suggests places with gas stations. You can enter any address and increase the KM radius to search for more options.",    "generalInfo": "General information",
-    "generalInfoText": "The km radius, fuel type, and maximum price are used to filter gas stations in routes."
+        "gasInfo": "Autocomplete only suggests places with gas stations. You can enter any address and increase the KM radius to search for more options.",
+        "generalInfo": "General information",
+        "generalInfoText": "The km radius, fuel type, and maximum price are used to filter gas stations in routes."
     },
     "languages": {
         "ES": "Spanish",

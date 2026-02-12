@@ -1,0 +1,10 @@
+@if (show) {
+<div class="modal-overlay" (click)="onClose()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <h3>{{ translation.translate('search.needLogin') }}</h3>
+    <p>{{ translation.translate('search.loginPromptMessage') }}</p>
+    <button (click)="goToLogin()">{{ translation.translate('auth.login') }}</button>
+    <button (click)="onClose()">{{ translation.translate('common.close') }}</button>
+  </div>
+</div>
+}
