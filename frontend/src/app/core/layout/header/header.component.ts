@@ -19,7 +19,6 @@ export class HeaderComponent implements OnInit {
   loginText = computed(() => this.translation.translate('auth.login'));
   logoutText = computed(() => this.translation.translate('auth.logout'));
   userAreaText = computed(() => this.translation.translate('header.userArea'));
-  languageText = computed(() => this.translation.translate('header.language'));
   currentLangDisplay = computed(() => this.translation.getCurrentLang());
 
   constructor(

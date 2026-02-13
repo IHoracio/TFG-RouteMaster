@@ -78,7 +78,12 @@ export class SearchBarComponent implements OnInit {
 
   activeTab: string = 'destination';
 
-  constructor(private searchBarService: SearchBarService, private routeService: RouteService, private authService: AuthService, private authGuard: AuthGuard, private mapCommunication: MapCommunicationService) { }
+  constructor(private searchBarService: SearchBarService, private routeService: RouteService, private authService: AuthService, private authGuard: AuthGuard, private mapCommunication: MapCommunicationService) {
+    effect(() => {
+      this.mapCommunication.sendGasStations(this.filteredGasStations());
+    });
+
+  }
 
   ngOnInit(): void {
     this.authGuard.isLoggedIn().subscribe(logged => {
@@ -114,9 +119,6 @@ export class SearchBarComponent implements OnInit {
         this.radioKm = 2;
         this.routeFormResponse.radioKm = 2;
       }
-    });
-    effect(() => {
-      this.mapCommunication.sendGasStations(this.filteredGasStations());
     });
   }
 

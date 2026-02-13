@@ -11,15 +11,18 @@
         "login": "Log in",
         "logout": "Log out",
         "userArea": "Personal area",
-        "language": "Language",
+        "language": "EN",
         "theme": "Theme:",
         "light": "Light",
         "dark": "Dark"
     },
     "footer": {
         "copyright": "© ",
-        "projectText": ". An interactive learning project from ",
-        "linkText": "Proyecto evolutivo"
+        "projectText": " - RouteMaster by ",
+        "linkText": "Mario Martín",
+        "logo": "RouteMaster",
+        "privacy": "Privacy",
+        "terms": "Terms"
     },
     "search": {
         "title": "Search Type",

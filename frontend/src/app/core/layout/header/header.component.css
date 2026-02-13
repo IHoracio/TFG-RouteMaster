@@ -1,18 +1,26 @@
+/* ========================================
+   HEADER
+   ======================================== */
 header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 0 30px;
-
-  position: fixed;
+  position: absolute;
   top: 0;
   left: 0;
   right: 0;
   height: 80px;
   z-index: 1000;
-
+  background: linear-gradient(to right, var(--header-gradient-start), var(--header-gradient-end));
+  transition: background-color 0.3s ease;
+  border-radius: 0 0 var(--spacing-sm) var(--spacing-sm);
+  box-shadow: var(--header-shadow);
 }
 
+/* ========================================
+   HEADER - Enlaces
+   ======================================== */
 header a {
   text-decoration: none;
   font-size: 18px;
@@ -23,10 +31,14 @@ header a:hover {
   text-decoration: none;
 }
 
+/* ========================================
+   HEADER - Logo
+   ======================================== */
 .logo {
   font-weight: bold;
   position: relative;
   transition: 0.3s ease;
+  cursor: pointer;
 }
 
 .logo::after {
@@ -42,14 +54,35 @@ header a:hover {
 }
 
 .logo:hover {
-  color: #ffffff;
-  text-shadow: 0 0 10px rgba(255, 255, 255, 0.9);
+  text-shadow: 0 0 10px rgb(255, 255, 255);
+  transform: scale(1.05);
+}
+
+::ng-deep .dark .logo:hover {
+  text-shadow: 0 0 10px rgba(231, 244, 250, 0.532);
+  transform: scale(1.05);
+}
+
+::ng-deep .dark .logo::after {
+  background: var(--text-color);
+}
+
+.logo:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+.logo:active {
+  box-shadow: none;
 }
 
 .logo a:hover::after {
   width: 100%;
 }
 
+/* ========================================
+   HEADER - Nav
+   ======================================== */
 nav {
   display: flex;
   gap: 20px;
@@ -58,11 +91,71 @@ nav {
 nav a {
   color: var(--color-title);
   padding: 6px 10px;
+  border: 1px solid rgba(100, 116, 139, 0.1);
   border-radius: 6px;
   transition: 0.3s ease;
 }
 
 nav a:hover {
-  background: rgba(255, 255, 255, 0.18);
+  background: var(--surface-color);
   backdrop-filter: blur(4px);
+  transform: scale(1.05);
+}
+
+:host-context(.dark) nav a:hover {
+  background: rgba(141, 179, 223, 0.32);
+  backdrop-filter: blur(4px);
+  transform: scale(1.05);
+}
+
+nav a:focus {
+  outline: none;
+}
+
+/* ========================================
+   HEADER - Botones
+   ======================================== */
+.lang-btn,
+.theme-btn {
+  background: transparent;
+  border: 1px solid rgba(100, 116, 139, 0.1);
+  color: var(--text-color);
+  padding: 6px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
+  font-family: var(--font-family);
+  font-size: var(--font-size-base);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.theme-btn {
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+}
+
+.theme-btn.sun {
+  background-color: rgba(15, 22, 78, 0.053);
+  box-shadow: 0 0 8px rgba(28, 39, 52, 0.3);
+}
+
+.theme-btn.moon {
+  background-color: rgba(147, 197, 253, 0.1);
+  box-shadow: 0 0 8px rgba(147, 197, 253, 0.3);
+}
+
+.lang-btn:hover,
+.theme-btn:hover {
+  background-color: var(--surface-color);
+  color: var(--primary-color);
+  transform: scale(1.05);
+}
+
+.lang-btn:focus,
+.theme-btn:focus {
+  outline: none;
 }
