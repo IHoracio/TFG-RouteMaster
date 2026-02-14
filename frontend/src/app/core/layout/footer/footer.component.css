@@ -1,3 +1,6 @@
+/* ========================================
+   FOOTER
+   ======================================== */
 footer {
   display: flex;
   justify-content: space-between;
@@ -5,7 +8,83 @@ footer {
   padding: 0 30px;
   height: 80px;
   width: 100%;
+  margin-top: 2rem;
+  background: linear-gradient(to right, var(--header-footer-gradient-start), var(--header-footer-gradient-end));
+  transition: background-color 0.3s ease;
+  border-radius: var(--spacing-sm) var(--spacing-sm) 0 0;
+  box-shadow: var(--footer-shadow);
+  z-index: 100;
 }
-footer a{
-    text-decoration: none;
+
+/* ========================================
+   FOOTER - Container
+   ======================================== */
+.container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+/* ========================================
+   FOOTER - Right
+   ======================================== */
+.footer-right {
+  display: flex;
+  align-items: left;
+}
+
+/* ========================================
+   FOOTER - Left
+   ======================================== */
+.footer-left {
+  text-align: right;
+}
+
+/* ========================================
+   FOOTER - Attribution
+   ======================================== */
+.attribution {
+  font-size: var(--font-size-base);
+  color: var(--text-secondary);
+  text-align: right;
+}
+
+.attribution a {
+  color: var(--primary-color);
+  text-decoration: none;
+  margin-left: 5px;
+}
+
+.attribution a:hover {
+  text-decoration: underline;
+  color: var(--secondary-color);
+}
+
+/* ========================================
+   FOOTER - Links
+   ======================================== */
+.footer-links {
+  display: flex;
+  gap: 15px;
+}
+
+.footer-links a {
+  color: var(--text-secondary);
+  font-size: 15px;
+  text-decoration: none;
+  transition: color 0.3s ease, text-decoration 0.3s ease;
+}
+
+.footer-links a:hover {
+  color: var(--primary-color);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+/* ========================================
+   FOOTER - Enlaces
+   ======================================== */
+footer a {
+  text-decoration: none;
 }

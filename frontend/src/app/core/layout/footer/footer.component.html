@@ -1,9 +1,17 @@
 <footer>
   <div class="container">
-    <a class="logo-font" routerLink="/">conduit</a>
-    <span class="attribution">
-      {{ translation.translate('footer.copyright') }}{{ today | date: 'yyyy' }}{{ translation.translate('footer.projectText') }}
-      <a href="https://github.com/mrs4ndman/proyecto_evolutivo_djlm">{{ translation.translate('footer.linkText') }}</a>.
-    </span>
+    <div class="footer-left">
+      <span class="attribution">
+        {{ translation.translate('footer.copyright') }}{{ today | date: 'yyyy' }}
+        <a href="https://github.com/IHoracio/TFG-RouteMaster" target="_blank">{{ translation.translate('footer.logo')
+          }}</a>
+      </span>
+    </div>
+    <div class="footer-right">
+      <div class="footer-links">
+        <a (click)="navigateToPrivacy()">{{ translation.translate('footer.privacy') }}</a>
+        <a (click)="navigateToTerms()">{{ translation.translate('footer.terms') }}</a>
+      </div>
+    </div>
   </div>
 </footer>
