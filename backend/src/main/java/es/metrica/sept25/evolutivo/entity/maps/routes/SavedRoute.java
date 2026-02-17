@@ -43,7 +43,6 @@ public class SavedRoute {
 	private boolean optimizeRoute;
 	private String language;
 	private boolean avoidTolls;
-	private EmissionType vehicleEmissionType;
 
 	public void setRouteId(Long routeId) {
 		this.routeId = routeId;
@@ -107,14 +106,6 @@ public class SavedRoute {
 
 	public void setAvoidTolls(boolean avoidTolls) {
 		this.avoidTolls = avoidTolls;
-	}
-
-	public EmissionType getVehicleEmissionType() {
-		return vehicleEmissionType;
-	}
-
-	public void setVehicleEmissionType(EmissionType vehicleEmissionType) {
-		this.vehicleEmissionType = vehicleEmissionType;
 	}
 
 	@PrePersist
