@@ -25,6 +25,7 @@ import com.google.maps.model.LatLng;
 
 import es.metrica.sept25.evolutivo.domain.dto.maps.routes.Coords;
 import es.metrica.sept25.evolutivo.domain.dto.maps.routes.CoordsWithWeather;
+import es.metrica.sept25.evolutivo.domain.dto.maps.routes.FullRouteData;
 import es.metrica.sept25.evolutivo.domain.dto.maps.routes.Leg;
 import es.metrica.sept25.evolutivo.domain.dto.maps.routes.RouteGroup;
 import es.metrica.sept25.evolutivo.domain.dto.maps.routes.Step;
@@ -71,7 +72,29 @@ public class RoutesServiceImpl implements RoutesService {
 	
 	@Autowired
 	private GeocodeService geocodeService;
-
+	
+	// Agregar al impl
+	@Override
+	public Optional<FullRouteData> getFullRouteData(String origin, String destination, List<String> waypoints,
+	                                      boolean optimizeWaypoints, boolean optimizeRoute, String language, 
+	                                      boolean avoidTolls, Long gasRadius) {
+	    Optional<RouteGroup> routeGroupOpt = getDirections(origin, destination, waypoints, optimizeWaypoints, 
+	                                                        optimizeRoute, language, avoidTolls);
+	    
+	    if (routeGroupOpt.isEmpty()) {
+	        return Optional.empty();
+	    }
+	    
+	    RouteGroup routeGroup = routeGroupOpt.get();
+	    
+	    List<Coords> polylineCoords = extractRoutePolylinePoints(routeGroup);
+	    List<Coords> legCoords = getLegCoords(routeGroup);
+	    List<Gasolinera> gasStations = getGasStationsCoordsForRoute(routeGroup, gasRadius);
+	    List<CoordsWithWeather> weatherData = getWeatherForRoute(routeGroup);
+	    
+	    return Optional.of(new FullRouteData(polylineCoords, legCoords, gasStations, weatherData));
+	}
+	
 	@Override
 	public Optional<RouteGroup> getDirections(String origin, String destination, List<String> waypoints,
 			boolean optimizeWaypoints, boolean optimizeRoute, String language, boolean avoidTolls) {

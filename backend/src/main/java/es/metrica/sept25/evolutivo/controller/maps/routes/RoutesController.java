@@ -12,8 +12,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import es.metrica.sept25.evolutivo.domain.dto.maps.routes.Coords;
+import es.metrica.sept25.evolutivo.domain.dto.maps.routes.FullRouteData;
 import es.metrica.sept25.evolutivo.domain.dto.maps.routes.RouteGroup;
-import es.metrica.sept25.evolutivo.enums.EmissionType;
 import es.metrica.sept25.evolutivo.service.maps.routes.RoutesService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -92,6 +92,34 @@ public class RoutesController {
 
 		return new ResponseEntity<>(coordsList, HttpStatus.OK);
 	}
+	
+	@Operation(
+		    summary = "Obtiene todos los datos de la ruta en una sola llamada",
+		    description = "Devuelve polilíneas, legs, gasolineras y clima para la ruta dada, llamando a Google solo una vez.")
+		@ApiResponses(value = {
+		    @ApiResponse(responseCode = "200", description = "Datos de ruta obtenidos exitosamente."),
+		    @ApiResponse(responseCode = "400", description = "Solicitud errónea.")
+		})
+		@GetMapping("/route/fullData")
+		public ResponseEntity<FullRouteData> getFullRouteData(
+		    @RequestParam(required = true, defaultValue = "El Vellon") String origin,
+		    @RequestParam(required = true, defaultValue = "El Molar") String destination,
+		    @RequestParam(required = false, defaultValue = "") List<String> waypoints,
+		    @RequestParam(required = false, defaultValue = "false") boolean optimizeWaypoints,
+		    @RequestParam(required = false, defaultValue = "false") boolean optimizeRoute,
+		    @RequestParam(required = false, defaultValue = "es") String language,
+		    @RequestParam(required = false, defaultValue = "false") boolean avoidTolls,
+		    @RequestParam(required = true, defaultValue = "1") Long gasRadius
+		) {
+		    Optional<FullRouteData> response = routesService.getFullRouteData(origin, destination, waypoints, optimizeWaypoints, 
+		                                                                       optimizeRoute, language, avoidTolls, gasRadius);
+
+		    if (response.isEmpty()) {
+		        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		    }
+
+		    return new ResponseEntity<>(response.get(), HttpStatus.OK);
+		}
 
 	@Operation(
 			summary = "Lista de coordenadas de los pasos de una ruta",
