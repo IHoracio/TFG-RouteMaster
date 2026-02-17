@@ -43,11 +43,10 @@ public class RouteWeatherController {
 			@RequestParam(required = false, defaultValue = "false") boolean optimizeWaypoints,
 			@RequestParam(required = false, defaultValue = "false") boolean optimizeRoute,
 			@RequestParam(required = false, defaultValue = "es") String language,
-			@RequestParam(required = false, defaultValue = "false") boolean avoidTolls,
-			@RequestParam(required = false, defaultValue = "C")EmissionType vehicleEmissionType
+			@RequestParam(required = false, defaultValue = "false") boolean avoidTolls
 			) {
 
-		Optional<RouteGroup> routeGroupOpt = routesService.getDirections(origin, destination, waypoints, optimizeWaypoints, optimizeRoute, language, avoidTolls, vehicleEmissionType);
+		Optional<RouteGroup> routeGroupOpt = routesService.getDirections(origin, destination, waypoints, optimizeWaypoints, optimizeRoute, language, avoidTolls);
 
 		if (routeGroupOpt.isEmpty()) {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);

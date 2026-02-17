@@ -8,6 +8,7 @@ import { Observable, forkJoin, map, switchMap } from 'rxjs';
 import { UserService } from '../user/user.service';
 import { AuthGuard } from '../../guards/auth.guard';
 import { GasStation } from '../../Dto/gas-station';
+import { FullRouteData } from '../../Dto/full-route-data';
 
 @Injectable({
   providedIn: 'root'
@@ -17,19 +18,12 @@ export class SearchBarService {
   constructor(private routeService: RouteService, private mapCommunication: MapCommunicationService, private userService: UserService, private authGuard: AuthGuard) { }
 
   onSubmit(routeFormResponse: RouteFormResponse): Observable<GasStation[]> {
-    const observables = [
-      this.saveCoordinates(routeFormResponse),
-      this.saveWaypointCoordinates(routeFormResponse),
-      this.saveGasStations(routeFormResponse),
-      this.saveWeatherRoute(routeFormResponse)
-    ];
-    return forkJoin(observables).pipe(
-      map((results) => {
-        const [coordsRoute, coordsWaypoints, gasStations, weather] = results as [Coords[], Coords[], GasStation[], WeatherData[]];
-        this.giveCoords(coordsRoute);
-        this.giveWaypointCoords(coordsWaypoints);
-        this.giveWeatherCoords(weather);
-        return gasStations;
+    return this.routeService.getFullRouteData(routeFormResponse).pipe(
+      map((data: FullRouteData) => {
+        this.giveCoords(data.polylineCoords);
+        this.giveWaypointCoords(data.legCoords);
+        this.giveWeatherCoords(data.weatherData);
+        return data.gasStations;
       })
     );
   }
