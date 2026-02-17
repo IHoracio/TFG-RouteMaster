@@ -67,8 +67,7 @@ public class SavedRouteController {
 			@RequestParam(required = false, defaultValue = "false") boolean optimizeWaypoints,
 			@RequestParam(required = false, defaultValue = "false") boolean optimizeRoute,
 			@RequestParam(required = false, defaultValue = "es") String language, 
-			@RequestParam(required = false, defaultValue = "false") boolean avoidTolls,
-			@RequestParam(required = false, defaultValue = "C") EmissionType vehicleEmissionType) {
+			@RequestParam(required = false, defaultValue = "false") boolean avoidTolls) {
 
 		String email = cookieService.getCookieValue(request, "sesionActiva").get();
 		Optional<User> userOpt = userService.getEntityByEmail(email);
@@ -101,7 +100,7 @@ public class SavedRouteController {
 		puntos.add(destinationPoint);
 
 		SavedRouteDTO saved = routerFavoriteService.saveRoute(name, puntos, user, optimizeWaypoints, optimizeRoute,
-				language, avoidTolls, vehicleEmissionType);
+				language, avoidTolls);
 		return ResponseEntity.ok(saved);
 	}
 

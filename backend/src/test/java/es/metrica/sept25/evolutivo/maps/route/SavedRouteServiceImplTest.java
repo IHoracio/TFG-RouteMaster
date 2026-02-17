@@ -66,7 +66,7 @@ public class SavedRouteServiceImplTest {
         when(repository.save(any(SavedRoute.class))).thenReturn(savedRoute);
 
         SavedRouteDTO result = service.saveRoute(
-            "Mi Ruta", puntosDTO, testUser, true, false, "es", false, EmissionType.C
+            "Mi Ruta", puntosDTO, testUser, true, false, "es", false
         );
 
         assertNotNull(result);

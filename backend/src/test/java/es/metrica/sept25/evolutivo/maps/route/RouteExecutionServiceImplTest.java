@@ -90,8 +90,7 @@ class RouteExecutionServiceImplTest {
 				false, 
 				false, 
 				"es", 
-				false, 
-				EmissionType.C))
+				false))
 		.thenReturn(Optional.of(group));
 
 		Optional<RouteExecutionDTO> result = service.executeSavedRoute(1L);
@@ -131,7 +130,7 @@ class RouteExecutionServiceImplTest {
 
 		// Devuelve Optional.empty() simulando fallo en RoutesService
 		when(routesService.getDirections(anyString(), anyString(), anyList(), anyBoolean(), anyBoolean(), anyString(),
-				anyBoolean(), any(EmissionType.class))).thenReturn(Optional.empty());
+				anyBoolean())).thenReturn(Optional.empty());
 
 		Optional<RouteExecutionDTO> result = service.executeSavedRoute(1L);
 

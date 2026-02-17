@@ -40,8 +40,7 @@ public class SavedRouteServiceImpl implements SavedRouteService {
 	        boolean optimizeWaypoints,
 	        boolean optimizeRoute,
 	        String language, 
-	        boolean avoidTolls,
-	        EmissionType vehicleEmissionType) {
+	        boolean avoidTolls) {
 		SavedRoute route = new SavedRoute();
 		route.setName(name);
 		route.setUser(user);
@@ -49,7 +48,6 @@ public class SavedRouteServiceImpl implements SavedRouteService {
 	    route.setOptimizeRoute(optimizeRoute);
 	    route.setLanguage(language);
 	    route.setAvoidTolls(avoidTolls);
-	    route.setVehicleEmissionType(vehicleEmissionType);
 	    
 		
 		List<Point> puntos = puntosDTO.stream().map(dto -> {

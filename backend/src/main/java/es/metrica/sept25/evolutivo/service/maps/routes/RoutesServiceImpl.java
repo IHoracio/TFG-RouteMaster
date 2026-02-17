@@ -74,8 +74,7 @@ public class RoutesServiceImpl implements RoutesService {
 
 	@Override
 	public Optional<RouteGroup> getDirections(String origin, String destination, List<String> waypoints,
-			boolean optimizeWaypoints, boolean optimizeRoute, String language, boolean avoidTolls,
-	        EmissionType vehicleEmissionType) {
+			boolean optimizeWaypoints, boolean optimizeRoute, String language, boolean avoidTolls) {
 
 		Set<String> invalidDirections = new HashSet<String>();
 		
@@ -122,10 +121,6 @@ public class RoutesServiceImpl implements RoutesService {
 
 		if (avoidTolls) {
 		    url.queryParam("avoid", AVOID_TOLLS);
-		}
-		
-		if (vehicleEmissionType != null) {
-		    url.queryParam("vehicleEmissionType", vehicleEmissionType.name());
 		}
 		
 		if (!optimizeRoute) {

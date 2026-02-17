@@ -79,7 +79,7 @@ class RoutesServiceImplTest {
         Optional<RouteGroup> result = service.getDirections(
                 "Origin", "Destination",
                 List.of(), false, false,
-                "es", false, EmissionType.C
+                "es", false
         );
 
         assertTrue(result.isPresent());
@@ -95,7 +95,7 @@ class RoutesServiceImplTest {
         Optional<RouteGroup> result = service.getDirections(
                 "Origin", "Destination",
                 List.of(), false, false,
-                "es", false, EmissionType.C
+                "es", false
         );
 
         assertTrue(result.isEmpty());
@@ -114,7 +114,7 @@ class RoutesServiceImplTest {
                 "Origin", "Destination",
                 List.of("BadWaypoint"),
                 false, false,
-                "es", false, EmissionType.C
+                "es", false
         );
 
         assertTrue(result.isEmpty());
@@ -141,7 +141,7 @@ class RoutesServiceImplTest {
                 "Origin", "Destination",
                 List.of("Waypoint"),
                 true, true,
-                "es", false, EmissionType.C
+                "es", false
         );
 
         assertEquals(1,
@@ -288,7 +288,7 @@ class RoutesServiceImplTest {
 
         RouteGroup rg = simpleRouteGroup();
 
-        List<Coords> result =
+        List<Gasolinera> result =
                 service.getGasStationsCoordsForRoute(rg, 10L);
 
         assertEquals(1, result.size());

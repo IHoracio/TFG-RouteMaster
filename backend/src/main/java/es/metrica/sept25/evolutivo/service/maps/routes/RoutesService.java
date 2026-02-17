@@ -28,8 +28,7 @@ public interface RoutesService {
 	List<Coords> decodePolyline(String polylinePoints);
 
 	Optional<RouteGroup> getDirections(String origin, String destination, List<String> waypoints,
-			boolean optimizeWaypoints, boolean optimizeRoute, String language, boolean avoidTolls,
-			EmissionType vehicleEmissionType);
+			boolean optimizeWaypoints, boolean optimizeRoute, String language, boolean avoidTolls);
 
 
 }

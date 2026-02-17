@@ -17,7 +17,7 @@ public interface SavedRouteService {
 	Optional<List<SavedRouteDTO>> getAllSavedRoutes(String email);
 
 	SavedRouteDTO saveRoute(String name, List<PointDTO> puntosDTO, User user, boolean optimizeWaypoints,
-			boolean optimizeRoute, String language, boolean avoidTolls, EmissionType vehicleEmissionType);
+			boolean optimizeRoute, String language, boolean avoidTolls);
 	
 	SavedRouteDTO renameRoute(String name, SavedRouteDTO savedRoute);
 }
