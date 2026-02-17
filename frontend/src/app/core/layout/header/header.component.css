@@ -7,12 +7,13 @@ header {
   align-items: center;
   padding: 0 30px;
   position: absolute;
+  margin-bottom: 2rem;
   top: 0;
   left: 0;
   right: 0;
   height: 80px;
   z-index: 1000;
-  background: linear-gradient(to right, var(--header-gradient-start), var(--header-gradient-end));
+  background: linear-gradient(to right, var(--header-footer-gradient-start), var(--header-footer-gradient-end));
   transition: background-color 0.3s ease;
   border-radius: 0 0 var(--spacing-sm) var(--spacing-sm);
   box-shadow: var(--header-shadow);
@@ -96,14 +97,18 @@ nav a {
   transition: 0.3s ease;
 }
 
+nav .personal-area {
+  transition: none;
+}
+
 nav a:hover {
-  background: var(--surface-color);
+  background: var(--hover-button);
   backdrop-filter: blur(4px);
   transform: scale(1.05);
 }
 
 :host-context(.dark) nav a:hover {
-  background: rgba(141, 179, 223, 0.32);
+  background: var(--hover-button);
   backdrop-filter: blur(4px);
   transform: scale(1.05);
 }
@@ -131,11 +136,37 @@ nav a:focus {
   justify-content: center;
 }
 
+/* Agregar esto: Estilos para el hover del botón de idioma */
+.lang-btn:hover {
+  background: var(--hover-button);
+  backdrop-filter: blur(4px);
+  transform: scale(1.05);
+}
+
+/* Para el modo oscuro, si es necesario */
+:host-context(.dark) .lang-btn:hover {
+  background: var(--hover-button);
+  backdrop-filter: blur(4px);
+  transform: scale(1.05);
+}
+
 .theme-btn {
   border-radius: 50%;
   width: 40px;
   height: 40px;
   padding: 0;
+}
+
+.theme-btn:hover {
+  background: var(--hover-button);
+  backdrop-filter: blur(4px);
+  transform: scale(1.05);
+}
+
+:host-context(.dark) .theme-btn:hover {
+  background: var(--hover-button);
+  backdrop-filter: blur(4px);
+  transform: scale(1.05);
 }
 
 .theme-btn.sun {

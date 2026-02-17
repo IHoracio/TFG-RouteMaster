@@ -102,9 +102,8 @@ export class MapPageComponent implements OnDestroy, AfterViewInit {
       center: { lat: 40.4168, lng: -3.7038 },
       zoom: 6,
       tilt: 45,
-      mapTypeControl: this.showControls(),
-      fullscreenControl: this.showControls(),
-      streetViewControl: false,
+      disableDefaultUI: true,
+      keyboardShortcuts: false,
       mapId: environment.googleMapsMapId,
       mapTypeId: this.getMapTypeId()
     };

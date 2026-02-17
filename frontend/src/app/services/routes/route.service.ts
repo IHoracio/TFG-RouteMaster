@@ -43,7 +43,6 @@ export class RouteService {
       .set('optimizeWaypoints', routeFormResponse.optimizeWaypoints)
       .set('optimizeRoute', routeFormResponse.optimizeRoute)
       .set('avoidTolls', routeFormResponse.avoidTolls)
-      .set('vehiculeEmissionType', routeFormResponse.vehiculeEmissionType)
     return this.http.get(this.apiUrl + "/api/route/polylineCords", { headers: headers, params: parameters, responseType: 'text' });
   }
 
@@ -58,7 +57,6 @@ export class RouteService {
       .set('optimizeWaypoints', routeFormResponse.optimizeWaypoints)
       .set('optimizeRoute', routeFormResponse.optimizeRoute)
       .set('avoidTolls', routeFormResponse.avoidTolls)
-      .set('vehiculeEmissionType', routeFormResponse.vehiculeEmissionType)
 
     return this.http.get(this.apiUrl + "/api/route/legCoords", { headers: headers, params: parameters, responseType: 'text' });
   }
@@ -95,7 +93,6 @@ export class RouteService {
       .set('optimizeWaypoints', routeFormResponse.optimizeWaypoints)
       .set('optimizeRoute', routeFormResponse.optimizeRoute)
       .set('avoidTolls', routeFormResponse.avoidTolls)
-      .set('vehiculeEmissionType', routeFormResponse.vehiculeEmissionType)
 
     return this.http.get(this.apiUrl + "/api/routes/weather", { headers: headers, params: parameters, responseType: 'text' });
   }

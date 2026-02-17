@@ -2,12 +2,13 @@
   display: block;
   box-sizing: border-box;
   width: 100%;
+  height: 100%;
 }
 
 .map-wrapper {
   position: relative;
   width: 100%;
-  height: 600px;
+  height: 100%;
   overflow: hidden;
 }
 
@@ -16,6 +17,14 @@
   width: 100%;
   height: 100%;
   display: block;
+}
+
+::ng-deep .gm-style-cc {
+  display: none !important;
+}
+
+::ng-deep .gm-style a {
+  display: none !important;
 }
 
 .gas-station-widget {

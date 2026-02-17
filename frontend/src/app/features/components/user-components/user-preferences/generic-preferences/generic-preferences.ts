@@ -1,6 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { UserPreferencesService } from '../../../../../services/user-page/user-preferences.service';
 import { TranslationService } from '../../../../../services/translation.service';
+import { ThemeService } from '../../../../../services/theme.service';
 
 @Component({
   selector: 'app-generic-preferences',
@@ -11,6 +12,7 @@ import { TranslationService } from '../../../../../services/translation.service'
 export class GenericPreferencesComponent {
   userPreferencesService = inject(UserPreferencesService);
   translation = inject(TranslationService);
+  themeService = inject(ThemeService);
 
   setMapType(event: Event): void {
     const value = (event.target as HTMLSelectElement).value;
@@ -20,6 +22,7 @@ export class GenericPreferencesComponent {
   setTheme(event: Event): void {
     const value = (event.target as HTMLSelectElement).value;
     this.userPreferencesService.setThemeLanguage({ ...this.userPreferencesService.getThemeLanguageSignal()(), theme: value });
+    this.themeService.setTheme(value);
   }
 
   setLanguage(event: Event): void {

@@ -5,6 +5,8 @@ import { LoginComponent } from './auth/login/login.component';
 import { UserPageComponent } from './features/pages/user-page/user-page.component';
 import { LogoutComponent } from './auth/logout/logout.component';
 import { AuthGuard } from './guards/auth.guard';
+import { PrivacyComponent } from './features/pages/privacy-page/privacy.component';
+import { TermsComponent } from './features/pages/terms-page/terms.component';
 
 export const routes: Routes = [
     {path: "", component: SearchBarComponent},
@@ -12,4 +14,6 @@ export const routes: Routes = [
     {path: "login", component: LoginComponent},
     {path: "logout", component: LogoutComponent},
     {path: "user", component: UserPageComponent, canActivate: [AuthGuard]},
+    { path: 'privacy', component: PrivacyComponent },
+    { path: 'terms', component: TermsComponent },
 ];

@@ -1,19 +1,16 @@
-import { Component, inject, signal, OnInit, computed, effect } from '@angular/core';
+import { Component, inject, signal, OnInit, computed, effect, ViewChild, ElementRef } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouteFormResponse } from '../../../Dto/route-form-response';
 import { MapPageComponent } from '../map-page/map-page.component';
 import { SearchBarService } from '../../../services/search-bar/search-bar.service';
-import { KeyValuePipe, NgClass, NgFor, NgIf } from '@angular/common';
+import { NgClass, NgFor, NgIf } from '@angular/common';
 import { RouteService } from '../../../services/routes/route.service';
-import { RouteGroupResponse } from '../../../Dto/maps-dtos';
 import { FavouriteGasStation } from '../../../Dto/gas-station';
 import { SavedRoute } from '../../../Dto/saved-route';
 import { TranslationService } from '../../../services/translation.service';
 import { GasStation } from '../../../Dto/gas-station';
-import { catchError } from 'rxjs/operators';
 import { UserInfoService } from '../../../services/user-page/user-info.service';
 import { UserPreferencesService } from '../../../services/user-page/user-preferences.service';
-import { of } from 'rxjs';
 import { AuthService } from '../../../services/auth/auth-service.service';
 import { AuthGuard } from '../../../guards/auth.guard';
 import { MapCommunicationService } from '../../../services/map/map-communication.service';
@@ -21,14 +18,17 @@ import { LoginPromptComponent } from '../../components/search-bar-components/log
 
 @Component({
   selector: 'app-search-bar',
-  imports: [FormsModule, MapPageComponent, NgFor, KeyValuePipe, NgIf, NgClass, LoginPromptComponent],
+  imports: [FormsModule, MapPageComponent, NgFor, NgIf, NgClass, LoginPromptComponent],
   templateUrl: './search-bar.component.html',
   styleUrl: './search-bar.component.css'
 })
 export class SearchBarComponent implements OnInit {
 
   isLoggedIn = signal<boolean>(false);
+  isFormCollapsed: boolean = false;
   showLoginPrompt = signal(false);
+  showShareMessage = signal(false);
+  createdRoute = signal(false);
 
   allGasStations = signal<GasStation[]>([]);
   filterByBrands = signal<boolean>(false);
@@ -58,8 +58,7 @@ export class SearchBarComponent implements OnInit {
     waypoints: [],
     optimizeWaypoints: false,
     optimizeRoute: false,
-    avoidTolls: false,
-    vehiculeEmissionType: "NONE"
+    avoidTolls: false
   };
   waypointTypes: string[] = [];
 
@@ -78,6 +77,19 @@ export class SearchBarComponent implements OnInit {
 
   activeTab: string = 'destination';
 
+  @ViewChild('card', { static: true }) card!: ElementRef;
+
+  scrollToCard() {
+    if (window.innerWidth >= 768) {
+      const rect = this.card.nativeElement.getBoundingClientRect();
+      const offset = 205;
+      window.scrollTo({
+        top: window.scrollY + rect.top + offset,
+        behavior: 'smooth'
+      });
+    }
+  }
+
   constructor(private searchBarService: SearchBarService, private routeService: RouteService, private authService: AuthService, private authGuard: AuthGuard, private mapCommunication: MapCommunicationService) {
     effect(() => {
       this.mapCommunication.sendGasStations(this.filteredGasStations());
@@ -94,7 +106,6 @@ export class SearchBarComponent implements OnInit {
       this.isLoggedIn.set(logged);
       if (logged) {
         this.userPreferences.getUserPreferences().subscribe(pref => {
-          this.routeFormResponse.vehiculeEmissionType = pref.emissionType;
           this.routeFormResponse.avoidTolls = pref.avoidTolls;
           this.preferredBrands = pref.preferredBrands;
           this.fuelType = pref.fuelType;
@@ -132,6 +143,14 @@ export class SearchBarComponent implements OnInit {
     this.activeTab = tab;
   }
 
+  shareRoute() {
+    // Lógica futura: generar link de la ruta
+    // Por ahora, copia la URL actual
+    navigator.clipboard.writeText(window.location.href).then(() => {
+      this.showShareMessage.set(true);
+      setTimeout(() => this.showShareMessage.set(false), 2000);
+    });
+  }
 
   addWaypoint() {
     this.routeFormResponse.waypoints.push('');
@@ -154,6 +173,7 @@ export class SearchBarComponent implements OnInit {
     this.searchBarService.onSubmit(this.routeFormResponse).subscribe({
       next: (gasStations) => {
         this.allGasStations.set(gasStations);
+        this.createdRoute.set(true);
       },
       error: (err) => {
         console.error('Error en onSubmit:', err);
@@ -217,6 +237,14 @@ export class SearchBarComponent implements OnInit {
           console.log(err);
         },
       });
+  }
+
+  toggleFormCollapse() {
+    this.isFormCollapsed = !this.isFormCollapsed;
+  }
+
+  isDesktop(): boolean {
+    return typeof window !== 'undefined' && window.innerWidth >= 768;
   }
 
 }

@@ -24,6 +24,28 @@
         "privacy": "Privacy",
         "terms": "Terms"
     },
+    "privacy": {
+        "title": "Privacy Policy",
+        "intro": "At RouteMaster, we value your privacy. This policy explains how we handle your data.",
+        "dataCollection": "Data Collection",
+        "dataText": "We collect minimal data to improve your experience:",
+        "localStorage": "We store preferences like theme and language in browser localStorage.",
+        "cookies": "We use cookies for sessions if you log in.",
+        "usage": "Data Usage",
+        "usageText": "Data is used only for app features and is not shared.",
+        "contact": "Contact",
+        "contactText": "If you have questions, contact: "
+    },
+    "terms": {
+        "title": "Terms of Use",
+        "intro": "By using RouteMaster, you agree to these terms.",
+        "usage": "Usage",
+        "usageText": "The app is for route planning. Use it responsibly.",
+        "responsibility": "Responsibility",
+        "responsibilityText": "We are not responsible for incorrect routes or related issues.",
+        "contact": "Contact",
+        "contactText": "For inquiries, email: "
+    },
     "search": {
         "title": "Search Type",
         "tabs": {
@@ -63,7 +85,9 @@
         "cheapest": "Cheapest",
         "favoriteBrands": "Favorite Brands",
         "maxPrice": "Maximum Price",
-        "loginPromptMessage": "Log in to access these features."
+        "loginPromptMessage": "Log in to access these features.",
+        "linkCopied": "Link copied to clipboard",
+        "searchRoute": "You need to create a route"
     },
     "fuelTypes": {
         "GASOLINE": "Gasoline",

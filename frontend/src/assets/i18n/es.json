@@ -24,6 +24,28 @@
         "privacy": "Privacidad",
         "terms": "Términos"
     },
+    "privacy": {
+        "title": "Política de Privacidad",
+        "intro": "En RouteMaster, valoramos tu privacidad. Esta política explica cómo manejamos tus datos.",
+        "dataCollection": "Recopilación de Datos",
+        "dataText": "Recopilamos datos mínimos para mejorar tu experiencia:",
+        "localStorage": "Almacenamos preferencias como tema e idioma en localStorage del navegador.",
+        "cookies": "Usamos cookies para sesiones si inicias sesión.",
+        "usage": "Uso de Datos",
+        "usageText": "Los datos se usan solo para funcionalidades de la app y no se comparten.",
+        "contact": "Contacto",
+        "contactText": "Si tienes preguntas, contacta a: "
+    },
+    "terms": {
+        "title": "Términos de Uso",
+        "intro": "Al usar RouteMaster, aceptas estos términos.",
+        "usage": "Uso",
+        "usageText": "La app es para planificación de rutas. Úsala responsablemente.",
+        "responsibility": "Responsabilidad",
+        "responsibilityText": "No somos responsables de rutas incorrectas o problemas derivados.",
+        "contact": "Contacto",
+        "contactText": "Para consultas, escribe a: "
+    },
     "search": {
         "title": "Tipo de Búsqueda",
         "tabs": {
@@ -63,7 +85,9 @@
         "cheapest": "Más barata",
         "favoriteBrands": "Marcas favoritas",
         "maxPrice": "Máximo precio",
-        "loginPromptMessage": "Inicia sesión para acceder a estas funciones."
+        "loginPromptMessage": "Inicia sesión para acceder a estas funciones.",
+        "linkCopied": "Enlace de ruta copiado",
+        "searchRoute": "Debes crear una ruta primero"
     },
     "fuelTypes": {
         "GASOLINE": "Gasolina",
