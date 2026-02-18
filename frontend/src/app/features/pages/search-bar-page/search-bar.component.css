@@ -124,7 +124,7 @@ h2 {
   }
 
   .card .form-map form {
-    overflow-y: auto;
+    overflow-y: scroll;
     max-height: calc(100vh - 100px);
     padding-right: var(--spacing-sm);
   }
@@ -184,6 +184,10 @@ h2 {
     margin-bottom: 1rem;
   }
 
+  .form-map .collapsible-content#selectRoute {
+    margin-top: 1rem;
+  }
+
 }
 
 /* ========================================
@@ -210,6 +214,7 @@ form p {
   flex-direction: column;
   gap: var(--spacing-xs);
   margin-bottom: var(--spacing-sm);
+  color: var(--text-color);
 }
 
 form label {
@@ -249,6 +254,14 @@ form input[type="text"]:-webkit-autofill {
 
 .form-map {
   overflow: hidden;
+}
+
+.choose-route-text {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  margin-top: var(--spacing-xs);
+  margin-bottom: var(--spacing-md);
+  display: block;
 }
 
 /* ========================================
@@ -315,14 +328,14 @@ form input[type="text"]:-webkit-autofill {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
-.filter-buttons {
+.filter-dropdown .filter-buttons {
   display: flex;
   flex-wrap: wrap;
   gap: var(--spacing-sm);
   margin-top: var(--spacing-md);
 }
 
-.filter-buttons button {
+.filter-dropdown .filter-buttons button {
   padding: var(--button-padding);
   background: linear-gradient(to left, var(--header-footer-gradient-start), var(--header-footer-gradient-end));
   color: var(--text-color);
@@ -338,7 +351,7 @@ form input[type="text"]:-webkit-autofill {
   margin-bottom: 1rem;
 }
 
-.filter-buttons button:hover {
+.filter-dropdown .filter-buttons button:hover {
   background-color: var(--light-blue);
   border-color: var(--primary-color);
 }
@@ -349,13 +362,13 @@ form input[type="text"]:-webkit-autofill {
   border-color: var(--primary-color);
 }
 
-.filter-buttons button:disabled {
+.filter-dropdown .filter-buttons button:disabled {
   background: rgba(64, 89, 119, 0.3);
   cursor: not-allowed;
   opacity: 0.6;
 }
 
-::ng-deep .dark .filter-buttons button:disabled {
+::ng-deep .dark .filter-dropdown .filter-buttons button:disabled {
   background: rgba(58, 53, 53, 0.3) !important;
   cursor: not-allowed;
   opacity: 0.6;
@@ -647,6 +660,35 @@ button[type="submit"]:disabled {
   padding: var(--spacing-md);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   display: none;
+}
+
+.filter-dropdown .filter-buttons input[type="text"] {
+  width: 100%;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  background-color: var(--surface-secondary);
+  color: var(--text-color);
+  font-size: 1rem;
+  transition: border-color 0.3s ease;
+  box-sizing: border-box;
+  margin-bottom: var(--spacing-sm);
+}
+
+.filter-dropdown .filter-buttons input[type="text"]:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+}
+
+.filter-dropdown .filter-buttons input[type="text"]::placeholder {
+  color: var(--text-secondary);
+}
+
+.filter-dropdown .filter-buttons input[type="text"]:-webkit-autofill {
+  background-color: var(--surface-secondary) !important;
+  -webkit-box-shadow: 0 0 0px 900px var(--surface-secondary) inset !important;
+  -webkit-text-fill-color: var(--text-color) !important;
 }
 
 .filter-dropdown[open] .filter-buttons {

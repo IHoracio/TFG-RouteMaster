@@ -87,7 +87,9 @@
         "maxPrice": "Maximum Price",
         "loginPromptMessage": "Log in to access these features.",
         "linkCopied": "Link copied to clipboard",
-        "searchRoute": "You need to create a route"
+        "searchRoute": "You need to create a route",
+        "selectRoute": "Saved Route",
+        "noRouteSelected": "No route selected"
     },
     "fuelTypes": {
         "GASOLINE": "Gasoline",

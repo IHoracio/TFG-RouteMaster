@@ -87,7 +87,9 @@
         "maxPrice": "Máximo precio",
         "loginPromptMessage": "Inicia sesión para acceder a estas funciones.",
         "linkCopied": "Enlace de ruta copiado",
-        "searchRoute": "Debes crear una ruta primero"
+        "searchRoute": "Debes crear una ruta primero",
+        "selectRoute": "Ruta Guardada",
+        "noRouteSelected": "No se ha seleccionado ninguna ruta"
     },
     "fuelTypes": {
         "GASOLINE": "Gasolina",

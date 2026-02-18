@@ -1,3 +1,6 @@
+/* ========================================
+   VARIABLES GLOBALES - Tema Claro por Defecto
+   ======================================== */
 :root {
   --bg-color: #a7c3e7;
   --surface-color: #96bdec;
@@ -31,6 +34,9 @@
   --button-padding: var(--spacing-sm) var(--spacing-md);
 }
 
+/* ========================================
+   TEMA OSCURO
+   ======================================== */
 .dark {
   --bg-color: #0f172a;
   --surface-color: #1e293b;
@@ -50,55 +56,6 @@
   --header-footer-gradient-end: #121b2f;
   --header-shadow: 0 4px 6px 2px rgba(147, 197, 253, 0.2);
   --footer-shadow: 0 -2px 4px rgba(147, 197, 253, 0.2);
-}
-
-/* ========================================
-   2. VARIABLES CSS (Paleta de Colores Azul Vibrante y Accesible)
-   ======================================== */
-:root {
-  --bg-color: #bed4f0;
-  --surface-color: #bfdbfe;
-
-  --text-color: #102357;
-  --text-secondary: #475569;
-
-  --border-color: #64748b;
-
-  --primary-color: #1e40af;
-  --secondary-color: #3b82f6;
-
-  --header-bg-color: #a0c4ff;
-  --header-gradient-end: #b6d0f0;
-  --header-gradient-start: #5c90e9;
-  --header-shadow: 0 4px 6px 2px rgba(25, 0, 255, 0.416);
-
-  --font-family: 'Roboto', 'Helvetica Neue', Arial, sans-serif;
-
-  --font-size-base: 1rem;
-  --line-height-base: 1.5;
-  --spacing-xs: 0.25rem;
-  --spacing-sm: 0.5rem;
-  --spacing-md: 1rem;
-  --spacing-lg: 1.5rem;
-  --spacing-xl: 2rem;
-}
-
-.dark {
-  --bg-color: #0f172a;
-  --surface-color: #1e293b;
-
-  --text-color: #93c5fd;
-  --text-secondary: #64748b;
-
-  --border-color: #334155;
-
-  --primary-color: #3b82f6;
-  --secondary-color: #60a5fa;
-
-  --header-bg-color: #1e293b;
-  --header-gradient-start: #12254e;
-  --header-gradient-end: #121b2f;
-  --header-shadow: 0 4px 6px 2px rgba(147, 197, 253, 0.2);
 }
 
 /* ========================================

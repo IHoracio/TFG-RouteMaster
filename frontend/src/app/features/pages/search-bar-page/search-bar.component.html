@@ -20,26 +20,29 @@
         <div class="filter-buttons">
           <button (click)="toggleFilterByCheapest()" [class.active]="filterByCheapest()">{{
             translation.translate('search.cheapest') }}</button>
-          <button (click)="toggleFilterByBrands()" [disabled]="!isLoggedIn()" [class.active]="filterByBrands()" [title]="!isLoggedIn() ? translation.translate('auth.loginRequired') : ''" >{{
+          <button (click)="toggleFilterByBrands()" [disabled]="!isLoggedIn()" [class.active]="filterByBrands()"
+            [title]="!isLoggedIn() ? translation.translate('auth.loginRequired') : ''">{{
             translation.translate('search.favoriteBrands') }}</button>
-          <button (click)="toggleFilterByMaxPrice()" [disabled]="!isLoggedIn()" [class.active]="filterByMaxPrice()" [title]="!isLoggedIn() ? translation.translate('auth.loginRequired') : ''">{{
+          <button (click)="toggleFilterByMaxPrice()" [disabled]="!isLoggedIn()" [class.active]="filterByMaxPrice()"
+            [title]="!isLoggedIn() ? translation.translate('auth.loginRequired') : ''">{{
             translation.translate('search.maxPrice') }}</button>
         </div>
       </details>
       <details class="filter-dropdown">
         <summary>{{ translation.translate('search.saveRoute') }}</summary>
         <div class="filter-buttons">
-          <label for="routeAlias">{{ translation.translate('search.saveRoute') }}</label>
           <input type="text" id="routeAlias" name="routeAlias" [(ngModel)]="routeAlias"
             [placeholder]="translation.translate('search.routeAliasPlaceholder')" />
-          <button type="button" (click)="saveRoute()" [disabled]="!createdRoute()" [title]="!createdRoute() ? translation.translate('search.searchRoute') : ''">{{
+          <button type="button" (click)="saveRoute()" [disabled]="!createdRoute()"
+            [title]="!createdRoute() ? translation.translate('search.searchRoute') : ''">{{
             translation.translate('search.saveRoute') }}</button>
           <div *ngIf="successfulMessage" class="success">{{ successfulMessage }}</div>
           <div *ngIf="errorMessage" class="error">{{ errorMessage }}</div>
         </div>
       </details>
       <div class="share-container">
-        <button class="share-btn" (click)="shareRoute()" [disabled]="!createdRoute()" [title]="!createdRoute() ? translation.translate('search.searchRoute') : ''">
+        <button class="share-btn" (click)="shareRoute()" [disabled]="!createdRoute()"
+          [title]="!createdRoute() ? translation.translate('search.searchRoute') : ''">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <circle cx="18" cy="5" r="3"></circle>
             <circle cx="6" cy="12" r="3"></circle>
@@ -62,6 +65,19 @@
               <path d="M9 18l6-6-6-6" *ngIf="isFormCollapsed"></path>
             </svg>
           </button>
+          @if(activeTab === "route") {
+          <p class="collapsible-content">
+            <label class="collapsible-content" for="savedRoute" id="selectRoute">{{
+              translation.translate('search.selectRoute') }}</label>
+            <span class="collapsible-content choose-route-text">{{ translation.translate('search.chooseRoute') }}</span>
+            <select class="collapsible-content" name="savedRoute" id="savedRoute" [(ngModel)]="selectedSavedRoute"
+              required>
+              <option *ngFor="let route of savedRoute()" [value]="route.routeId">{{ route.name }}</option>
+            </select>
+          </p>
+          <button type="submit" class="collapsible-content" id="submit-button">{{ translation.translate('search.submit')
+            }}</button>
+          } @else {
           @if(activeTab === "destination" || activeTab === "gas") {
           <p class="collapsible-content">
             <label class="collapsible-content" id="originField" for="origin">{{ translation.translate('search.origin')
@@ -194,6 +210,7 @@
           }
           <button type="submit" class="collapsible-content" [disabled]="!form.valid" id="submit-button">{{
             translation.translate('search.submit') }}</button>
+          }
           <div *ngIf="successfulMessage" class="success collapsible-content">{{ successfulMessage }}</div>
           <div *ngIf="errorMessage" class="error collapsible-content">{{ errorMessage }}</div>
         </form>
