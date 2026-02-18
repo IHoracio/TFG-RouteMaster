@@ -89,7 +89,8 @@
         "linkCopied": "Link copied to clipboard",
         "searchRoute": "You need to create a route",
         "selectRoute": "Saved Route",
-        "noRouteSelected": "No route selected"
+        "noRouteSelected": "No route selected",
+        "noFavoriteGas": "You dont have favourite gas stations"
     },
     "fuelTypes": {
         "GASOLINE": "Gasoline",

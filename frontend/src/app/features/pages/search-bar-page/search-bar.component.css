@@ -20,11 +20,10 @@
   border-radius: 8px;
   padding: var(--spacing-lg);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  display: grid;
+  gap: var(--spacing-lg);
 }
 
-/* ========================================
-   TÍTULO
-   ======================================== */
 h2 {
   color: var(--primary-color);
   font-size: 1.75rem;
@@ -33,61 +32,49 @@ h2 {
   text-align: center;
 }
 
-/* ========================================
-   TABS (destination, gas, route)
-   ======================================== */
-
-.tabs_wrap ul {
-  display: flex;
-  justify-content: center;
-  gap: var(--spacing-md);
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  border-bottom: 2px solid var(--border-color);
-}
-
-.tabs_wrap li {
-  padding: var(--spacing-sm) var(--spacing-lg);
-  cursor: pointer;
-  color: var(--text-secondary);
-  font-weight: 500;
-  transition: all 0.3s ease;
-  border-bottom: 3px solid transparent;
-  margin-bottom: -2px;
-}
-
-.tabs_wrap li:hover {
-  color: var(--primary-color);
-}
-
-.tabs_wrap li.active {
-  color: var(--primary-color);
-  border-bottom-color: var(--primary-color);
-}
-
-/* ========================================
-   GRID LAYOUT - Filtros + Formulario + Mapa
-   ======================================== */
-.card {
-  display: grid;
-  /* Título, Tabs, Filtros, Form+Mapa */
-  gap: var(--spacing-lg);
-}
-
-/* El título ocupa toda la fila */
 .card h2 {
   grid-column: 1 / -1;
   grid-row: 1;
 }
 
-/* Los tabs ocupan toda la fila */
-.card .tabs_wrap {
+.card app-search-bar-tabs {
   grid-column: 1 / -1;
   grid-row: 2;
 }
 
-/* En pantallas grandes, el form-map usa flexbox */
+.form-map {
+  overflow: hidden;
+}
+
+.form-wrapper {
+  background: linear-gradient(to left, var(--header-footer-gradient-start), var(--header-footer-gradient-end));
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  padding: var(--spacing-md);
+  position: relative;
+  overflow: hidden;
+  flex: 0 0 35%;
+  transition: flex-basis 0.9s ease;
+  height: calc(100vh - 70px);
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.map-wrapper {
+  background: linear-gradient(to left, var(--header-footer-gradient-start), var(--header-footer-gradient-end));
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  padding: var(--spacing-md);
+  position: relative;
+  overflow: hidden;
+  flex: 0 0 62%;
+  transition: flex-basis 0.9s ease;
+  max-width: none;
+  height: calc(100vh - 70px);
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
 @media (min-width: 768px) {
   .card {
     grid-template-columns: var(--grid-search-bar-cols);
@@ -100,7 +87,7 @@ h2 {
     grid-row: 1;
   }
 
-  .card .tabs_wrap {
+  .card app-search-bar-tabs {
     grid-column: 1 / -1;
     grid-row: 2;
   }
@@ -123,24 +110,10 @@ h2 {
     gap: 0;
   }
 
-  .card .form-map form {
-    overflow-y: scroll;
-    max-height: calc(100vh - 100px);
-    padding-right: var(--spacing-sm);
-  }
-
   .form-wrapper {
     flex: 0 0 35%;
     transition: flex-basis 0.9s ease, margin-right 0.9s ease;
     margin-right: var(--spacing-xl);
-  }
-
-  .collapsible-content {
-    transition: opacity 0.6s ease;
-  }
-
-  .form-map.collapsed .collapsible-content {
-    transition: none;
   }
 
   .form-map.collapsed {
@@ -151,17 +124,9 @@ h2 {
     flex: 0 0 7%;
   }
 
-  .form-map.collapsed .collapse-btn {
-    margin-right: 1px;
-  }
-
   .form-map.collapsed .map-wrapper {
     flex-basis: 90%;
     max-width: none;
-  }
-
-  .form-map.collapsed .collapsible-content {
-    opacity: 0;
   }
 
   .form-map.collapsed .form-wrapper {
@@ -171,589 +136,48 @@ h2 {
   .form-map.collapsed .form-wrapper::-webkit-scrollbar {
     display: none !important;
   }
-
-  .form-map.collapsed form {
-    overflow-y: hidden !important;
-  }
-
-  .form-map .collapsible-content#waypoints {
-    margin-top: 0.5rem;
-  }
-
-  .form-map .collapsible-content#submit-button {
-    margin-bottom: 1rem;
-  }
-
-  .form-map .collapsible-content#selectRoute {
-    margin-top: 1rem;
-  }
-
-}
-
-/* ========================================
-   FORMULARIO
-   ======================================== */
-form {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-md);
-}
-
-.form-container {
-  position: relative;
-  overflow: hidden;
-  transition: height 0.3s ease;
-}
-
-#originField {
-  margin-top: var(--spacing-lg);
-}
-
-form p {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-xs);
-  margin-bottom: var(--spacing-sm);
-  color: var(--text-color);
-}
-
-form label {
-  color: var(--text-color);
-  font-weight: 500;
-  font-size: 0.95rem;
-}
-
-form input[type="text"],
-form select {
-  width: 100%;
-  padding: var(--spacing-sm) var(--spacing-md);
-  border: 1px solid var(--border-color);
-  border-radius: 4px;
-  background-color: var(--surface-secondary);
-  color: var(--text-color);
-  font-size: 1rem;
-  transition: border-color 0.3s ease;
-}
-
-form input[type="text"]:focus,
-form select:focus {
-  outline: none;
-  border-color: var(--primary-color);
-  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
-}
-
-form input[type="text"]::placeholder {
-  color: var(--text-secondary);
-}
-
-form input[type="text"]:-webkit-autofill {
-  background-color: var(--surface-secondary) !important;
-  -webkit-box-shadow: 0 0 0px 900px var(--surface-secondary) inset !important;
-  -webkit-text-fill-color: var(--text-color) !important;
-}
-
-.form-map {
-  overflow: hidden;
-}
-
-.choose-route-text {
-  color: var(--text-secondary);
-  font-size: 0.9rem;
-  margin-top: var(--spacing-xs);
-  margin-bottom: var(--spacing-md);
-  display: block;
-}
-
-/* ========================================
-   FORM WRAPPER (Contenedor de fondo para el formulario)
-   ======================================== */
-.form-wrapper {
-  background: linear-gradient(to left, var(--header-footer-gradient-start), var(--header-footer-gradient-end));
-  border: 1px solid var(--border-color);
-  border-radius: 4px;
-  padding: var(--spacing-md);
-  position: relative;
-  overflow: hidden;
-  flex: 0 0 35%;
-  transition: flex-basis 0.9s ease;
-  height: calc(100vh - 70px);
-  margin-top: 0;
-  margin-bottom: 0;
-}
-
-/* ========================================
-   MAP WRAPPER (Contenedor de fondo para el mapa)
-   ======================================== */
-.map-wrapper {
-  background: linear-gradient(to left, var(--header-footer-gradient-start), var(--header-footer-gradient-end));
-  border: 1px solid var(--border-color);
-  border-radius: 4px;
-  padding: var(--spacing-md);
-  position: relative;
-  overflow: hidden;
-  flex: 0 0 62%;
-  transition: flex-basis 0.9s ease;
-  max-width: none;
-  height: calc(100vh - 70px);
-  margin-top: 0;
-  margin-bottom: 0;
-}
-
-/* ========================================
-   BOTONES
-   ======================================== */
-
-.collapse-btn {
-  position: absolute;
-  top: 5px;
-  right: 5px;
-  width: 30px;
-  height: 30px;
-  padding: 0;
-  background-color: var(--surface-secondary);
-  color: var(--text-color);
-  border: 2px solid var(--border-color);
-  border-radius: 10%;
-  cursor: pointer;
-  z-index: 10;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-}
-
-.collapse-btn:hover {
-  background-color: var(--hover-button);
-  transform: scale(1.1);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-}
-
-.filter-dropdown .filter-buttons {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--spacing-sm);
-  margin-top: var(--spacing-md);
-}
-
-.filter-dropdown .filter-buttons button {
-  padding: var(--button-padding);
-  background: linear-gradient(to left, var(--header-footer-gradient-start), var(--header-footer-gradient-end));
-  color: var(--text-color);
-  border: 1px solid var(--border-color);
-  border-radius: 4px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  width: 100%;
-  box-sizing: border-box;
-}
-
-.filter-buttons button:not(:last-child) {
-  margin-bottom: 1rem;
-}
-
-.filter-dropdown .filter-buttons button:hover {
-  background-color: var(--light-blue);
-  border-color: var(--primary-color);
-}
-
-.filter-buttons button.active {
-  background-color: var(--primary-color);
-  color: white;
-  border-color: var(--primary-color);
-}
-
-.filter-dropdown .filter-buttons button:disabled {
-  background: rgba(64, 89, 119, 0.3);
-  cursor: not-allowed;
-  opacity: 0.6;
-}
-
-::ng-deep .dark .filter-dropdown .filter-buttons button:disabled {
-  background: rgba(58, 53, 53, 0.3) !important;
-  cursor: not-allowed;
-  opacity: 0.6;
-}
-
-.share-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  position: relative;
-}
-
-.share-btn {
-  width: 40px;
-  height: 40px;
-  background: var(--surface-secondary);
-  border: 1px solid var(--border-color);
-  border-radius: 4px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--primary-color);
-}
-
-.share-btn:disabled {
-  background: rgba(64, 89, 119, 0.3);
-  cursor: not-allowed;
-  opacity: 0.6;
-}
-
-::ng-deep .dark .share-btn:disabled {
-  background: rgba(58, 53, 53, 0.3) !important;
-  cursor: not-allowed;
-  opacity: 0.6;
-}
-
-.share-btn:hover {
-  background-color: var(--hover-button);
-  transform: scale(1.05);
-}
-
-.share-message {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background-color: var(--primary-color);
-  color: white;
-  padding: var(--spacing-sm);
-  border-radius: 4px;
-  font-size: 0.875rem;
-  z-index: 1000;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-.share-message.show {
-  opacity: 1;
-}
-
-button[type="submit"] {
-  width: 100%;
-  padding: var(--spacing-md);
-  background-color: var(--primary-color);
-  color: white;
-  border: none;
-  border-radius: 4px;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-  margin-top: var(--spacing-md);
-}
-
-button[type="submit"]:hover:not(:disabled) {
-  background-color: var(--secondary-color);
-}
-
-button[type="submit"]:disabled {
-  background-color: var(--text-color);
-  cursor: not-allowed;
-  opacity: 0.6;
-}
-
-.button {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--spacing-xs);
-  padding: var(--spacing-sm) var(--spacing-md);
-  background-color: var(--primary-color);
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 0.95rem;
-  transition: background-color 0.3s ease;
-}
-
-.button:hover {
-  background-color: var(--hover-button);
-}
-
-.button__icon svg {
-  width: 20px;
-  height: 20px;
-}
-
-.button-delete {
-  --main: var(--color-error);
-  --border: #973434;
-  --active: #862e2e;
-}
-
-.button,
-.button-delete {
-  position: relative;
-  width: 142px;
-  height: 25px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-xs);
-  padding: var(--spacing-sm) var(--spacing-md);
-  background-color: var(--primary-color);
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 0.95rem;
-  transition: background-color 0.3s ease;
-}
-
-.button:hover {
-  background-color: var(--secondary-color);
-}
-
-.button__icon svg {
-  width: 20px;
-  height: 20px;
-}
-
-.button-delete {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--spacing-xs);
-  padding: var(--spacing-sm) var(--spacing-md);
-  background-color: #dc3545;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 0.95rem;
-  transition: background-color 0.3s ease;
-  margin-top: var(--spacing-sm);
-}
-
-.button-delete:hover {
-  background-color: #c82333;
-}
-
-/* ========================================
-   CHECKBOXES
-   ======================================== */
-.checkbox-wrapper-46 {
-  margin: var(--spacing-sm) 0;
-}
-
-.checkbox-wrapper-46 input[type="checkbox"] {
-  display: none;
-}
-
-.checkbox-wrapper-46 .cbx {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-  cursor: pointer;
-  user-select: none;
-  color: var(--text-color);
-}
-
-.checkbox-wrapper-46 .cbx span:first-child {
-  display: inline-block;
-  width: 20px;
-  height: 20px;
-  border: 2px solid var(--border-color);
-  border-radius: 3px;
-  background-color: var(--surface-secondary);
-  transition: all 0.3s ease;
-  position: relative;
-}
-
-.checkbox-wrapper-46 .cbx span:first-child svg {
-  position: absolute;
-  top: 3px;
-  left: 2px;
-  fill: none;
-  stroke: white;
-  stroke-width: 2;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  stroke-dasharray: 16px;
-  stroke-dashoffset: 16px;
-  transition: all 0.3s ease;
-  transition-delay: 0.1s;
-  transform: translate3d(0, 0, 0);
-}
-
-.checkbox-wrapper-46 input[type="checkbox"]:checked+.cbx span:first-child {
-  background-color: var(--primary-color);
-  border-color: var(--primary-color);
-}
-
-.checkbox-wrapper-46 input[type="checkbox"]:checked+.cbx span:first-child svg {
-  opacity: 1;
-  stroke-dashoffset: 0;
-}
-
-.checkbox-wrapper-46 .cbx span:last-child {
-  padding-left: 8px;
-  color: var(--color-text);
-}
-
-.checkbox-wrapper-46 .cbx:hover span:first-child {
-  border-color: var(--color-primary);
-}
-
-.checkbox-wrapper-46 .inp-cbx:checked + .cbx span:first-child {
-  background: var(--color-primary);
-  border-color: var(--color-primary);
-  animation: wave-46 0.4s ease;
-}
-
-.checkbox-wrapper-46 .inp-cbx:checked + .cbx span:first-child svg {
-  stroke-dashoffset: 0;
-}
-
-.checkbox-wrapper-46 .inp-cbx:checked + .cbx span:first-child:before {
-  transform: scale(3.5);
-  opacity: 0;
-  transition: all 0.6s ease;
-}
-
-@keyframes wave-46 {
-  50% {
-    transform: scale(0.9);
-  }
-}
-
-/* ========================================
-   MENSAJES DE ERROR Y ÉXITO
-   ======================================== */
-.error {
-  color: #dc3545;
-  font-size: 0.875rem;
-  margin-top: var(--spacing-xs);
-}
-
-.success {
-  color: #28a745;
-  font-size: 0.875rem;
-  padding: var(--spacing-sm);
-  background-color: rgba(40, 167, 69, 0.1);
-  border-radius: 4px;
-  margin-top: var(--spacing-sm);
-}
-
-/* ========================================
-   FILTER DROPDOWN
-   ======================================== */
-.filter-dropdown {
-  position: relative;
-  border: 1px solid var(--border-color);
-  border-radius: 4px;
-  padding: var(--spacing-md);
-  background-color: var(--surface-secondary);
-}
-
-.filter-dropdown .filter-buttons {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  right: 0;
-  background-color: var(--surface-secondary);
-  border: 1px solid var(--border-color);
-  border-top: none;
-  border-radius: 0 0 4px 4px;
-  z-index: 1000;
-  padding: var(--spacing-md);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  display: none;
-}
-
-.filter-dropdown .filter-buttons input[type="text"] {
-  width: 100%;
-  padding: var(--spacing-sm) var(--spacing-md);
-  border: 1px solid var(--border-color);
-  border-radius: 4px;
-  background-color: var(--surface-secondary);
-  color: var(--text-color);
-  font-size: 1rem;
-  transition: border-color 0.3s ease;
-  box-sizing: border-box;
-  margin-bottom: var(--spacing-sm);
-}
-
-.filter-dropdown .filter-buttons input[type="text"]:focus {
-  outline: none;
-  border-color: var(--primary-color);
-  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
-}
-
-.filter-dropdown .filter-buttons input[type="text"]::placeholder {
-  color: var(--text-secondary);
-}
-
-.filter-dropdown .filter-buttons input[type="text"]:-webkit-autofill {
-  background-color: var(--surface-secondary) !important;
-  -webkit-box-shadow: 0 0 0px 900px var(--surface-secondary) inset !important;
-  -webkit-text-fill-color: var(--text-color) !important;
-}
-
-.filter-dropdown[open] .filter-buttons {
-  display: block;
-}
-
-.filter-dropdown summary {
-  font-weight: 600;
-  color: var(--primary-color);
-  list-style: none;
-  user-select: none;
-}
-
-.filter-dropdown summary::-webkit-details-marker {
-  display: none;
-}
-
-.filter-dropdown summary::before {
-  content: '▶\00A0';
-  display: inline-block;
-  transition: transform 0.3s ease;
-}
-
-.filter-dropdown[open] summary::before {
-  transform: rotate(90deg);
-}
-
-.filter-dropdown summary:hover {
-  color: var(--secondary-color);
-}
-
-.filter-dropdown[open] summary {
-  color: var(--text-color);
 }
 
-/* ========================================
-   RESPONSIVE - Pantallas pequeñas
-   ======================================== */
 @media (max-width: 767px) {
   .card {
     padding: var(--spacing-md);
-    overflow-y: auto;
-    max-height: calc(100vh - 200px);
+    overflow: visible;
+    max-height: none;
   }
 
   h2 {
     font-size: 1.5rem;
   }
 
-  .tabs_wrap ul {
+  .card .filters-map {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--spacing-md);
+    margin-top: var(--spacing-sm);
+  }
+
+  .card .form-map {
+    display: flex;
     flex-direction: column;
-    border-bottom: none;
+    gap: var(--spacing-md);
   }
 
-  .tabs_wrap li {
-    border-bottom: 1px solid var(--border-color);
-    margin-bottom: 0;
+  .form-wrapper,
+  .map-wrapper {
+    flex: 1 1 auto;
+    height: auto;
+    margin-right: 0;
   }
 
-  .tabs_wrap li.active {
-    background-color: var(--light-blue);
-    border-left: 3px solid var(--primary-color);
+  .form-wrapper {
+    margin-bottom: var(--spacing-md);
+  }
+
+  .map-wrapper {
+    min-height: 45vh;
   }
 
   .card .form-map app-map-page {
-    height: 50%;
+    height: 100%;
   }
 }

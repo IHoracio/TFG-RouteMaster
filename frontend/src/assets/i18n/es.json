@@ -89,7 +89,8 @@
         "linkCopied": "Enlace de ruta copiado",
         "searchRoute": "Debes crear una ruta primero",
         "selectRoute": "Ruta Guardada",
-        "noRouteSelected": "No se ha seleccionado ninguna ruta"
+        "noRouteSelected": "No se ha seleccionado ninguna ruta",
+        "noFavoriteGas": "No tienes gasolineras favoritas"
     },
     "fuelTypes": {
         "GASOLINE": "Gasolina",

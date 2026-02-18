@@ -1,16 +1,63 @@
 .modal-overlay {
   position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(0,0,0,0.5);
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: transparent;  /* Fondo transparente */
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 1000;
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
 }
 
 .modal-content {
-  background: var(--color-card);
-  padding: 20px;
+  background: var(--header-footer-gradient-end);
+  color: var(--text-color);
+  padding: var(--spacing-lg);
   border-radius: 8px;
+  max-width: 500px;
+  width: 90%;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   text-align: center;
+  transition: opacity 0.3s ease;
+}
+
+.modal-content h3 {
+  margin-top: 0;
+  color: var(--primary-color);
+  font-size: 1.25rem;
+}
+
+.modal-content p {
+  margin: var(--spacing-md) 0;
+  color: var(--text-color);
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.modal-content button {
+  padding: var(--spacing-sm) var(--spacing-md);
+  margin: 0 var(--spacing-xs);
+  margin-top: var(--spacing-xs);
+  background: linear-gradient(to left, var(--header-footer-gradient-start), var(--header-footer-gradient-end));
+  color: var(--text-color);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 1rem;
+}
+
+.modal-content button:hover {
+  background-color: var(--light-blue);
+  border-color: var(--primary-color);
+}
+
+.modal-content button:active {
+  background-color: var(--primary-color);
+  color: white;
+  border-color: var(--primary-color);
 }

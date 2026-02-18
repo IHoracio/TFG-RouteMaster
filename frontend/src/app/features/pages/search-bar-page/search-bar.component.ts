@@ -1,24 +1,25 @@
 import { Component, inject, signal, OnInit, computed, effect, ViewChild, ElementRef } from '@angular/core';
-import { FormsModule } from '@angular/forms';
 import { RouteFormResponse } from '../../../Dto/route-form-response';
 import { MapPageComponent } from '../map-page/map-page.component';
 import { SearchBarService } from '../../../services/search-bar/search-bar.service';
-import { NgClass, NgFor, NgIf } from '@angular/common';
+import { NgClass } from '@angular/common';
 import { RouteService } from '../../../services/routes/route.service';
-import { FavouriteGasStation } from '../../../Dto/gas-station';
-import { SavedRoute } from '../../../Dto/saved-route';
 import { TranslationService } from '../../../services/translation.service';
-import { GasStation } from '../../../Dto/gas-station';
+import { FavouriteGasStation, GasStation } from '../../../Dto/gas-station';
 import { UserInfoService } from '../../../services/user-page/user-info.service';
 import { UserPreferencesService } from '../../../services/user-page/user-preferences.service';
 import { AuthService } from '../../../services/auth/auth-service.service';
 import { AuthGuard } from '../../../guards/auth.guard';
 import { MapCommunicationService } from '../../../services/map/map-communication.service';
 import { LoginPromptComponent } from '../../components/search-bar-components/login-prompt/login-prompt.component';
+import { SavedRouteDto, RoutePreferencesDto } from '../../../Dto/user-dtos';
+import { SearchBarTabsComponent } from '../../components/search-bar-components/search-bar-tabs/search-bar-tabs.component';
+import { SearchBarFiltersComponent } from '../../components/search-bar-components/search-bar-filters/search-bar-filters.component';
+import { SearchBarFormComponent } from '../../components/search-bar-components/search-bar-form/search-bar-form.component';
 
 @Component({
   selector: 'app-search-bar',
-  imports: [FormsModule, MapPageComponent, NgFor, NgIf, NgClass, LoginPromptComponent],
+  imports: [MapPageComponent, NgClass, LoginPromptComponent, SearchBarTabsComponent, SearchBarFiltersComponent, SearchBarFormComponent],
   templateUrl: './search-bar.component.html',
   styleUrl: './search-bar.component.css'
 })
@@ -40,7 +41,7 @@ export class SearchBarComponent implements OnInit {
   userPreferences = inject(UserPreferencesService);
 
   favouriteGasStations = signal<FavouriteGasStation[]>([]);
-  savedRoute = signal<SavedRoute[]>([]);
+  savedRoute = signal<SavedRouteDto[]>([]);
   preferredBrands: string[] = [];
   fuelType: string = 'ALL';
   maxPrice: number = 0;
@@ -76,6 +77,7 @@ export class SearchBarComponent implements OnInit {
   };
 
   activeTab: string = 'destination';
+  selectedSavedRoute: number | null = null;
 
   @ViewChild('card', { static: true }) card!: ElementRef;
 
@@ -94,7 +96,6 @@ export class SearchBarComponent implements OnInit {
     effect(() => {
       this.mapCommunication.sendGasStations(this.filteredGasStations());
     });
-
   }
 
   ngOnInit(): void {
@@ -105,7 +106,7 @@ export class SearchBarComponent implements OnInit {
     this.authService.getUserSession().subscribe(logged => {
       this.isLoggedIn.set(logged);
       if (logged) {
-        this.userPreferences.getUserPreferences().subscribe(pref => {
+        this.userPreferences.getUserPreferences().subscribe((pref: RoutePreferencesDto) => {
           this.routeFormResponse.avoidTolls = pref.avoidTolls;
           this.preferredBrands = pref.preferredBrands;
           this.fuelType = pref.fuelType;
@@ -115,12 +116,19 @@ export class SearchBarComponent implements OnInit {
         });
         this.searchBarService
           .saveFavouriteGasStations()
-          .subscribe(gas => this.favouriteGasStations.set(JSON.parse(gas))
-          );
+          .subscribe(gas => {
+            const parsedGas = JSON.parse(gas) as FavouriteGasStation[];
+            console.log('Gasolineras parseadas:', parsedGas);
+            this.favouriteGasStations.set(parsedGas);
+          });
         this.searchBarService
           .saveSavedRoutes()
           .subscribe(route => {
-            this.savedRoute.set(JSON.parse(route));
+            try {
+              const parsedRoutes = JSON.parse(route) as SavedRouteDto[];
+              this.savedRoute.set(parsedRoutes);
+            } catch (e) {
+            }
           });
       } else {
         this.favouriteGasStations.set([]);
@@ -170,8 +178,39 @@ export class SearchBarComponent implements OnInit {
   submitted: boolean = false;
   onSubmit() {
     this.submitted = true;
+    if (this.activeTab === 'route') {
+      const selected = this.selectedSavedRoute;
+      if (selected) {
+        const route = this.savedRoute().find(r => r.routeId == selected);
+        if (route) {
+          if (route.points && Array.isArray(route.points)) {
+            const originPoint = route.points.find(p => p.type === 'ORIGIN');
+            const destPoint = route.points.find(p => p.type === 'DESTINATION');
+            const waypoints = route.points.filter(p => p.type === 'WAYPOINT').map(p => p.address);
+            this.routeFormResponse.origin = originPoint?.address || '';
+            this.routeFormResponse.destination = destPoint?.address || '';
+            this.routeFormResponse.waypoints = waypoints;
+            this.routeFormResponse.optimizeWaypoints = route.optimizeWaypoints ?? false;
+            this.routeFormResponse.optimizeRoute = route.optimizeRoute ?? false;
+            this.routeFormResponse.avoidTolls = route.avoidTolls ?? false;
+          } else {
+            this.successfulMessage = "";
+            return;
+          }
+        } else {
+          this.errorMessage = this.translation.translate('search.routeNotFound');
+          this.successfulMessage = "";
+          return;
+        }
+      } else {
+        this.errorMessage = this.translation.translate('search.noRouteSelected');
+        this.successfulMessage = "";
+        return;
+      }
+    }
     this.searchBarService.onSubmit(this.routeFormResponse).subscribe({
       next: (gasStations) => {
+        console.log('onSubmit exitoso, gasStations:', gasStations);
         this.allGasStations.set(gasStations);
         this.createdRoute.set(true);
       },
@@ -206,7 +245,6 @@ export class SearchBarComponent implements OnInit {
     return stations;
   });
 
-
   trackByIndex(index: number) {
     return index;
   }
@@ -229,8 +267,10 @@ export class SearchBarComponent implements OnInit {
     this.searchBarService.saveFavouriteRoute(this.routeAlias, this.routeFormResponse)
       .subscribe({
         next: (response) => {
+          this.savedRoute.update(routes => [...routes, response as SavedRouteDto]);
           this.successfulMessage = this.translation.translate('search.routeSaved');
           this.errorMessage = "";
+          this.routeAlias = "";
         }, error: (err) => {
           this.errorMessage = this.translation.translate('search.saveError');
           this.successfulMessage = "";

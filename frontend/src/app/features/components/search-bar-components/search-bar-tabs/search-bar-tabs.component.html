@@ -1,0 +1,13 @@
+<div class="tabs_wrap">
+  <ul>
+    <li [ngClass]="{ active: activeTab() === 'destination' }" (click)="setTab('destination')">
+      {{ translation.translate('search.tabs.destination') }}
+    </li>
+    <li [ngClass]="{ active: activeTab() === 'gas' }" (click)="setTab('gas')">
+      {{ translation.translate('search.tabs.gas') }}
+    </li>
+    <li [ngClass]="{ active: activeTab() === 'route' }" (click)="setTab('route')">
+      {{ translation.translate('search.tabs.route') }}
+    </li>
+  </ul>
+</div>

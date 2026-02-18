@@ -1,219 +1,27 @@
 <div class="container">
   <section class="card" #card>
     <h2>{{ translation.translate('search.title') }}</h2>
-    <div class="tabs_wrap">
-      <ul>
-        <li [ngClass]="{ active: activeTab === 'destination' }" (click)="setTab('destination')">
-          {{ translation.translate('search.tabs.destination') }}
-        </li>
-        <li [ngClass]="{ active: activeTab === 'gas' }" (click)="setTab('gas')">
-          {{ translation.translate('search.tabs.gas') }}
-        </li>
-        <li [ngClass]="{ active: activeTab === 'route' }" (click)="setTab('route')">
-          {{ translation.translate('search.tabs.route') }}
-        </li>
-      </ul>
-    </div>
+    <app-search-bar-tabs [activeTab]="activeTab" (tabChange)="setTab($event)"></app-search-bar-tabs>
     <div class="filters-map">
-      <details class="filter-dropdown">
-        <summary>{{ translation.translate('search.gasFilters') }}</summary>
-        <div class="filter-buttons">
-          <button (click)="toggleFilterByCheapest()" [class.active]="filterByCheapest()">{{
-            translation.translate('search.cheapest') }}</button>
-          <button (click)="toggleFilterByBrands()" [disabled]="!isLoggedIn()" [class.active]="filterByBrands()"
-            [title]="!isLoggedIn() ? translation.translate('auth.loginRequired') : ''">{{
-            translation.translate('search.favoriteBrands') }}</button>
-          <button (click)="toggleFilterByMaxPrice()" [disabled]="!isLoggedIn()" [class.active]="filterByMaxPrice()"
-            [title]="!isLoggedIn() ? translation.translate('auth.loginRequired') : ''">{{
-            translation.translate('search.maxPrice') }}</button>
-        </div>
-      </details>
-      <details class="filter-dropdown">
-        <summary>{{ translation.translate('search.saveRoute') }}</summary>
-        <div class="filter-buttons">
-          <input type="text" id="routeAlias" name="routeAlias" [(ngModel)]="routeAlias"
-            [placeholder]="translation.translate('search.routeAliasPlaceholder')" />
-          <button type="button" (click)="saveRoute()" [disabled]="!createdRoute()"
-            [title]="!createdRoute() ? translation.translate('search.searchRoute') : ''">{{
-            translation.translate('search.saveRoute') }}</button>
-          <div *ngIf="successfulMessage" class="success">{{ successfulMessage }}</div>
-          <div *ngIf="errorMessage" class="error">{{ errorMessage }}</div>
-        </div>
-      </details>
-      <div class="share-container">
-        <button class="share-btn" (click)="shareRoute()" [disabled]="!createdRoute()"
-          [title]="!createdRoute() ? translation.translate('search.searchRoute') : ''">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="18" cy="5" r="3"></circle>
-            <circle cx="6" cy="12" r="3"></circle>
-            <circle cx="18" cy="19" r="3"></circle>
-            <path d="m8.59 13.51 6.83 3.98"></path>
-            <path d="m15.41 6.51-6.82 3.98"></path>
-          </svg>
-        </button>
-        <div class="share-message" [class.show]="showShareMessage()">{{ translation.translate('search.linkCopied') }}
-        </div>
-      </div>
+      <app-search-bar-filters [isLoggedIn]="isLoggedIn()" [filterByCheapest]="filterByCheapest()"
+        [filterByBrands]="filterByBrands()" [filterByMaxPrice]="filterByMaxPrice()" [routeAlias]="routeAlias"
+        [createdRoute]="createdRoute()" [successfulMessage]="successfulMessage" [errorMessage]="errorMessage"
+        [showShareMessage]="showShareMessage()" (toggleFilterByCheapest)="toggleFilterByCheapest()"
+        (toggleFilterByBrands)="toggleFilterByBrands()" (toggleFilterByMaxPrice)="toggleFilterByMaxPrice()"
+        (routeAliasChange)="routeAlias = $event" (saveRoute)="saveRoute()" (shareRoute)="shareRoute()">
+      </app-search-bar-filters>
     </div>
     <div class="form-map" [ngClass]="{ 'collapsed': isFormCollapsed }">
       <div class="form-wrapper">
-        <form class="form-container" (ngSubmit)="onSubmit()" #form="ngForm">
-          <button type="button" class="collapse-btn" (click)="toggleFormCollapse()">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-              stroke-linecap="round" stroke-linejoin="round">
-              <path d="M15 18l-6-6 6-6" *ngIf="!isFormCollapsed"></path>
-              <path d="M9 18l6-6-6-6" *ngIf="isFormCollapsed"></path>
-            </svg>
-          </button>
-          @if(activeTab === "route") {
-          <p class="collapsible-content">
-            <label class="collapsible-content" for="savedRoute" id="selectRoute">{{
-              translation.translate('search.selectRoute') }}</label>
-            <span class="collapsible-content choose-route-text">{{ translation.translate('search.chooseRoute') }}</span>
-            <select class="collapsible-content" name="savedRoute" id="savedRoute" [(ngModel)]="selectedSavedRoute"
-              required>
-              <option *ngFor="let route of savedRoute()" [value]="route.routeId">{{ route.name }}</option>
-            </select>
-          </p>
-          <button type="submit" class="collapsible-content" id="submit-button">{{ translation.translate('search.submit')
-            }}</button>
-          } @else {
-          @if(activeTab === "destination" || activeTab === "gas") {
-          <p class="collapsible-content">
-            <label class="collapsible-content" id="originField" for="origin">{{ translation.translate('search.origin')
-              }}</label>
-            <input class="form-control collapsible-content" type="text" id="origin" name="origin"
-              [(ngModel)]="routeFormResponse.origin" [placeholder]="translation.translate('search.originPlaceholder')"
-              required #originField="ngModel" (focus)="scrollToCard()" />
-            @if(originField && originField.touched) {
-          <div class="error collapsible-content">
-            @if(originField.errors?.['required']) {
-            {{ translation.translate('search.originRequired') }}
-            }
-          </div>
-          }
-          </p>
-          }
-          @if(activeTab === "destination") {
-          <p class="collapsible-content">
-            <label class="collapsible-content" for="destination">{{ translation.translate('search.destination')
-              }}</label>
-            <input class="form-control collapsible-content" type="text" id="destination" name="destination"
-              [(ngModel)]="routeFormResponse.destination"
-              [placeholder]="translation.translate('search.destinationPlaceholder')" required
-              #destinationField="ngModel" />
-            @if(destinationField && destinationField.touched) {
-          <div class="error collapsible-content">
-            @if(destinationField.errors?.['required']) {
-            {{ translation.translate('search.destinationRequired') }}
-            }
-          </div>
-          }
-          </p>
-          }
-          <p class="collapsible-content" id="waypoints">{{ translation.translate('search.waypoints') }}</p>
-          <button (click)="addWaypoint()" type="button" class="button collapsible-content">
-            <span class="button__text">{{ translation.translate('search.add') }}</span>
-            <span class="button__icon">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" viewBox="0 0 24 24" stroke-width="2"
-                stroke-linejoin="round" stroke-linecap="round" stroke="currentColor" height="24" fill="none"
-                class="svg">
-                <line y2="19" y1="5" x2="12" x1="12"></line>
-                <line y2="12" y1="12" x2="19" x1="5"></line>
-              </svg>
-            </span>
-          </button>
-          <div *ngFor="let waypoint of routeFormResponse.waypoints; let i = index; trackBy: trackByIndex"
-            class="collapsible-content">
-            <select class="collapsible-content" [(ngModel)]="waypointTypes[i]" [name]="'type' + i">
-              <option value="text">{{ translation.translate('search.address') }}</option>
-              <option value="gas">{{ translation.translate('search.favoriteGas') }}</option>
-            </select>
-            @if(waypointTypes[i]==="text") {
-            <input class="form-control collapsible-content" type="text" [name]="'waypoint' + i"
-              [(ngModel)]="routeFormResponse.waypoints[i]"
-              [placeholder]="translation.translate('search.addressPlaceholder')" />
-            }
-            @if(waypointTypes[i]==="gas") {
-            <select class="collapsible-content" [name]="'waypoint' + i" [(ngModel)]="routeFormResponse.waypoints[i]">
-              @if (isLoggedIn()) {
-              <option *ngFor="let gasStation of favouriteGasStations()" [value]="gasStation.direccion">
-                {{ gasStation.alias }} — {{ gasStation.marca }}
-              </option>
-              } @else {
-              <option disabled>{{ translation.translate('search.loginToSeeGas') }}</option>
-              }
-            </select>
-            }
-          </div>
-          <button (click)="deleteWaypoint()" type="button" class="button-delete collapsible-content">
-            <span class="button__text">{{ translation.translate('search.delete') }}</span>
-            <span class="button__icon">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" viewBox="0 0 24 24" stroke-width="2"
-                stroke-linejoin="round" stroke-linecap="round" stroke="currentColor" height="24" fill="none"
-                class="svg">
-                <line y2="19" y1="5" x2="12" x1="12"></line>
-                <line y2="12" y1="12" x2="19" x1="5"></line>
-              </svg>
-            </span>
-          </button>
-          <div class="checkbox-wrapper-46 collapsible-content">
-            <input [(ngModel)]="routeFormResponse.optimizeWaypoints" type="checkbox" id="optimizeWaypoints"
-              class="inp-cbx" name="optimizeWaypoints" />
-            <label for="optimizeWaypoints" class="cbx">
-              <span>
-                <svg viewBox="0 0 12 10" height="10px" width="12px">
-                  <polyline points="1.5 6 4.5 9 10.5 1"></polyline>
-                </svg>
-              </span>
-              <span>{{ translation.translate('search.optimizeWaypoints') }}</span>
-            </label>
-          </div>
-          <div class="checkbox-wrapper-46 collapsible-content">
-            <input [(ngModel)]="routeFormResponse.optimizeRoute" type="checkbox" id="optimizeRoute" class="inp-cbx"
-              name="optimizeRoute" />
-            <label for="optimizeRoute" class="cbx">
-              <span>
-                <svg viewBox="0 0 12 10" height="10px" width="12px">
-                  <polyline points="1.5 6 4.5 9 10.5 1"></polyline>
-                </svg>
-              </span>
-              <span>{{ translation.translate('search.optimizeRoute') }}</span>
-            </label>
-          </div>
-          <div class="checkbox-wrapper-46 collapsible-content">
-            <input [(ngModel)]="routeFormResponse.avoidTolls" type="checkbox" id="avoidTolls" class="inp-cbx"
-              name="avoidTolls" />
-            <label for="avoidTolls" class="cbx">
-              <span>
-                <svg viewBox="0 0 12 10" height="10px" width="12px">
-                  <polyline points="1.5 6 4.5 9 10.5 1"></polyline>
-                </svg>
-              </span>
-              <span>{{ translation.translate('search.avoidTolls') }}</span>
-            </label>
-          </div>
-          @if(activeTab === "gas") {
-          <p class="collapsible-content">
-            <select class="collapsible-content" name="gasStation" id="gasStation"
-              [(ngModel)]="routeFormResponse.destination" required>
-              <option value="">{{ translation.translate('search.chooseGas') }}</option>
-              @if (isLoggedIn()) {
-              <option *ngFor="let gasStation of favouriteGasStations()" [value]="gasStation.direccion">
-                {{ gasStation.alias }} — {{ gasStation.marca }}
-              </option>
-              } @else {
-              <option disabled>{{ translation.translate('search.loginToSeeGas') }}</option>
-              }
-            </select>
-          </p>
-          }
-          <button type="submit" class="collapsible-content" [disabled]="!form.valid" id="submit-button">{{
-            translation.translate('search.submit') }}</button>
-          }
-          <div *ngIf="successfulMessage" class="success collapsible-content">{{ successfulMessage }}</div>
-          <div *ngIf="errorMessage" class="error collapsible-content">{{ errorMessage }}</div>
-        </form>
+        <app-search-bar-form [activeTab]="activeTab" [isFormCollapsed]="isFormCollapsed"
+          [routeFormResponse]="routeFormResponse" [waypointTypes]="waypointTypes"
+          [favouriteGasStations]="favouriteGasStations()" [savedRoute]="savedRoute()"
+          [selectedSavedRoute]="selectedSavedRoute" [isLoggedIn]="isLoggedIn()"
+          [successfulMessage]="successfulMessage" [errorMessage]="errorMessage"
+          (selectedSavedRouteChange)="selectedSavedRoute = $event" (toggleFormCollapse)="toggleFormCollapse()"
+          (addWaypoint)="addWaypoint()" (deleteWaypoint)="deleteWaypoint()" (submit)="onSubmit()"
+          (originFocus)="scrollToCard()">
+        </app-search-bar-form>
       </div>
       <div class="map-wrapper">
         <app-map-page></app-map-page>

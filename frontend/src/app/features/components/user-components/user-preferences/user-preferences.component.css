@@ -1,9 +1,15 @@
 .user-preferences {
-  background: var(--color-card);
-  padding: 20px;
-  border-radius: var(--border-radius);
-  box-shadow: var(--card-shadow);
-  color: var(--color-text);
+  background: linear-gradient(to left, var(--header-footer-gradient-start), var(--header-footer-gradient-end));
+  padding: var(--spacing-lg);
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  color: var(--text-color);
+  border: 1px solid var(--border-color);
+}
+
+.user-preferences h2 {
+  color: var(--primary-color);
+  margin-bottom: var(--spacing-md);
 }
 
 .preferences-form {
@@ -18,17 +24,17 @@
 }
 
 .form-group label {
-  margin-bottom: 5px;
-  font-weight: bold;
+  margin-bottom: 6px;
+  font-weight: 600;
   color: inherit;
 }
 
 .form-group select,
 .form-group input {
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  background: inherit;
+  padding: 8px 10px;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  background: var(--surface-secondary);
   color: inherit;
 }
 
@@ -39,36 +45,36 @@
 }
 
 .form-group input[type="checkbox"] {
-  width: 24px;
-  height: 24px;
+  width: 22px;
+  height: 22px;
   cursor: pointer;
   -webkit-appearance: none;
   appearance: none;
-  border: 2px solid #ccc;
+  border: 2px solid var(--border-color);
   border-radius: 4px;
-  background: inherit;
+  background: var(--surface-secondary);
   position: relative;
   transition: background-color 0.2s, border-color 0.2s;
 }
 
 .form-group input[type="checkbox"]:checked {
-  background: var(--color-primary);
-  border-color: var(--color-primary);
+  background: var(--primary-color);
+  border-color: var(--primary-color);
 }
 
 .form-group input[type="checkbox"]:checked::after {
-  content: '✓';
+  content: 'x';
   color: white;
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  font-size: 16px;
-  font-weight: bold;
+  font-size: 14px;
+  font-weight: 700;
 }
 
 .form-group input[type="checkbox"]:hover {
-  border-color: var(--color-primary);
+  border-color: var(--primary-color);
 }
 
 .form-group ul {
@@ -82,8 +88,8 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 5px 0;
-  border-bottom: 1px solid #ddd;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--border-color);
   color: inherit;
 }
 
@@ -91,18 +97,18 @@
   list-style: none;
   padding: 0;
   margin: 0;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  max-height: 120px;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  max-height: 140px;
   overflow-y: auto;
-  background: inherit;
+  background: var(--surface-secondary);
   color: inherit;
 }
 
 .dropdown-list li {
   padding: 8px;
   cursor: pointer;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
   color: inherit;
 }
 
@@ -119,15 +125,17 @@
 .buttons button {
   padding: 10px 15px;
   border: none;
-  border-radius: 4px;
+  border-radius: 6px;
   cursor: pointer;
   font-size: 14px;
-  background: var(--color-primary);
+  background: var(--primary-color);
   color: white;
+  transition: background-color 0.2s ease, transform 0.2s ease;
 }
 
 .buttons button:first-child:hover {
-  background: var(--color-primary-light);
+  background: var(--secondary-color);
+  transform: scale(1.02);
 }
 
 .buttons button:last-child {
@@ -137,34 +145,36 @@
 
 .buttons button:last-child:hover {
   background: #c82333;
+  transform: scale(1.02);
 }
 
 .clickable-station {
   cursor: pointer;
   padding: 8px;
-  border: 1px solid #ddd;
-  margin-bottom: 4px;
-  border-radius: 4px;
-  transition: background-color 0.2s;
-  background: inherit;
+  border: 1px solid var(--border-color);
+  margin-bottom: 6px;
+  border-radius: 6px;
+  transition: background-color 0.2s, border-color 0.2s;
+  background: var(--surface-secondary);
   color: inherit;
 }
 
 .clickable-station:hover {
   background-color: rgba(0, 123, 255, 0.1);
+  border-color: var(--primary-color);
 }
 
 .clickable-station.selected {
-  background-color: rgba(204, 229, 255, 0.5);
-  border-color: var(--color-primary);
+  background-color: rgba(204, 229, 255, 0.35);
+  border-color: var(--primary-color);
 }
 
 .added-station {
   padding: 8px;
-  border: 1px solid #ddd;
-  margin-bottom: 4px;
-  border-radius: 4px;
-  background-color: rgba(245, 245, 245, 0.5);
+  border: 1px solid var(--border-color);
+  margin-bottom: 6px;
+  border-radius: 6px;
+  background-color: rgba(255, 255, 255, 0.6);
   color: inherit;
 }
 
@@ -176,10 +186,10 @@
 }
 
 .slider-container input[type="range"] {
-  width: 150px;
+  width: 160px;
   -webkit-appearance: none;
   appearance: none;
-  background: #ddd;
+  background: var(--border-color);
   height: 6px;
   border-radius: 3px;
   outline: none;
@@ -190,7 +200,7 @@
   appearance: none;
   width: 16px;
   height: 16px;
-  background: var(--color-primary);
+  background: var(--primary-color);
   border-radius: 50%;
   cursor: pointer;
   border: none;
@@ -199,17 +209,17 @@
 .slider-container input[type="range"]::-moz-range-thumb {
   width: 16px;
   height: 16px;
-  background: var(--color-primary);
+  background: var(--primary-color);
   border-radius: 50%;
   cursor: pointer;
   border: none;
 }
 
 .map-container {
-  height: 400px;
+  height: 360px;
   width: 100%;
-  border: 1px solid #ddd;
-  border-radius: 4px;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
   margin-top: 10px;
   overflow: hidden;
 }
@@ -223,15 +233,15 @@
   cursor: pointer;
   margin-left: 5px;
   font-size: 16px;
-  color: var(--color-primary);
+  color: var(--primary-color);
 }
 
 .info-tooltip {
   margin-top: 5px;
   padding: 10px;
   background: rgba(233, 236, 239, 0.8);
-  border: 1px solid #ccc;
-  border-radius: 4px;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
   font-size: 14px;
   color: inherit;
 }
@@ -249,23 +259,24 @@
 
 .collapsible {
   margin-bottom: 10px;
-  border-radius: 4px;
+  border-radius: 6px;
   overflow: hidden;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--border-color);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
 }
 
 .collapsible h3 {
   cursor: pointer;
-  background: linear-gradient(to right, var(--color-primary), var(--color-primary-light));
+  background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
   color: white;
-  padding: 1rem;
+  padding: 0.85rem 1rem;
   margin: 0;
-  font-size: 1.1rem;
+  font-size: 1rem;
   transition: background-color 0.2s;
 }
 
 .collapsible h3:hover {
-  background: linear-gradient(to right, var(--color-primary-light), var(--color-primary));
+  background: linear-gradient(to right, var(--secondary-color), var(--primary-color));
 }
 
 .collapsible > div {
