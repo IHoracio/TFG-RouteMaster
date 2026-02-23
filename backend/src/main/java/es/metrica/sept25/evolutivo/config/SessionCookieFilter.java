@@ -32,6 +32,7 @@ public class SessionCookieFilter extends OncePerRequestFilter {
 				|| !path.startsWith("/api/")
 				|| path.startsWith("/api/routes")
 				|| path.startsWith("/api/route")
+				|| path.startsWith("/api/geocode/normal")
 				|| path.startsWith("/api/oil/gasolineras/radio/coords");
 	}
 
