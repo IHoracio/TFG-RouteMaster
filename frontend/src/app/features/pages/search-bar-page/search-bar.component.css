@@ -12,6 +12,37 @@
   box-sizing: border-box;
 }
 
+.form-map {
+  overflow: hidden;
+  position: relative;
+}
+
+.form-map::before {
+  content: "RouteMaster";
+  writing-mode: vertical-rl;
+  text-orientation: sideways-left;
+  position: absolute;
+  top: 50%;
+  left: 2px;
+  transform: translateY(-50%) scaleY(-1) scaleX(-1);
+  font-size: 2.5rem;
+  font-weight: 600;
+  color: var(--surface-secondary);
+  z-index: 1;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  text-shadow: 3px 2px 5px rgb(42, 53, 57);
+}
+
+:host-context(.dark) .form-map::before {
+  text-shadow: 3px 2px 5px rgb(177, 228, 248);
+}
+
+.form-map.collapsed::before {
+  opacity: 1;
+  transition: opacity 2.8s ease;
+}
+
 .card {
   width: 100%;
   max-width: 100%;
@@ -52,7 +83,8 @@ h2 {
   border-radius: 4px;
   padding: var(--spacing-md);
   position: relative;
-  overflow: hidden;
+  overflow-y: auto;
+  overflow-x: hidden;
   flex: 0 0 35%;
   transition: flex-basis 0.9s ease;
   height: calc(100vh - 70px);
@@ -111,7 +143,7 @@ h2 {
   }
 
   .form-wrapper {
-    flex: 0 0 35%;
+    flex: 0 0 33%;
     transition: flex-basis 0.9s ease, margin-right 0.9s ease;
     margin-right: var(--spacing-xl);
   }
@@ -121,11 +153,11 @@ h2 {
   }
 
   .form-map.collapsed .form-wrapper {
-    flex: 0 0 7%;
+    flex: 0 0 11%;
   }
 
   .form-map.collapsed .map-wrapper {
-    flex-basis: 90%;
+    flex-basis: 84%;
     max-width: none;
   }
 
@@ -136,13 +168,47 @@ h2 {
   .form-map.collapsed .form-wrapper::-webkit-scrollbar {
     display: none !important;
   }
+
+}
+
+@media (min-width: 990px) {
+  .form-map.collapsed .form-wrapper {
+    flex: 0 0 8.5%;
+  }
+
+  .form-map.collapsed .map-wrapper {
+    flex-basis: 87.5%;
+  }
+
+}
+
+@media (min-width: 1100px) {
+  .form-map.collapsed .form-wrapper {
+    flex: 0 0 8%;
+  }
+
+  .form-map.collapsed .map-wrapper {
+    flex-basis: 88%;
+  }
+
+  .form-map::before {
+    left: 9px;
+  }
+
 }
 
 @media (max-width: 767px) {
+  .container {
+    margin-top: -1rem;
+  }
+
   .card {
     padding: var(--spacing-md);
     overflow: visible;
     max-height: none;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
   }
 
   h2 {
@@ -152,12 +218,12 @@ h2 {
   .card .filters-map {
     display: grid;
     grid-template-columns: 1fr;
-    gap: var(--spacing-md);
-    margin-top: var(--spacing-sm);
+    gap: 0;
+    order: 2;
   }
 
   .card .form-map {
-    display: flex;
+    display: contents;
     flex-direction: column;
     gap: var(--spacing-md);
   }
@@ -170,14 +236,18 @@ h2 {
   }
 
   .form-wrapper {
-    margin-bottom: var(--spacing-md);
+    order: 1;
   }
 
   .map-wrapper {
+    height: 45vh;
     min-height: 45vh;
+    order: 3;
   }
 
-  .card .form-map app-map-page {
-    height: 100%;
+  .form-map.collapsed::before {
+    opacity: 0;
+    transition: none;
   }
+
 }

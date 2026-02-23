@@ -27,7 +27,14 @@
   min-width: 0;
 }
 
+/* ========================================
+   USER-PAGE - Mobile
+   ======================================== */
 @media (max-width: 768px) {
+  .user-page h1 {
+    margin-top: -6rem;
+  }
+
   .user-page {
     margin-top: 5rem;
   }

@@ -1,4 +1,4 @@
-import { Component, inject, input, output } from '@angular/core';
+import { Component, inject, input, output, ElementRef, Renderer2, AfterViewInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { NgIf } from '@angular/common';
 import { TranslationService } from '../../../../services/translation.service';
@@ -10,7 +10,7 @@ import { TranslationService } from '../../../../services/translation.service';
   templateUrl: './search-bar-filters.component.html',
   styleUrl: './search-bar-filters.component.css'
 })
-export class SearchBarFiltersComponent {
+export class SearchBarFiltersComponent implements AfterViewInit {
   isLoggedIn = input<boolean>(false);
   filterByCheapest = input<boolean>(false);
   filterByBrands = input<boolean>(false);
@@ -29,6 +29,23 @@ export class SearchBarFiltersComponent {
   routeAliasChange = output<string>();
 
   translation = inject(TranslationService);
+  private el = inject(ElementRef);
+  private renderer = inject(Renderer2);
+
+  ngAfterViewInit() {
+    const saveRouteDropdown = this.el.nativeElement.querySelector('.save-route-dropdown');
+    if (saveRouteDropdown) {
+      const summary = saveRouteDropdown.querySelector('summary');
+      if (summary) {
+        this.renderer.listen(summary, 'click', (event: Event) => {
+          if (!this.createdRoute()) {
+            event.preventDefault();
+            event.stopPropagation();
+          }
+        });
+      }
+    }
+  }
 
   onRouteAliasChange(value: string) {
     this.routeAliasChange.emit(value);

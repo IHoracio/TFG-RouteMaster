@@ -1,7 +1,6 @@
-import { Component, OnDestroy, signal, input, effect, AfterViewInit, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnDestroy, signal, input, effect, AfterViewInit, ChangeDetectionStrategy, computed } from '@angular/core';
 import { setOptions, importLibrary } from '@googlemaps/js-api-loader';
 import { MarkerClusterer } from '@googlemaps/markerclusterer';
-
 import { MapCommunicationService } from '../../../services/map/map-communication.service';
 import { environment } from '../../../../environments/environment';
 import { Coords } from '../../../Dto/maps-dtos';
@@ -13,6 +12,7 @@ import { UserPreferencesService } from '../../../services/user-page/user-prefere
 import { WeatherOverlayHostComponent } from '../../components/map-components/weather-overlay/weather-overlay-host/weather-overlay-host.component';
 import { AuthGuard } from '../../../guards/auth.guard';
 import { GasStationSelectionService } from '../../../services/user-page/gas-station-selection/gas-station-selection.service';
+import { ThemeService } from '../../../services/theme.service';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -24,6 +24,7 @@ import { GasStationSelectionService } from '../../../services/user-page/gas-stat
 })
 export class MapPageComponent implements OnDestroy, AfterViewInit {
   private static mapsOptionsSet = false;
+  private isRecreatingMap = false;
 
   public map?: google.maps.Map;
   private routePolyline?: google.maps.Polyline;
@@ -34,6 +35,7 @@ export class MapPageComponent implements OnDestroy, AfterViewInit {
   private markerClusterer?: MarkerClusterer;
   protected weatherRoute = signal<WeatherData[] | null>(null);
   protected createdRoute = signal<boolean>(false);
+  protected mapReady = signal<boolean>(false);
 
   protected selectedGasStation = signal<GasStation | null>(null);
   private selectedMarker: google.maps.marker.AdvancedMarkerElement | null = null;
@@ -53,6 +55,7 @@ export class MapPageComponent implements OnDestroy, AfterViewInit {
     private authGuard: AuthGuard,
     private userPreferences: UserPreferencesService,
     private gasStationSelectionService: GasStationSelectionService,
+    private themeService: ThemeService
   ) {
     effect(() => {
       this.gasStationsFromInput();
@@ -71,6 +74,13 @@ export class MapPageComponent implements OnDestroy, AfterViewInit {
     effect(() => {
       this.gasStationSelectionService.selectedStation.set(this.selectedGasStation());
     });
+
+    effect(() => {
+      this.themeService.selectedTheme();
+      if (this.map) {
+        void this.recreateMap();
+      }
+    });
   }
 
   async ngAfterViewInit(): Promise<void> {
@@ -84,11 +94,12 @@ export class MapPageComponent implements OnDestroy, AfterViewInit {
   }
 
   private async initMap(): Promise<void> {
+    this.mapReady.set(false);
     if (!MapPageComponent.mapsOptionsSet) {
       setOptions({
         key: environment.googleMapsApiKey,
         v: 'weekly',
-        language: this.translation.getCurrentLang().toLowerCase()
+        language: this.translation.getCurrentLang().toLowerCase(),
       });
       MapPageComponent.mapsOptionsSet = true;
     }
@@ -101,14 +112,30 @@ export class MapPageComponent implements OnDestroy, AfterViewInit {
     const mapOptions: google.maps.MapOptions = {
       center: { lat: 40.4168, lng: -3.7038 },
       zoom: 6,
-      tilt: 45,
       disableDefaultUI: true,
+      zoomControl: true,
       keyboardShortcuts: false,
-      mapId: environment.googleMapsMapId,
-      mapTypeId: this.getMapTypeId()
+      mapId: environment.mapId,
+      colorScheme: this.themeService.selectedTheme() === 'DARK'
+        ? google.maps.ColorScheme.DARK
+        : google.maps.ColorScheme.LIGHT,
+      mapTypeId : this.getMapTypeId(),
     };
 
     this.map = new Map(document.getElementById('map') as HTMLElement, mapOptions);
+    const mapInstance = this.map;
+    if (mapInstance) {
+      let readySet = false;
+      const markReady = () => {
+        if (readySet) return;
+        readySet = true;
+        this.mapReady.set(true);
+      };
+      mapInstance.addListener('idle', () => {
+        setTimeout(markReady, 0);
+      });
+      setTimeout(markReady, 1500);
+    }
     this.markerClusterer = new MarkerClusterer({
       map: this.map,
       minimumClusterSize: 3
@@ -116,6 +143,66 @@ export class MapPageComponent implements OnDestroy, AfterViewInit {
     this.mapComm.registerMapPage(this);
 
     this.updateMarkers();
+  }
+
+  private async recreateMap(): Promise<void> {
+    if (this.isRecreatingMap) return;
+    this.isRecreatingMap = true;
+    try {
+      const center = this.map?.getCenter() ?? null;
+      const zoom = this.map?.getZoom() ?? null;
+      const routePath = this.routePolyline?.getPath()?.getArray()?.map(point => ({
+        lat: point.lat(),
+        lng: point.lng()
+      })) ?? null;
+      const waypointCoords = this.waypoints
+        .map(marker => this.getMarkerCoords(marker))
+        .filter((coords): coords is Coords => coords !== null);
+
+      this.teardownMap();
+      await this.initMap();
+
+      if (this.map && center) {
+        this.map.setCenter(center);
+      }
+      if (this.map && typeof zoom === 'number') {
+        this.map.setZoom(zoom);
+      }
+      if (routePath && routePath.length) {
+        this.drawRoute(routePath);
+      }
+      if (waypointCoords.length) {
+        this.drawPoints(waypointCoords);
+      }
+    } finally {
+      this.isRecreatingMap = false;
+    }
+  }
+
+  private teardownMap(): void {
+    if (this.routePolyline) {
+      this.routePolyline.setMap(null);
+    }
+    if (this.waypoints && this.waypoints.length) {
+      this.waypoints.forEach(marker => {
+        marker.map = null;
+      });
+      this.waypoints = [];
+      this.startMarker = undefined;
+      this.endMarker = undefined;
+    }
+    this.clearGasStations();
+    this.markerClusterer = undefined;
+    this.map = undefined;
+  }
+
+  private getMarkerCoords(marker: google.maps.marker.AdvancedMarkerElement): Coords | null {
+    const position = marker.position;
+    if (!position) return null;
+    const lat = typeof position.lat === 'function' ? position.lat() : position.lat;
+    const lng = typeof position.lng === 'function' ? position.lng() : position.lng;
+    if (typeof lat !== 'number' || typeof lng !== 'number') return null;
+    return { lat, lng };
   }
 
   private getMapTypeId(): google.maps.MapTypeId {
@@ -325,7 +412,13 @@ export class MapPageComponent implements OnDestroy, AfterViewInit {
 
       if (hasValid) {
         if (this.fitToStations()) {
-          this.map.fitBounds(bounds, { top: 70, right: 120, bottom: 150, left: 120 });
+          if (stations.length === 1) {
+            const station = stations[0];
+            this.map.setCenter({ lat: Number(station.latitud), lng: Number(station.longitud) });
+            this.map.setZoom(12);
+          } else {
+            this.map.fitBounds(bounds, { top: 70, right: 120, bottom: 150, left: 120 });
+          }
         }
       } else {
         console.log('No valid gas stations to display on map');

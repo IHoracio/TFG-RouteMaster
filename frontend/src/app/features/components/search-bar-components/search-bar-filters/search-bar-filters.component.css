@@ -34,12 +34,12 @@
 }
 
 .filter-dropdown .filter-buttons button:hover {
-  background-color: var(--light-blue);
+  background: var(--light-blue);
   border-color: var(--primary-color);
 }
 
-.filter-buttons button.active {
-  background-color: var(--primary-color);
+.filter-dropdown[open] .filter-buttons button.active {
+  background: var(--primary-color);
   color: white;
   border-color: var(--primary-color);
 }
@@ -109,6 +109,21 @@
   color: var(--primary-color);
   list-style: none;
   user-select: none;
+  cursor: pointer;
+}
+
+.filter-dropdown.disabled summary {
+  cursor: not-allowed;
+  opacity: 0.6;
+  color: var(--text-secondary);
+}
+
+.filter-dropdown.disabled summary:hover {
+  color: var(--text-secondary);
+}
+
+.filter-dropdown.disabled summary::before {
+  opacity: 0.6;
 }
 
 .filter-dropdown summary::-webkit-details-marker {
@@ -159,13 +174,18 @@
   opacity: 0.6;
 }
 
+.share-btn:disabled:hover:active {
+  background-color: rgba(64, 89, 119, 0.3);
+  transform: scale(1);
+}
+
 ::ng-deep .dark .share-btn:disabled {
   background: rgba(58, 53, 53, 0.3) !important;
   cursor: not-allowed;
   opacity: 0.6;
 }
 
-.share-btn:hover {
+.share-btn:hover:active {
   background-color: var(--hover-button);
   transform: scale(1.05);
 }

@@ -37,7 +37,7 @@
     }
     @if(activeTab() === "destination") {
     <p class="collapsible-content">
-        <label class="collapsible-content" for="destination">{{ translation.translate('search.destination') }}</label>
+        <label class="collapsible-content" id="destinationField" for="destination">{{ translation.translate('search.destination') }}</label>
         <input class="form-control collapsible-content" type="text" id="destination" name="destination"
             [(ngModel)]="routeFormResponse().destination"
             [placeholder]="translation.translate('search.destinationPlaceholder')" required
@@ -53,7 +53,7 @@
     }
     <p class="collapsible-content" id="waypoints">{{ translation.translate('search.waypoints') }}</p>
     <div class="waypoint-buttons">
-        <button (click)="addWaypoint.emit()" type="button" class="button collapsible-content">
+        <button (click)="addWaypoint.emit()" type="button" class="button collapsible-content" [disabled]="routeFormResponse().waypoints.length >= 5" [title]="routeFormResponse().waypoints.length >= 5 ? 'Máximo 5 waypoints' : ''">
             <span class="button__icon">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" viewBox="0 0 24 24" stroke-width="2"
                     stroke-linejoin="round" stroke-linecap="round" stroke="currentColor" height="24" fill="none"

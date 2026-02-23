@@ -25,4 +25,8 @@ export class ThemeService {
     const newTheme = this.currentTheme() === 'LIGHT' ? 'DARK' : 'LIGHT';
     this.setTheme(newTheme);
   }
+
+  get selectedTheme() {
+    return this.currentTheme.asReadonly();
+  }
 }

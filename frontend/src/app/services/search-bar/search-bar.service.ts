@@ -20,6 +20,7 @@ export class SearchBarService {
   onSubmit(routeFormResponse: RouteFormResponse): Observable<GasStation[]> {
     return this.routeService.getFullRouteData(routeFormResponse).pipe(
       map((data: FullRouteData) => {
+        console.log(data);
         this.giveCoords(data.polylineCoords);
         this.giveWaypointCoords(data.legCoords);
         this.giveWeatherCoords(data.weatherData);

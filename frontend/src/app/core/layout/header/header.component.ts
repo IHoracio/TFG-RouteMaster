@@ -5,6 +5,7 @@ import { TranslationService } from '../../../services/translation.service';
 import { ThemeService } from '../../../services/theme.service';
 import { UserPreferencesService } from '../../../services/user-page/user-preferences.service';
 import { AuthGuard } from '../../../guards/auth.guard';
+import { LoginPromptService } from '../../../services/login-prompt/login-prompt.service';
 
 @Component({
   selector: 'app-header',
@@ -27,7 +28,8 @@ export class HeaderComponent implements OnInit {
     public translation: TranslationService,
     public theme: ThemeService,
     private authService: AuthService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private loginPromptService: LoginPromptService
   ) { }
 
   ngOnInit() {
@@ -60,5 +62,12 @@ export class HeaderComponent implements OnInit {
     this.authService.logout().subscribe(() => {
       this.authService.sendUserSession(false);
     });
+  }
+
+  onPersonalAreaClick(event: Event) {
+    if (!this.isLoggedIn()) {
+      event.preventDefault();
+      this.loginPromptService.openLoginPrompt();
+    }
   }
 }

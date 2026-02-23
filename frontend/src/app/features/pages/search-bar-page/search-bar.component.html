@@ -12,7 +12,7 @@
       </app-search-bar-filters>
     </div>
     <div class="form-map" [ngClass]="{ 'collapsed': isFormCollapsed }">
-      <div class="form-wrapper">
+      <div class="form-wrapper" #formWrapper>
         <app-search-bar-form [activeTab]="activeTab" [isFormCollapsed]="isFormCollapsed"
           [routeFormResponse]="routeFormResponse" [waypointTypes]="waypointTypes"
           [favouriteGasStations]="favouriteGasStations()" [savedRoute]="savedRoute()"
@@ -27,6 +27,6 @@
         <app-map-page></app-map-page>
       </div>
     </div>
-    <app-login-prompt [show]="showLoginPrompt()" (close)="showLoginPrompt.set(false)"></app-login-prompt>
+    <app-login-prompt [show]="loginPromptService.showLoginPrompt()" (close)="loginPromptService.closeLoginPrompt()"></app-login-prompt>
   </section>
 </div>

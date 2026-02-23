@@ -14,12 +14,13 @@
     </button>
   </div>
 </details>
-<details class="filter-dropdown">
-  <summary>{{ translation.translate('search.saveRoute') }}</summary>
+<details class="filter-dropdown save-route-dropdown" [class.disabled]="!createdRoute()">
+  <summary [title]="!createdRoute() ? translation.translate('search.searchRoute') : ''">{{ translation.translate('search.saveRoute') }}</summary>
   <div class="filter-buttons">
     <input type="text" id="routeAlias" name="routeAlias" [ngModel]="routeAlias()"
       (ngModelChange)="onRouteAliasChange($event)"
-      [placeholder]="translation.translate('search.routeAliasPlaceholder')" />
+      [placeholder]="translation.translate('search.routeAliasPlaceholder')"
+      [disabled]="!createdRoute()" />
     <button type="button" (click)="saveRoute.emit()" [disabled]="!createdRoute()"
       [title]="!createdRoute() ? translation.translate('search.searchRoute') : ''">
       {{ translation.translate('search.saveRoute') }}

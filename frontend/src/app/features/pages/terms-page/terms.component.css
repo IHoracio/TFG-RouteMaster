@@ -20,3 +20,19 @@ p {
 a {
   color: var(--primary-color);
 }
+
+@media (max-width: 768px) {
+  .terms-container {
+    margin: 1rem;
+    padding: 1.25rem;
+    margin-top: 0;
+  }
+
+  h1 {
+    font-size: 1.5rem;
+  }
+
+  h2 {
+    font-size: 1.2rem;
+  }
+}

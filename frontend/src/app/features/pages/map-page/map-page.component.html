@@ -1,5 +1,8 @@
 <div class="map-wrapper">
-  <div id="map" class="map-canvas" aria-label="Mapa"></div>
+  <div id="map" class="map-canvas" [class.is-loading]="!mapReady()" aria-label="Mapa"></div>
+  @if (!mapReady()) {
+    <div class="map-loading" aria-hidden="true"></div>
+  }
 
   @if (selectedGasStation()) {
   <div class="gas-station-widget" (click)="closeWidget()">
@@ -17,7 +20,7 @@
   </div>
 }
 
-  @if (showWeather()) {
+  @if (showWeather() && mapReady()) {
     <app-weather-overlay-host
       [mapDiv]="map?.getDiv() ?? null"
       [weatherRoute]="weatherRoute()"

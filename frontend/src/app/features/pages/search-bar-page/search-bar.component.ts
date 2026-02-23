@@ -12,6 +12,7 @@ import { AuthService } from '../../../services/auth/auth-service.service';
 import { AuthGuard } from '../../../guards/auth.guard';
 import { MapCommunicationService } from '../../../services/map/map-communication.service';
 import { LoginPromptComponent } from '../../components/search-bar-components/login-prompt/login-prompt.component';
+import { LoginPromptService } from '../../../services/login-prompt/login-prompt.service';
 import { SavedRouteDto, RoutePreferencesDto } from '../../../Dto/user-dtos';
 import { SearchBarTabsComponent } from '../../components/search-bar-components/search-bar-tabs/search-bar-tabs.component';
 import { SearchBarFiltersComponent } from '../../components/search-bar-components/search-bar-filters/search-bar-filters.component';
@@ -27,9 +28,9 @@ export class SearchBarComponent implements OnInit {
 
   isLoggedIn = signal<boolean>(false);
   isFormCollapsed: boolean = false;
-  showLoginPrompt = signal(false);
   showShareMessage = signal(false);
   createdRoute = signal(false);
+  loginPromptService = inject(LoginPromptService);
 
   allGasStations = signal<GasStation[]>([]);
   filterByBrands = signal<boolean>(false);
@@ -80,6 +81,7 @@ export class SearchBarComponent implements OnInit {
   selectedSavedRoute: number | null = null;
 
   @ViewChild('card', { static: true }) card!: ElementRef;
+  @ViewChild('formWrapper') formWrapper!: ElementRef;
 
   scrollToCard() {
     if (window.innerWidth >= 768) {
@@ -144,7 +146,7 @@ export class SearchBarComponent implements OnInit {
   setTab(tab: string) {
     if (tab === 'gas' || tab === 'route') {
       if (!this.isLoggedIn()) {
-        this.showLoginPrompt.set(true);
+        this.loginPromptService.openLoginPrompt();
         return;
       }
     }
@@ -161,8 +163,10 @@ export class SearchBarComponent implements OnInit {
   }
 
   addWaypoint() {
-    this.routeFormResponse.waypoints.push('');
-    this.waypointTypes.push('text');
+    if (this.routeFormResponse.waypoints.length < 5) {
+      this.routeFormResponse.waypoints.push('');
+      this.waypointTypes.push('text');
+    }
   }
 
   deleteWaypoint() {
@@ -227,7 +231,7 @@ export class SearchBarComponent implements OnInit {
         this.preferredBrands.some(brand => brand.toLowerCase() === station.marca.toLowerCase())
       );
     }
-    if (this.isLoggedIn() && this.filterByCheapest()) {
+    if (this.filterByCheapest()) {
       const fuelKey = (this.fuelType === 'ALL' || this.fuelType === 'GASOLINE') ? 'Gasolina95' : 'Diesel';
       const cheapest = stations.reduce((min, station) => {
         const price = station[fuelKey];
@@ -281,6 +285,12 @@ export class SearchBarComponent implements OnInit {
 
   toggleFormCollapse() {
     this.isFormCollapsed = !this.isFormCollapsed;
+    if (this.isFormCollapsed && typeof document !== 'undefined') {
+      const formWrapper = document.querySelector('.form-wrapper') as HTMLElement;
+      if (formWrapper) {
+        formWrapper.scrollTop = 0;
+      }
+    }
   }
 
   isDesktop(): boolean {

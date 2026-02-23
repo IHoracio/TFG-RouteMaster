@@ -1,10 +1,10 @@
 .error {
-    color: var(--color-error);
+    color: var(--text-secondary);
     font-weight: 600;
 }
 
 .asterisk {
-    color: var(--color-error);
+    color: var(--primary-color);
     font-weight: 700;
     margin-right: 5px;
 }
@@ -30,6 +30,7 @@
     border: 1px solid var(--border-color);
     max-width: 420px;
     width: 100%;
+    margin-top: 5.5rem;
 }
 
 .form-header {
@@ -106,4 +107,14 @@ label {
 
 .text-muted a:hover {
     text-decoration: underline;
+}
+
+/* ========================================
+   LOGIN - Mobile
+   ======================================== */
+@media (max-width: 768px) {
+    .container {
+        margin-top: -8rem;
+        margin-bottom: -4rem;
+    }
 }

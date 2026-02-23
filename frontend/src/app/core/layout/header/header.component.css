@@ -38,7 +38,7 @@ header a:hover {
 .logo {
   font-weight: bold;
   position: relative;
-  transition: 0.3s ease;
+  transition: 0.1s ease;
   cursor: pointer;
 }
 
@@ -50,7 +50,7 @@ header a:hover {
   width: 0;
   height: 3px;
   background: #ffffff;
-  transition: width 0.3s ease;
+  transition: width 0.1s ease;
   border-radius: 2px;
 }
 
@@ -94,7 +94,6 @@ nav a {
   padding: 6px 10px;
   border: 1px solid rgba(100, 116, 139, 0.1);
   border-radius: 6px;
-  transition: 0.3s ease;
 }
 
 nav .personal-area {
@@ -105,6 +104,7 @@ nav a:hover {
   background: var(--hover-button);
   backdrop-filter: blur(4px);
   transform: scale(1.05);
+  cursor: pointer;
 }
 
 :host-context(.dark) nav a:hover {
@@ -189,4 +189,119 @@ nav a:focus {
 .lang-btn:focus,
 .theme-btn:focus {
   outline: none;
+}
+
+/* ========================================
+   HEADER - Mobile
+   ======================================== */
+@media (max-width: 768px) {
+  header {
+    position: relative;
+    height: auto;
+    padding: 12px 16px;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    justify-content: space-between;
+  }
+
+  .logo {
+    font-size: 18px;
+    font-weight: bold;
+    flex-shrink: 0;
+  }
+
+  /* Animaciones de efectos temporales en móvil, simular los hover de desktop */
+  @keyframes hoverEffectLight {
+    0% {
+      text-shadow: 0 0 10px rgb(255, 255, 255);
+      transform: scale(1.05);
+    }
+    100% {
+      text-shadow: none;
+      transform: scale(1);
+    }
+  }
+
+  @keyframes hoverEffectDark {
+    0% {
+      text-shadow: 0 0 10px rgba(231, 244, 250, 0.532);
+      transform: scale(1.05);
+    }
+    100% {
+      text-shadow: none;
+      transform: scale(1);
+    }
+  }
+
+  @keyframes buttonHoverEffect {
+    0% {
+      background: var(--hover-button);
+      backdrop-filter: blur(4px);
+      transform: scale(1.05);
+    }
+    100% {
+      background: transparent;
+      transform: scale(1);
+    }
+  }
+
+  /* Aplicar efectos en focus para táctiles */
+  @media (hover: none) {
+    .logo:hover,
+    nav a:hover,
+    .lang-btn:hover,
+    .theme-btn:hover {
+      text-shadow: none;
+      transform: none;
+      background: transparent;
+    }
+
+    .logo::after {
+      display: none;
+    }
+
+    .logo:focus {
+      animation: hoverEffectLight 2s ease-out forwards;
+      outline: none;
+    }
+
+    ::ng-deep .dark .logo:focus {
+      animation: hoverEffectDark 2s ease-out forwards;
+      outline: none;
+    }
+
+    nav a:focus {
+      animation: buttonHoverEffect 2s ease-out forwards;
+      outline: none;
+    }
+
+    .lang-btn:focus,
+    .theme-btn:focus {
+      animation: buttonHoverEffect 2s ease-out forwards;
+      outline: none;
+    }
+  }
+
+  nav {
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: flex-end;
+    flex: 1;
+  }
+
+  nav a {
+    font-size: 14px;
+    padding: 6px 8px;
+  }
+
+  .lang-btn {
+    font-size: 14px;
+    padding: 6px 8px;
+  }
+
+  .theme-btn {
+    width: 36px;
+    height: 36px;
+  }
 }

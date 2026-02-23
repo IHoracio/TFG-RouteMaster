@@ -97,6 +97,10 @@ app-root {
   min-height: 100vh;
 }
 
+p {
+    color: var(--secondary-color);
+}
+
 /* ========================================
    7. ESTILOS DE SCROLLBAR GLOBALES
    ======================================== */
@@ -129,4 +133,27 @@ app-root {
 * {
   scrollbar-width: thin;
   scrollbar-color: var(--primary-color) var(--bg-color);
+}
+
+/* ========================================
+   8. EVITAR MODIFICACIONES DEL NAVEGADOR AL AUTOCOMPLETAR
+   ======================================== */
+input:not([type="submit"]):not([type="button"]):not([type="reset"]) {
+  color: var(--text-color);
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  background-color: var(--surface-secondary) !important;
+  -webkit-box-shadow: 0 0 0px 1000px var(--surface-secondary) inset !important;
+  -webkit-text-fill-color: var(--text-color) !important;
+  color: var(--text-color) !important;
+  transition: background-color 0s, color 0s;
+}
+
+input:-moz-autofill {
+  background-color: var(--surface-secondary) !important;
+  color: var(--text-color) !important;
 }

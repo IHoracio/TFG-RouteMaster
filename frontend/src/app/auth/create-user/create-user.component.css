@@ -1,10 +1,10 @@
 .error {
-    color: var(--color-error);
+    color: var(--text-secondary);
     font-weight: 600;
 }
 
 .asterisk {
-    color: var(--color-error);
+    color: var(--primary-color);
     font-weight: 700;
     margin-right: 5px;
 }
@@ -30,6 +30,7 @@
     border: 1px solid var(--border-color);
     max-width: 460px;
     width: 100%;
+    margin-top: 5.5rem;
 }
 
 .form-header {
@@ -64,6 +65,10 @@ label {
     box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
     border-color: var(--primary-color);
     outline: none;
+}
+
+.form-control::placeholder {
+    color: var(--text-secondary);
 }
 
 .btn,
@@ -105,4 +110,14 @@ label {
 
 .text-muted a:hover {
     text-decoration: underline;
+}
+
+/* ========================================
+   CREATE-USER - Mobile
+   ======================================== */
+@media (max-width: 768px) {
+    .container {
+        margin-top: -7.4rem;
+        
+    }
 }
