@@ -21,10 +21,23 @@
 }
 
   @if (showWeather() && mapReady()) {
-    <app-weather-overlay-host
-      [mapDiv]="map?.getDiv() ?? null"
-      [weatherRoute]="weatherRoute()"
-      [createdRoute]="createdRoute()">
-    </app-weather-overlay-host>
+    @if (showWeatherOverlay()) {
+      <div class="weather-overlay-host__container">
+        <app-weather-overlay
+          [data]="weatherRoute()"
+          [routeCreated]="createdRoute()"
+          (close)="closeWeatherOverlay()">
+        </app-weather-overlay>
+      </div>
+    } @else {
+      <button 
+        class="weather-overlay-toggle" 
+        (click)="openWeatherOverlay()" 
+        [disabled]="!createdRoute()"
+        [attr.aria-label]="translation.translate('weather.title')" 
+        [title]="createdRoute() ? translation.translate('weather.open') : translation.translate('weather.needRoute')">
+        ☁️
+      </button>
+    }
   }
 </div>

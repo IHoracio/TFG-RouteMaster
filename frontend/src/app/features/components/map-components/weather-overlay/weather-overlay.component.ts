@@ -16,6 +16,7 @@ export class WeatherOverlayComponent {
   translation = inject(TranslationService);
 
   data = input<WeatherData[] | null>();
+  routeCreated = input<boolean>(false);
   close = output<void>();
 
   currentHour = signal<number>(new Date().getHours());

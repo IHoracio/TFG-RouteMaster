@@ -2,8 +2,8 @@
    VARIABLES GLOBALES - Tema Claro por Defecto
    ======================================== */
 :root {
-  --bg-color: #a7c3e7;
-  --surface-color: #96bdec;
+  --bg-color: #aed1ff;
+  --surface-color: #8abdfa;
   --surface-secondary: #bcdcff;
 
   --text-color: #102357;
@@ -14,10 +14,15 @@
   --primary-color: #1e40af;
   --secondary-color: #3b82f6;
 
+  --surface-weather: #7ac8ff5b;
+
   --hover-button: rgba(60, 76, 94, 0.32);
 
   --header-footer-gradient-end: #a9d0ff;
   --header-footer-gradient-start: #5c90e9;
+  --weather-gradient-start: #8de6e3;;
+  --weather-gradient-end: #96d0ff;
+
   --header-shadow: 0 4px 6px 2px rgba(25, 0, 255, 0.416);
   --footer-shadow: 0 -2px 4px rgba(25, 0, 255, 0.416);
 
@@ -50,10 +55,15 @@
   --primary-color: #3b82f6;
   --secondary-color: #60a5fa;
 
+  --surface-weather: #0220361a;
+
   --hover-button: rgba(141, 179, 223, 0.32);
 
   --header-footer-gradient-start: #12254e;
   --header-footer-gradient-end: #121b2f;
+  --weather-gradient-start: #1f3a37;
+  --weather-gradient-end: #2b3f71;
+
   --header-shadow: 0 4px 6px 2px rgba(147, 197, 253, 0.2);
   --footer-shadow: 0 -2px 4px rgba(147, 197, 253, 0.2);
 }

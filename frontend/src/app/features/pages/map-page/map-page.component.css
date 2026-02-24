@@ -43,7 +43,7 @@
 }
 
 ::ng-deep .gm-control-active {
-  background: linear-gradient(var(--header-footer-gradient-end), var(--header-footer-gradient-start)) !important;
+  background: var(--header-footer-gradient-start) !important;
   border-radius: 12px !important;
   box-shadow: var(--map-btn-shadow) !important;
   width: 42px !important;
@@ -59,14 +59,12 @@
 }
 
 ::ng-deep .gm-control-active:hover {
-  background: var(--secondary-color) !important;
-  filter: brightness(1.02) !important;
+  filter: brightness(1.2) !important;
   transform: translateY(-1px) !important;
 }
 
 ::ng-deep .dark .gm-control-active:hover {
-  background: var(--border-color) !important;
-  filter: brightness(1.02) !important;
+  filter: brightness(1.8) !important;
   transform: translateY(-1px) !important;
 }
 
@@ -165,4 +163,59 @@
 .widget-content button {
   margin-top: 10px;
   align-self: flex-end;
+}
+
+/* Weather Overlay Container Styles */
+.weather-overlay-host__container {
+  position: absolute !important;
+  top: 3px !important;
+  right: 3px !important;
+  z-index: 999 !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
+}
+
+.weather-overlay-toggle {
+  position: absolute !important;
+  top: 3px !important;
+  right: 3px !important;
+  height: 42px;
+  width: 42px;
+  z-index: 999 !important;
+  background: var(--header-footer-gradient-start) !important;
+  border: 1px solid rgba(255, 255, 255, 0.22) !important;
+  color: #000000 !important;
+  padding: 8px 12px !important;
+  border-radius: 10px !important;
+  cursor: pointer !important;
+  font-size: 20px !important;
+  line-height: 1 !important;
+  backdrop-filter: blur(6px) !important;
+  -webkit-backdrop-filter: blur(6px) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: all 0.2s ease !important;
+}
+
+.weather-overlay-toggle:hover {
+  background: var(--map-btn-bg-hover);
+  filter: brightness(1.02);
+  transform: translateY(-1px);
+}
+
+.weather-overlay-toggle:active {
+  transform: scale(0.95) !important;
+}
+
+.weather-overlay-toggle:disabled {
+  opacity: 0.5 !important;
+  cursor: not-allowed !important;
+  filter: grayscale(0.5) !important;
+}
+
+.weather-overlay-toggle:disabled:hover {
+  background: var(--header-footer-gradient-start) !important;
+  transform: none !important;
 }

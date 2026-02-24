@@ -150,7 +150,9 @@
         "temperaturesByHour": "Temperatures by hour",
         "noData": "No weather data available.",
         "noDescription": "(no description)",
-        "noTemperature": "(no temperature)"
+        "noTemperature": "(no temperature)",
+        "needRoute": "You must create a route to view weather information.",
+        "open": "Open weather information"
     },
     "weatherTerms": {
         "Despejado": "Clear",

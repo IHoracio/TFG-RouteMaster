@@ -64,6 +64,10 @@
       </div>
     }
   } @else {
-    <div class="weather-empty">{{ translation.translate('weather.noData') }}</div>
+    @if (!routeCreated()) {
+      <div class="weather-empty weather-no-route">{{ translation.translate('weather.needRoute') }}</div>
+    } @else {
+      <div class="weather-empty">{{ translation.translate('weather.noData') }}</div>
+    }
   }
 </div>

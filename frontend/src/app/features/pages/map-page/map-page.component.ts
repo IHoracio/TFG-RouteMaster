@@ -9,7 +9,7 @@ import { WeatherData } from '../../../Dto/weather-dtos';
 import { GasStation } from '../../../Dto/gas-station';
 import { TranslationService } from '../../../services/translation.service';
 import { UserPreferencesService } from '../../../services/user-page/user-preferences.service';
-import { WeatherOverlayHostComponent } from '../../components/map-components/weather-overlay/weather-overlay-host/weather-overlay-host.component';
+import { WeatherOverlayComponent } from '../../components/map-components/weather-overlay/weather-overlay.component';
 import { AuthGuard } from '../../../guards/auth.guard';
 import { GasStationSelectionService } from '../../../services/user-page/gas-station-selection/gas-station-selection.service';
 import { ThemeService } from '../../../services/theme.service';
@@ -18,7 +18,7 @@ import { ThemeService } from '../../../services/theme.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-map-page',
   standalone: true,
-  imports: [CommonModule, WeatherOverlayHostComponent],
+  imports: [CommonModule, WeatherOverlayComponent],
   templateUrl: './map-page.component.html',
   styleUrl: './map-page.component.css'
 })
@@ -28,6 +28,7 @@ export class MapPageComponent implements OnDestroy, AfterViewInit {
 
   public map?: google.maps.Map;
   private routePolyline?: google.maps.Polyline;
+  private routePathCache: Coords[] | null = null;
   private startMarker?: any;
   private endMarker?: any;
   private waypoints: any[] = [];
@@ -36,6 +37,7 @@ export class MapPageComponent implements OnDestroy, AfterViewInit {
   protected weatherRoute = signal<WeatherData[] | null>(null);
   protected createdRoute = signal<boolean>(false);
   protected mapReady = signal<boolean>(false);
+  protected showWeatherOverlay = signal<boolean>(false);
 
   protected selectedGasStation = signal<GasStation | null>(null);
   private selectedMarker: google.maps.marker.AdvancedMarkerElement | null = null;
@@ -109,17 +111,21 @@ export class MapPageComponent implements OnDestroy, AfterViewInit {
 
     const { Map } = mapsLib;
 
+    const mapTypeId = this.getMapTypeId();
+    const isSatelliteType = mapTypeId === google.maps.MapTypeId.SATELLITE || 
+                            mapTypeId === google.maps.MapTypeId.HYBRID;
+
     const mapOptions: google.maps.MapOptions = {
       center: { lat: 40.4168, lng: -3.7038 },
       zoom: 6,
       disableDefaultUI: true,
       zoomControl: true,
       keyboardShortcuts: false,
-      mapId: environment.mapId,
-      colorScheme: this.themeService.selectedTheme() === 'DARK'
+      mapId: isSatelliteType ? environment.defaultMapId : environment.styledMapId,
+      colorScheme: !isSatelliteType && this.themeService.selectedTheme() === 'DARK'
         ? google.maps.ColorScheme.DARK
         : google.maps.ColorScheme.LIGHT,
-      mapTypeId : this.getMapTypeId(),
+      mapTypeId: mapTypeId,
     };
 
     this.map = new Map(document.getElementById('map') as HTMLElement, mapOptions);
@@ -154,7 +160,7 @@ export class MapPageComponent implements OnDestroy, AfterViewInit {
       const routePath = this.routePolyline?.getPath()?.getArray()?.map(point => ({
         lat: point.lat(),
         lng: point.lng()
-      })) ?? null;
+      })) ?? this.routePathCache;
       const waypointCoords = this.waypoints
         .map(marker => this.getMarkerCoords(marker))
         .filter((coords): coords is Coords => coords !== null);
@@ -225,8 +231,23 @@ export class MapPageComponent implements OnDestroy, AfterViewInit {
       if (logged) {
         this.userPreferences.getUserPreferences().subscribe(pref => {
           const mapView = pref.mapView;
+          const newMapTypeId = this.getMapTypeIdFromRaw(mapView);
+          
           if (this.map) {
-            this.map.setMapTypeId(this.getMapTypeIdFromRaw(mapView));
+            const currentMapTypeId = this.map.getMapTypeId();
+            
+            // Verificar si ambos tipos usan el mismo mapId
+            const currentIsSatellite = currentMapTypeId === 'satellite' || currentMapTypeId === 'hybrid';
+            const newIsSatellite = newMapTypeId === google.maps.MapTypeId.SATELLITE || 
+                                   newMapTypeId === google.maps.MapTypeId.HYBRID;
+            
+            // Si cambiamos entre tipos que usan diferentes mapIds, recrear el mapa
+            if (currentIsSatellite !== newIsSatellite) {
+              void this.recreateMap();
+            } else {
+              // Si usan el mismo mapId, solo cambiar el tipo
+              this.map.setMapTypeId(newMapTypeId);
+            }
           }
         });
       }
@@ -241,6 +262,7 @@ export class MapPageComponent implements OnDestroy, AfterViewInit {
 
     this.createdRoute.set(true);
     const path: google.maps.LatLngLiteral[] = coords;
+    this.routePathCache = [...coords];
 
     if (!this.routePolyline) {
       this.routePolyline = new google.maps.Polyline({
@@ -252,6 +274,7 @@ export class MapPageComponent implements OnDestroy, AfterViewInit {
         map: this.map
       });
     } else {
+      this.routePolyline.setMap(this.map);
       this.routePolyline.setPath(path);
     }
 
@@ -265,6 +288,7 @@ export class MapPageComponent implements OnDestroy, AfterViewInit {
       this.routePolyline.setMap(null);
       this.routePolyline = undefined;
     }
+    this.routePathCache = null;
 
     if (this.waypoints && this.waypoints.length) {
       this.waypoints.forEach(wp => {
@@ -478,6 +502,14 @@ export class MapPageComponent implements OnDestroy, AfterViewInit {
 
   public closeWidget(): void {
     this.selectedGasStation.set(null);
+  }
+
+  public closeWeatherOverlay(): void {
+    this.showWeatherOverlay.set(false);
+  }
+
+  public openWeatherOverlay(): void {
+    this.showWeatherOverlay.set(true);
   }
 
   public getStationType(tipoVenta: string): string {

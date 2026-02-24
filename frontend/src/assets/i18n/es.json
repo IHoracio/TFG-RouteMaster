@@ -150,7 +150,9 @@
         "temperaturesByHour": "Temperaturas por hora",
         "noData": "No hay datos meteorológicos disponibles.",
         "noDescription": "(sin descripción)",
-        "noTemperature": "(sin temperatura)"
+        "noTemperature": "(sin temperatura)",
+        "needRoute": "Debes crear una ruta para ver información meteorológica.",
+        "open": "Abrir información del clima"
     },
     "weatherTerms": {
         "Despejado": "Despejado",

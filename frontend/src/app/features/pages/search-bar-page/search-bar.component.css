@@ -240,8 +240,8 @@ h2 {
   }
 
   .map-wrapper {
-    height: 45vh;
-    min-height: 45vh;
+    height: 90dvh;
+    min-height: 90dvh;
     order: 3;
   }
 
