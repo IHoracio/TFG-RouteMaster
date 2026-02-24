@@ -78,7 +78,7 @@
   padding: 4px 8px;
   font-size: 16px;
   line-height: 1;
-  color: #000000;
+  color: var(--primary-color);
 }
 
 .weather-overlay .btn.close:hover {
@@ -114,7 +114,7 @@
 
 .weather-entry-index {
   background: var(--weather-accent);
-  color: var(--text-secondary);
+  color: var(--text-primary);
   width: 34px;
   height: 34px;
   display: grid;

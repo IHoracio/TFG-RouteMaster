@@ -235,17 +235,13 @@ export class MapPageComponent implements OnDestroy, AfterViewInit {
           
           if (this.map) {
             const currentMapTypeId = this.map.getMapTypeId();
-            
-            // Verificar si ambos tipos usan el mismo mapId
             const currentIsSatellite = currentMapTypeId === 'satellite' || currentMapTypeId === 'hybrid';
             const newIsSatellite = newMapTypeId === google.maps.MapTypeId.SATELLITE || 
                                    newMapTypeId === google.maps.MapTypeId.HYBRID;
             
-            // Si cambiamos entre tipos que usan diferentes mapIds, recrear el mapa
             if (currentIsSatellite !== newIsSatellite) {
               void this.recreateMap();
             } else {
-              // Si usan el mismo mapId, solo cambiar el tipo
               this.map.setMapTypeId(newMapTypeId);
             }
           }
@@ -364,7 +360,14 @@ export class MapPageComponent implements OnDestroy, AfterViewInit {
     }
     if (!gasStations || gasStations.length === 0) return;
 
-    this.gasStationsFromService.set(gasStations);
+    const filteredStations = gasStations.filter(station => 
+      station.Gasolina95 !== null || 
+      station.Gasolina98 !== null || 
+      station.Diesel !== null || 
+      station.DieselB !== null
+    );
+
+    this.gasStationsFromService.set(filteredStations);
   }
 
   private updateMarkers(): void {
@@ -423,10 +426,6 @@ export class MapPageComponent implements OnDestroy, AfterViewInit {
 
         marker.addListener('gmp-click', () => {
           this.selectedGasStation.set(station);
-          if (this.map) {
-            this.map.setCenter({ lat: station.latitud, lng: station.longitud })
-            this.map.setZoom(13);
-          }
         });
         this.gasStationsMarkers.push(marker);
         this.markerClusterer?.addMarker(marker);
