@@ -115,14 +115,4 @@ export class UserInfoComponent {
     return type;
   }
 
-  goToLanding(): void {
-    this.router.navigate(['/']);
-  }
-
-  goToPreferences(): void {
-    const element = document.getElementById('add-gas-stations');
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
-    }
-  }
 }

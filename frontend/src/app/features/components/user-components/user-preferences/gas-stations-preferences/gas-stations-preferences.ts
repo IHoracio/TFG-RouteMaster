@@ -27,6 +27,7 @@ export class GasStationsPreferencesComponent {
   brandSearch = signal<string>('');
   showBrandDropdown = signal<boolean>(false);
   alias = signal<string>('');
+  isAddressFocused = signal<boolean>(false);
 
   filteredBrands = computed(() => {
     const search = this.brandSearch().toLowerCase();
@@ -79,6 +80,10 @@ export class GasStationsPreferencesComponent {
 
   setSearchAddress(event: Event): void {
     this.searchAddress.set((event.target as HTMLInputElement).value);
+  }
+
+  setAddressFocus(isFocused: boolean): void {
+    this.isAddressFocused.set(isFocused);
   }
 
   setMunicipality(municipality: string): void {

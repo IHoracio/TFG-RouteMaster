@@ -255,6 +255,9 @@
     },
     "preferences": {
         "title": "User Preferences",
+        "generic": "General Preferences",
+        "vehicle": "Vehicle Preferences",
+        "gasStations": "Favorite Gas Stations",
         "fuelType": "Fuel Type:",
         "addBrand": "Add Favorite Gas Station Brand:",
         "searchBrand": "Search brand",
@@ -267,6 +270,7 @@
         "theme": "Theme:",
         "language": "Language:",
         "radioKm": "Radius KM:",
+        "radioKmInfo": "Defines the radius in kilometers around your location to search for gas stations on the map both when planning a route and when searching for nearby gas stations.",
         "addGasStations": "Add Favorite Gas Stations:",
         "searchAddress": "Enter an address",
         "search": "Search",

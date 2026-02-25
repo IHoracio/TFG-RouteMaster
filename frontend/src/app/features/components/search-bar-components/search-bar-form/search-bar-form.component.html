@@ -13,6 +13,7 @@
         <span class="collapsible-content choose-route-text">{{ translation.translate('search.chooseRoute') }}</span>
         <select class="collapsible-content" name="savedRoute" id="savedRoute" [ngModel]="selectedSavedRoute()"
             (ngModelChange)="selectedSavedRouteChange.emit($event)" required>
+            <option [ngValue]="null">{{ translation.translate('search.chooseRoute') }}</option>
             <option *ngFor="let route of savedRoute()" [value]="route.routeId">{{ route.name }}</option>
         </select>
     </p>

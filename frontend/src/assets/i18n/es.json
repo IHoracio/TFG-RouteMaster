@@ -255,6 +255,9 @@
     },
     "preferences": {
         "title": "Preferencias de Usuario",
+        "generic": "Preferencias Generales",
+        "vehicle": "Preferencias del Vehículo",
+        "gasStations": "Gasolineras Favoritas",
         "fuelType": "Tipo de Combustible:",
         "addBrand": "Añadir Marca de Gasolinera Favorita:",
         "searchBrand": "Buscar marca",
@@ -267,6 +270,7 @@
         "theme": "Tema:",
         "language": "Idioma:",
         "radioKm": "Radio KM:",
+        "radioKmInfo": "Define el radio en kilómetros alrededor de tu ubicación para buscar gasolineras en el mapa tanto al planificar una ruta como al buscar gasolineras cercanas.",
         "addGasStations": "Añadir Gasolineras Favoritas:",
         "searchAddress": "Escribe una dirección",
         "search": "Buscar",

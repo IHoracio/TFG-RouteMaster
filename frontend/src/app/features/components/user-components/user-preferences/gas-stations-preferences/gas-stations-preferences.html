@@ -21,7 +21,10 @@
   </div>
 
   <div class="form-group radio-slider">
-    <label for="radioKm">{{ translation.translate('preferences.radioKm') }}</label>
+    <div class="label-container">
+      <label for="radioKm">{{ translation.translate('preferences.radioKm') }}</label>
+      <span class="info-icon" [title]="translation.translate('preferences.radioKmInfo')">ⓘ</span>
+    </div>
     <div class="slider-container">
       <input id="radioKm" type="range" [value]="userPreferencesService.getUserPreferencesSignal()().radioKm" (input)="setRadioKm($event)" min="1" max="15" step="1">
       <span>{{ userPreferencesService.getUserPreferencesSignal()().radioKm }} km</span>
@@ -30,11 +33,11 @@
 
   <div class="form-group" id="add-gas-stations">
     <label>{{ translation.translate('preferences.addGasStations') }}</label>
-    <input type="text" [value]="searchAddress()" (input)="setSearchAddress($event)" placeholder="{{ translation.translate('preferences.searchAddress') }}">
-    @if (filteredMunicipalities().length > 0) {
+    <input type="text" [value]="searchAddress()" (input)="setSearchAddress($event)" (focus)="setAddressFocus(true)" (blur)="setAddressFocus(false)" placeholder="{{ translation.translate('preferences.searchAddress') }}">
+    @if (isAddressFocused() && filteredMunicipalities().length > 0) {
     <ul class="dropdown-list">
       @for (municipality of filteredMunicipalities(); track $index) {
-      <li (click)="setMunicipality(municipality)">{{ capitalize(municipality) }}</li>
+      <li (mousedown)="setMunicipality(municipality)">{{ capitalize(municipality) }}</li>
       }
     </ul>
     }
@@ -67,12 +70,12 @@
   </div>
   }
 
-  @if (userPreferencesService.getFavoriteGasStationsSignal()().length > 0 || searchResults().length > 0) {
   @if (allStations().length <= 50) {
-    <app-map-page [showWeather]="false" [showControls]="false" [gasStationsFromInput]="allStations()" [mapType]="userPreferencesService.getUserPreferencesSignal()().mapView"></app-map-page>
+    <div class="map-container">
+      <app-map-page [showWeather]="false" [showControls]="false" [gasStationsFromInput]="allStations()" [selectedGasStationInput]="selectedGasStation()" [mapType]="userPreferencesService.getUserPreferencesSignal()().mapView"></app-map-page>
+    </div>
   } @else {
     <p>{{ translation.translate('preferences.tooMany') }}</p>
-  }
   }
 
   <div class="form-group">

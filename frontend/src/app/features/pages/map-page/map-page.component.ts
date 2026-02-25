@@ -25,6 +25,7 @@ import { ThemeService } from '../../../services/theme.service';
 export class MapPageComponent implements OnDestroy, AfterViewInit {
   private static mapsOptionsSet = false;
   private isRecreatingMap = false;
+  private mapElement: HTMLElement | null = null;
 
   public map?: google.maps.Map;
   private routePolyline?: google.maps.Polyline;
@@ -46,7 +47,7 @@ export class MapPageComponent implements OnDestroy, AfterViewInit {
   showControls = input<boolean>(true);
   gasStationsFromInput = input<GasStation[]>([]);
   gasStationsFromService = signal<GasStation[]>([]);
-
+  selectedGasStationInput = input<GasStation | null>(null);
 
   mapType = input<string>('MAP');
   fitToStations = input<boolean>(true);
@@ -67,6 +68,13 @@ export class MapPageComponent implements OnDestroy, AfterViewInit {
     effect(() => {
       this.gasStationsFromService();
       this.updateMarkers();
+    });
+
+    effect(() => {
+      const selected = this.selectedGasStationInput();
+      if (selected) {
+        this.selectedGasStation.set(selected);
+      }
     });
 
     effect(() => {
@@ -93,10 +101,15 @@ export class MapPageComponent implements OnDestroy, AfterViewInit {
   ngOnDestroy(): void {
     try { this.mapComm.unregisterMapPage(this); } catch { }
     this.clearRoute();
+    this.teardownMap();
   }
 
   private async initMap(): Promise<void> {
     this.mapReady.set(false);
+    this.mapElement = document.getElementById('map') as HTMLElement | null;
+    if (this.mapElement) {
+      this.mapElement.replaceChildren();
+    }
     if (!MapPageComponent.mapsOptionsSet) {
       setOptions({
         key: environment.googleMapsApiKey,
@@ -128,7 +141,11 @@ export class MapPageComponent implements OnDestroy, AfterViewInit {
       mapTypeId: mapTypeId,
     };
 
-    this.map = new Map(document.getElementById('map') as HTMLElement, mapOptions);
+    if (!this.mapElement) {
+      console.warn('Map container not found');
+      return;
+    }
+    this.map = new Map(this.mapElement, mapOptions);
     const mapInstance = this.map;
     if (mapInstance) {
       let readySet = false;
@@ -186,6 +203,9 @@ export class MapPageComponent implements OnDestroy, AfterViewInit {
   }
 
   private teardownMap(): void {
+    if (this.map) {
+      google.maps.event.clearInstanceListeners(this.map);
+    }
     if (this.routePolyline) {
       this.routePolyline.setMap(null);
     }
@@ -198,8 +218,14 @@ export class MapPageComponent implements OnDestroy, AfterViewInit {
       this.endMarker = undefined;
     }
     this.clearGasStations();
+    if (this.markerClusterer) {
+      this.markerClusterer.clearMarkers();
+    }
     this.markerClusterer = undefined;
     this.map = undefined;
+    if (this.mapElement) {
+      this.mapElement.replaceChildren();
+    }
   }
 
   private getMarkerCoords(marker: google.maps.marker.AdvancedMarkerElement): Coords | null {
