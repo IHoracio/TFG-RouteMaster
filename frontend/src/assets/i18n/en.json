@@ -11,15 +11,40 @@
         "login": "Log in",
         "logout": "Log out",
         "userArea": "Personal area",
-        "language": "Language",
+        "language": "EN",
         "theme": "Theme:",
         "light": "Light",
         "dark": "Dark"
     },
     "footer": {
         "copyright": "© ",
-        "projectText": ". An interactive learning project from ",
-        "linkText": "Proyecto evolutivo"
+        "projectText": " - RouteMaster by ",
+        "linkText": "Mario Martín",
+        "logo": "RouteMaster",
+        "privacy": "Privacy",
+        "terms": "Terms"
+    },
+    "privacy": {
+        "title": "Privacy Policy",
+        "intro": "At RouteMaster, we value your privacy. This policy explains how we handle your data.",
+        "dataCollection": "Data Collection",
+        "dataText": "We collect minimal data to improve your experience:",
+        "localStorage": "We store preferences like theme and language in browser localStorage.",
+        "cookies": "We use cookies for sessions if you log in.",
+        "usage": "Data Usage",
+        "usageText": "Data is used only for app features and is not shared.",
+        "contact": "Contact",
+        "contactText": "If you have questions, contact: "
+    },
+    "terms": {
+        "title": "Terms of Use",
+        "intro": "By using RouteMaster, you agree to these terms.",
+        "usage": "Usage",
+        "usageText": "The app is for route planning. Use it responsibly.",
+        "responsibility": "Responsibility",
+        "responsibilityText": "We are not responsible for incorrect routes or related issues.",
+        "contact": "Contact",
+        "contactText": "For inquiries, email: "
     },
     "search": {
         "title": "Search Type",
@@ -60,7 +85,12 @@
         "cheapest": "Cheapest",
         "favoriteBrands": "Favorite Brands",
         "maxPrice": "Maximum Price",
-        "loginPromptMessage": "Log in to access these features."
+        "loginPromptMessage": "Log in to access these features.",
+        "linkCopied": "Link copied to clipboard",
+        "searchRoute": "You need to create a route",
+        "selectRoute": "Saved Route",
+        "noRouteSelected": "No route selected",
+        "noFavoriteGas": "You dont have favourite gas stations"
     },
     "fuelTypes": {
         "GASOLINE": "Gasoline",
@@ -120,7 +150,9 @@
         "temperaturesByHour": "Temperatures by hour",
         "noData": "No weather data available.",
         "noDescription": "(no description)",
-        "noTemperature": "(no temperature)"
+        "noTemperature": "(no temperature)",
+        "needRoute": "You must create a route to view weather information.",
+        "open": "Open weather information"
     },
     "weatherTerms": {
         "Despejado": "Clear",
@@ -223,6 +255,9 @@
     },
     "preferences": {
         "title": "User Preferences",
+        "generic": "General Preferences",
+        "vehicle": "Vehicle Preferences",
+        "gasStations": "Favorite Gas Stations",
         "fuelType": "Fuel Type:",
         "addBrand": "Add Favorite Gas Station Brand:",
         "searchBrand": "Search brand",
@@ -235,6 +270,7 @@
         "theme": "Theme:",
         "language": "Language:",
         "radioKm": "Radius KM:",
+        "radioKmInfo": "Defines the radius in kilometers around your location to search for gas stations on the map both when planning a route and when searching for nearby gas stations.",
         "addGasStations": "Add Favorite Gas Stations:",
         "searchAddress": "Enter an address",
         "search": "Search",

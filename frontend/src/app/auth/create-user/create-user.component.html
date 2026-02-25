@@ -6,14 +6,12 @@
         <p>{{ translation.translate('register.subtitle') }}</p>
       </div>
 
-      <!--EMAIL FIELD-->
       <div class="mb-3">
         <span class="asterisk">*</span>
         <label for="email">{{ translation.translate('register.email') }}</label>
         <input class="form-control" type="email" name="email" id="email" formControlName="email"
           [placeholder]="translation.translate('register.emailPlaceholder')">
 
-        <!--Error messages-->
         <div *ngIf="hasError('email', 'required')">
           <p class="error">{{ translation.translate('register.emailRequired') }}</p>
         </div>
@@ -22,14 +20,12 @@
         </div>
       </div>
 
-      <!--PASSWORD FIELD-->
       <div class="mb-3">
         <span class="asterisk">*</span>
         <label for="password">{{ translation.translate('register.password') }}</label>
         <input class="form-control" type="password" name="password" id="password" formControlName="password"
           [placeholder]="translation.translate('register.passwordPlaceholder')">
 
-        <!--Error messages-->
         <div *ngIf="hasError('password', 'required')">
           <p class="error">{{ translation.translate('register.passwordRequired') }}</p>
         </div>
@@ -42,14 +38,12 @@
         </div>
       </div>
 
-      <!--CONFIRM PASSWORD FIELD-->
       <div class="mb-3">
         <span class="asterisk">*</span>
         <label for="passwordConfirmation">{{ translation.translate('register.passwordConfirmation') }}</label>
         <input class="form-control" type="password" name="passwordConfirmation" id="passwordConfirmation"
           formControlName="passwordConfirmation" [placeholder]="translation.translate('register.passwordConfirmationPlaceholder')">
 
-        <!--Error messages-->
         <div *ngIf="hasError('passwordConfirmation', 'required')">
           <p class="error">{{ translation.translate('register.passwordConfirmationRequired') }}</p>
         </div>
@@ -59,38 +53,32 @@
         </div>
       </div>
 
-      <!--NAME FIELD-->
       <div class="mb-3">
         <span class="asterisk">*</span>
         <label for="name">{{ translation.translate('register.name') }}</label>
         <input class="form-control" type="text" name="name" id="name" formControlName="name"
           [placeholder]="translation.translate('register.namePlaceholder')">
 
-        <!--Error messages-->
         <div *ngIf="hasError('name', 'required')">
           <p class="error">{{ translation.translate('register.nameRequired') }}</p>
         </div>
       </div>
 
-      <!--SURNAME FIELD-->
       <div class="mb-3">
         <span class="asterisk">*</span>
         <label for="surname">{{ translation.translate('register.surname') }}</label>
         <input class="form-control" type="text" name="surname" id="surname" formControlName="surname"
           [placeholder]="translation.translate('register.surnamePlaceholder')">
 
-        <!--Error messages-->
         <div *ngIf="hasError('surname', 'required')">
           <p class="error">{{ translation.translate('register.surnameRequired') }}</p>
         </div>
       </div>
 
-      <!-- Mostrar mensaje de éxito -->
       <div *ngIf="message" class="success">
         {{ message }}
       </div>
 
-      <!-- Mostrar mensaje de error -->
       <div *ngIf="error" class="error">
         {{ error }}
       </div>

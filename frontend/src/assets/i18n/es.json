@@ -11,15 +11,40 @@
         "login": "Iniciar sesión",
         "logout": "Cerrar sesión",
         "userArea": "Área personal",
-        "language": "Idioma",
+        "language": "ES",
         "theme": "Tema:",
         "light": "Claro",
         "dark": "Oscuro"
     },
     "footer": {
         "copyright": "© ",
-        "projectText": ". Un proyecto de aprendizaje interactivo de ",
-        "linkText": "Proyecto evolutivo"
+        "projectText": " - RouteMaster por ",
+        "linkText": "Mario Martín",
+        "logo": "RouteMaster",
+        "privacy": "Privacidad",
+        "terms": "Términos"
+    },
+    "privacy": {
+        "title": "Política de Privacidad",
+        "intro": "En RouteMaster, valoramos tu privacidad. Esta política explica cómo manejamos tus datos.",
+        "dataCollection": "Recopilación de Datos",
+        "dataText": "Recopilamos datos mínimos para mejorar tu experiencia:",
+        "localStorage": "Almacenamos preferencias como tema e idioma en localStorage del navegador.",
+        "cookies": "Usamos cookies para sesiones si inicias sesión.",
+        "usage": "Uso de Datos",
+        "usageText": "Los datos se usan solo para funcionalidades de la app y no se comparten.",
+        "contact": "Contacto",
+        "contactText": "Si tienes preguntas, contacta a: "
+    },
+    "terms": {
+        "title": "Términos de Uso",
+        "intro": "Al usar RouteMaster, aceptas estos términos.",
+        "usage": "Uso",
+        "usageText": "La app es para planificación de rutas. Úsala responsablemente.",
+        "responsibility": "Responsabilidad",
+        "responsibilityText": "No somos responsables de rutas incorrectas o problemas derivados.",
+        "contact": "Contacto",
+        "contactText": "Para consultas, escribe a: "
     },
     "search": {
         "title": "Tipo de Búsqueda",
@@ -60,7 +85,12 @@
         "cheapest": "Más barata",
         "favoriteBrands": "Marcas favoritas",
         "maxPrice": "Máximo precio",
-        "loginPromptMessage": "Inicia sesión para acceder a estas funciones."
+        "loginPromptMessage": "Inicia sesión para acceder a estas funciones.",
+        "linkCopied": "Enlace de ruta copiado",
+        "searchRoute": "Debes crear una ruta primero",
+        "selectRoute": "Ruta Guardada",
+        "noRouteSelected": "No se ha seleccionado ninguna ruta",
+        "noFavoriteGas": "No tienes gasolineras favoritas"
     },
     "fuelTypes": {
         "GASOLINE": "Gasolina",
@@ -120,7 +150,9 @@
         "temperaturesByHour": "Temperaturas por hora",
         "noData": "No hay datos meteorológicos disponibles.",
         "noDescription": "(sin descripción)",
-        "noTemperature": "(sin temperatura)"
+        "noTemperature": "(sin temperatura)",
+        "needRoute": "Debes crear una ruta para ver información meteorológica.",
+        "open": "Abrir información del clima"
     },
     "weatherTerms": {
         "Despejado": "Despejado",
@@ -223,6 +255,9 @@
     },
     "preferences": {
         "title": "Preferencias de Usuario",
+        "generic": "Preferencias Generales",
+        "vehicle": "Preferencias del Vehículo",
+        "gasStations": "Gasolineras Favoritas",
         "fuelType": "Tipo de Combustible:",
         "addBrand": "Añadir Marca de Gasolinera Favorita:",
         "searchBrand": "Buscar marca",
@@ -235,6 +270,7 @@
         "theme": "Tema:",
         "language": "Idioma:",
         "radioKm": "Radio KM:",
+        "radioKmInfo": "Define el radio en kilómetros alrededor de tu ubicación para buscar gasolineras en el mapa tanto al planificar una ruta como al buscar gasolineras cercanas.",
         "addGasStations": "Añadir Gasolineras Favoritas:",
         "searchAddress": "Escribe una dirección",
         "search": "Buscar",

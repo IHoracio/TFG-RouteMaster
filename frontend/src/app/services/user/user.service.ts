@@ -1,9 +1,7 @@
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { FavouriteGasStationDto, User, UserLoginDTO } from '../../Dto/user-dtos';
-import { BehaviorSubject, Observable } from 'rxjs';
-import { environment } from '../../../environments/environment';
-import { SavedRoute } from '../../Dto/saved-route';
+import { Observable } from 'rxjs';
+
 
 @Injectable({
   providedIn: 'root'

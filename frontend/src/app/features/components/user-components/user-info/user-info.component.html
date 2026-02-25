@@ -35,13 +35,12 @@
     } @else {
       <p>{{ translation.translate('userInfo.noRoutes') }}</p>
     }
-    <button (click)="goToLanding()">{{ translation.translate('userInfo.create') }}</button>
   </div>
   
   <div class="favorites-section">
     <h3>{{ translation.translate('userInfo.favoriteGas') }}</h3>
-    <button (click)="toggleSortByPrice()">{{ sortByPrice() ? translation.translate('userInfo.deactivateSort') : translation.translate('userInfo.activateSort') }}</button>
     @if (favoriteGasStations().length > 0) {
+      <button (click)="toggleSortByPrice()">{{ sortByPrice() ? translation.translate('userInfo.deactivateSort') : translation.translate('userInfo.activateSort') }}</button>
       <ul>
         @for (station of (sortByPrice() ? sortedStations() : favoriteGasStations()); track station.idEstacion) {
           <li class="gas-station-item" (click)="toggleGasStationSelection(station)">
@@ -63,6 +62,5 @@
     } @else {
       <p>{{ translation.translate('userInfo.noGas') }}</p>
     }
-    <button (click)="goToPreferences()">{{ translation.translate('userInfo.createModify') }}</button>
   </div>
 </div>

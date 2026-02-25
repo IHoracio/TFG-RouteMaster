@@ -1,0 +1,46 @@
+<details class="filter-dropdown">
+  <summary>{{ translation.translate('search.gasFilters') }}</summary>
+  <div class="filter-buttons">
+    <button (click)="toggleFilterByCheapest.emit()" [class.active]="filterByCheapest()">
+      {{ translation.translate('search.cheapest') }}
+    </button>
+    <button (click)="toggleFilterByBrands.emit()" [disabled]="!isLoggedIn()" [class.active]="filterByBrands()"
+      [title]="!isLoggedIn() ? translation.translate('auth.loginRequired') : ''">
+      {{ translation.translate('search.favoriteBrands') }}
+    </button>
+    <button (click)="toggleFilterByMaxPrice.emit()" [disabled]="!isLoggedIn()" [class.active]="filterByMaxPrice()"
+      [title]="!isLoggedIn() ? translation.translate('auth.loginRequired') : ''">
+      {{ translation.translate('search.maxPrice') }}
+    </button>
+  </div>
+</details>
+<details class="filter-dropdown save-route-dropdown" [class.disabled]="!createdRoute()">
+  <summary [title]="!createdRoute() ? translation.translate('search.searchRoute') : ''">{{ translation.translate('search.saveRoute') }}</summary>
+  <div class="filter-buttons">
+    <input type="text" id="routeAlias" name="routeAlias" [ngModel]="routeAlias()"
+      (ngModelChange)="onRouteAliasChange($event)"
+      [placeholder]="translation.translate('search.routeAliasPlaceholder')"
+      [disabled]="!createdRoute()" />
+    <button type="button" (click)="saveRoute.emit()" [disabled]="!createdRoute()"
+      [title]="!createdRoute() ? translation.translate('search.searchRoute') : ''">
+      {{ translation.translate('search.saveRoute') }}
+    </button>
+    <div *ngIf="successfulMessage()" class="success">{{ successfulMessage() }}</div>
+    <div *ngIf="errorMessage()" class="error">{{ errorMessage() }}</div>
+  </div>
+</details>
+<div class="share-container">
+  <button class="share-btn" (click)="shareRoute.emit()" [disabled]="!createdRoute()"
+    [title]="!createdRoute() ? translation.translate('search.searchRoute') : ''">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <circle cx="18" cy="5" r="3"></circle>
+      <circle cx="6" cy="12" r="3"></circle>
+      <circle cx="18" cy="19" r="3"></circle>
+      <path d="m8.59 13.51 6.83 3.98"></path>
+      <path d="m15.41 6.51-6.82 3.98"></path>
+    </svg>
+  </button>
+  <div class="share-message" [class.show]="showShareMessage()">
+    {{ translation.translate('search.linkCopied') }}
+  </div>
+</div>

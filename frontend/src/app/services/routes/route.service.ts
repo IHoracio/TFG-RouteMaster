@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
-import { environment } from '../../../environments/environment';
 import { RouteFormResponse } from '../../Dto/route-form-response';
 import { GasStation } from '../../Dto/gas-station';
 import { FullRouteData } from '../../Dto/full-route-data';
@@ -17,7 +16,6 @@ export class RouteService {
   constructor(private http: HttpClient) { }
 
   getFullRouteData(routeFormResponse: RouteFormResponse): Observable<FullRouteData> {
-    const headers = new HttpHeaders().set('key', environment.googleMapsMapId);
 
     let waypointsString = routeFormResponse.waypoints.join('|');
     let parameters = new HttpParams()
@@ -30,11 +28,10 @@ export class RouteService {
       .set('avoidTolls', routeFormResponse.avoidTolls)
       .set('gasRadius', routeFormResponse.radioKm || 1); 
 
-    return this.http.get<FullRouteData>(this.apiUrl + "/api/route/fullData", { headers, params: parameters });
+    return this.http.get<FullRouteData>(this.apiUrl + "/api/route/fullData", { params: parameters });
   }
 
   calculateRoute(routeFormResponse: RouteFormResponse): Observable<string> {
-    const headers = new HttpHeaders().set('key', environment.googleMapsMapId);
 
     let waypointsString = routeFormResponse.waypoints.join('|');
     let parameters = new HttpParams()
@@ -44,7 +41,7 @@ export class RouteService {
       .set('optimizeWaypoints', routeFormResponse.optimizeWaypoints)
       .set('optimizeRoute', routeFormResponse.optimizeRoute);
 
-    return this.http.get(this.apiUrl, { headers: headers, params: parameters, responseType: 'text' });
+    return this.http.get(this.apiUrl, { params: parameters, responseType: 'text' });
   }
 
   calculatePolylineCoords(routeFormResponse: RouteFormResponse): Observable<string> {

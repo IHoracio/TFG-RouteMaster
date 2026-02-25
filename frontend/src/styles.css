@@ -1,219 +1,169 @@
+/* ========================================
+   VARIABLES GLOBALES - Tema Claro por Defecto
+   ======================================== */
 :root {
-  --color-primary: #6a11cb;
-  --color-secondary: #2323FF;
-  --color-primary-light: #7e3dff;
-  --color-secondary-light: #525aff;
-  --color-title: #F2F2F2;
-  --color-title-dark: #252525;
-  --color-bg: #e2e1eb;
-  --color-card: #d3d3ff;
-  --color-text: #0f172a;
-  --color-p: #545454;
-  --border-radius: 8px;
-  --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  --color-error: red;
-  --color-success: #28a745;
+  --bg-color: #aed1ff;
+  --surface-color: #8abdfa;
+  --surface-secondary: #bcdcff;
+
+  --text-color: #102357;
+  --text-secondary: #57687f;
+
+  --border-color: #64748b;
+
+  --primary-color: #1e40af;
+  --secondary-color: #3b82f6;
+
+  --surface-weather: #7ac8ff5b;
+
+  --hover-button: rgba(60, 76, 94, 0.32);
+
+  --header-footer-gradient-end: #a9d0ff;
+  --header-footer-gradient-start: #5c90e9;
+  --weather-gradient-start: #a5e4e2;;
+  --weather-gradient-end: #96d0ff;
+
+  --header-shadow: 0 4px 6px 2px rgba(25, 0, 255, 0.416);
+  --footer-shadow: 0 -2px 4px rgba(25, 0, 255, 0.416);
+
+  --font-family: 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+
+  --font-size-base: 1rem;
+  --line-height-base: 1.5;
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+  --grid-search-bar-cols: minmax(0, 35%) minmax(0, 65%);
+  --button-padding: var(--spacing-sm) var(--spacing-md);
 }
 
-html,
+/* ========================================
+   TEMA OSCURO
+   ======================================== */
+.dark {
+  --bg-color: #0f172a;
+  --surface-color: #1e293b;
+  --surface-secondary: #1a2130;
+
+  --text-color: #93c5fd;
+  --text-secondary: #64748b;
+
+  --border-color: #334155;
+
+  --primary-color: #3b82f6;
+  --secondary-color: #60a5fa;
+
+  --surface-weather: #0220361a;
+
+  --hover-button: rgba(141, 179, 223, 0.32);
+
+  --header-footer-gradient-start: #12254e;
+  --header-footer-gradient-end: #121b2f;
+  --weather-gradient-start: #1f3a37;
+  --weather-gradient-end: #2b3f71;
+
+  --header-shadow: 0 4px 6px 2px rgba(147, 197, 253, 0.2);
+  --footer-shadow: 0 -2px 4px rgba(147, 197, 253, 0.2);
+}
+
+/* ========================================
+   3. ESTILOS BASE PARA HTML Y BODY
+   ======================================== */
 body {
-  height: 100%;
-  margin: 0;
+  font-family: var(--font-family);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-base);
+  color: var(--text-color);
+  background-color: var(--bg-color);
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
+/* ========================================
+   4. TIPOGRAFÍA GLOBAL
+   ======================================== */
+h1, h2, h3, h4, h5, h6 {
+  margin-top: 0;
+  margin-bottom: var(--spacing-md);
+  font-weight: 500;
+  line-height: 1.2;
+  color: var(--text-color);
+}
+
+*:focus {
+  outline: none !important;
+}
+
+/* ========================================
+   6. SOPORTE PARA COMPONENTES (Opcional)
+   ======================================== */
 app-root {
-  display: flex;
-  flex-direction: column;
+  display: block;
   min-height: 100vh;
 }
 
-router-outlet {
-  flex: 1;
-  display: block;
-  padding-top: 100px;
+p {
+    color: var(--secondary-color);
 }
 
-body {
-  margin: 0;
-  font-family: "Inter", "Roboto", sans-serif;
-  background-color: var(--color-bg);
-  color: var(--color-text);
+/* ========================================
+   7. ESTILOS DE SCROLLBAR GLOBALES
+   ======================================== */
+/* Chrome/Safari/Edge */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
 }
 
-footer,
-header {
-  background: linear-gradient(90deg, var(--color-primary), var(--color-secondary));
-  text-decoration: none;
-}
-
-.light {
-  --color-bg: #e2e1eb;
-  --color-card: #d3d3ff;
-  --color-text: #0f172a;
-}
-
-.dark {
-  --color-bg: #000000;
-  --color-card: #2e4c6b;
-  --color-text: #ffffff;
-}
-
-.dark input,
-.dark textarea,
-.dark select {
-  background-color: #444;
-  color: var(--color-text);
-  border: 1px solid #666;
-}
-
-.dark a {
-  color: #add8e6;
-}
-
-.dark a:hover {
-  color: #87ceeb;
-}
-
-.btn {
-  padding: 4px 8px;
-  background: var(--color-primary);
-  color: white;
-  border: none;
+::-webkit-scrollbar-track {
+  background: var(--bg-color);
   border-radius: 4px;
-  cursor: pointer;
 }
 
-.btn:hover {
-  background: var(--color-primary-light);
+::-webkit-scrollbar-thumb {
+  background: var(--primary-color);
+  border-radius: 4px;
+  transition: background 0.3s ease;
 }
 
-.lang-btn,
-.theme-btn {
-  margin-left: 10px;
-  cursor: pointer;
-  background-color: var(--color-primary);
-  color: white;
-  border: none;
-  padding: 5px 10px;
-  border-radius: var(--border-radius);
+::-webkit-scrollbar-thumb:hover {
+  background: var(--secondary-color);
 }
 
-.lang-btn:hover,
-.theme-btn:hover {
-  background-color: var(--color-primary-light);
+::-webkit-scrollbar-corner {
+  background: var(--bg-color);
 }
 
-select {
-  appearance: none;
-  background: var(--color-card)
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='1.5' stroke='%23FFF' class='size-6'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='m19.5 8.25-7.5 7.5-7.5-7.5' /%3E%3C/svg%3E%0A")
-    right 10px center / 20px no-repeat;
-  border: 2px solid var(--color-primary-light);
-  border-radius: 8px;
-  padding: 10px;
-  color: var(--color-text);
-  cursor: pointer;
-  transition: all 0.3s ease;
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--primary-color) var(--bg-color);
 }
 
-select:focus {
-  border-color: var(--color-primary);
-  box-shadow: 0 0 10px rgba(38, 143, 255, 0.5);
-  outline: none;
+/* ========================================
+   8. EVITAR MODIFICACIONES DEL NAVEGADOR AL AUTOCOMPLETAR
+   ======================================== */
+input:not([type="submit"]):not([type="button"]):not([type="reset"]) {
+  color: var(--text-color);
 }
 
-select:hover {
-  border-color: var(--color-secondary);
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  background-color: var(--surface-secondary) !important;
+  -webkit-box-shadow: 0 0 0px 1000px var(--surface-secondary) inset !important;
+  -webkit-text-fill-color: var(--text-color) !important;
+  color: var(--text-color) !important;
+  transition: background-color 0s, color 0s;
 }
 
-@supports (appearance: base-select) {
-  select {
-    background-image: none;
-    &::picker-icon {
-      content: "";
-      width: 20px;
-      height: 20px;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='1.5' stroke='%23FFF' class='size-6'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='m19.5 8.25-7.5 7.5-7.5-7.5' /%3E%3C/svg%3E%0A");
-      transition: rotate 0.2s ease-out;
-    }
-    &:open::picker-icon {
-      rotate: 180deg;
-    }
-    &::picker(select) {
-      padding: 0;
-      margin-top: 5px;
-      border: 2px solid var(--color-primary-light);
-      background: var(--color-secondary-light);
-      border-radius: 8px;
-      font-weight: 400;
-      color: white;
-      opacity: 0;
-      height: 0;
-      overflow: clip;
-      transition: height 0.5s ease-out, opacity 0.5s ease-out, overlay 0.5s;
-      transition-behavior: allow-discrete;
-    }
-    &:open::picker(select) {
-      opacity: 1;
-      height: calc-size(auto, size);
-      overflow: auto;
-      @starting-style {
-        opacity: 0;
-        height: 0;
-      }
-    }
-    option {
-      padding: 10px 15px;
-      border-top: 1px solid var(--color-primary-light);
-      cursor: pointer;
-      transition-property: color, background;
-      transition-duration: 0.2s;
-      transition-timing-function: ease-out;
-      color: white;
-      background: var(--color-secondary-light);
-      &:where(:hover, :focus, :active) {
-        background: var(--color-primary);
-        color: white;
-      }
-      &:checked {
-        background: var(--color-secondary);
-        color: white;
-      }
-      &::checkmark {
-        display: none;
-      }
-      &:first-child {
-        border: 0;
-      }
-    }
-  }
-}
-
-select option {
-  background: var(--color-secondary-light);
-  color: white;
-}
-
-details {
-  border: 1px solid var(--color-primary-light);
-  border-radius: 8px;
-  padding: 10px;
-  background: var(--color-card);
-  color: var(--color-text);
-  margin-bottom: 10px;
-}
-
-details summary {
-  cursor: pointer;
-  font-weight: bold;
-  color: var(--color-text);
-}
-
-details[open] {
-  border-color: var(--color-primary);
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-}
-
-details[open] summary {
-  color: var(--color-primary);
+input:-moz-autofill {
+  background-color: var(--surface-secondary) !important;
+  color: var(--text-color) !important;
 }

@@ -23,20 +23,30 @@ export class UserPreferencesComponent {
   router = inject(Router);
 
   defaultUserPreferences = this.userPreferencesService.getDefaultPreferencesSignal();
-  showGeneric = signal<boolean>(false);
-  showVehicle = signal<boolean>(false);
-  showGasStations = signal<boolean>(false);
+  activeSection = signal<string | null>(null);
 
   toggleGeneric(): void {
-    this.showGeneric.update(v => !v);
+    this.activeSection.update(v => v === 'generic' ? null : 'generic');
   }
 
   toggleVehicle(): void {
-    this.showVehicle.update(v => !v);
+    this.activeSection.update(v => v === 'vehicle' ? null : 'vehicle');
   }
 
   toggleGasStations(): void {
-    this.showGasStations.update(v => !v);
+    this.activeSection.update(v => v === 'gasStations' ? null : 'gasStations');
+  }
+
+  showGeneric(): boolean {
+    return this.activeSection() === 'generic';
+  }
+
+  showVehicle(): boolean {
+    return this.activeSection() === 'vehicle';
+  }
+
+  showGasStations(): boolean {
+    return this.activeSection() === 'gasStations';
   }
 
   savePreferences(): void {

@@ -17,7 +17,6 @@ export class AuthGuard implements CanActivate {
         return this.http.post(`${this.baseUrl}/auth/check`, {}, { withCredentials: true }).pipe(
             map(() => true),
             catchError(() => {
-                alert(this.translation.translate('auth.loginRequired'));
                 this.router.navigate(['/login']);
                 return of(false);
             })

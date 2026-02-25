@@ -1,34 +1,36 @@
-import { Component, inject, signal, OnInit, computed, effect } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { Component, inject, signal, OnInit, computed, effect, ViewChild, ElementRef } from '@angular/core';
 import { RouteFormResponse } from '../../../Dto/route-form-response';
 import { MapPageComponent } from '../map-page/map-page.component';
 import { SearchBarService } from '../../../services/search-bar/search-bar.service';
-import { KeyValuePipe, NgClass, NgFor, NgIf } from '@angular/common';
+import { NgClass } from '@angular/common';
 import { RouteService } from '../../../services/routes/route.service';
-import { RouteGroupResponse } from '../../../Dto/maps-dtos';
-import { FavouriteGasStation } from '../../../Dto/gas-station';
-import { SavedRoute } from '../../../Dto/saved-route';
 import { TranslationService } from '../../../services/translation.service';
-import { GasStation } from '../../../Dto/gas-station';
-import { catchError } from 'rxjs/operators';
+import { FavouriteGasStation, GasStation } from '../../../Dto/gas-station';
 import { UserInfoService } from '../../../services/user-page/user-info.service';
 import { UserPreferencesService } from '../../../services/user-page/user-preferences.service';
-import { of } from 'rxjs';
 import { AuthService } from '../../../services/auth/auth-service.service';
 import { AuthGuard } from '../../../guards/auth.guard';
 import { MapCommunicationService } from '../../../services/map/map-communication.service';
 import { LoginPromptComponent } from '../../components/search-bar-components/login-prompt/login-prompt.component';
+import { LoginPromptService } from '../../../services/login-prompt/login-prompt.service';
+import { SavedRouteDto, RoutePreferencesDto } from '../../../Dto/user-dtos';
+import { SearchBarTabsComponent } from '../../components/search-bar-components/search-bar-tabs/search-bar-tabs.component';
+import { SearchBarFiltersComponent } from '../../components/search-bar-components/search-bar-filters/search-bar-filters.component';
+import { SearchBarFormComponent } from '../../components/search-bar-components/search-bar-form/search-bar-form.component';
 
 @Component({
   selector: 'app-search-bar',
-  imports: [FormsModule, MapPageComponent, NgFor, KeyValuePipe, NgIf, NgClass, LoginPromptComponent],
+  imports: [MapPageComponent, NgClass, LoginPromptComponent, SearchBarTabsComponent, SearchBarFiltersComponent, SearchBarFormComponent],
   templateUrl: './search-bar.component.html',
   styleUrl: './search-bar.component.css'
 })
 export class SearchBarComponent implements OnInit {
 
   isLoggedIn = signal<boolean>(false);
-  showLoginPrompt = signal(false);
+  isFormCollapsed: boolean = false;
+  showShareMessage = signal(false);
+  createdRoute = signal(false);
+  loginPromptService = inject(LoginPromptService);
 
   allGasStations = signal<GasStation[]>([]);
   filterByBrands = signal<boolean>(false);
@@ -40,7 +42,7 @@ export class SearchBarComponent implements OnInit {
   userPreferences = inject(UserPreferencesService);
 
   favouriteGasStations = signal<FavouriteGasStation[]>([]);
-  savedRoute = signal<SavedRoute[]>([]);
+  savedRoute = signal<SavedRouteDto[]>([]);
   preferredBrands: string[] = [];
   fuelType: string = 'ALL';
   maxPrice: number = 0;
@@ -58,8 +60,7 @@ export class SearchBarComponent implements OnInit {
     waypoints: [],
     optimizeWaypoints: false,
     optimizeRoute: false,
-    avoidTolls: false,
-    vehiculeEmissionType: "NONE"
+    avoidTolls: false
   };
   waypointTypes: string[] = [];
 
@@ -77,8 +78,27 @@ export class SearchBarComponent implements OnInit {
   };
 
   activeTab: string = 'destination';
+  selectedSavedRoute: number | null = null;
 
-  constructor(private searchBarService: SearchBarService, private routeService: RouteService, private authService: AuthService, private authGuard: AuthGuard, private mapCommunication: MapCommunicationService) { }
+  @ViewChild('card', { static: true }) card!: ElementRef;
+  @ViewChild('formWrapper') formWrapper!: ElementRef;
+
+  scrollToCard() {
+    if (window.innerWidth >= 768) {
+      const rect = this.card.nativeElement.getBoundingClientRect();
+      const offset = 205;
+      window.scrollTo({
+        top: window.scrollY + rect.top + offset,
+        behavior: 'smooth'
+      });
+    }
+  }
+
+  constructor(private searchBarService: SearchBarService, private routeService: RouteService, private authService: AuthService, private authGuard: AuthGuard, private mapCommunication: MapCommunicationService) {
+    effect(() => {
+      this.mapCommunication.sendGasStations(this.filteredGasStations());
+    });
+  }
 
   ngOnInit(): void {
     this.authGuard.isLoggedIn().subscribe(logged => {
@@ -88,8 +108,7 @@ export class SearchBarComponent implements OnInit {
     this.authService.getUserSession().subscribe(logged => {
       this.isLoggedIn.set(logged);
       if (logged) {
-        this.userPreferences.getUserPreferences().subscribe(pref => {
-          this.routeFormResponse.vehiculeEmissionType = pref.emissionType;
+        this.userPreferences.getUserPreferences().subscribe((pref: RoutePreferencesDto) => {
           this.routeFormResponse.avoidTolls = pref.avoidTolls;
           this.preferredBrands = pref.preferredBrands;
           this.fuelType = pref.fuelType;
@@ -99,12 +118,19 @@ export class SearchBarComponent implements OnInit {
         });
         this.searchBarService
           .saveFavouriteGasStations()
-          .subscribe(gas => this.favouriteGasStations.set(JSON.parse(gas))
-          );
+          .subscribe(gas => {
+            const parsedGas = JSON.parse(gas) as FavouriteGasStation[];
+            console.log('Gasolineras parseadas:', parsedGas);
+            this.favouriteGasStations.set(parsedGas);
+          });
         this.searchBarService
           .saveSavedRoutes()
           .subscribe(route => {
-            this.savedRoute.set(JSON.parse(route));
+            try {
+              const parsedRoutes = JSON.parse(route) as SavedRouteDto[];
+              this.savedRoute.set(parsedRoutes);
+            } catch (e) {
+            }
           });
       } else {
         this.favouriteGasStations.set([]);
@@ -115,25 +141,32 @@ export class SearchBarComponent implements OnInit {
         this.routeFormResponse.radioKm = 2;
       }
     });
-    effect(() => {
-      this.mapCommunication.sendGasStations(this.filteredGasStations());
-    });
   }
 
   setTab(tab: string) {
     if (tab === 'gas' || tab === 'route') {
       if (!this.isLoggedIn()) {
-        this.showLoginPrompt.set(true);
+        this.loginPromptService.openLoginPrompt();
         return;
       }
     }
     this.activeTab = tab;
   }
 
+  shareRoute() {
+    // Lógica futura: generar link de la ruta
+    // Por ahora, copia la URL actual
+    navigator.clipboard.writeText(window.location.href).then(() => {
+      this.showShareMessage.set(true);
+      setTimeout(() => this.showShareMessage.set(false), 2000);
+    });
+  }
 
   addWaypoint() {
-    this.routeFormResponse.waypoints.push('');
-    this.waypointTypes.push('text');
+    if (this.routeFormResponse.waypoints.length < 5) {
+      this.routeFormResponse.waypoints.push('');
+      this.waypointTypes.push('text');
+    }
   }
 
   deleteWaypoint() {
@@ -149,9 +182,41 @@ export class SearchBarComponent implements OnInit {
   submitted: boolean = false;
   onSubmit() {
     this.submitted = true;
+    if (this.activeTab === 'route') {
+      const selected = this.selectedSavedRoute;
+      if (selected) {
+        const route = this.savedRoute().find(r => r.routeId == selected);
+        if (route) {
+          if (route.points && Array.isArray(route.points)) {
+            const originPoint = route.points.find(p => p.type === 'ORIGIN');
+            const destPoint = route.points.find(p => p.type === 'DESTINATION');
+            const waypoints = route.points.filter(p => p.type === 'WAYPOINT').map(p => p.address);
+            this.routeFormResponse.origin = originPoint?.address || '';
+            this.routeFormResponse.destination = destPoint?.address || '';
+            this.routeFormResponse.waypoints = waypoints;
+            this.routeFormResponse.optimizeWaypoints = route.optimizeWaypoints ?? false;
+            this.routeFormResponse.optimizeRoute = route.optimizeRoute ?? false;
+            this.routeFormResponse.avoidTolls = route.avoidTolls ?? false;
+          } else {
+            this.successfulMessage = "";
+            return;
+          }
+        } else {
+          this.errorMessage = this.translation.translate('search.routeNotFound');
+          this.successfulMessage = "";
+          return;
+        }
+      } else {
+        this.errorMessage = this.translation.translate('search.noRouteSelected');
+        this.successfulMessage = "";
+        return;
+      }
+    }
     this.searchBarService.onSubmit(this.routeFormResponse).subscribe({
       next: (gasStations) => {
+        console.log('onSubmit exitoso, gasStations:', gasStations);
         this.allGasStations.set(gasStations);
+        this.createdRoute.set(true);
       },
       error: (err) => {
         console.error('Error en onSubmit:', err);
@@ -166,7 +231,7 @@ export class SearchBarComponent implements OnInit {
         this.preferredBrands.some(brand => brand.toLowerCase() === station.marca.toLowerCase())
       );
     }
-    if (this.isLoggedIn() && this.filterByCheapest()) {
+    if (this.filterByCheapest()) {
       const fuelKey = (this.fuelType === 'ALL' || this.fuelType === 'GASOLINE') ? 'Gasolina95' : 'Diesel';
       const cheapest = stations.reduce((min, station) => {
         const price = station[fuelKey];
@@ -183,7 +248,6 @@ export class SearchBarComponent implements OnInit {
     }
     return stations;
   });
-
 
   trackByIndex(index: number) {
     return index;
@@ -207,14 +271,30 @@ export class SearchBarComponent implements OnInit {
     this.searchBarService.saveFavouriteRoute(this.routeAlias, this.routeFormResponse)
       .subscribe({
         next: (response) => {
+          this.savedRoute.update(routes => [...routes, response as SavedRouteDto]);
           this.successfulMessage = this.translation.translate('search.routeSaved');
           this.errorMessage = "";
+          this.routeAlias = "";
         }, error: (err) => {
           this.errorMessage = this.translation.translate('search.saveError');
           this.successfulMessage = "";
           console.log(err);
         },
       });
+  }
+
+  toggleFormCollapse() {
+    this.isFormCollapsed = !this.isFormCollapsed;
+    if (this.isFormCollapsed && typeof document !== 'undefined') {
+      const formWrapper = document.querySelector('.form-wrapper') as HTMLElement;
+      if (formWrapper) {
+        formWrapper.scrollTop = 0;
+      }
+    }
+  }
+
+  isDesktop(): boolean {
+    return typeof window !== 'undefined' && window.innerWidth >= 768;
   }
 
 }

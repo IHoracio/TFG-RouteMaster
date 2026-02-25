@@ -19,19 +19,27 @@
 }
 
 .form-group select,
-.form-group input {
-  padding: 8px;
-  border: 1px solid #ccc;
+.form-group input:not([type="checkbox"]) {
+  width: 100%;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: 1px solid var(--border-color);
   border-radius: 4px;
-  background: inherit;
-  color: inherit;
-  transition: border-color 0.2s;
+  background-color: var(--surface-secondary);
+  color: var(--text-color);
+  font-size: 1rem;
+  transition: border-color 0.3s ease;
 }
 
-.form-group input:focus,
+.form-group select option {
+  background-color: var(--surface-secondary);
+  color: var(--text-color);
+}
+
+.form-group input:not([type="checkbox"]):focus,
 .form-group select:focus {
-  border-color: var(--color-primary);
   outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
 }
 
 .form-group:has(input[type="checkbox"]) {
