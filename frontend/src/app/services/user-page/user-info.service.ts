@@ -1,12 +1,13 @@
 import { Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class UserInfoService {
-  private baseUrl = 'http://localhost:8080';
+  private baseUrl = environment.apiUrl;
 
   private userSignal = signal<any>({});
   private routesSignal = signal<any[]>([]);

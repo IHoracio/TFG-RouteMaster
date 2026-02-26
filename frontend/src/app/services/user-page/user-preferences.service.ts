@@ -4,12 +4,13 @@ import { Observable } from 'rxjs';
 import { DefaultUserPreferences, Preferences, ThemeLangPreferences } from '../../Dto/preferences';
 import { Municipalitie } from '../../Dto/municipalities';
 import { GasStation, FavouriteGasStation } from '../../Dto/gas-station';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class UserPreferencesService {
-  private baseUrl = 'http://localhost:8080';
+  private baseUrl = environment.apiUrl;
 
   private favoriteGasStationsSignal = signal<FavouriteGasStation[]>([]);
   private userPreferencesSignal = signal<any>({});

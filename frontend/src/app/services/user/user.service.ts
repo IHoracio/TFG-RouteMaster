@@ -1,6 +1,7 @@
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { environment } from '../../../environments/environment';
 
 
 @Injectable({
@@ -8,8 +9,8 @@ import { Observable } from 'rxjs';
 })
 export class UserService {
 
-  private userUrl = 'http://localhost:8080/api/users';
-  private routeUrl = 'http://localhost:8080/api/savedRoute'
+  private userUrl = environment.apiUrl + '/api/users';
+  private routeUrl = environment.apiUrl +'/api/savedRoute'
   constructor(private http: HttpClient) { }
 
   receiveUserData(): Observable<string> {

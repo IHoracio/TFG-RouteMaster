@@ -1,4 +1,5 @@
 export const environment = {
+  apiUrl: "http://localhost:8080",
   googleMapsApiKey: "GOOGLE_API_KEY",
   googleMapsMapId: "GOOGLE_MAP_ID"
 };

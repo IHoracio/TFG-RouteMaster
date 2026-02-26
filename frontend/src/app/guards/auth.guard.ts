@@ -3,13 +3,14 @@ import { CanActivate, Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { catchError, map, Observable, of } from 'rxjs';
 import { TranslationService } from '../services/translation.service';
+import { environment } from '../../environments/environment';
 
 @Injectable({
     providedIn: 'root'
 })
 export class AuthGuard implements CanActivate {
 
-    private baseUrl = 'http://localhost:8080';
+    private baseUrl = environment.apiUrl;
 
     constructor(private router: Router, private http: HttpClient, private translation: TranslationService) { }
 

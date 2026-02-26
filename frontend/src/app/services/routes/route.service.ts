@@ -4,14 +4,15 @@ import { Observable, map } from 'rxjs';
 import { RouteFormResponse } from '../../Dto/route-form-response';
 import { GasStation } from '../../Dto/gas-station';
 import { FullRouteData } from '../../Dto/full-route-data';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class RouteService {
 
-  private apiUrl = 'http://localhost:8080';
-  private routeUrl = 'http://localhost:8080/api/savedRoute';
+  private apiUrl = environment.apiUrl;
+  private routeUrl = '/api/savedRoute';
 
   constructor(private http: HttpClient) { }
 
@@ -89,7 +90,7 @@ export class RouteService {
       .set('optimizeRoute', routeFormResponse.optimizeRoute);
 
     console.log(params);
-    return this.http.post(
+    return this.http.post(this.apiUrl +
       this.routeUrl + '/save',
       null,
       { params, withCredentials: true }
