@@ -1,5 +1,6 @@
 package es.metrica.sept25.evolutivo.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.cors.CorsConfiguration;
@@ -9,17 +10,20 @@ import org.springframework.web.filter.CorsFilter;
 @Configuration
 public class CorsConfig {
 
-	@Bean
-	public CorsFilter corsFilter() {
-		CorsConfiguration config = new CorsConfiguration();
-		config.setAllowCredentials(true);
-		config.addAllowedOrigin("http://localhost:4200");
-		config.addAllowedHeader("*");
-		config.addAllowedMethod("*");
+    @Value("${cors.allowed.origins}")
+    private String allowedOrigins;
 
-		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-		source.registerCorsConfiguration("/**", config);
+    @Bean
+    public CorsFilter corsFilter() {
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowCredentials(true);
+        config.addAllowedOrigin(allowedOrigins);
+        config.addAllowedHeader("*");
+        config.addAllowedMethod("*");
 
-		return new CorsFilter(source);
-	}
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config);
+
+        return new CorsFilter(source);
+    }
 }
