@@ -10,9 +10,9 @@ spring.jpa.database-platform=org.hibernate.dialect.MySQLDialect
 # Zona horaria para Jackson
 spring.jackson.time-zone=Europe/Madrid
 
-# Claves API (obten las tuyas en Google y AEMET)
+# Claves API (obten las tuyas en Google y OpenWeatherMap)
 evolutivo.api_key_google=TU_CLAVE_API_GOOGLE_AQUI
-evolutivo.api_key_aemet=TU_CLAVE_API_AEMET_AQUI
+evolutivo.api_key_openweather=TU_CLAVE_API_OPENWEATHERMAP_AQUI
 
 # Clave secreta para cookies de autenticacion (genera una segura)
 evolutivo.auth.secret-cookie-key=TU_CLAVE_SECRETA_AQUI
