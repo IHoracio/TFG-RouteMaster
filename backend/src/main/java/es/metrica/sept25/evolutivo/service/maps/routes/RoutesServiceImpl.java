@@ -4,7 +4,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -29,14 +28,11 @@ import es.metrica.sept25.evolutivo.domain.dto.maps.routes.FullRouteData;
 import es.metrica.sept25.evolutivo.domain.dto.maps.routes.Leg;
 import es.metrica.sept25.evolutivo.domain.dto.maps.routes.RouteGroup;
 import es.metrica.sept25.evolutivo.domain.dto.maps.routes.Step;
-import es.metrica.sept25.evolutivo.domain.dto.weather.Dia;
 import es.metrica.sept25.evolutivo.domain.dto.weather.EstadoCielo;
-import es.metrica.sept25.evolutivo.domain.dto.weather.Temperatura;
+import es.metrica.sept25.evolutivo.domain.dto.weather.HourlyWeather;
 import es.metrica.sept25.evolutivo.domain.dto.weather.Weather;
 import es.metrica.sept25.evolutivo.entity.gasolinera.Gasolinera;
-import es.metrica.sept25.evolutivo.enums.EmissionType;
 import es.metrica.sept25.evolutivo.service.gasolineras.GasolineraService;
-import es.metrica.sept25.evolutivo.service.ine.INEService;
 import es.metrica.sept25.evolutivo.service.maps.geocode.GeocodeService;
 import es.metrica.sept25.evolutivo.service.maps.geocode.ReverseGeocodeService;
 import es.metrica.sept25.evolutivo.service.weather.WeatherService;
@@ -57,9 +53,6 @@ public class RoutesServiceImpl implements RoutesService {
 
 	@Autowired
 	private RestTemplate restTemplate;
-
-	@Autowired
-	private INEService ineService;
 
 	@Autowired
 	GasolineraService gasolineraService;
@@ -90,7 +83,7 @@ public class RoutesServiceImpl implements RoutesService {
 	    List<Coords> polylineCoords = extractRoutePolylinePoints(routeGroup);
 	    List<Coords> legCoords = getLegCoords(routeGroup);
 	    List<Gasolinera> gasStations = getGasStationsCoordsForRoute(routeGroup, gasRadius);
-	    List<CoordsWithWeather> weatherData = getWeatherForRoute(routeGroup);
+	    List<CoordsWithWeather> weatherData = getWeatherForRoute(routeGroup, language);
 	    
 	    return Optional.of(new FullRouteData(polylineCoords, legCoords, gasStations, weatherData));
 	}
@@ -240,81 +233,89 @@ public class RoutesServiceImpl implements RoutesService {
 	}
 
 	@Override
-	public List<CoordsWithWeather> getWeatherForRoute(RouteGroup routeGroup) {
+	public List<CoordsWithWeather> getWeatherForRoute(RouteGroup routeGroup, String lang) {
 		log.info("[routes-service] [" + LocalDateTime.now() + "] "
-	            + "Attempting to get weather for each point of the route.");
+	            + "Attempting to get weather for each leg of the route.");
 
-	    List<Coords> sampledPoints = getSampledRoutePoints(routeGroup);
+	    List<Coords> legCoords = getLegCoords(routeGroup);
 
-	    if (sampledPoints.isEmpty()) {
+	    if (legCoords.isEmpty()) {
 	        return List.of();
 	    }
 
-		Map<String, Coords> coordsPorMunicipio = new LinkedHashMap<>();
-
-		for (Coords coords : sampledPoints) {
-			Optional<String> codigoINE =
-					ineService.getCodigoINE(coords.getLat(), coords.getLng());
-			
-			if (codigoINE.isEmpty()) {
-				log.warn("[routes-service] [" + LocalDateTime.now().toString() + "] "
-						+ "No INE code could be extracted for the given coords: "
-						+ coords.toString());
-			}
-
-			codigoINE.ifPresent(code ->
-					coordsPorMunicipio.putIfAbsent(code, coords)
-			);
-		}
-
-		return coordsPorMunicipio.entrySet().stream()
-				.map(entry -> {
-
-					String codigoINE = entry.getKey();
-					Coords coords = entry.getValue();
-
+		return legCoords.stream()
+				.map(coords -> {
 					String address = reverseGeocodeService
 							.getAddress(coords.getLat(), coords.getLng())
-							.orElse("Ubicación desconocida");
+							.orElse("Unknown address");
 
 					Optional<Weather> weatherOpt =
-							weatherService.getWeather(codigoINE);
+							weatherService.getWeather(coords.getLat(), coords.getLng(), lang, address);
 
 					if (weatherOpt.isEmpty()) {
+						log.warn("[routes-service] [" + LocalDateTime.now().toString() + "] "
+								+ "No weather data could be retrieved for coords: "
+								+ coords.toString());
 						return new CoordsWithWeather(
 								address,
 								new HashMap<>(),
-								new HashMap<>()
+								new HashMap<>(),
+								new HashMap<>(),
+								new HashMap<>(),
+								new HashMap<>(),
+								List.of()
 								);
 					}
 
 					Weather weather = weatherOpt.get();
-					Dia dia = weather.getPrediccion().getDia().get(0);
 
-					Map<Integer, String> mapaDescripciones = new HashMap<>();
-					if (dia.getEstadoCielo() != null) {
-						for (EstadoCielo estado : dia.getEstadoCielo()) {
-							mapaDescripciones.put(
-									estado.getPeriodo(),
-									estado.getDescripcion()
-									);
-						}
-					}
-
+					Map<Integer, String> mapaAlertas = new HashMap<>();
 					Map<Integer, Double> mapaTemperaturas = new HashMap<>();
-					if (dia.getTemperatura() != null) {
-						for (Temperatura temp : dia.getTemperatura()) {
-							mapaTemperaturas.put(
-									temp.getPeriodo(),
-									temp.getValue()
-									);
+					Map<Integer, Double> mapaFeelsLike = new HashMap<>();
+					Map<Integer, Double> mapaWindSpeed = new HashMap<>();
+					Map<Integer, Integer> mapaVisibility = new HashMap<>();
+					
+					// Get weather data from hourly array
+					if (weather.getHourly() != null && !weather.getHourly().isEmpty()) {
+						for (int i = 0; i < weather.getHourly().size(); i++) {
+							HourlyWeather hourly = weather.getHourly().get(i);
+							
+							// Get weather descriptions
+							if (hourly.getWeather() != null && !hourly.getWeather().isEmpty()) {
+								EstadoCielo estado = hourly.getWeather().get(0);
+								mapaAlertas.put(i, estado.getDescription());
+							}
+							
+							// Get temperature
+							if (hourly.getTemp() != null) {
+								mapaTemperaturas.put(i, hourly.getTemp());
+							}
+							
+							// Get feels like temperature
+							if (hourly.getFeelsLike() != null) {
+								mapaFeelsLike.put(i, hourly.getFeelsLike());
+							}
+							
+							// Get wind speed
+							if (hourly.getWindSpeed() != null) {
+								mapaWindSpeed.put(i, hourly.getWindSpeed());
+							}
+							
+							// Get visibility
+							if (hourly.getVisibility() != null) {
+								mapaVisibility.put(i, hourly.getVisibility());
+							}
 						}
 					}
 
 					return new CoordsWithWeather(
 							address,
-							mapaDescripciones,
-							mapaTemperaturas
+							mapaAlertas,
+							mapaTemperaturas,
+							mapaFeelsLike,
+							mapaWindSpeed,
+							mapaVisibility,
+							weather.getAlerts() != null ? weather.getAlerts() : List.of()
 							);
 				})
 				.toList();

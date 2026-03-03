@@ -52,7 +52,7 @@ public class RouteWeatherController {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 
-		List<CoordsWithWeather> stepsWithWeather = routesService.getWeatherForRoute(routeGroupOpt.get());
+		List<CoordsWithWeather> stepsWithWeather = routesService.getWeatherForRoute(routeGroupOpt.get(), language);
 		return new ResponseEntity<>(stepsWithWeather, HttpStatus.OK);
 	}
 }

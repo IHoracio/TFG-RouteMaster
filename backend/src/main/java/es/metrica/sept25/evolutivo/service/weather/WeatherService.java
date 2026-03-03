@@ -5,5 +5,5 @@ import java.util.Optional;
 import es.metrica.sept25.evolutivo.domain.dto.weather.Weather;
 
 public interface WeatherService {
-	public Optional<Weather> getWeather(String code);
+	public Optional<Weather> getWeather(double lat, double lng, String lang, String address);
 }

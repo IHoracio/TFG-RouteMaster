@@ -19,9 +19,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import es.metrica.sept25.evolutivo.domain.dto.maps.routes.*;
 import es.metrica.sept25.evolutivo.domain.dto.weather.*;
 import es.metrica.sept25.evolutivo.entity.gasolinera.Gasolinera;
-import es.metrica.sept25.evolutivo.enums.EmissionType;
 import es.metrica.sept25.evolutivo.service.gasolineras.GasolineraService;
-import es.metrica.sept25.evolutivo.service.ine.INEService;
 import es.metrica.sept25.evolutivo.service.maps.geocode.GeocodeService;
 import es.metrica.sept25.evolutivo.service.maps.geocode.ReverseGeocodeService;
 import es.metrica.sept25.evolutivo.service.maps.routes.RoutesServiceImpl;
@@ -33,9 +31,6 @@ class RoutesServiceImplTest {
 
     @Mock
     private RestTemplate restTemplate;
-
-    @Mock
-    private INEService ineService;
 
     @Mock
     private GasolineraService gasolineraService;
@@ -227,29 +222,53 @@ class RoutesServiceImplTest {
 
         RouteGroup rg = simpleRouteGroup();
 
-        when(ineService.getCodigoINE(anyDouble(), anyDouble()))
-                .thenReturn(Optional.of("28079"));
-
         when(reverseGeocodeService.getAddress(anyDouble(), anyDouble()))
                 .thenReturn(Optional.of("Madrid"));
 
         Weather weather = new Weather();
-        Dia dia = new Dia();
-        dia.setEstadoCielo(List.of(new EstadoCielo(0, "Despejado")));
-        dia.setTemperatura(List.of(new Temperatura(0, 20.0)));
+        weather.setDireccion("Madrid");
+        weather.setLat(40.4168);
+        weather.setLon(-3.7038);
+        weather.setTimezone("Europe/Madrid");
+        weather.setTimezoneOffset(3600);
+        
+        // Set up hourly weather data
+        HourlyWeather hourly = new HourlyWeather();
+        hourly.setDt(1772528400L);
+        hourly.setTemp(20.0);
+        hourly.setFeelsLike(18.5);
+        hourly.setHumidity(65);
+        hourly.setWindSpeed(5.5);
+        hourly.setVisibility(10000);
+        
+        // Set up weather conditions
+        EstadoCielo estado = new EstadoCielo();
+        estado.setId(800);
+        estado.setMain("Clear");
+        estado.setDescription("Despejado");
+        estado.setIcon("01d");
+        hourly.setWeather(List.of(estado));
+        
+        weather.setHourly(List.of(hourly));
+        
+        // Set up alerts
+        Alerta alerta = new Alerta();
+        alerta.setSenderName("AEMET");
+        alerta.setEvent("Wind warning");
+        weather.setAlerts(List.of(alerta));
 
-        Prediccion pred = new Prediccion();
-        pred.setDia(List.of(dia));
-        weather.setPrediccion(pred);
-
-        when(weatherService.getWeather("28079"))
+        when(weatherService.getWeather(anyDouble(), anyDouble(), anyString(), anyString()))
                 .thenReturn(Optional.of(weather));
 
         List<CoordsWithWeather> result =
-                service.getWeatherForRoute(rg);
+                service.getWeatherForRoute(rg, "es");
 
         assertEquals(1, result.size());
         assertEquals("Madrid", result.get(0).getAddress());
+        assertFalse(result.get(0).getFeelsLike().isEmpty());
+        assertFalse(result.get(0).getWindSpeed().isEmpty());
+        assertFalse(result.get(0).getVisibility().isEmpty());
+        assertFalse(result.get(0).getAlerts().isEmpty());
     }
 
     @Test
@@ -257,15 +276,13 @@ class RoutesServiceImplTest {
 
         RouteGroup rg = simpleRouteGroup();
 
-        when(ineService.getCodigoINE(anyDouble(), anyDouble()))
-                .thenReturn(Optional.of("28079"));
-        when(weatherService.getWeather("28079"))
+        when(weatherService.getWeather(anyDouble(), anyDouble(), anyString(), anyString()))
                 .thenReturn(Optional.empty());
         when(reverseGeocodeService.getAddress(anyDouble(), anyDouble()))
                 .thenReturn(Optional.of("Madrid"));
 
         List<CoordsWithWeather> result =
-                service.getWeatherForRoute(rg);
+                service.getWeatherForRoute(rg, "es");
 
         assertTrue(result.get(0).getWeatherDescription().isEmpty());
         assertTrue(result.get(0).getTemperatures().isEmpty());

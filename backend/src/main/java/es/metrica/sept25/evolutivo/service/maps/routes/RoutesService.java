@@ -18,7 +18,7 @@ public interface RoutesService {
 
 	String getUrl(List<Coords> waypoints, UriComponentsBuilder url);
 
-	List<CoordsWithWeather> getWeatherForRoute(RouteGroup routeGroup);
+	List<CoordsWithWeather> getWeatherForRoute(RouteGroup routeGroup, String lang);
 
 	List<Coords> extractRoutePoints(RouteGroup routeGroup);
 

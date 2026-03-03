@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import es.metrica.sept25.evolutivo.domain.dto.weather.Weather;
-import es.metrica.sept25.evolutivo.service.ine.INEService;
+import es.metrica.sept25.evolutivo.service.maps.geocode.ReverseGeocodeService;
 import es.metrica.sept25.evolutivo.service.weather.WeatherService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -25,9 +25,9 @@ public class CoordenadasWeatherController {
 
 	@Autowired
 	private WeatherService weatherService;
-
+	
 	@Autowired
-	private INEService ineService;
+	private ReverseGeocodeService reverseGeocodeService;
 
 	@Operation(summary = "Devuelve el clima para unas coordenadas", 
 			description = "Compone un objeto Weather que contiene toda la "
@@ -49,16 +49,16 @@ public class CoordenadasWeatherController {
 	@GetMapping("/coords")
 	public ResponseEntity<Weather> getWeatherByCoords(
 			@RequestParam double lat,
-			@RequestParam double lng) {
+			@RequestParam double lng,
+			@RequestParam(defaultValue = "es") String lang) {
 
-		Optional<String> codigoINE = ineService.getCodigoINE(lat, lng);
-		if (codigoINE.isEmpty()) {
-			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-		}
+		String address = reverseGeocodeService
+				.getAddress(lat, lng)
+				.orElse("Ubicación desconocida");
 
-		Optional<Weather> weather = weatherService.getWeather(codigoINE.get());
+		Optional<Weather> weather = weatherService.getWeather(lat, lng, lang, address);
 		if (weather.isEmpty()) {
-			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
 
 		return new ResponseEntity<Weather>(weather.get(), HttpStatus.OK);
