@@ -263,7 +263,7 @@ class RoutesServiceImplTest {
         List<CoordsWithWeather> result =
                 service.getWeatherForRoute(rg, "es");
 
-        assertEquals(1, result.size());
+        assertEquals(2, result.size());
         assertEquals("Madrid", result.get(0).getAddress());
         assertFalse(result.get(0).getFeelsLike().isEmpty());
         assertFalse(result.get(0).getWindSpeed().isEmpty());
@@ -284,6 +284,7 @@ class RoutesServiceImplTest {
         List<CoordsWithWeather> result =
                 service.getWeatherForRoute(rg, "es");
 
+        assertEquals(2, result.size());
         assertTrue(result.get(0).getWeatherDescription().isEmpty());
         assertTrue(result.get(0).getTemperatures().isEmpty());
     }
