@@ -18,17 +18,39 @@
               </div>
             </div>
 
+            @if (weatherPoint.alerts && weatherPoint.alerts.length > 0) {
+              @for (alert of weatherPoint.alerts; track alert.event) {
+                <div class="weather-alert">
+                  <strong>{{ translation.translate('weather.alert') }}</strong>: <span class="alert-event">{{ translateAlertEvent(alert.event) }}</span>
+                  <div class="alert-sender">{{ translation.translate('weather.alertSender') }}: <span class="alert-values">{{ alert.sender_name }}</span></div>
+                  <p class="alert-values">{{ formatTime(alert.start) }} - {{ formatTime(alert.end) }}</p>
+                </div>
+              }
+            }
+
             <div class="weather-summary-compact">
               @if (getForHour(weatherPoint.weatherDescription, currentHourStr); as desc) {
-                <div class="weather-desc">{{ translateWeatherDesc(desc) }}</div>
+                <div class="weather-desc">{{ translation.translate('weather.weather') }}:<span class="weather-values">{{ translateWeatherDesc(desc) | titlecase }}</span></div>
               } @else {
                 <div class="weather-desc weather-empty-value">{{ translation.translate('weather.noDescription') }}</div>
               }
 
               @if (hasForHour(weatherPoint.temperatures, currentHourStr)) {
-                <div class="weather-temp">{{ getForHour(weatherPoint.temperatures, currentHourStr) }}°C</div>
+                <div class="weather-temp">{{ translation.translate('weather.temp') }}:<span class="weather-values">{{ getForHour(weatherPoint.temperatures, currentHourStr) }}°C</span></div>
               } @else {
                 <div class="weather-temp weather-empty-value">{{ translation.translate('weather.noTemperature') }}</div>
+              }
+
+              @if (hasForHour(weatherPoint.feelsLike, currentHourStr)) {
+                <div class="weather-feels-like">{{ translation.translate('weather.feelsLike') }}: <span class="weather-values">{{ getForHour(weatherPoint.feelsLike, currentHourStr) }}°C</span></div>
+              }
+
+              @if (hasForHour(weatherPoint.windSpeed, currentHourStr)) {
+                <div class="weather-wind">{{ translation.translate('weather.windSpeed') }}: <span class="weather-values">{{ getForHour(weatherPoint.windSpeed, currentHourStr) }} km/h</span></div>
+              }
+
+              @if (hasForHour(weatherPoint.visibility, currentHourStr)) {
+                <div class="weather-visibility">{{ translation.translate('weather.visibility') }}: <span class="weather-values">{{ getForHour(weatherPoint.visibility, currentHourStr) }} m</span></div>
               }
             </div>
 
@@ -38,22 +60,26 @@
               <div class="weather-content">
                 <div class="weather-current-hour-line">{{ translation.translate('weather.currentHour') }}: <strong>{{ currentHourStr }}</strong> @if (currentHour() < 13) { <strong>{{ translation.translate('weather.am') }}</strong> } @else { <strong>{{ translation.translate('weather.pm') }}</strong> }</div>
 
-                <h4 class="weather-section-title">{{ translation.translate('weather.descriptionByHour') }}</h4>
+                <h4 class="weather-section-title">{{ translation.translate('weather.hourlySchedule') }}</h4>
                 <ul class="weather-hour-list">
-                  @for (entry of hourEntries(weatherPoint.weatherDescription); track entry[0]) {
+                  @for (entry of hourEntries(weatherPoint.temperatures) | slice:0:24; track entry[0]) {
                     <li [class.weather-hour-current]="entry[0] === currentHourStr">
                       <span class="hour-key">{{ entry[0] }}:00</span>
-                      <span class="hour-val">{{ translateWeatherDesc(entry[1]) }}</span>
-                    </li>
-                  }
-                </ul>
-
-                <h4 class="weather-section-title">{{ translation.translate('weather.temperaturesByHour') }}</h4>
-                <ul class="weather-hour-list">
-                  @for (entry of hourEntries(weatherPoint.temperatures); track entry[0]) {
-                    <li [class.weather-hour-current]="entry[0] === currentHourStr">
-                      <span class="hour-key">{{ entry[0] }}:00</span>
-                      <span class="hour-val">{{ entry[1] }}°C</span>
+                      <div class="hour-data">
+                        @if (getForHour(weatherPoint.weatherDescription, entry[0]); as desc) {
+                          <div class="hour-desc">{{ translation.translate('weather.weather') }}:<span class="weather-values">{{ translateWeatherDesc(desc) | titlecase}}</span></div>
+                        }
+                        <div class="hour-temp">{{ translation.translate('weather.temp') }}:<span class="weather-values">{{ entry[1] }}°C</span></div>
+                        @if (getForHour(weatherPoint.feelsLike, entry[0]); as fl) {
+                          <div class="hour-feels">{{ translation.translate('weather.feelsLike') }}: <span class="weather-values">{{ fl }}°C</span></div>
+                        }
+                        @if (getForHour(weatherPoint.windSpeed, entry[0]); as ws) {
+                          <div class="hour-wind">{{ translation.translate('weather.windSpeed') }}: <span class="weather-values">{{ ws }} km/h</span></div>
+                        }
+                        @if (getForHour(weatherPoint.visibility, entry[0]); as vis) {
+                          <div class="hour-vis">{{ translation.translate('weather.visibility') }}: <span class="weather-values">{{ vis }} m</span></div>
+                        }
+                      </div>
                     </li>
                   }
                 </ul>
