@@ -50,7 +50,7 @@ public class WeatherServiceImpl implements WeatherService {
 					.queryParam("lang", lang)
 					.queryParam("appid", API_KEY_OPENWEATHER)
 					.toUriString();
-			System.err.println(url);
+
 			Weather weather = restTemplate.getForObject(url, Weather.class);
 			
 			if (weather != null) {
