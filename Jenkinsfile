@@ -6,6 +6,9 @@ pipeline {
         CLOUDFRONT_DIST_ID = 'E27QH8YNNPVJHF'
         JAR_NAME = 'routemaster-0.0.1-SNAPSHOT.jar'
         SPRING_LOG = 'spring.log'
+        EVOLUTIVO_API_KEY_GOOGLE = credentials('google-api-key')
+        EVOLUTIVO_API_KEY_OPENWEATHER = credentials('openweather-api-key')
+        EVOLUTIVO_AUTH_SECRET_COOKIE_KEY = credentials('auth-secret-key')
     }
     stages {
         stage('Checkout') {
