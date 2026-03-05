@@ -1,6 +1,6 @@
 HELP.md
 backend/target/
-backend/mvnw*
+backend/mvnw
 backend/GET
 backend/Host:
 backend/spring.log
