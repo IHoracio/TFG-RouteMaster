@@ -1,14 +1,24 @@
 pipeline {
     agent any
     environment {
+
+	# AWS
         AWS_REGION = 'us-east-1'  
         S3_BUCKET = 'route-master-frontend'
         CLOUDFRONT_DIST_ID = 'E27QH8YNNPVJHF'
+
+	# SpringBoot
         JAR_NAME = 'routemaster-0.0.1-SNAPSHOT.jar'
         SPRING_LOG = 'spring.log'
-        EVOLUTIVO_API_KEY_GOOGLE = credentials('google-api-key')
-        EVOLUTIVO_API_KEY_OPENWEATHER = credentials('openweather-api-key')
-        EVOLUTIVO_AUTH_SECRET_COOKIE_KEY = credentials('auth-secret-key')
+
+	# Credentials
+        GOOGLE_KEY = credentials('google-api-key')
+        OPENWEATHER_KEY = credentials('openweather-api-key')
+        COOKIE_AUTH_SECRET_KEY = credentials('auth-secret-key')
+	SSL_KEYSTORE_PASSWD = credentials('ssl-keystore-passwd')
+	DATABASE_URL = credentials('database-url')
+	DATABASE_USER = credentials('database-user')
+	DATABASE_PASSWD = credentials('database-passwd')
     }
     stages {
         stage('Checkout') {

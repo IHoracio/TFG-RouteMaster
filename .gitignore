@@ -49,7 +49,6 @@ frontend/yarn-error.log
 backend/src/main/resources/application-dev.properties
 frontend/src/environments/environment.ts
 count_commits_by_contributor.sh
-backend/src/main/resources/application-prod.properties
 # Archivos de configuración de aplicación
 backend/application.properties
 backend/src/main/resources/keystore.p12
