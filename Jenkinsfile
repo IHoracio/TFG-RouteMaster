@@ -24,7 +24,7 @@ pipeline {
         }
         stage('Deploy Backend') {
             steps {
-                sh 'pkill -f ${JAR_NAME}'
+                sh 'pkill -f ${JAR_NAME} || true'
                 sh 'nohup java -jar backend/target/${JAR_NAME} > ${SPRING_LOG} 2>&1 &'
             }
         }
