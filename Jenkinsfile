@@ -31,8 +31,8 @@ pipeline {
         stage('Build Frontend') {
             steps {
                 dir('frontend') {
-                    sh 'npm install'
-                    sh 'ng build --configuration=production'
+                    sh 'npm ci'
+                    sh 'npx ng build --configuration=production'
                 }
             }
         }
