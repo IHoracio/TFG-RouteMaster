@@ -2,16 +2,16 @@ pipeline {
     agent any
     environment {
 
-	# AWS
+	// AWS
         AWS_REGION = 'us-east-1'  
         S3_BUCKET = 'route-master-frontend'
         CLOUDFRONT_DIST_ID = 'E27QH8YNNPVJHF'
 
-	# SpringBoot
+	// SpringBoot
         JAR_NAME = 'routemaster-0.0.1-SNAPSHOT.jar'
         SPRING_LOG = 'spring.log'
 
-	# Credentials
+	// Credentials
         GOOGLE_KEY = credentials('google-api-key')
         OPENWEATHER_KEY = credentials('openweather-api-key')
         COOKIE_AUTH_SECRET_KEY = credentials('auth-secret-key')
