@@ -38,14 +38,21 @@ pipeline {
                 sh 'nohup java -jar backend/target/${JAR_NAME} > ${SPRING_LOG} 2>&1 &'
             }
         }
-        stage('Build Frontend') {
-            steps {
-                dir('frontend') {
-                    sh 'npm ci'
-                    sh 'npx ng build --configuration=production'
-                }
-            }
-        }
+	stage('Build Frontend') {
+	  steps {
+	    dir('frontend') {
+	      sh 'npm ci'
+	
+	      sh '''
+	        set -eu
+		envsubst < src/environments/environment.prod.ts > src/environments/environment.prod.ts.tmp
+                mv src/environments/environment.prod.ts.tmp src/environments/environment.prod.ts
+	      '''
+	
+	      sh 'npx ng build --configuration=production'
+	    }
+	  }
+	}
         stage('Deploy Frontend') {
             steps {
                 sh 'aws s3 sync frontend/dist/angular/browser/ s3://${S3_BUCKET}/ --delete'

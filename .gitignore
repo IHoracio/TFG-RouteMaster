@@ -47,6 +47,7 @@ frontend/yarn-error.log
 
 # SECRETS
 backend/src/main/resources/application-dev.properties
+frontend/src/environments/environment.dev.ts
 count_commits_by_contributor.sh
 # Archivos de configuración de aplicación
 backend/application.properties
