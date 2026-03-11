@@ -9,14 +9,14 @@ La motivación surge de la necesidad de soluciones digitales para movilidad sost
 - **Cálculo de Rutas**: Trayectos optimizados con puntos intermedios opcionales.
 - **Información Adicional**: Gasolineras en el recorrido, condiciones meteorológicas y opciones personalizadas.
 - **Interfaz Interactiva**: Buscador y Mapas visuales con marcadores.
-- **APIs Integradas**: Google (Drirections, Geocode, Weahter), Precioil (precios de combustible).
+- **APIs Integradas**: Google (Drirections, Geocode, Weahter), Precioil (precios de combustible), Openweathermap (tiempo en las paradas de la ruta).
 - **Despliegue en Nube**: Backend en AWS Lambda, BD en RDS.
 - **Seguridad**: Autenticación con JWT y protección de APIs.
 
 ## Tecnologías Utilizadas
-- **Backend**: Spring Boot (Java), JPA, MySQL/RDS.
+- **Backend**: Spring Boot (Java), JPA, MySQL/RDS, H2 for Tests Database.
 - **Frontend**: Angular (TypeScript), RxJS, Google Maps API.
-- **Despliegue**: AWS (Lambda, RDS).
+- **Despliegue**: AWS (EC2, S3, CLAUDFRONT, RDS).
 - **Herramientas**: Git, GitHub, Maven, Node.js.
 
 ## Instalación y Configuración
@@ -33,9 +33,9 @@ La motivación surge de la necesidad de soluciones digitales para movilidad sost
    - Ejecuta: `ng serve`
    - Abre en `http://localhost:4200`
 
-5. **APIs**: Obtén claves de Google y configúrala en `backend/src/main/resources/application.properties` dentro del backend y `frontend/src/environments/environment.ts` en el frontend.
+5. **APIs**: Obtén claves de Google, Openweathermap y configúralas en `backend/src/main/resources/application.properties` dentro del backend y `frontend/src/environments/environment.ts` en el frontend.
    
-   Tienes de ejemplo el `backend/src/main/resources/application-example.properties` y `frontend/src/environments/environment-example.ts`
+   Tienes de ejemplo el `backend/src/main/resources/application-example.txt` y `frontend/src/environments/environment-example.txt`
 
 ## Uso
 - (Opcional) Regístrate y configura preferencias de vehículo.
