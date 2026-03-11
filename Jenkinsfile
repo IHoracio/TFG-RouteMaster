@@ -32,12 +32,19 @@ pipeline {
                 }
             }
         }
-        stage('Deploy Backend') {
-            steps {
-                sh 'pkill -f ${JAR_NAME} || true'
-                sh 'nohup java -jar backend/target/${JAR_NAME} > ${SPRING_LOG} 2>&1 &'
-            }
-        }
+	stage('Deploy Backend') {
+	  steps {
+	    withCredentials([file(credentialsId: 'ssl-keystore-p12', variable: 'KEYSTORE_FILE')]) {
+	      sh '''
+	        set -eu
+	        mkdir -p /var/jenkins_home/keystore
+	        cp "$KEYSTORE_FILE" /var/jenkins_home/keystore/keystore.p12
+	        pkill -f "${JAR_NAME}" || true
+	        nohup java -jar backend/target/${JAR_NAME} > ${SPRING_LOG} 2>&1 &
+	      '''
+	    }
+	  }
+	}
 	stage('Build Frontend') {
 	  steps {
 	    dir('frontend') {
