@@ -10,6 +10,24 @@ import { environment } from '../../../environments/environment';
   providedIn: 'root'
 })
 export class RouteService {
+  /**
+   * Envía los datos de la ruta al backend para generar un enlace compartible
+   * @param routeFormResponse Datos de la ruta actual
+   * @returns Observable con la URL generada
+   */
+  shareRoute(routeFormResponse: RouteFormResponse): Observable<{ url: string }> {
+    let waypointsString = routeFormResponse.waypoints.join('|');
+    let params = new HttpParams()
+      .set('origin', routeFormResponse.origin)
+      .set('destination', routeFormResponse.destination)
+      .set('waypoints', waypointsString)
+      .set('optimizeWaypoints', routeFormResponse.optimizeWaypoints)
+      .set('optimizeRoute', routeFormResponse.optimizeRoute)
+      .set('language', 'es')
+      .set('avoidTolls', routeFormResponse.avoidTolls)
+      .set('gasRadius', routeFormResponse.radioKm || 1);
+    return this.http.post<{ url: string }>(this.apiUrl + '/api/route/share', null, { params });
+  }
 
   private apiUrl = environment.apiUrl;
   private routeUrl = '/api/savedRoute';

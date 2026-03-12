@@ -28,7 +28,7 @@ import tfg.service.maps.routes.RoutesService;
 				+ "relacionados con la creación de rutas, el clima y las gasolineras "
 				+ "en un trayecto."
 		)
-@RequestMapping("/api/route")
+@RequestMapping("/api")
 public class RoutesController {
 
 	@Autowired

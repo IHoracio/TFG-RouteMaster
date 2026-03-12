@@ -154,13 +154,23 @@ export class SearchBarComponent implements OnInit {
   }
 
   shareRoute() {
-    // Lógica futura: generar link de la ruta
-    // Por ahora, copia la URL actual
-    navigator.clipboard.writeText(window.location.href).then(() => {
-      this.showShareMessage.set(true);
-      setTimeout(() => this.showShareMessage.set(false), 2000);
+    // Llama al backend para generar el enlace compartible y lo copia al portapapeles directamente
+    this.routeService.shareRoute(this.routeFormResponse).subscribe({
+      next: (resp) => {
+        navigator.clipboard.writeText(resp.url).then(() => {
+          this.showShareMessage.set(true);
+          setTimeout(() => this.showShareMessage.set(false), 2000);
+        });
+      },
+      error: () => {
+        // Si hay error, muestra el mensaje de error en el toast
+        this.showShareMessage.set(true);
+        setTimeout(() => this.showShareMessage.set(false), 2000);
+      }
     });
   }
+
+  // copyShareUrl y closeShareModal eliminados, ya no se usan
 
   addWaypoint() {
     if (this.routeFormResponse.waypoints.length < 5) {
