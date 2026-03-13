@@ -14,7 +14,9 @@ public class CoordsWithWeather {
 	private Map<Integer, Double> windSpeed;
 	private Map<Integer, Integer> visibility;
 	private List<Alerta> alerts;
-
+	
+	public CoordsWithWeather() {}
+	
 	public CoordsWithWeather(String address, Map<Integer, String> weatherDescription,
 			Map<Integer, Double> temperatures) {
 		this.address = address;
