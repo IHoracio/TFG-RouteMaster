@@ -1,15 +1,13 @@
 package tfg.service.maps.routes.sharedRoutes;
 
-import java.util.List;
 import java.util.Optional;
 
 import tfg.domain.dto.maps.routes.FullRouteData;
+import tfg.domain.dto.maps.routes.sharedRoutes.ShareRouteRequest;
 
 public interface SharedRouteService {
     
-    String generateShareToken(String origin, String destination, List<String> waypoints, 
-                              boolean optimizeWaypoints, boolean optimizeRoute, 
-                              String language, boolean avoidTolls, Long gasRadius);
+    String generateShareToken(ShareRouteRequest request);
 
     Optional<FullRouteData> getSharedRouteData(String token);
 }
