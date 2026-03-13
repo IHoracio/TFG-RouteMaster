@@ -3,9 +3,11 @@ package tfg.service.gasolineras;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -188,6 +190,38 @@ public class GasolineraServiceImpl implements GasolineraService {
 
 		return foundRadius;
 	}
+	
+	@Override
+    public List<Gasolinera> findGasStationsNearRoute(List<Coords> polylineCoords, Long radius) {
+        log.info("[gas-service] [" + LocalDateTime.now() + "] Buscando gasolineras a lo largo de una ruta con radio: " + radius);
+        
+        Set<Gasolinera> uniqueGasStations = new HashSet<>();
+        
+        if (polylineCoords == null || polylineCoords.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        // OPTIMIZACIÓN: No comprobamos los miles de puntos. 
+        // Comprobamos 1 de cada 100 puntos (ajusta este "step" según te convenga).
+        int step = Math.max(1, polylineCoords.size() / 20); // Asegura al menos 20 llamadas repartidas en la ruta
+
+        for (int i = 0; i < polylineCoords.size(); i += step) {
+            Coords point = polylineCoords.get(i);
+            
+            List<Gasolinera> gasStationsNearPoint = getGasolinerasInRadiusCoords(
+                    point.getLat(), point.getLng(), radius
+            );
+            
+            uniqueGasStations.addAll(gasStationsNearPoint);
+        }
+
+        Coords lastPoint = polylineCoords.get(polylineCoords.size() - 1);
+        uniqueGasStations.addAll(getGasolinerasInRadiusCoords(lastPoint.getLat(), lastPoint.getLng(), radius));
+
+        log.info("[gas-service] [" + LocalDateTime.now() + "] Se han encontrado " + uniqueGasStations.size() + " gasolineras únicas en la ruta.");
+        
+        return new ArrayList<>(uniqueGasStations);
+    }
 
 	@Override
 	@Cacheable(value = "brands", cacheManager = "staticCacheManager")
