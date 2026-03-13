@@ -3,6 +3,7 @@ package tfg.service.gasolineras;
 import java.util.List;
 import java.util.Optional;
 
+import tfg.domain.dto.maps.routes.Coords;
 import tfg.entity.gasolinera.Gasolinera;
 
 public interface GasolineraService {
@@ -13,6 +14,8 @@ public interface GasolineraService {
 	List<Gasolinera> getGasolinerasInRadiusCoords(Double latitud, Double longitud, Long radio);
 
 	List<Gasolinera> getGasolinerasInRadiusAddress(String direccion, Long radio);
+	
+	List<Gasolinera> findGasStationsNearRoute(List<Coords> polylineCoords, Long radius);
 
 	List<String> getMarcasFromAllGasolineras();
 
