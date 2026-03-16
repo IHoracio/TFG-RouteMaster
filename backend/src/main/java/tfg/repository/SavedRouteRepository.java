@@ -14,5 +14,5 @@ public interface SavedRouteRepository extends JpaRepository<SavedRoute, Long> {
 
 	List<SavedRoute> findByUser(User user);
 
-	Optional<SavedRoute> findByRouteId(Long routeId);
+	Optional<SavedRoute> findByRouteId(String routeId);
 }
