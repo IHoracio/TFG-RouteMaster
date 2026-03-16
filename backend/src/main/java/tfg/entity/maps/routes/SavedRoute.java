@@ -25,11 +25,13 @@ public class SavedRoute {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
+	// identificador secundario, único, que es el que se expone en la URL pública o al frontend
 	@Column(name = "route_id", nullable = false, updatable = false, unique = true)
-	private Long routeId;
+	private String routeId;
 
 	private String name;
 
+	// Mantenemos los puntos visuales (Origen, Waypoints, Destino) para la interfaz
 	@OneToMany(mappedBy = "savedRoute", cascade = CascadeType.ALL, orphanRemoval = true)
 	@OrderColumn(name = "order_index")
 	@JsonManagedReference("route-puntos")
@@ -38,18 +40,33 @@ public class SavedRoute {
 	@ManyToOne
 	@JsonBackReference("user-routes")
 	private User user;
+	
+	@Column(columnDefinition = "LONGTEXT")
+	private String polylineCoordsJson;
 
-	private boolean optimizeWaypoints;
-	private boolean optimizeRoute;
+	@Column(columnDefinition = "LONGTEXT")
+	private String legCoordsJson;
+
+	private Long gasRadius;
+
 	private String language;
-	private boolean avoidTolls;
 
-	public void setRouteId(Long routeId) {
-		this.routeId = routeId;
+
+
+	public Long getId() {
+		return id;
 	}
 
-	public Long getRouteId() {
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public String getRouteId() {
 		return routeId;
+	}
+
+	public void setRouteId(String routeId) {
+		this.routeId = routeId;
 	}
 
 	public String getName() {
@@ -76,20 +93,28 @@ public class SavedRoute {
 		this.user = user;
 	}
 
-	public boolean isOptimizeWaypoints() {
-		return optimizeWaypoints;
+	public String getPolylineCoordsJson() {
+		return polylineCoordsJson;
 	}
 
-	public void setOptimizeWaypoints(boolean optimizeWaypoints) {
-		this.optimizeWaypoints = optimizeWaypoints;
+	public void setPolylineCoordsJson(String polylineCoordsJson) {
+		this.polylineCoordsJson = polylineCoordsJson;
 	}
 
-	public boolean isOptimizeRoute() {
-		return optimizeRoute;
+	public String getLegCoordsJson() {
+		return legCoordsJson;
 	}
 
-	public void setOptimizeRoute(boolean optimizeRoute) {
-		this.optimizeRoute = optimizeRoute;
+	public void setLegCoordsJson(String legCoordsJson) {
+		this.legCoordsJson = legCoordsJson;
+	}
+
+	public Long getGasRadius() {
+		return gasRadius;
+	}
+
+	public void setGasRadius(Long gasRadius) {
+		this.gasRadius = gasRadius;
 	}
 
 	public String getLanguage() {
@@ -100,18 +125,10 @@ public class SavedRoute {
 		this.language = language;
 	}
 
-	public boolean isAvoidTolls() {
-		return avoidTolls;
-	}
-
-	public void setAvoidTolls(boolean avoidTolls) {
-		this.avoidTolls = avoidTolls;
-	}
-
 	@PrePersist
 	private void generateRouteId() {
 		if (this.routeId == null) {
-			this.routeId = System.currentTimeMillis();
+			this.routeId = java.util.UUID.randomUUID().toString();
 		}
 	}
 }
