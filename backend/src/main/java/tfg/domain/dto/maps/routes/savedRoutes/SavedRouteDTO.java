@@ -4,40 +4,34 @@ import java.util.List;
 
 public class SavedRouteDTO {
 
-	private Long routeId;
-	private String name;
-	private List<PointDTO> points;
-	private RoutePreferencesDTO preferences;
+		private String routeId; 
+		
+		private String name;
+		
+		private List<PointDTO> points;
 
-	public Long getRouteId() {
-		return routeId;
-	}
+		public String getRouteId() {
+			return routeId;
+		}
 
-	public void setRouteId(Long routeId) {
-		this.routeId = routeId;
-	}
+		public void setRouteId(String routeId) {
+			this.routeId = routeId;
+		}
 
-	public String getName() {
-		return name;
-	}
+		public String getName() {
+			return name;
+		}
 
-	public void setName(String name) {
-		this.name = name;
-	}
+		public void setName(String name) {
+			this.name = name;
+		}
 
-	public List<PointDTO> getPoints() {
-		return points;
-	}
+		public List<PointDTO> getPoints() {
+			return points;
+		}
 
-	public void setPoints(List<PointDTO> points) {
-		this.points = points;
-	}
-
-	public RoutePreferencesDTO getPreferences() {
-		return preferences;
-	}
-
-	public void setPreferences(RoutePreferencesDTO preferences) {
-		this.preferences = preferences;
-	}
+		public void setPoints(List<PointDTO> points) {
+			this.points = points;
+		}
+		
 }
