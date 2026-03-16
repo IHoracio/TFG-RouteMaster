@@ -1,15 +1,18 @@
 package tfg.controller.maps.routes.savedRoutes;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -19,192 +22,210 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
-import tfg.domain.dto.maps.routes.savedRoutes.PointDTO;
+
+import tfg.domain.dto.maps.routes.FullRouteData;
 import tfg.domain.dto.maps.routes.savedRoutes.SavedRouteDTO;
+import tfg.domain.dto.maps.routes.savedRoutes.SavedRouteRequest;
 import tfg.entity.user.User;
-import tfg.enums.EmissionType;
 import tfg.service.maps.routes.savedRoutes.SavedRouteService;
 import tfg.service.session.CookieService;
 import tfg.service.user.UserService;
 
 @RestController
 @Tag(
-		name = "Rutas guardadas", 
-		description = "Endpoints que hacen CRUD sobre las rutas que se guardan"
-					+ " asociadas a un usuario."
+        name = "Rutas guardadas", 
+        description = "Endpoints que hacen CRUD sobre las rutas que se guardan asociadas a un usuario."
 )
 @RequestMapping("/api/savedRoute")
 public class SavedRouteController {
 
-	@Autowired
-	private SavedRouteService routerFavoriteService;
+    private static final Logger log = LoggerFactory.getLogger(SavedRouteController.class);
 
-	@Autowired
-	private CookieService cookieService;
+    @Autowired
+    private SavedRouteService savedRouteService;
 
-	@Autowired
-	private UserService userService;
+    @Autowired
+    private CookieService cookieService;
 
+    @Autowired
+    private UserService userService;
 
-	@Operation(summary = "Guarda una ruta calculada")
-	@ApiResponses(value = { 
-			@ApiResponse(
-					responseCode = "200", 
-					description = "Ruta guardada correctamente"
-					),
-			@ApiResponse(
-					responseCode = "404",
-					description = "Usuario no encontrado"
-					) 
-	})
-	@PostMapping("/save")
-	public ResponseEntity<SavedRouteDTO> saveRoute(
-			HttpServletRequest request,
-			@RequestParam String name,
-			@RequestParam(required = true) String origin, 
-			@RequestParam(required = true) String destination,
-			@RequestParam(required = false, defaultValue = "") List<String> waypoints,
-			@RequestParam(required = false, defaultValue = "false") boolean optimizeWaypoints,
-			@RequestParam(required = false, defaultValue = "false") boolean optimizeRoute,
-			@RequestParam(required = false, defaultValue = "es") String language, 
-			@RequestParam(required = false, defaultValue = "false") boolean avoidTolls) {
+    @Operation(summary = "Guarda una ruta calculada")
+    @ApiResponses(value = { 
+            @ApiResponse(responseCode = "200", description = "Ruta guardada correctamente"),
+            @ApiResponse(responseCode = "404", description = "Usuario no encontrado") 
+    })
+    @PostMapping("/save")
+    public ResponseEntity<SavedRouteDTO> saveRoute(
+            HttpServletRequest request,
+            @RequestBody SavedRouteRequest saveRequest) { 
 
-		String email = cookieService.getCookieValue(request, "sesionActiva").get();
-		Optional<User> userOpt = userService.getEntityByEmail(email);
+        log.info("Petición POST recibida en /api/savedRoute/save para guardar una nueva ruta.");
 
-		if (userOpt.isEmpty()) {
-			return ResponseEntity.status(404).build();
-		}
+        String email = cookieService.getCookieValue(request, "sesionActiva").orElse("");
+        Optional<User> userOpt = userService.getEntityByEmail(email);
 
-		User user = userOpt.get();
+        if (userOpt.isEmpty()) {
+            log.warn("Intento de guardar ruta fallido. No se encontró sesión o usuario activo.");
+            return ResponseEntity.status(404).build();
+        }
 
-		List<PointDTO> puntos = new ArrayList<>();
+        User user = userOpt.get();
+        SavedRouteDTO saved = savedRouteService.saveRoute(saveRequest, user);
+        
+        log.info("Ruta '{}' guardada exitosamente para el usuario: {}", saved.getName(), email);
+        return ResponseEntity.ok(saved);
+    }
 
-		PointDTO originPoint = new PointDTO();
-		originPoint.setAddress(origin);
-		originPoint.setType("ORIGIN");
-		puntos.add(originPoint);
+    @Operation(summary = "Ejecuta una ruta guardada", description = "Devuelve el trazado y calcula el clima/gasolina en tiempo real asegurando que pertenece al usuario.")
+    @ApiResponses(value = { 
+            @ApiResponse(responseCode = "200", description = "Ruta ejecutada con éxito"),
+            @ApiResponse(responseCode = "401", description = "Usuario no autorizado (no logueado)"),
+            @ApiResponse(responseCode = "403", description = "Acceso denegado (la ruta no pertenece al usuario)"),
+            @ApiResponse(responseCode = "404", description = "Ruta no encontrada") 
+    })
+    @GetMapping("/execute/{routeId}")
+    public ResponseEntity<FullRouteData> executeSavedRoute(
+            @PathVariable String routeId,
+            HttpServletRequest request) {
 
-		if (waypoints != null) {
-			for (String wp : waypoints) {
-				PointDTO wpPoint = new PointDTO();
-				wpPoint.setAddress(wp);
-				wpPoint.setType("WAYPOINT");
-				puntos.add(wpPoint);
-			}
-		}
+        log.info("Petición GET recibida en /api/savedRoute/execute/{} para ejecutar ruta.", routeId);
 
-		PointDTO destinationPoint = new PointDTO();
-		destinationPoint.setAddress(destination);
-		destinationPoint.setType("DESTINATION");
-		puntos.add(destinationPoint);
+        String email = cookieService.getCookieValue(request, "sesionActiva").orElse("");
+        Optional<User> userOpt = userService.getEntityByEmail(email);
 
-		SavedRouteDTO saved = routerFavoriteService.saveRoute(name, puntos, user, optimizeWaypoints, optimizeRoute,
-				language, avoidTolls);
-		return ResponseEntity.ok(saved);
-	}
+        if (userOpt.isEmpty()) {
+            log.warn("Petición denegada para ejecutar ruta {}: Usuario no autorizado.", routeId);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
 
-	@Operation(summary = "Obtiene una ruta guardada por su ID")
-	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Ruta encontrada"),
-			@ApiResponse(responseCode = "404", description = "Ruta no encontrada") })
-	@GetMapping("/get/{routeId}")
-	public ResponseEntity<SavedRouteDTO> getSavedRoute(@PathVariable Long routeId) {
-		Optional<SavedRouteDTO> routeDTO = routerFavoriteService.getSavedRoute(routeId);
+        Optional<List<SavedRouteDTO>> userRoutes = savedRouteService.getAllSavedRoutes(email);
+        
+        boolean isOwner = userRoutes.isPresent() && userRoutes.get().stream()
+                .anyMatch(route -> route.getRouteId().equals(routeId));
 
-		if (routeDTO.isEmpty()) {
-			return ResponseEntity.notFound().build();
-		}
+        if (!isOwner) {
+            log.warn("Alerta de Seguridad: El usuario {} intentó ejecutar la ruta {} que no le pertenece.", email, routeId);
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
 
-		return ResponseEntity.ok(routeDTO.get());
-	}
+        Optional<FullRouteData> response = savedRouteService.executeRoute(routeId);
 
-	@Operation(summary = "Elimina una ruta guardada")
-	@ApiResponses(value = { @ApiResponse(responseCode = "204", description = "Ruta eliminada con éxito"),
-			@ApiResponse(responseCode = "404", description = "Ruta no encontrada.") })
-	@DeleteMapping("/delete/{id}")
-	public ResponseEntity<Void> deleteRoute(@PathVariable Long id, HttpServletRequest request) {
+        if (response.isEmpty()) {
+            log.warn("La ruta {} no se pudo recuperar de la base de datos.", routeId);
+            return ResponseEntity.notFound().build();
+        }
 
-		String email = cookieService.getCookieValue(request, "sesionActiva").get();
-		Optional<User> user = userService.getEntityByEmail(email);
+        log.info("Ruta {} ejecutada y devuelta con éxito al usuario {}.", routeId, email);
+        return ResponseEntity.ok(response.get());
+    }
 
-		if (user.isEmpty()) {
-			return ResponseEntity.notFound().build();
-		}
+    @Operation(summary = "Obtiene una ruta guardada por su ID")
+    @ApiResponses(value = { 
+            @ApiResponse(responseCode = "200", description = "Ruta encontrada"),
+            @ApiResponse(responseCode = "404", description = "Ruta no encontrada") 
+    })
+    @GetMapping("/get/{routeId}")
+    public ResponseEntity<SavedRouteDTO> getSavedRoute(@PathVariable String routeId) { 
+        log.info("Petición GET recibida en /api/savedRoute/get/{} para obtener información de ruta.", routeId);
+        
+        Optional<SavedRouteDTO> routeDTO = savedRouteService.getSavedRoute(routeId);
 
-		routerFavoriteService.deleteRoute(id, user.get());
-		return ResponseEntity.noContent().build();
-	}
+        if (routeDTO.isEmpty()) {
+            log.warn("No se encontró la ruta con ID: {}", routeId);
+            return ResponseEntity.notFound().build();
+        }
 
-	@Operation(summary = "Obtiene todas las rutas guardadas")
-	@ApiResponses(value = { 
-			@ApiResponse(
-					responseCode = "200", 
-					description = "Ruta encontrada"
-					),
-			@ApiResponse(
-					responseCode = "404", 
-					description = "Ruta no encontrada"
-					) 
-	})
-	
-	@GetMapping
-	public ResponseEntity<List<SavedRouteDTO>> getAllSavedRoutes(
-			HttpServletRequest request) {
+        log.info("Información de la ruta {} obtenida exitosamente.", routeId);
+        return ResponseEntity.ok(routeDTO.get());
+    }
 
-		String email = cookieService.getCookieValue(request, "sesionActiva").get();
-		Optional<List<SavedRouteDTO>> routes = routerFavoriteService.getAllSavedRoutes(email);
+    @Operation(summary = "Elimina una ruta guardada")
+    @ApiResponses(value = { 
+            @ApiResponse(responseCode = "204", description = "Ruta eliminada con éxito"),
+            @ApiResponse(responseCode = "404", description = "Ruta no encontrada.") 
+    })
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<Void> deleteRoute(@PathVariable String id, HttpServletRequest request) { 
 
-		if (routes.isPresent()) {
+        log.info("Petición DELETE recibida en /api/savedRoute/delete/{} para borrar ruta.", id);
 
-			return ResponseEntity.ok(routes.get());
-		}
+        String email = cookieService.getCookieValue(request, "sesionActiva").orElse("");
+        Optional<User> user = userService.getEntityByEmail(email);
 
-		return ResponseEntity.notFound().build();
+        if (user.isEmpty()) {
+            log.warn("No se pudo eliminar la ruta {}: Usuario no autorizado o sesión inválida.", id);
+            return ResponseEntity.notFound().build();
+        }
 
-	}
+        savedRouteService.deleteRoute(id, user.get());
+        log.info("Proceso de eliminación finalizado para la ruta {} (solicitado por {}).", id, email);
+        
+        return ResponseEntity.noContent().build();
+    }
 
-	@Operation(summary = "Cambia de nombre la ruta dada (por ID) al nuevo nombre")
-	@ApiResponses(value = {
-			@ApiResponse(
-					responseCode = "200",
-					description = "Renombrada con éxito"
-					),
-			@ApiResponse(
-					responseCode = "404",
-					description = "Ruta no encontrada o nombre duplicado"
-					)
-	})
-	@PostMapping("/rename")
-	public ResponseEntity<SavedRouteDTO> renameSavedRoute(
-			@RequestParam String newName, 
-			@RequestParam Long routeId,
-			HttpServletRequest request
-			) {
+    @Operation(summary = "Obtiene todas las rutas guardadas")
+    @ApiResponses(value = { 
+            @ApiResponse(responseCode = "200", description = "Ruta encontrada"),
+            @ApiResponse(responseCode = "404", description = "Ruta no encontrada") 
+    })
+    @GetMapping
+    public ResponseEntity<List<SavedRouteDTO>> getAllSavedRoutes(HttpServletRequest request) {
 
-		String email = cookieService.getCookieValue(request, "sesionActiva").get();
-		Optional<List<SavedRouteDTO>> routes = routerFavoriteService.getAllSavedRoutes(email);
+        log.info("Petición GET recibida en /api/savedRoute para listar todas las rutas del usuario.");
 
-		if (routes.isEmpty() || routes.get().isEmpty()) {
-			return ResponseEntity.notFound().build();
-		}
+        String email = cookieService.getCookieValue(request, "sesionActiva").orElse("");
+        Optional<List<SavedRouteDTO>> routes = savedRouteService.getAllSavedRoutes(email);
 
-		List<SavedRouteDTO> routesList = routes.get();
+        if (routes.isPresent()) {
+            log.info("Se han devuelto {} rutas guardadas para el usuario {}.", routes.get().size(), email);
+            return ResponseEntity.ok(routes.get());
+        }
 
-		Long routesWithSameName = routesList.stream()
-				.filter(sRoute -> sRoute.getName().equals(newName))
-				.count();
+        log.warn("No se encontraron rutas para el usuario o la sesión de {} es inválida.", email);
+        return ResponseEntity.notFound().build();
+    }
 
-		Optional<SavedRouteDTO> savedRouteOpt = routesList.stream()
-				.filter(sRoute -> sRoute.getRouteId().equals(routeId))
-				.findFirst();
+    @Operation(summary = "Cambia de nombre la ruta dada (por ID) al nuevo nombre")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Renombrada con éxito"),
+            @ApiResponse(responseCode = "404", description = "Ruta no encontrada o nombre duplicado")
+    })
+    @PostMapping("/rename")
+    public ResponseEntity<SavedRouteDTO> renameSavedRoute(
+            @RequestParam String newName, 
+            @RequestParam String routeId,
+            HttpServletRequest request
+            ) {
 
-		if (routesWithSameName > 0 || savedRouteOpt.isEmpty()) {
-			return ResponseEntity.notFound().build();
-		}
+        log.info("Petición POST recibida en /api/savedRoute/rename para cambiar el nombre de la ruta {} a '{}'.", routeId, newName);
 
-		SavedRouteDTO renamedRoute = 
-				routerFavoriteService.renameRoute(newName, savedRouteOpt.get());
+        String email = cookieService.getCookieValue(request, "sesionActiva").orElse("");
+        Optional<List<SavedRouteDTO>> routes = savedRouteService.getAllSavedRoutes(email);
 
-		return ResponseEntity.ok(renamedRoute);
-	}
+        if (routes.isEmpty() || routes.get().isEmpty()) {
+            log.warn("No se puede renombrar: El usuario {} no tiene rutas o no existe.", email);
+            return ResponseEntity.notFound().build();
+        }
+
+        List<SavedRouteDTO> routesList = routes.get();
+
+        long routesWithSameName = routesList.stream()
+                .filter(sRoute -> sRoute.getName().equals(newName))
+                .count();
+
+        Optional<SavedRouteDTO> savedRouteOpt = routesList.stream()
+                .filter(sRoute -> sRoute.getRouteId().equals(routeId))
+                .findFirst();
+
+        if (routesWithSameName > 0 || savedRouteOpt.isEmpty()) {
+            log.warn("No se puede renombrar la ruta {}. Ya existe una ruta con el nombre '{}' o la ruta no pertenece al usuario.", routeId, newName);
+            return ResponseEntity.notFound().build();
+        }
+
+        SavedRouteDTO renamedRoute = savedRouteService.renameRoute(newName, savedRouteOpt.get());
+        log.info("Ruta {} renombrada exitosamente a '{}' para el usuario {}.", routeId, newName, email);
+        
+        return ResponseEntity.ok(renamedRoute);
+    }
 }
