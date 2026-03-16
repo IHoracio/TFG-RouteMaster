@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import tfg.domain.dto.user.preferences.EnumOptionDTO;
-import tfg.enums.EmissionType;
 import tfg.enums.FuelType;
 import tfg.enums.MapViewType;
 import tfg.service.traductor.EnumTranslator;
@@ -37,13 +36,5 @@ public class RouteOptionsServiceImpl implements RouteOptionsService{
                 .toList();
     }
 
-	@Override
-    public List<EnumOptionDTO> getEmissionTypes(Locale locale) {
-        return Arrays.stream(EmissionType.values())
-                .map(em -> new EnumOptionDTO(
-                        em.name(),
-                        translator.translate("emission", em, locale)))
-                .toList();
-    }
 
 }

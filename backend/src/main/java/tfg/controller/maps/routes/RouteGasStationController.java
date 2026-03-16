@@ -18,7 +18,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import tfg.domain.dto.maps.routes.Coords;
 import tfg.domain.dto.maps.routes.RouteGroup;
 import tfg.entity.gasolinera.Gasolinera;
-import tfg.enums.EmissionType;
 import tfg.service.maps.routes.RoutesService;
 
 @RestController

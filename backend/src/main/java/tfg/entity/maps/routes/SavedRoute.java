@@ -13,10 +13,10 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OrderBy;
 import jakarta.persistence.OrderColumn;
 import jakarta.persistence.PrePersist;
 import tfg.entity.user.User;
-import tfg.enums.EmissionType;
 
 @Entity
 public class SavedRoute {
@@ -33,7 +33,7 @@ public class SavedRoute {
 
 	// Mantenemos los puntos visuales (Origen, Waypoints, Destino) para la interfaz
 	@OneToMany(mappedBy = "savedRoute", cascade = CascadeType.ALL, orphanRemoval = true)
-	@OrderColumn(name = "order_index")
+	@OrderBy("id ASC")
 	@JsonManagedReference("route-puntos")
 	private List<Point> puntos;
 

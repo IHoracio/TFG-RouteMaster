@@ -11,6 +11,5 @@ public interface RouteOptionsService {
 
 	List<EnumOptionDTO> getMapViewTypes(Locale locale);
 
-	List<EnumOptionDTO> getEmissionTypes(Locale locale);
 
 }

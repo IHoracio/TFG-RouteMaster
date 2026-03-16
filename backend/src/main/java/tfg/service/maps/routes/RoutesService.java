@@ -10,7 +10,6 @@ import tfg.domain.dto.maps.routes.CoordsWithWeather;
 import tfg.domain.dto.maps.routes.FullRouteData;
 import tfg.domain.dto.maps.routes.RouteGroup;
 import tfg.entity.gasolinera.Gasolinera;
-import tfg.enums.EmissionType;
 
 public interface RoutesService {
 

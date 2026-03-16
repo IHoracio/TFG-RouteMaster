@@ -11,7 +11,6 @@ import tfg.entity.maps.routes.RoutePreferences;
 import tfg.entity.user.User;
 import tfg.entity.user.UserPreferences.Language;
 import tfg.entity.user.UserPreferences.Theme;
-import tfg.enums.EmissionType;
 import tfg.enums.FuelType;
 import tfg.enums.MapViewType;
 
@@ -39,7 +38,7 @@ public interface UserService {
 	void updateUserPreferences(User user, Theme theme, Language language);
 
 	void updateRoutePreferences(User user, List<String> preferredBrands, int radioKm, FuelType fuelType,
-			double maxPrice, MapViewType mapView, boolean avoidTolls, EmissionType vehicleEmissionType);
+		    double maxPrice, MapViewType mapView, boolean avoidTolls);
 
 	Optional<RoutePreferences> getDefaultPreferences();
 }

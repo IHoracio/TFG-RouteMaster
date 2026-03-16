@@ -27,7 +27,6 @@ import tfg.entity.maps.routes.RoutePreferences;
 import tfg.entity.user.User;
 import tfg.entity.user.UserPreferences.Language;
 import tfg.entity.user.UserPreferences.Theme;
-import tfg.enums.EmissionType;
 import tfg.enums.FuelType;
 import tfg.enums.MapViewType;
 import tfg.repository.GasolineraRepository;
@@ -184,8 +183,7 @@ class UserServiceImplTest {
                 FuelType.DIESEL,
                 1.5,
                 MapViewType.SATELLITE,
-                false,
-                EmissionType.C
+                false
         );
 
         assertEquals(10, user.getRoutePreferences().getRadioKm());

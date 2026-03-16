@@ -22,7 +22,6 @@ import tfg.entity.user.User;
 import tfg.entity.user.UserPreferences;
 import tfg.entity.user.UserPreferences.Language;
 import tfg.entity.user.UserPreferences.Theme;
-import tfg.enums.EmissionType;
 import tfg.enums.FuelType;
 import tfg.enums.MapViewType;
 import tfg.repository.GasolineraRepository;
@@ -155,11 +154,9 @@ public class UserServiceImpl implements UserService {
 	    
 	    prefs.setPreferredBrands(List.of());
         prefs.setRadioKm(1);
-        prefs.setFuelType(FuelType.ALL);
         prefs.setMaxPrice(3.0);
         prefs.setMapView(MapViewType.MAP);
         prefs.setAvoidTolls(false);
-        prefs.setEmissionType(EmissionType.NONE);
         
         user.setRoutePreferences(prefs);
         
@@ -175,6 +172,8 @@ public class UserServiceImpl implements UserService {
 	    return Optional.of(save(user));
 	}
 	
+	
+	
 	@Override
 	@Transactional
 	public void updateRoutePreferences(
@@ -184,8 +183,7 @@ public class UserServiceImpl implements UserService {
 	        FuelType fuelType,
 	        double maxPrice,
 	        MapViewType mapView,
-	        boolean avoidTolls,
-	        EmissionType vehicleEmissionType
+	        boolean avoidTolls
 	) {
 
 		log.info("[user-service] [" + LocalDateTime.now().toString() + "] "
@@ -202,7 +200,6 @@ public class UserServiceImpl implements UserService {
 	    prefs.setMaxPrice(maxPrice);
 	    prefs.setMapView(mapView);
 	    prefs.setAvoidTolls(avoidTolls);
-	    prefs.setEmissionType(vehicleEmissionType);
 
         userRepository.save(user);
     }
@@ -237,7 +234,6 @@ public class UserServiceImpl implements UserService {
 	     prefs.setMaxPrice(3.0);
 	     prefs.setMapView(MapViewType.MAP);
 	     prefs.setAvoidTolls(false);
-	     prefs.setEmissionType(EmissionType.NONE);
 
 	     return Optional.of(prefs);
 

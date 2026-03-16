@@ -16,7 +16,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import tfg.domain.dto.maps.routes.CoordsWithWeather;
 import tfg.domain.dto.maps.routes.RouteGroup;
-import tfg.enums.EmissionType;
 import tfg.service.maps.routes.RoutesService;
 
 @RestController

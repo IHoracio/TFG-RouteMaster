@@ -6,7 +6,6 @@ import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import tfg.enums.EmissionType;
 import tfg.enums.FuelType;
 import tfg.enums.MapViewType;
 
@@ -21,8 +20,6 @@ public class RoutePreferences {
 	@Enumerated(EnumType.STRING)
 	private FuelType fuelType;
 
-	@Enumerated(EnumType.STRING)
-	private EmissionType emissionType;
 
 	private Double maxPrice;
 
@@ -55,13 +52,6 @@ public class RoutePreferences {
 		this.fuelType = fuelType;
 	}
 
-	public EmissionType getEmissionType() {
-		return emissionType;
-	}
-
-	public void setEmissionType(EmissionType emissionType) {
-		this.emissionType = emissionType;
-	}
 
 	public Double getMaxPrice() {
 		return maxPrice;

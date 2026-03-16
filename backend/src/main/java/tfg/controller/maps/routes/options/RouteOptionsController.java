@@ -45,14 +45,4 @@ public class RouteOptionsController {
 		return service.getMapViewTypes(LocaleContextHolder.getLocale());
 	}
 
-    @Operation(
-    		summary = "Devuelve los tipos de emisiones de gas disponibles en la API"
-    )
-    @ApiResponses({
-        @ApiResponse(responseCode = "200", description = "Datos recuperados con éxito"),
-    })
-	@GetMapping("/emissions")
-	public List<EnumOptionDTO> getEmissions() {
-		return service.getEmissionTypes(LocaleContextHolder.getLocale());
-	}
 }

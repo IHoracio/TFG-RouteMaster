@@ -32,7 +32,6 @@ import tfg.entity.user.User;
 import tfg.entity.user.UserPreferences;
 import tfg.entity.user.UserPreferences.Language;
 import tfg.entity.user.UserPreferences.Theme;
-import tfg.enums.EmissionType;
 import tfg.enums.FuelType;
 import tfg.enums.MapViewType;
 import tfg.service.session.CookieService;
@@ -144,8 +143,7 @@ public class UserController {
 			@RequestParam FuelType fuelType,
 			@RequestParam double maxPrice,
 			@RequestParam MapViewType mapView,
-			@RequestParam boolean avoidTolls,
-			@RequestParam EmissionType vehicleEmissionType
+			@RequestParam boolean avoidTolls
 			) {
 		String email = cookieService.getCookieValue(request, "sesionActiva").get();
 		Optional<User> userOpt = service.getEntityByEmail(email);
@@ -160,8 +158,7 @@ public class UserController {
 				fuelType,
 				maxPrice,
 				mapView,
-				avoidTolls,
-				vehicleEmissionType
+				avoidTolls
 				);
 
 		return ResponseEntity.ok().build();

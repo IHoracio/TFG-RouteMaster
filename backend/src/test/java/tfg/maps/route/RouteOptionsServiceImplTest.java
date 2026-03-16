@@ -15,7 +15,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import tfg.domain.dto.user.preferences.EnumOptionDTO;
-import tfg.enums.EmissionType;
 import tfg.enums.FuelType;
 import tfg.enums.MapViewType;
 import tfg.service.maps.routes.options.RouteOptionsServiceImpl;
@@ -80,24 +79,4 @@ class RouteOptionsServiceImplTest {
         }
     }
 
-    @Test
-    void getEmissionTypes_returnsTranslatedList() {
-        for (EmissionType em : EmissionType.values()) {
-            when(translator.translate("emission", em, locale))
-                .thenReturn("Translated-" + em.name());
-        }
-
-        List<EnumOptionDTO> result = service.getEmissionTypes(locale);
-
-        assertEquals(EmissionType.values().length, result.size());
-
-        for (int i = 0; i < result.size(); i++) {
-            assertEquals(EmissionType.values()[i].name(), result.get(i).getCode());
-            assertEquals("Translated-" + EmissionType.values()[i].name(), result.get(i).getLabel());
-        }
-
-        for (EmissionType em : EmissionType.values()) {
-            verify(translator).translate("emission", em, locale);
-        }
-    }
 }
