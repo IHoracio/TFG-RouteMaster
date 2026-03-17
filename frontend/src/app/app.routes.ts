@@ -16,4 +16,5 @@ export const routes: Routes = [
     {path: "user", component: UserPageComponent, canActivate: [AuthGuard]},
     { path: 'privacy', component: PrivacyComponent },
     { path: 'terms', component: TermsComponent },
+    { path: 'shared/:token', component: SearchBarComponent },
 ];
