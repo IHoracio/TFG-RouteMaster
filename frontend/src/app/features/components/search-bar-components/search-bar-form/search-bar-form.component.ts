@@ -27,16 +27,16 @@ export class SearchBarFormComponent {
   waypointTypes = input<string[]>([]);
   favouriteGasStations = input<FavouriteGasStation[]>([]);
   savedRoute = input<SavedRouteDto[]>([]);
-  selectedSavedRoute = input<number | null>(null);
+  selectedSavedRoute = input<string | null>(null);
   isLoggedIn = input<boolean>(false);
   successfulMessage = input<string>('');
   errorMessage = input<string>('');
 
-  submit = output<void>();
+  searchSubmit = output<void>();
   toggleFormCollapse = output<void>();
   addWaypoint = output<void>();
   deleteWaypoint = output<void>();
-  selectedSavedRouteChange = output<number | null>();
+  selectedSavedRouteChange = output<string | null>();
   originFocus = output<void>();
 
   translation = inject(TranslationService);
