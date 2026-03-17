@@ -10,6 +10,8 @@ import { GasStation } from '../../Dto/gas-station';
 })
 export class MapCommunicationService {
   private mapPageInstance: MapPageComponent | null = null;
+  private polylineCoords: Coords[] = [];
+  private legCoords: Coords[] = [];
 
   registerMapPage(instance: MapPageComponent): boolean {
     if (this.mapPageInstance && this.mapPageInstance !== instance) {
@@ -26,15 +28,18 @@ export class MapCommunicationService {
     }
   }
 
-  constructor() {}
+  constructor() { }
 
   sendRoute(coords: Coords[]): void {
-  
+
+    this.polylineCoords = coords;
     this.mapPageInstance?.clearRoute();
     this.mapPageInstance?.drawRoute(coords);
   }
 
   sendPoints(coords: Coords[]): void {
+
+    this.legCoords = coords;
     this.mapPageInstance?.drawPoints(coords);
   }
 
@@ -49,6 +54,16 @@ export class MapCommunicationService {
 
   clearRoute(): void {
     this.mapPageInstance?.clearRoute();
+    this.legCoords = [];
+    this.polylineCoords = [];
+  }
+
+  getPolylineCoords(): Coords[] {
+    return this.polylineCoords;
+  }
+
+  getLegCoords(): Coords[] {
+    return this.legCoords;
   }
 
 }
