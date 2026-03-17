@@ -19,7 +19,7 @@
           [selectedSavedRoute]="selectedSavedRoute" [isLoggedIn]="isLoggedIn()"
           [successfulMessage]="successfulMessage" [errorMessage]="errorMessage"
           (selectedSavedRouteChange)="selectedSavedRoute = $event" (toggleFormCollapse)="toggleFormCollapse()"
-          (addWaypoint)="addWaypoint()" (deleteWaypoint)="deleteWaypoint()" (submit)="onSubmit()"
+          (addWaypoint)="addWaypoint()" (deleteWaypoint)="deleteWaypoint()" (searchSubmit)="onSubmit()"
           (originFocus)="scrollToCard()">
         </app-search-bar-form>
       </div>

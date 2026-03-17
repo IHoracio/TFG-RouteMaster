@@ -17,6 +17,7 @@ import { SavedRouteDto, RoutePreferencesDto } from '../../../Dto/user-dtos';
 import { SearchBarTabsComponent } from '../../components/search-bar-components/search-bar-tabs/search-bar-tabs.component';
 import { SearchBarFiltersComponent } from '../../components/search-bar-components/search-bar-filters/search-bar-filters.component';
 import { SearchBarFormComponent } from '../../components/search-bar-components/search-bar-form/search-bar-form.component';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-search-bar',
@@ -25,7 +26,6 @@ import { SearchBarFormComponent } from '../../components/search-bar-components/s
   styleUrl: './search-bar.component.css'
 })
 export class SearchBarComponent implements OnInit {
-
   isLoggedIn = signal<boolean>(false);
   isFormCollapsed: boolean = false;
   showShareMessage = signal(false);
@@ -70,15 +70,8 @@ export class SearchBarComponent implements OnInit {
     savedRoute: "Ruta guardada"
   };
 
-  vehiculeEmissionTypeOptions: Record<string, string> = {
-    ELECTRIC: "Eléctrico",
-    HYBRID: "Híbrido",
-    DIESEL: 'Diesel',
-    GASOLINE: "Gasolina"
-  };
-
   activeTab: string = 'destination';
-  selectedSavedRoute: number | null = null;
+  selectedSavedRoute: string | null = null;
 
   @ViewChild('card', { static: true }) card!: ElementRef;
   @ViewChild('formWrapper') formWrapper!: ElementRef;
@@ -94,7 +87,7 @@ export class SearchBarComponent implements OnInit {
     }
   }
 
-  constructor(private searchBarService: SearchBarService, private routeService: RouteService, private authService: AuthService, private authGuard: AuthGuard, private mapCommunication: MapCommunicationService) {
+  constructor(private searchBarService: SearchBarService, private routeService: RouteService, private authService: AuthService, private authGuard: AuthGuard, private mapCommunication: MapCommunicationService, private activatedRoute: ActivatedRoute) {
     effect(() => {
       this.mapCommunication.sendGasStations(this.filteredGasStations());
     });
@@ -103,6 +96,14 @@ export class SearchBarComponent implements OnInit {
   ngOnInit(): void {
     this.authGuard.isLoggedIn().subscribe(logged => {
       this.authService.sendUserSession(logged);
+    });
+
+    this.activatedRoute.paramMap.subscribe(params => {
+      const token = params.get('token');
+
+      if (token) {
+        this.loadSharedRoute(token);
+      }
     });
 
     this.authService.getUserSession().subscribe(logged => {
@@ -137,8 +138,8 @@ export class SearchBarComponent implements OnInit {
         this.savedRoute.set([]);
         this.fuelType = 'ALL';
         this.maxPrice = 0;
-        this.radioKm = 2;
-        this.routeFormResponse.radioKm = 2;
+        this.radioKm = 1;
+        this.routeFormResponse.radioKm = 1;
       }
     });
   }
@@ -154,8 +155,12 @@ export class SearchBarComponent implements OnInit {
   }
 
   shareRoute() {
-    // Llama al backend para generar el enlace compartible y lo copia al portapapeles directamente
-    this.routeService.shareRoute(this.routeFormResponse).subscribe({
+    const polylineCoords = this.mapCommunication?.getPolylineCoords() || [];
+    const legCoords = this.mapCommunication?.getLegCoords() || [];
+    const gasRadius = this.routeFormResponse.radioKm || 1;
+    const lang = this.translation.getCurrentLang ? this.translation.getCurrentLang() : 'es';
+
+    this.routeService.shareRoute(polylineCoords, legCoords, gasRadius, lang).subscribe({
       next: (resp) => {
         navigator.clipboard.writeText(resp.url).then(() => {
           this.showShareMessage.set(true);
@@ -163,19 +168,41 @@ export class SearchBarComponent implements OnInit {
         });
       },
       error: () => {
-        // Si hay error, muestra el mensaje de error en el toast
         this.showShareMessage.set(true);
         setTimeout(() => this.showShareMessage.set(false), 2000);
       }
     });
   }
 
-  // copyShareUrl y closeShareModal eliminados, ya no se usan
+  loadSharedRoute(token: string) {
+    this.routeService.getSharedRoute(token).subscribe({
+      next: (data) => {
+        if (data.polylineCoords && data.polylineCoords.length) {
+          this.mapCommunication.sendRoute(data.polylineCoords);
+        }
+        if (data.legCoords && data.legCoords.length) {
+          this.mapCommunication.sendPoints(data.legCoords);
+        }
+        if (data.gasStations && data.gasStations.length) {
+          this.mapCommunication.sendGasStations(data.gasStations);
+        }
+        if (data.weatherData && data.weatherData.length) {
+          this.mapCommunication.sendWeather(data.weatherData);
+        }
+      },
+      error: (err) => {
+        this.errorMessage = this.translation.translate('search.routeNotFound') || 'No se pudo cargar la ruta compartida.';
+        this.successfulMessage = '';
+        console.error('Error al cargar la ruta compartida:', err);
+      }
+    });
+  }
 
   addWaypoint() {
     if (this.routeFormResponse.waypoints.length < 5) {
       this.routeFormResponse.waypoints.push('');
       this.waypointTypes.push('text');
+      console.log("waypoint añadido, ahora hay" + this.routeFormResponse.waypoints)
     }
   }
 
@@ -224,7 +251,6 @@ export class SearchBarComponent implements OnInit {
     }
     this.searchBarService.onSubmit(this.routeFormResponse).subscribe({
       next: (gasStations) => {
-        console.log('onSubmit exitoso, gasStations:', gasStations);
         this.allGasStations.set(gasStations);
         this.createdRoute.set(true);
       },
@@ -278,17 +304,22 @@ export class SearchBarComponent implements OnInit {
   successfulMessage: string = "";
   errorMessage: string = "";
   saveRoute() {
-    this.searchBarService.saveFavouriteRoute(this.routeAlias, this.routeFormResponse)
+    const polylineCoords = this.mapCommunication?.getPolylineCoords() || [];
+    const legCoords = this.mapCommunication?.getLegCoords() || [];
+    const lang = this.translation.getCurrentLang ? this.translation.getCurrentLang() : 'es';
+
+    this.searchBarService.saveFavouriteRoute(this.routeAlias, this.routeFormResponse, polylineCoords, legCoords, lang)
       .subscribe({
         next: (response) => {
           this.savedRoute.update(routes => [...routes, response as SavedRouteDto]);
-          this.successfulMessage = this.translation.translate('search.routeSaved');
+          this.successfulMessage = this.translation.translate('search.routeSaved') || 'Ruta guardada correctamente';
           this.errorMessage = "";
           this.routeAlias = "";
-        }, error: (err) => {
-          this.errorMessage = this.translation.translate('search.saveError');
+        },
+        error: (err) => {
+          this.errorMessage = this.translation.translate('search.saveError') || 'Error al guardar la ruta';
           this.successfulMessage = "";
-          console.log(err);
+          console.error('Error al guardar ruta:', err);
         },
       });
   }
