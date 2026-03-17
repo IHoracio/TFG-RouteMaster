@@ -42,7 +42,7 @@ export class RouteService {
       .set('destination', routeFormResponse.destination)
       .set('optimizeWaypoints', routeFormResponse.optimizeWaypoints)
       .set('optimizeRoute', routeFormResponse.optimizeRoute)
-      .set('language', this.translation.getCurrentLang ? this.translation.getCurrentLang() : 'es')
+      .set('language', (this.translation.getCurrentLang() || 'es').toLowerCase())
       .set('avoidTolls', routeFormResponse.avoidTolls)
       .set('gasRadius', routeFormResponse.radioKm || 1); 
 
