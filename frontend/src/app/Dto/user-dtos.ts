@@ -30,7 +30,7 @@ export interface UserPreferencesDto {
   user: string;
 }
 export interface SavedRouteDto {
-  routeId: number;
+  routeId: string;
   name: string;
   points: RoutePointDto[];
   user: string;
