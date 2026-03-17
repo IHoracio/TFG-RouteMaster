@@ -30,6 +30,7 @@ public class SessionCookieFilter extends OncePerRequestFilter {
 
 		return "OPTIONS".equalsIgnoreCase(request.getMethod())
 				|| !path.startsWith("/api/")
+				|| path.startsWith("/api/auth")
 				|| path.startsWith("/api/routes")
 				|| path.startsWith("/api/route")
 				|| path.startsWith("/api/geocode/normal")

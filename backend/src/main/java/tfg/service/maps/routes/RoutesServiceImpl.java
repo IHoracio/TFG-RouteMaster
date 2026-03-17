@@ -66,11 +66,11 @@ public class RoutesServiceImpl implements RoutesService {
 	@Autowired
 	private GeocodeService geocodeService;
 	
-	// Agregar al impl
 	@Override
 	public Optional<FullRouteData> getFullRouteData(String origin, String destination, List<String> waypoints,
 	                                      boolean optimizeWaypoints, boolean optimizeRoute, String language, 
 	                                      boolean avoidTolls, Long gasRadius) {
+
 	    Optional<RouteGroup> routeGroupOpt = getDirections(origin, destination, waypoints, optimizeWaypoints, 
 	                                                        optimizeRoute, language, avoidTolls);
 	    
@@ -222,8 +222,6 @@ public class RoutesServiceImpl implements RoutesService {
 
 	@Override
 	public List<Coords> decodePolyline(String polylinePoints) {
-		log.info("[routes-service] [" + LocalDateTime.now().toString() + "] "
-				+ "Attempting to decode into coordinates a given route polyline.");
 		EncodedPolyline polyline = new EncodedPolyline(polylinePoints);
 		List<LatLng> latLngs = polyline.decodePath();
 		
