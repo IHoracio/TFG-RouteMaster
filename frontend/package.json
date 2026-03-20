@@ -19,7 +19,6 @@
     "@angular/platform-browser": "^20.3.17",
     "@angular/platform-browser-dynamic": "^20.3.17",
     "@angular/router": "^20.3.17",
-    "@googlemaps/js-api-loader": "^2.0.2",
     "@googlemaps/markerclusterer": "^2.6.2",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
