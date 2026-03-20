@@ -1,4 +1,4 @@
-import { Component, inject, signal, OnInit, computed, effect, ViewChild, ElementRef } from '@angular/core';
+import { Component, inject, signal, OnInit, computed, effect, ViewChild, ElementRef, output } from '@angular/core';
 import { RouteFormResponse } from '../../../Dto/route-form-response';
 import { MapPageComponent } from '../map-page/map-page.component';
 import { SearchBarService } from '../../../services/search-bar/search-bar.service';
@@ -18,6 +18,7 @@ import { SearchBarTabsComponent } from '../../components/search-bar-components/s
 import { SearchBarFiltersComponent } from '../../components/search-bar-components/search-bar-filters/search-bar-filters.component';
 import { SearchBarFormComponent } from '../../components/search-bar-components/search-bar-form/search-bar-form.component';
 import { ActivatedRoute } from '@angular/router';
+import { PlaceSelection } from '../../../Dto/place-selection';
 
 @Component({
   selector: 'app-search-bar',
@@ -26,6 +27,11 @@ import { ActivatedRoute } from '@angular/router';
   styleUrl: './search-bar.component.css'
 })
 export class SearchBarComponent implements OnInit {
+
+  originSelected = output<PlaceSelection>();
+  destinationSelected = output<PlaceSelection>();
+  waypointSelected = output<{ index: number; selection: PlaceSelection }>();
+
   isLoggedIn = signal<boolean>(false);
   isFormCollapsed: boolean = false;
   showShareMessage = signal(false);
@@ -336,6 +342,18 @@ export class SearchBarComponent implements OnInit {
 
   isDesktop(): boolean {
     return typeof window !== 'undefined' && window.innerWidth >= 768;
+  }
+
+  handleOriginSelected(selection: PlaceSelection) {
+    this.routeFormResponse.origin = `place_id:${selection.placeId}`;
+  }
+
+  handleDestinationSelected(selection: PlaceSelection) {
+    this.routeFormResponse.destination = `place_id:${selection.placeId}`;
+  }
+
+  handleWaypointSelected(index: number, selection: PlaceSelection) {
+    this.routeFormResponse.waypoints[index] = `place_id:${selection.placeId}`;
   }
 
 }

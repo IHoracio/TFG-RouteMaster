@@ -5,11 +5,13 @@ import { RouteFormResponse } from '../../../../Dto/route-form-response';
 import { FavouriteGasStation } from '../../../../Dto/gas-station';
 import { SavedRouteDto } from '../../../../Dto/user-dtos';
 import { TranslationService } from '../../../../services/translation.service';
+import { GoogleAutocompleteComponent } from '../../google-autocomplete/google-autocomplete.component';
+import { PlaceSelection } from '../../../../Dto/place-selection';
 
 @Component({
   selector: 'app-search-bar-form',
   standalone: true,
-  imports: [FormsModule, NgFor, NgIf],
+  imports: [FormsModule, NgFor, NgIf, GoogleAutocompleteComponent],
   templateUrl: './search-bar-form.component.html',
   styleUrl: './search-bar-form.component.css'
 })
@@ -38,6 +40,9 @@ export class SearchBarFormComponent {
   deleteWaypoint = output<void>();
   selectedSavedRouteChange = output<string | null>();
   originFocus = output<void>();
+  originSelected = output<PlaceSelection>();
+  destinationSelected = output<PlaceSelection>();
+  waypointSelected = output<{ index: number; selection: PlaceSelection }>();
 
   translation = inject(TranslationService);
 
