@@ -120,7 +120,7 @@ public class OilController {
 	public ResponseEntity<List<Gasolinera>> getGasolinerasInRadiusAddress(
 			@RequestParam(required = true, defaultValue = "Calle Gran Via 1 Madrid Madrid") String direccion,
 			@RequestParam(required = true, defaultValue = "5") Long radio) {
-		List<Gasolinera> gasolinera = gasolineraService.getGasolinerasInRadiusAddress(direccion, radio);
+		List<Gasolinera> gasolinera = gasolineraService.getGasolinerasInRadiusPlace(direccion, radio);
 
 		if (gasolinera.isEmpty()) {
 			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
