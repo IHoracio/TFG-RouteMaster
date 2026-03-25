@@ -6,13 +6,13 @@ import { Coords } from '../../../Dto/maps-dtos';
 import { CommonModule } from '@angular/common';
 import { WeatherData } from '../../../Dto/weather-dtos';
 import { GasStation } from '../../../Dto/gas-station';
-import { TranslationService } from '../../../services/translation.service';
 import { UserPreferencesService } from '../../../services/user-page/user-preferences.service';
 import { WeatherOverlayComponent } from '../../components/map-components/weather-overlay/weather-overlay.component';
 import { AuthGuard } from '../../../guards/auth.guard';
 import { GasStationSelectionService } from '../../../services/user-page/gas-station-selection/gas-station-selection.service';
-import { ThemeService } from '../../../services/theme.service';
-import { GoogleMapsLoaderService } from '../../../services/google.maps.loader.service';
+import { ThemeService } from '../../../services/singleton/theme.service';
+import { GoogleMapsLoaderService } from '../../../services/singleton/google.maps.loader.service';
+import { TranslationService } from '../../../services/singleton/translation.service';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,

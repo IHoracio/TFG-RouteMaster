@@ -4,7 +4,6 @@ import { MapPageComponent } from '../map-page/map-page.component';
 import { SearchBarService } from '../../../services/search-bar/search-bar.service';
 import { NgClass } from '@angular/common';
 import { RouteService } from '../../../services/routes/route.service';
-import { TranslationService } from '../../../services/translation.service';
 import { FavouriteGasStation, GasStation } from '../../../Dto/gas-station';
 import { UserInfoService } from '../../../services/user-page/user-info.service';
 import { UserPreferencesService } from '../../../services/user-page/user-preferences.service';
@@ -19,6 +18,7 @@ import { SearchBarFiltersComponent } from '../../components/search-bar-component
 import { SearchBarFormComponent } from '../../components/search-bar-components/search-bar-form/search-bar-form.component';
 import { ActivatedRoute } from '@angular/router';
 import { PlaceSelection } from '../../../Dto/place-selection';
+import { TranslationService } from '../../../services/singleton/translation.service';
 
 @Component({
   selector: 'app-search-bar',

@@ -6,7 +6,7 @@ import { GasStation } from '../../Dto/gas-station';
 import { FullRouteData } from '../../Dto/full-route-data';
 import { environment } from '../../../environments/environment';
 import { Coords } from '../../Dto/maps-dtos';
-import { TranslationService } from '../translation.service';
+import { TranslationService } from '../singleton/translation.service';
 
 @Injectable({
   providedIn: 'root'

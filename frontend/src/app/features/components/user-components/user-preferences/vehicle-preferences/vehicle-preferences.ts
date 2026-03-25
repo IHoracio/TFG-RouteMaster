@@ -2,7 +2,7 @@ import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { UserPreferencesService } from '../../../../../services/user-page/user-preferences.service';
-import { TranslationService } from '../../../../../services/translation.service';
+import { TranslationService } from '../../../../../services/singleton/translation.service';
 
 @Component({
   selector: 'app-vehicle-preferences',

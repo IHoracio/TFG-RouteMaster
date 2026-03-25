@@ -2,7 +2,7 @@ import { Component, effect, inject } from '@angular/core';
 import { FooterComponent } from './core/layout/footer/footer.component';
 import { HeaderComponent } from './core/layout/header/header.component';
 import { RouterLink, RouterOutlet } from '@angular/router';
-import { ThemeService } from './services/theme.service';
+import { ThemeService } from './services/singleton/theme.service';
 
 @Component({
   selector: 'app-root',

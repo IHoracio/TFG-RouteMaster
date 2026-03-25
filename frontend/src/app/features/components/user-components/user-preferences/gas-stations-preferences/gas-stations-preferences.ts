@@ -2,11 +2,11 @@ import { Component, computed, effect, inject, signal } from '@angular/core';
 import { UserPreferencesService } from '../../../../../services/user-page/user-preferences.service';
 import { GasStationService } from '../../../../../services/user-page/gas-station/gas-station.service';
 import { GasStationSelectionService } from '../../../../../services/user-page/gas-station-selection/gas-station-selection.service';
-import { TranslationService } from '../../../../../services/translation.service';
 import { FavouriteGasStation, GasStation } from '../../../../../Dto/gas-station';
 import { MapPageComponent } from '../../../../pages/map-page/map-page.component';
 import { GoogleAutocompleteComponent } from '../../../google-autocomplete/google-autocomplete.component';
 import { PlaceSelection } from '../../../../../Dto/place-selection';
+import { TranslationService } from '../../../../../services/singleton/translation.service';
 
 @Component({
   selector: 'app-gas-stations-preferences',

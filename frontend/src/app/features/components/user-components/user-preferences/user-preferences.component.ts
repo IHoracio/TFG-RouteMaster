@@ -4,11 +4,11 @@ import { FormsModule } from '@angular/forms';
 import { UserPreferencesService } from '../../../../services/user-page/user-preferences.service';
 import { forkJoin } from 'rxjs';
 import { Router } from '@angular/router';
-import { TranslationService } from '../../../../services/translation.service';
 import { UserDataService } from '../../../../services/singleton/user-data.service';
 import { GenericPreferencesComponent } from './generic-preferences/generic-preferences';
 import { GasStationsPreferencesComponent } from './gas-stations-preferences/gas-stations-preferences';
 import { VehiclePreferencesComponent } from './vehicle-preferences/vehicle-preferences';
+import { TranslationService } from '../../../../services/singleton/translation.service';
 
 @Component({
   selector: 'app-user-preferences',
