@@ -1,13 +1,15 @@
 package tfg.domain.dto.maps.routes.savedRoutes;
 
+import tfg.domain.dto.maps.routes.autocomplete.PlaceSelection;
+
 public class PointDTO {
 
 	private String type;
-	private String address;
+	private PlaceSelection placeSelection;
 
-	public PointDTO(String type, String address) {
+	public PointDTO(String type, PlaceSelection placeSelection) {
 		this.type= type;
-		this.address= address;
+		this.placeSelection = placeSelection;
 	}
 
 	public PointDTO() {
@@ -21,12 +23,12 @@ public class PointDTO {
 		this.type = type;
 	}
 
-	public String getAddress() {
-		return address;
+	public PlaceSelection getPlaceSelection() {
+		return placeSelection;
 	}
 
-	public void setAddress(String address) {
-		this.address = address;
+	public void setPlaceSelection(PlaceSelection placeSelection) {
+		this.placeSelection = placeSelection;
 	}
 
 }
