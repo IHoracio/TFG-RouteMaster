@@ -21,7 +21,6 @@ export class UserPreferencesService {
   private languageOptionsSignal = signal<string[]>([]);
   private mapTypeOptionsSignal = signal<string[]>([]);
   private gasStationBrandsOptionsSignal = signal<string[]>([]);
-  private spainMunicipalitiesSignal = signal<string[]>([]);
 
   constructor(private http: HttpClient) {
     const savedFavStations = localStorage.getItem('favoriteGasStations');
@@ -59,10 +58,6 @@ export class UserPreferencesService {
     const savedGasStationBrandsOptions = localStorage.getItem('gasStationBrandsOptions');
     if (savedGasStationBrandsOptions) {
       this.gasStationBrandsOptionsSignal.set(JSON.parse(savedGasStationBrandsOptions));
-    }
-    const savedSpainMunicipalities = localStorage.getItem('spainMunicipalities');
-    if (savedSpainMunicipalities) {
-      this.spainMunicipalitiesSignal.set(JSON.parse(savedSpainMunicipalities));
     }
   }
 
@@ -122,12 +117,6 @@ export class UserPreferencesService {
   setGasStationBrandsOptions(data: string[]) { 
     this.gasStationBrandsOptionsSignal.set(data); 
     localStorage.setItem('gasStationBrandsOptions', JSON.stringify(data));
-  }
-
-  getSpainMunicipalitiesSignal() { return this.spainMunicipalitiesSignal; }
-  setSpainMunicipalities(data: string[]) { 
-    this.spainMunicipalitiesSignal.set(data); 
-    localStorage.setItem('spainMunicipalities', JSON.stringify(data));
   }
 
   getUserPreferences(): Observable<any> {
