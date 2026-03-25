@@ -9,13 +9,12 @@ import tfg.domain.dto.maps.routes.Coords;
 import tfg.domain.dto.maps.routes.CoordsWithWeather;
 import tfg.domain.dto.maps.routes.FullRouteData;
 import tfg.domain.dto.maps.routes.RouteGroup;
+import tfg.domain.dto.maps.routes.autocomplete.PlaceSelection;
 import tfg.entity.gasolinera.Gasolinera;
 
 public interface RoutesService {
 
 	List<Gasolinera> getGasStationsCoordsForRoute(RouteGroup routeGroup, Long radius);
-
-	String getUrl(List<Coords> waypoints, UriComponentsBuilder url);
 
 	List<CoordsWithWeather> getWeatherForRoute(RouteGroup routeGroup, String lang);
 
@@ -27,12 +26,11 @@ public interface RoutesService {
 	
 	List<Coords> decodePolyline(String polylinePoints);
 
-	Optional<RouteGroup> getDirections(String origin, String destination, List<String> waypoints,
-			boolean optimizeWaypoints, boolean optimizeRoute, String language, boolean avoidTolls);
-	
-	Optional<FullRouteData> getFullRouteData(String origin, String destination, List<String> waypoints,
+	Optional<RouteGroup> getDirections(PlaceSelection origin, PlaceSelection destination, List<PlaceSelection> waypoints,
+            boolean optimizeWaypoints, boolean optimizeRoute, String language, boolean avoidTolls);
+    
+    Optional<FullRouteData> getFullRouteData(PlaceSelection origin, PlaceSelection destination, List<PlaceSelection> waypoints,
             boolean optimizeWaypoints, boolean optimizeRoute, String language, 
             boolean avoidTolls, Long gasRadius);
-
 
 }

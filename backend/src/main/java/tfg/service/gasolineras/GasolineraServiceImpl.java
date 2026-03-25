@@ -12,15 +12,17 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
-
+import tfg.controller.maps.routes.savedRoutes.SavedRouteController;
 import tfg.domain.dto.maps.routes.Coords;
 import tfg.entity.gasolinera.Gasolinera;
 import tfg.entity.gasolinera.Municipio;
+import tfg.entity.gasolinera.PlaceDetailsResponse;
 import tfg.enums.BrandEnum;
 import tfg.repository.BrandRepository;
 import tfg.repository.GasolineraRepository;
@@ -31,7 +33,7 @@ public class GasolineraServiceImpl implements GasolineraService {
 	
 	private static final Logger log = LoggerFactory.getLogger(GasolineraServiceImpl.class);
 	private static final String API_URL = "https://api.precioil.es/estaciones/";
-
+	
 	@Autowired
 	private RestTemplate restTemplate;
 
@@ -46,6 +48,9 @@ public class GasolineraServiceImpl implements GasolineraService {
 	
 	@Autowired
 	BrandRepository brandRepository;
+
+    GasolineraServiceImpl() {
+    }
 
 	@Override
 	@Cacheable(value = "gasolinera_id", cacheManager = "gasCacheManager")
@@ -144,51 +149,25 @@ public class GasolineraServiceImpl implements GasolineraService {
 	}
 	
 	@Override
-	@Cacheable(value = "getGasStationsInRadiusAddress", cacheManager = "gasCacheManager")
-	public List<Gasolinera> getGasolinerasInRadiusAddress(String address, Long radius) {
-		log.info("[gas-service] [" + LocalDateTime.now().toString() + "] "
-				+ "Attempting to retrieve gas stations for data: "+
-				"[address=(" + address + "), r=" + radius + "].");
-		List<Gasolinera> foundRadius = new ArrayList<>();
+	@Cacheable(value = "getGasStationsInRadiusPlace", cacheManager = "gasCacheManager")
+	public List<Gasolinera> getGasolinerasInRadiusPlace(String place, Long radius) {
+	    log.info("[gas-service] Buscando gasolineras para input: {} con radio: {}", place, radius);
+	    
+	    Optional<Coords> coordsOpt;
 
-		Optional<Coords> coordsOpt = geocodeService.getCoordinates(address);
+	    if (place.startsWith("place_id:")) {
+	        String placeId = place.replace("place_id:", "");
+	        coordsOpt = geocodeService.getCoordinatesFromPlaceId(placeId);
+	    } else {
+	        coordsOpt = Optional.empty();
+	    }
 
-		if (coordsOpt.isEmpty()) {
-			log.warn("[gas-service] [" + LocalDateTime.now().toString() + "] "
-					+ "Coordinates could not be extracted from the address. "
-					+ "Data: [address=(" + address + "), r=" + radius + "].");
-			return foundRadius;
-		}
+	    if (coordsOpt.isEmpty()) {
+	        return new ArrayList<>();
+	    }
 
-		if (radius < 1) {
-			log.warn("[gas-service] [" + LocalDateTime.now().toString() + "] "
-					+ "Invalid radius value for the method call (" + radius + ")"
-					+ "Data: [address=(" + address + "), r=" + radius + "].");
-			return foundRadius;
-		}
-		
-		String urlRadio = UriComponentsBuilder
-				.fromUriString(API_URL + "radio")
-				.queryParam("latitud", coordsOpt.get().getLat())
-				.queryParam("longitud", coordsOpt.get().getLng())
-				.queryParam("radio", radius)
-				.toUriString();
-		
-		Gasolinera[] gasolinerasPorRadio;
-		try {
-			gasolinerasPorRadio = restTemplate.getForObject(urlRadio, Gasolinera[].class);
-		} catch (HttpClientErrorException.NotFound e) {
-			log.warn("[gas-service] [" + LocalDateTime.now().toString() + "] "
-					+ "No gas stations were found in a radius: " + radius + " for"
-					+ " address = " + address + ".");
-			return foundRadius;
-		}
-
-		if (Objects.nonNull(gasolinerasPorRadio)) {
-			foundRadius.addAll(Arrays.asList(gasolinerasPorRadio));
-		}
-
-		return foundRadius;
+	    Coords c = coordsOpt.get();
+	    return getGasolinerasInRadiusCoords(c.getLat(), c.getLng(), radius);
 	}
 	
 	@Override

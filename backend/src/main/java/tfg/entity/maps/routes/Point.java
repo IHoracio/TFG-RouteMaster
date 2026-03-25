@@ -1,5 +1,8 @@
 package tfg.entity.maps.routes;
 
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
+
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import jakarta.persistence.Entity;
@@ -9,6 +12,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
+import tfg.domain.dto.maps.routes.autocomplete.PlaceSelection;
 
 @Entity
 public class Point {
@@ -23,8 +27,9 @@ public class Point {
 
 	@Enumerated(EnumType.STRING)
 	private TypePoint type;
-
-	private String address;
+	
+	@JdbcTypeCode(SqlTypes.JSON)
+	private PlaceSelection placeSelection;
 
 	@ManyToOne
 	@JsonBackReference("route-puntos")
@@ -46,12 +51,12 @@ public class Point {
 		this.type = type;
 	}
 
-	public String getAddress() {
-		return address;
+	public PlaceSelection getPlaceSelection() {
+		return placeSelection;
 	}
 
-	public void setAddress(String address) {
-		this.address = address;
+	public void setPlaceSelection(PlaceSelection placeSelection) {
+		this.placeSelection = placeSelection;
 	}
 
 	public SavedRoute getSavedRoute() {

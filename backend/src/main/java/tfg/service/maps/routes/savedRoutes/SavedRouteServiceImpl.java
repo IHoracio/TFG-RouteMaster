@@ -71,7 +71,7 @@ public class SavedRouteServiceImpl implements SavedRouteService {
         // Mapear los puntos visuales (Origen, Destino...)
         List<Point> puntos = request.getPuntosDTO().stream().map(dto -> {
             Point point = new Point();
-            point.setAddress(dto.getAddress());
+            point.setPlaceSelection(dto.getPlaceSelection());
             point.setType(Point.TypePoint.valueOf(dto.getType().toUpperCase()));
             point.setSavedRoute(route);
             return point;
@@ -197,7 +197,7 @@ public class SavedRouteServiceImpl implements SavedRouteService {
         dto.setPoints(route.getPuntos().stream().map(p -> {
             PointDTO pdto = new PointDTO();
             pdto.setType(p.getType().name());
-            pdto.setAddress(p.getAddress());
+            pdto.setPlaceSelection(p.getPlaceSelection());
             return pdto;
         }).toList());
 
