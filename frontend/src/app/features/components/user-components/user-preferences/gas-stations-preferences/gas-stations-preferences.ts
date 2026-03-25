@@ -37,11 +37,6 @@ export class GasStationsPreferencesComponent {
     return this.userPreferencesService.getGasStationBrandsOptionsSignal()().filter(brand => brand.toLowerCase().includes(search)).slice(0, 4);
   });
 
-  filteredMunicipalities = computed(() => {
-    const search = this.searchAddress().toLowerCase();
-    return this.userPreferencesService.getSpainMunicipalitiesSignal()().filter(municipality => municipality.toLowerCase().includes(search)).slice(0, 4);
-  });
-
   allStations = computed(() => {
     const favorites = this.favoriteGasStations();
     const results = this.searchResults();
