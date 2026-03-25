@@ -87,6 +87,13 @@ Element.prototype.attachShadow = function (init: ShadowRootInit) {
         transform: translateX(4px) scale(1.01);
       }
 
+      button:hover,
+      button:focus,
+      button:focus-visible {
+        background-color: var(--hover-button) !important;
+        transform: translateX(4px) scale(1.01);
+      }
+
       .dropdown > ul > li[aria-selected="true"] {
         background-color: var(--hover-button) !important;
         transform: translateX(4px) scale(1.01);
