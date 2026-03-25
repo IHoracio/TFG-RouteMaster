@@ -20,7 +20,6 @@ export class UserPreferencesService {
   private themeOptionsSignal = signal<string[]>([]);
   private languageOptionsSignal = signal<string[]>([]);
   private mapTypeOptionsSignal = signal<string[]>([]);
-  private emissionLabelOptionsSignal = signal<string[]>([]);
   private gasStationBrandsOptionsSignal = signal<string[]>([]);
   private spainMunicipalitiesSignal = signal<string[]>([]);
 
@@ -56,10 +55,6 @@ export class UserPreferencesService {
     const savedMapTypeOptions = localStorage.getItem('mapTypeOptions');
     if (savedMapTypeOptions) {
       this.mapTypeOptionsSignal.set(JSON.parse(savedMapTypeOptions));
-    }
-    const savedEmissionLabelOptions = localStorage.getItem('emissionLabelOptions');
-    if (savedEmissionLabelOptions) {
-      this.emissionLabelOptionsSignal.set(JSON.parse(savedEmissionLabelOptions));
     }
     const savedGasStationBrandsOptions = localStorage.getItem('gasStationBrandsOptions');
     if (savedGasStationBrandsOptions) {
@@ -123,12 +118,6 @@ export class UserPreferencesService {
     localStorage.setItem('mapTypeOptions', JSON.stringify(data));
   }
 
-  getEmissionLabelOptionsSignal() { return this.emissionLabelOptionsSignal; }
-  setEmissionLabelOptions(data: string[]) { 
-    this.emissionLabelOptionsSignal.set(data); 
-    localStorage.setItem('emissionLabelOptions', JSON.stringify(data));
-  }
-
   getGasStationBrandsOptionsSignal() { return this.gasStationBrandsOptionsSignal; }
   setGasStationBrandsOptions(data: string[]) { 
     this.gasStationBrandsOptionsSignal.set(data); 
@@ -153,10 +142,10 @@ export class UserPreferencesService {
     return this.http.get<ThemeLangPreferences>(`${this.baseUrl}/api/users/preferences/user/get`, { withCredentials: true });
   }
 
-  updateUserPreferences(radioKm: number, fuelType: string, emissionType: string, maxPrice: number, mapType: string, avoidTolls: boolean, preferredBrands: string[]): Observable<any> {
+  updateUserPreferences(radioKm: number, fuelType: string, maxPrice: number, mapType: string, avoidTolls: boolean, preferredBrands: string[]): Observable<any> {
     const body = { preferredBrands };
     return this.http.put(`${this.baseUrl}/api/users/preferences/update`, body, {
-      params: { radioKm: radioKm.toString(), fuelType, vehicleEmissionType: emissionType, maxPrice: maxPrice.toString(), mapView: mapType, avoidTolls: avoidTolls.toString() },
+      params: { radioKm: radioKm.toString(), fuelType: fuelType, maxPrice: maxPrice.toString(), mapView: mapType, avoidTolls: avoidTolls.toString() },
       withCredentials: true
     });
   }
@@ -199,10 +188,6 @@ export class UserPreferencesService {
 
   getFuelTypes(): Observable<Preferences[]> {
     return this.http.get<Preferences[]>(`${this.baseUrl}/api/route-options/fuels`, { withCredentials: true });
-  }
-
-  getEmissionLabels(): Observable<Preferences[]> {
-    return this.http.get<Preferences[]>(`${this.baseUrl}/api/route-options/emissions`, { withCredentials: true });
   }
 
   getThemes(): Observable<Preferences[]> {

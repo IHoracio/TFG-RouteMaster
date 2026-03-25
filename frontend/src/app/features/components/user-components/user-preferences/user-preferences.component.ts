@@ -59,7 +59,7 @@ export class UserPreferencesComponent {
     const themeLang = this.userPreferencesService.getThemeLanguageSignal()();
 
     const updatePrefs$ = this.userPreferencesService.updateUserPreferences(
-      prefs.radioKm, prefs.fuelType, prefs.emissionType, prefs.maxPrice, prefs.mapView, prefs.avoidTolls, prefs.preferredBrands
+      prefs.radioKm, prefs.fuelType, prefs.maxPrice, prefs.mapView, prefs.avoidTolls, prefs.preferredBrands
     );
 
     const updateTheme$ = this.userPreferencesService.updateUserThemeLanguage(themeLang.theme, themeLang.language);
@@ -104,7 +104,7 @@ export class UserPreferencesComponent {
     const themeLang = this.userPreferencesService.getThemeLanguageSignal()();
 
     const updatePrefs$ = this.userPreferencesService.updateUserPreferences(
-      prefs.radioKm, prefs.fuelType, prefs.emissionType, prefs.maxPrice, prefs.mapView, prefs.avoidTolls, prefs.preferredBrands
+      prefs.radioKm, prefs.fuelType, prefs.maxPrice, prefs.mapView, prefs.avoidTolls, prefs.preferredBrands
     );
 
     const updateTheme$ = this.userPreferencesService.updateUserThemeLanguage(themeLang.theme, themeLang.language);

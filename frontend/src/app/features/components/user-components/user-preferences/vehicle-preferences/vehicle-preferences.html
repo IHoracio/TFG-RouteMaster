@@ -19,13 +19,4 @@
     <label for="avoidTolls">{{ translation.translate('preferences.avoidTolls') }}</label>
     <input id="avoidTolls" type="checkbox" [checked]="userPreferencesService.getUserPreferencesSignal()().avoidTolls" (change)="setAvoidTolls($event)">
   </div>
-
-  <div class="form-group">
-    <label for="emissionType">{{ translation.translate('preferences.emissionLabel') }}</label>
-    <select id="emissionType" [value]="userPreferencesService.getUserPreferencesSignal()().emissionType" (change)="setEmissionType($event)">
-      @for (option of userPreferencesService.getEmissionLabelOptionsSignal()(); track $index) {
-      <option [value]="option">{{ translation.translate('emissionLabelOptions.' + option) }}</option>
-      }
-    </select>
-  </div>
 </div>

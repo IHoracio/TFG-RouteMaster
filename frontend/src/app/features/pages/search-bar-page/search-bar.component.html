@@ -20,7 +20,10 @@
           [successfulMessage]="successfulMessage" [errorMessage]="errorMessage"
           (selectedSavedRouteChange)="selectedSavedRoute = $event" (toggleFormCollapse)="toggleFormCollapse()"
           (addWaypoint)="addWaypoint()" (deleteWaypoint)="deleteWaypoint()" (searchSubmit)="onSubmit()"
-          (originFocus)="scrollToCard()">
+          (originFocus)="scrollToCard()"
+          (originSelected)="handleOriginSelected($event)"
+          (destinationSelected)="handleDestinationSelected($event)"
+          (waypointSelected)="handleWaypointSelected($event.index, $event.selection)">
         </app-search-bar-form>
       </div>
       <div class="map-wrapper">

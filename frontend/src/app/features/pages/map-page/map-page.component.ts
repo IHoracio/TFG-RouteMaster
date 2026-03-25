@@ -1,5 +1,4 @@
-import { Component, OnDestroy, signal, input, effect, AfterViewInit, ChangeDetectionStrategy, computed } from '@angular/core';
-import { setOptions, importLibrary } from '@googlemaps/js-api-loader';
+import { Component, OnDestroy, signal, input, effect, AfterViewInit, ChangeDetectionStrategy, computed, inject, Inject } from '@angular/core';
 import { MarkerClusterer } from '@googlemaps/markerclusterer';
 import { MapCommunicationService } from '../../../services/map/map-communication.service';
 import { environment } from '../../../../environments/environment';
@@ -13,6 +12,7 @@ import { WeatherOverlayComponent } from '../../components/map-components/weather
 import { AuthGuard } from '../../../guards/auth.guard';
 import { GasStationSelectionService } from '../../../services/user-page/gas-station-selection/gas-station-selection.service';
 import { ThemeService } from '../../../services/theme.service';
+import { GoogleMapsLoaderService } from '../../../services/google.maps.loader.service';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -52,14 +52,15 @@ export class MapPageComponent implements OnDestroy, AfterViewInit {
   mapType = input<string>('MAP');
   fitToStations = input<boolean>(true);
 
-  constructor(
-    private mapComm: MapCommunicationService,
-    protected translation: TranslationService,
-    private authGuard: AuthGuard,
-    private userPreferences: UserPreferencesService,
-    private gasStationSelectionService: GasStationSelectionService,
-    private themeService: ThemeService
-  ) {
+  private mapsLoader = inject(GoogleMapsLoaderService);
+  private themeService = inject(ThemeService);
+  private gasStationSelectionService = inject(GasStationSelectionService);
+  private userPreferences = inject(UserPreferencesService);
+  private authGuard = inject(AuthGuard);
+  translation = inject(TranslationService);
+  private mapComm = inject(MapCommunicationService);
+
+  constructor() {
     effect(() => {
       this.gasStationsFromInput();
       this.updateMarkers();
@@ -107,33 +108,26 @@ export class MapPageComponent implements OnDestroy, AfterViewInit {
   private async initMap(): Promise<void> {
     this.mapReady.set(false);
     this.mapElement = document.getElementById('map') as HTMLElement | null;
+
     if (this.mapElement) {
       this.mapElement.replaceChildren();
     }
-    if (!MapPageComponent.mapsOptionsSet) {
-      setOptions({
-        key: environment.googleMapsApiKey,
-        v: 'weekly',
-        language: this.translation.getCurrentLang().toLowerCase(),
-      });
-      MapPageComponent.mapsOptionsSet = true;
-    }
 
-    const mapsLib = (await importLibrary('maps')) as unknown as any;
-    (await importLibrary('marker')) as unknown as any;
+    // Cargamos las librerías usando el nuevo servicio
+    const mapsLib = await this.mapsLoader.getMapsLibrary();
+    const markerLib = await this.mapsLoader.getMarkerLibrary();
 
     const { Map } = mapsLib;
 
     const mapTypeId = this.getMapTypeId();
-    const isSatelliteType = mapTypeId === google.maps.MapTypeId.SATELLITE || 
-                            mapTypeId === google.maps.MapTypeId.HYBRID;
+    const isSatelliteType = mapTypeId === google.maps.MapTypeId.SATELLITE ||
+      mapTypeId === google.maps.MapTypeId.HYBRID;
 
     const mapOptions: google.maps.MapOptions = {
       center: { lat: 40.4168, lng: -3.7038 },
       zoom: 6,
       disableDefaultUI: true,
       zoomControl: true,
-      keyboardShortcuts: false,
       mapId: isSatelliteType ? environment.defaultMapId : environment.styledMapId,
       colorScheme: !isSatelliteType && this.themeService.selectedTheme() === 'DARK'
         ? google.maps.ColorScheme.DARK
@@ -141,30 +135,19 @@ export class MapPageComponent implements OnDestroy, AfterViewInit {
       mapTypeId: mapTypeId,
     };
 
-    if (!this.mapElement) {
-      console.warn('Map container not found');
-      return;
-    }
+    if (!this.mapElement) return;
+
     this.map = new Map(this.mapElement, mapOptions);
-    const mapInstance = this.map;
-    if (mapInstance) {
-      let readySet = false;
-      const markReady = () => {
-        if (readySet) return;
-        readySet = true;
-        this.mapReady.set(true);
-      };
-      mapInstance.addListener('idle', () => {
-        setTimeout(markReady, 0);
-      });
-      setTimeout(markReady, 1500);
-    }
+
+    // Configuración del Clusterer con el nuevo requisito (mínimo 5)
     this.markerClusterer = new MarkerClusterer({
       map: this.map,
-      minimumClusterSize: 3
+      markers: [],
+      algorithmOptions: { minimumClusterSize: 5 }
     } as any);
-    this.mapComm.registerMapPage(this);
 
+    this.mapReady.set(true);
+    this.mapComm.registerMapPage(this);
     this.updateMarkers();
   }
 
@@ -258,13 +241,13 @@ export class MapPageComponent implements OnDestroy, AfterViewInit {
         this.userPreferences.getUserPreferences().subscribe(pref => {
           const mapView = pref.mapView;
           const newMapTypeId = this.getMapTypeIdFromRaw(mapView);
-          
+
           if (this.map) {
             const currentMapTypeId = this.map.getMapTypeId();
             const currentIsSatellite = currentMapTypeId === 'satellite' || currentMapTypeId === 'hybrid';
-            const newIsSatellite = newMapTypeId === google.maps.MapTypeId.SATELLITE || 
-                                   newMapTypeId === google.maps.MapTypeId.HYBRID;
-            
+            const newIsSatellite = newMapTypeId === google.maps.MapTypeId.SATELLITE ||
+              newMapTypeId === google.maps.MapTypeId.HYBRID;
+
             if (currentIsSatellite !== newIsSatellite) {
               void this.recreateMap();
             } else {
@@ -386,10 +369,10 @@ export class MapPageComponent implements OnDestroy, AfterViewInit {
     }
     if (!gasStations || gasStations.length === 0) return;
 
-    const filteredStations = gasStations.filter(station => 
-      station.Gasolina95 !== null || 
-      station.Gasolina98 !== null || 
-      station.Diesel !== null || 
+    const filteredStations = gasStations.filter(station =>
+      station.Gasolina95 !== null ||
+      station.Gasolina98 !== null ||
+      station.Diesel !== null ||
       station.DieselB !== null
     );
 

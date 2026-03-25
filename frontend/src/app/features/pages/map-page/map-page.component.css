@@ -34,14 +34,6 @@
   z-index: 1;
 }
 
-::ng-deep .gm-style-cc {
-  display: none !important;
-}
-
-::ng-deep .gm-style a {
-  display: none !important;
-}
-
 ::ng-deep .gm-control-active {
   background: var(--header-footer-gradient-start) !important;
   border-radius: 12px !important;

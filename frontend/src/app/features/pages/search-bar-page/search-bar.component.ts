@@ -1,4 +1,4 @@
-import { Component, inject, signal, OnInit, computed, effect, ViewChild, ElementRef } from '@angular/core';
+import { Component, inject, signal, OnInit, computed, effect, ViewChild, ElementRef, output } from '@angular/core';
 import { RouteFormResponse } from '../../../Dto/route-form-response';
 import { MapPageComponent } from '../map-page/map-page.component';
 import { SearchBarService } from '../../../services/search-bar/search-bar.service';
@@ -13,11 +13,12 @@ import { AuthGuard } from '../../../guards/auth.guard';
 import { MapCommunicationService } from '../../../services/map/map-communication.service';
 import { LoginPromptComponent } from '../../components/search-bar-components/login-prompt/login-prompt.component';
 import { LoginPromptService } from '../../../services/login-prompt/login-prompt.service';
-import { SavedRouteDto, RoutePreferencesDto } from '../../../Dto/user-dtos';
+import { SavedRouteDto, RoutePreferencesDto, RoutePointDto } from '../../../Dto/user-dtos';
 import { SearchBarTabsComponent } from '../../components/search-bar-components/search-bar-tabs/search-bar-tabs.component';
 import { SearchBarFiltersComponent } from '../../components/search-bar-components/search-bar-filters/search-bar-filters.component';
 import { SearchBarFormComponent } from '../../components/search-bar-components/search-bar-form/search-bar-form.component';
 import { ActivatedRoute } from '@angular/router';
+import { PlaceSelection } from '../../../Dto/place-selection';
 
 @Component({
   selector: 'app-search-bar',
@@ -26,6 +27,11 @@ import { ActivatedRoute } from '@angular/router';
   styleUrl: './search-bar.component.css'
 })
 export class SearchBarComponent implements OnInit {
+
+  originSelected = output<PlaceSelection>();
+  destinationSelected = output<PlaceSelection>();
+  waypointSelected = output<{ index: number; selection: PlaceSelection }>();
+
   isLoggedIn = signal<boolean>(false);
   isFormCollapsed: boolean = false;
   showShareMessage = signal(false);
@@ -50,18 +56,19 @@ export class SearchBarComponent implements OnInit {
   destinationType: string = "";
   routeAlias: string = "";
   selectedRouteOption = {
-    origin: "",
-    destination: ""
+    origin: null,
+    destination: null
   };
 
   routeFormResponse: RouteFormResponse = {
-    origin: "",
-    destination: "",
+    origin: null,
+    destination: null,
     waypoints: [],
     optimizeWaypoints: false,
     optimizeRoute: false,
     avoidTolls: false
   };
+
   waypointTypes: string[] = [];
 
   destinationTypeOptions: Record<string, string> = {
@@ -197,12 +204,16 @@ export class SearchBarComponent implements OnInit {
       }
     });
   }
-
   addWaypoint() {
+    // Mantenemos el límite de 5 para no saturar la API (o tu UI)
     if (this.routeFormResponse.waypoints.length < 5) {
-      this.routeFormResponse.waypoints.push('');
+
+      // Añadimos null o un objeto vacío tipado como PlaceSelection
+      // Usamos 'as any' o 'null' dependiendo de qué tan estricto sea tu linter
+      this.routeFormResponse.waypoints.push(null as any);
+
       this.waypointTypes.push('text');
-      console.log("waypoint añadido, ahora hay" + this.routeFormResponse.waypoints)
+
     }
   }
 
@@ -221,32 +232,26 @@ export class SearchBarComponent implements OnInit {
     this.submitted = true;
     if (this.activeTab === 'route') {
       const selected = this.selectedSavedRoute;
-      if (selected) {
-        const route = this.savedRoute().find(r => r.routeId == selected);
-        if (route) {
-          if (route.points && Array.isArray(route.points)) {
-            const originPoint = route.points.find(p => p.type === 'ORIGIN');
-            const destPoint = route.points.find(p => p.type === 'DESTINATION');
-            const waypoints = route.points.filter(p => p.type === 'WAYPOINT').map(p => p.address);
-            this.routeFormResponse.origin = originPoint?.address || '';
-            this.routeFormResponse.destination = destPoint?.address || '';
-            this.routeFormResponse.waypoints = waypoints;
-            this.routeFormResponse.optimizeWaypoints = route.optimizeWaypoints ?? false;
-            this.routeFormResponse.optimizeRoute = route.optimizeRoute ?? false;
-            this.routeFormResponse.avoidTolls = route.avoidTolls ?? false;
-          } else {
-            this.successfulMessage = "";
-            return;
-          }
-        } else {
-          this.errorMessage = this.translation.translate('search.routeNotFound');
-          this.successfulMessage = "";
-          return;
-        }
-      } else {
-        this.errorMessage = this.translation.translate('search.noRouteSelected');
-        this.successfulMessage = "";
-        return;
+      const route = this.savedRoute().find(r => r.routeId == selected);
+
+      if (route && Array.isArray(route.points)) {
+        // Extraemos los puntos buscando el objeto placeSelection directamente
+        const originPoint = route.points.find(p => p.type === 'ORIGIN')?.placeSelection || null;
+        const destPoint = route.points.find(p => p.type === 'DESTINATION')?.placeSelection || null;
+
+        // Los waypoints se convierten en un array de PlaceSelection en una sola línea
+        const waypoints = route.points
+          .filter(p => p.type === 'WAYPOINT')
+          .map(p => p.placeSelection);
+
+        this.routeFormResponse = {
+          origin: originPoint,
+          destination: destPoint,
+          waypoints: waypoints,
+          optimizeWaypoints: route.optimizeWaypoints ?? false,
+          optimizeRoute: route.optimizeRoute ?? false,
+          avoidTolls: route.avoidTolls ?? false
+        };
       }
     }
     this.searchBarService.onSubmit(this.routeFormResponse).subscribe({
@@ -304,24 +309,28 @@ export class SearchBarComponent implements OnInit {
   successfulMessage: string = "";
   errorMessage: string = "";
   saveRoute() {
-    const polylineCoords = this.mapCommunication?.getPolylineCoords() || [];
-    const legCoords = this.mapCommunication?.getLegCoords() || [];
-    const lang = this.translation.getCurrentLang ? this.translation.getCurrentLang() : 'es';
+    if (!this.isLoggedIn()) {
+      this.loginPromptService.openLoginPrompt();
+    } else {
+      const polylineCoords = this.mapCommunication?.getPolylineCoords() || [];
+      const legCoords = this.mapCommunication?.getLegCoords() || [];
+      const lang = this.translation.getCurrentLang ? this.translation.getCurrentLang() : 'es';
 
-    this.searchBarService.saveFavouriteRoute(this.routeAlias, this.routeFormResponse, polylineCoords, legCoords, lang)
-      .subscribe({
-        next: (response) => {
-          this.savedRoute.update(routes => [...routes, response as SavedRouteDto]);
-          this.successfulMessage = this.translation.translate('search.routeSaved') || 'Ruta guardada correctamente';
-          this.errorMessage = "";
-          this.routeAlias = "";
-        },
-        error: (err) => {
-          this.errorMessage = this.translation.translate('search.saveError') || 'Error al guardar la ruta';
-          this.successfulMessage = "";
-          console.error('Error al guardar ruta:', err);
-        },
-      });
+      this.searchBarService.saveFavouriteRoute(this.routeAlias, this.routeFormResponse, polylineCoords, legCoords, lang)
+        .subscribe({
+          next: (response) => {
+            this.savedRoute.update(routes => [...routes, response as SavedRouteDto]);
+            this.successfulMessage = this.translation.translate('search.routeSaved') || 'Ruta guardada correctamente';
+            this.errorMessage = "";
+            this.routeAlias = "";
+          },
+          error: (err) => {
+            this.errorMessage = this.translation.translate('search.saveError') || 'Error al guardar la ruta';
+            this.successfulMessage = "";
+            console.error('Error al guardar ruta:', err);
+          },
+        });
+    }
   }
 
   toggleFormCollapse() {
@@ -336,6 +345,18 @@ export class SearchBarComponent implements OnInit {
 
   isDesktop(): boolean {
     return typeof window !== 'undefined' && window.innerWidth >= 768;
+  }
+
+  handleOriginSelected(selection: PlaceSelection) {
+    this.routeFormResponse.origin = selection;
+  }
+
+  handleDestinationSelected(selection: PlaceSelection) {
+    this.routeFormResponse.destination = selection;
+  }
+
+  handleWaypointSelected(index: number, selection: PlaceSelection) {
+    this.routeFormResponse.waypoints[index] = selection;
   }
 
 }

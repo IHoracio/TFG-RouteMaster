@@ -13,7 +13,7 @@ public interface GasolineraService {
 
 	List<Gasolinera> getGasolinerasInRadiusCoords(Double latitud, Double longitud, Long radio);
 
-	List<Gasolinera> getGasolinerasInRadiusAddress(String direccion, Long radio);
+	List<Gasolinera> getGasolinerasInRadiusPlace(String place, Long radius);
 	
 	List<Gasolinera> findGasStationsNearRoute(List<Coords> polylineCoords, Long radius);
 

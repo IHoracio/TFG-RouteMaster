@@ -1,0 +1,24 @@
+/* ESTRUCTURA EXTERNA */
+:host {
+  display: block;
+  width: 100%;
+}
+
+:host ::ng-deep gmp-place-autocomplete {
+  background-color: transparent !important;
+  width: 100% !important;
+  border-radius: 8px !important;
+  display: block;
+}
+
+/* INPUT */
+:host ::ng-deep input {
+  background-color: var(--surface-secondary) !important;
+  color: var(--text-color) !important;
+}
+
+/* Placeholder */
+:host ::ng-deep input::placeholder {
+  color: var(--text-secondary) !important;
+  opacity: 0.7 !important;
+}

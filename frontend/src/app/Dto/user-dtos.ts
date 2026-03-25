@@ -1,4 +1,5 @@
 import { FavouriteGasStation } from "./gas-station";
+import { PlaceSelection } from "./place-selection";
 
 export interface User {
     email: string,
@@ -42,7 +43,7 @@ export interface SavedRouteDto {
 export interface RoutePointDto {
   id: number;
   type: RoutePointType;
-  address: string;
+  placeSelection: PlaceSelection; 
   savedRoute: string;
 }
 export type RoutePointType = 'ORIGIN' | 'DESTINATION' | 'WAYPOINT';

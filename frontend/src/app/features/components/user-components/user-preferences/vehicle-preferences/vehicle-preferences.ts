@@ -29,8 +29,4 @@ export class VehiclePreferencesComponent {
     this.userPreferencesService.setUserPreferences({ ...this.userPreferencesService.getUserPreferencesSignal()(), avoidTolls: value });
   }
 
-  setEmissionType(event: Event): void {
-    const value = (event.target as HTMLSelectElement).value;
-    this.userPreferencesService.setUserPreferences({ ...this.userPreferencesService.getUserPreferencesSignal()(), emissionType: value });
-  }
 }

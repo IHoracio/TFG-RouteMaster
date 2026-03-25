@@ -22,39 +22,25 @@
     } @else {
     @if(activeTab() === "destination" || activeTab() === "gas") {
     <p class="collapsible-content">
-        <label class="collapsible-content" id="originField" for="origin">{{ translation.translate('search.origin')
-            }}</label>
-        <input class="form-control collapsible-content" type="text" id="origin" name="origin"
-            [(ngModel)]="routeFormResponse().origin" [placeholder]="translation.translate('search.originPlaceholder')"
-            required #originField="ngModel" (focus)="originFocus.emit()" />
-        @if(originField && originField.touched) {
-    <div class="error collapsible-content">
-        @if(originField.errors?.['required']) {
-        {{ translation.translate('search.originRequired') }}
-        }
-    </div>
-    }
+        <label class="collapsible-content">{{ translation.translate('search.origin') }}</label>
+        <app-google-autocomplete [placeholder]="translation.translate('search.originPlaceholder')"
+            (onPlaceSelected)="originSelected.emit($event)">
+        </app-google-autocomplete>
     </p>
     }
     @if(activeTab() === "destination") {
     <p class="collapsible-content">
-        <label class="collapsible-content" id="destinationField" for="destination">{{ translation.translate('search.destination') }}</label>
-        <input class="form-control collapsible-content" type="text" id="destination" name="destination"
-            [(ngModel)]="routeFormResponse().destination"
-            [placeholder]="translation.translate('search.destinationPlaceholder')" required
-            #destinationField="ngModel" />
-        @if(destinationField && destinationField.touched) {
-    <div class="error collapsible-content">
-        @if(destinationField.errors?.['required']) {
-        {{ translation.translate('search.destinationRequired') }}
-        }
-    </div>
-    }
+        <label class="collapsible-content">{{ translation.translate('search.destination') }}</label>
+        <app-google-autocomplete [placeholder]="translation.translate('search.destinationPlaceholder')"
+            (onPlaceSelected)="destinationSelected.emit($event)">
+        </app-google-autocomplete>
     </p>
     }
     <p class="collapsible-content" id="waypoints">{{ translation.translate('search.waypoints') }}</p>
     <div class="waypoint-buttons">
-        <button (click)="addWaypoint.emit()" type="button" class="button collapsible-content" [disabled]="routeFormResponse().waypoints.length >= 5" [title]="routeFormResponse().waypoints.length >= 5 ? 'Máximo 5 waypoints' : ''">
+        <button (click)="addWaypoint.emit()" type="button" class="button collapsible-content"
+            [disabled]="routeFormResponse().waypoints.length >= 5"
+            [title]="routeFormResponse().waypoints.length >= 5 ? 'Máximo 5 waypoints' : ''">
             <span class="button__icon">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" viewBox="0 0 24 24" stroke-width="2"
                     stroke-linejoin="round" stroke-linecap="round" stroke="currentColor" height="24" fill="none"
@@ -76,29 +62,10 @@
     </div>
     <div *ngFor="let waypoint of routeFormResponse().waypoints; let i = index; trackBy: trackByIndex"
         class="collapsible-content">
-        <select class="collapsible-content waypoint-type-select" [(ngModel)]="waypointTypes()[i]" [name]="'type' + i">
-            <option value="text">{{ translation.translate('search.address') }}</option>
-            <option value="gas">{{ translation.translate('search.favoriteGas') }}</option>
-        </select>
         @if(waypointTypes()[i] === "text") {
-        <input class="form-control collapsible-content" type="text" [name]="'waypoint' + i"
-            [(ngModel)]="routeFormResponse().waypoints[i]"
-            [placeholder]="translation.translate('search.addressPlaceholder')" />
-        }
-        @if(waypointTypes()[i] === "gas") {
-        <select class="collapsible-content" [name]="'waypoint' + i" [(ngModel)]="routeFormResponse().waypoints[i]">
-            @if (isLoggedIn()) {
-            @if (favouriteGasStations().length > 0) {
-            <option *ngFor="let gasStation of favouriteGasStations()" [value]="gasStation.direccion">
-                {{ gasStation.alias }} &mdash; {{ gasStation.marca }}
-            </option>
-            } @else {
-            <option disabled>{{ translation.translate('search.noFavoriteGas') }}</option>
-            }
-            } @else {
-            <option disabled>{{ translation.translate('search.loginToSeeGas') }}</option>
-            }
-        </select>
+        <app-google-autocomplete [placeholder]="translation.translate('search.addressPlaceholder')"
+            (onPlaceSelected)="waypointSelected.emit({index: i, selection: $event})">
+        </app-google-autocomplete>
         }
     </div>
     <div class="checkbox-wrapper-46 collapsible-content">

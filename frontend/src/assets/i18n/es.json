@@ -277,5 +277,8 @@
     },
     "userPage": {
         "title": "Portal de Usuario"
+    },
+    "autocomplete": {
+        "placeholder": "Search location..."
     }
 }

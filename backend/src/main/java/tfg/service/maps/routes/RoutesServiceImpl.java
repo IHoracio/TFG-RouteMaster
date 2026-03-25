@@ -28,6 +28,7 @@ import tfg.domain.dto.maps.routes.FullRouteData;
 import tfg.domain.dto.maps.routes.Leg;
 import tfg.domain.dto.maps.routes.RouteGroup;
 import tfg.domain.dto.maps.routes.Step;
+import tfg.domain.dto.maps.routes.autocomplete.PlaceSelection;
 import tfg.domain.dto.weather.EstadoCielo;
 import tfg.domain.dto.weather.HourlyWeather;
 import tfg.domain.dto.weather.Weather;
@@ -63,13 +64,10 @@ public class RoutesServiceImpl implements RoutesService {
 	@Autowired
 	private ReverseGeocodeService reverseGeocodeService;
 	
-	@Autowired
-	private GeocodeService geocodeService;
-	
 	@Override
-	public Optional<FullRouteData> getFullRouteData(String origin, String destination, List<String> waypoints,
-	                                      boolean optimizeWaypoints, boolean optimizeRoute, String language, 
-	                                      boolean avoidTolls, Long gasRadius) {
+	public Optional<FullRouteData> getFullRouteData(PlaceSelection origin, PlaceSelection destination, List<PlaceSelection> waypoints,
+            boolean optimizeWaypoints, boolean optimizeRoute, String language, 
+            boolean avoidTolls, Long gasRadius) {
 
 	    Optional<RouteGroup> routeGroupOpt = getDirections(origin, destination, waypoints, optimizeWaypoints, 
 	                                                        optimizeRoute, language, avoidTolls);
@@ -78,96 +76,97 @@ public class RoutesServiceImpl implements RoutesService {
 	        return Optional.empty();
 	    }
 	    
-	    RouteGroup routeGroup = routeGroupOpt.get();
-	    
-	    List<Coords> polylineCoords = extractRoutePolylinePoints(routeGroup);
-	    List<Coords> legCoords = getLegCoords(routeGroup);
-	    List<Gasolinera> gasStations = getGasStationsCoordsForRoute(routeGroup, gasRadius);
-	    List<CoordsWithWeather> weatherData = getWeatherForRoute(routeGroup, language);
-	    
-	    return Optional.of(new FullRouteData(polylineCoords, legCoords, gasStations, weatherData));
+		RouteGroup routeGroup = routeGroupOpt.get();
+		        
+		        return Optional.of(new FullRouteData(
+		            extractRoutePolylinePoints(routeGroup),
+		            getLegCoords(routeGroup),
+		            getGasStationsCoordsForRoute(routeGroup, gasRadius),
+		            getWeatherForRoute(routeGroup, language)
+		        ));
 	}
 	
 	@Override
-	public Optional<RouteGroup> getDirections(String origin, String destination, List<String> waypoints,
-			boolean optimizeWaypoints, boolean optimizeRoute, String language, boolean avoidTolls) {
+	public Optional<RouteGroup> getDirections(PlaceSelection origin, PlaceSelection destination, List<PlaceSelection> waypoints,
+	        boolean optimizeWaypoints, boolean optimizeRoute, String language, boolean avoidTolls) {
+	    
+	    if (origin == null || destination == null) {
+	        log.warn("[routes-service] Intento de calcular ruta con origen o destino nulo.");
+	        return Optional.empty();
+	    }
 
-		Set<String> invalidDirections = new HashSet<String>();
-		
-		Optional<Coords> originCoords = geocodeService.getCoordinates(origin);
+	    log.info("[routes-service] Iniciando cálculo de ruta: Origin[{}], Destination[{}], Waypoints Count: {}", 
+	            origin.name() != null ? origin.name() : origin.address(), 
+	            destination.name() != null ? destination.name() : destination.address(),
+	            waypoints.size());
 
-		if (originCoords.isEmpty()) {
-			invalidDirections.add(origin);
-		}
-		
-		Optional<Coords> destinationCoords = geocodeService.getCoordinates(destination);
+	    UriComponentsBuilder urlBuilder = UriComponentsBuilder
+	            .fromUriString(API_URL)
+	            .queryParam("mode", MODE)
+	            .queryParam("language", language)
+	            .queryParam("key", API_KEY_GOOGLE)
+	            .queryParam("origin", "place_id:" + origin.placeId());
+	    
+	    if (avoidTolls) {
+	        urlBuilder.queryParam("avoid", AVOID_TOLLS);
+	        log.debug("[routes-service] Evitando peajes activado.");
+	    }
+	    
+	    // Lógica de destino y optimización
+	    String destPlaceId = "place_id:" + destination.placeId();
+	    if (optimizeRoute) {
+	        urlBuilder.queryParam("destination", "place_id:" + origin.placeId());
+	        log.debug("[routes-service] Optimización de ruta completa activa (Round Trip).");
+	    } else {
+	        urlBuilder.queryParam("destination", destPlaceId);
+	    }
 
-		if (destinationCoords.isEmpty()) {
-			invalidDirections.add(destination);
-		}
+	    // Manejo de Waypoints
+	    StringBuilder waypointsValue = new StringBuilder();
+	    if (optimizeWaypoints || optimizeRoute) {
+	        waypointsValue.append(OPTIMIZE);
+	    }
+	    
+	    // Extraemos los IDs con prefijo
+	    List<String> wpIdentifiers = waypoints.stream()
+	            .filter(java.util.Objects::nonNull)
+	            .map(wp -> "place_id:" + wp.placeId())
+	            .collect(Collectors.toList());
+	    
+	    if (optimizeRoute) {
+	        wpIdentifiers.add(destPlaceId);
+	    }
+	    
+	    if (!wpIdentifiers.isEmpty()) {
+	        waypointsValue.append(String.join("|", wpIdentifiers));
+	        urlBuilder.queryParam("waypoints", waypointsValue.toString());
+	        log.debug("[routes-service] Waypoints procesados: {}", wpIdentifiers);
+	    }
+	    
+	    String finalUrl = urlBuilder.build().toUriString();
 
-		List<Coords> waypointsCoords = new ArrayList<>();
-		
-		if(!waypoints.isEmpty()) {
-			for (String waypoint : waypoints) {
-				Optional<Coords> waypointCoords = geocodeService.getCoordinates(waypoint);
-				
-				if (waypointCoords.isEmpty()) {
-					invalidDirections.add(waypoint);
-				} else {
-					waypointsCoords.add(waypointCoords.get());
-				}
-			}
-		}
-		
-		if(!invalidDirections.isEmpty()) {
-			
-			log.error("[routes-service] [" + LocalDateTime.now().toString() + "] "
-					+ "Invalid directions were found: \n" 
-					+ invalidDirections.toString() + ".");
-			return Optional.empty();
-		}
-		
-		UriComponentsBuilder url = UriComponentsBuilder
-				.fromUriString(API_URL)
-				.queryParam("mode", MODE)
-				.queryParam("language", language)
-				.queryParam("key", API_KEY_GOOGLE)
-				.queryParam("origin", originCoords.get().toString());
+	    try {
+	        long startTime = System.currentTimeMillis();
+	        RouteGroup response = restTemplate.getForObject(finalUrl, RouteGroup.class);
+	        long duration = System.currentTimeMillis() - startTime;
 
-		if (avoidTolls) {
-		    url.queryParam("avoid", AVOID_TOLLS);
-		}
-		
-		if (!optimizeRoute) {
-			url.queryParam("destination", destinationCoords.get().toString());
-		}
+	        if (response != null && "OK".equals(response.getStatus())) {
+	            if (optimizeRoute) {
+	                response = deleteLastLeg(response);
+	            }
+	            log.info("[routes-service] Ruta calculada exitosamente en {}ms. Origen: {} -> Destino: {}", 
+	                    duration, origin.address(), destination.address());
+	            return Optional.of(response);
+	        } else {
+	            String status = (response != null) ? response.getStatus() : "NULL_RESPONSE";
+	            log.error("[routes-service] Google Maps retornó un status de error: {}. URL consultada: {}", status, finalUrl);
+	            return Optional.empty();
+	        }
 
-		String result = "";
-		if (!waypoints.isEmpty() && 
-				optimizeWaypoints || optimizeRoute) {
-
-			result += OPTIMIZE;
-			if (optimizeRoute) {
-				waypointsCoords.add(destinationCoords.get());
-				url.queryParam("destination", originCoords.get().toString());
-			}
-		}
-
-		result = getUrl(waypointsCoords, url);
-
-		RouteGroup response = restTemplate.getForObject(result, RouteGroup.class);
-
-		if (!waypoints.isEmpty() && optimizeRoute) {
-			response = deleteLastLeg(response);
-		}
-
-		log.info("[routes-service] [" + LocalDateTime.now().toString() + "] "
-				+ "Sucessfully calculated directions for the given data: \n ["
-				+ origin + " - " + waypoints.toString() + " - " + destination
-				+ " | OptWay=" + optimizeWaypoints + ", OptRoute=" + optimizeRoute
-				+ ", lang=" + language + "]");
-		return Optional.of(response);
+	    } catch (Exception e) {
+	        log.error("[routes-service] Excepción crítica al llamar a Google Maps API: {}", e.getMessage(), e);
+	        return Optional.empty();
+	    }
 	}
 
 	private RouteGroup deleteLastLeg(RouteGroup response) {
@@ -176,15 +175,6 @@ public class RoutesServiceImpl implements RoutesService {
 		response.getRoutes().getFirst().setLegs(legs);
 
 		return response;
-	}
-
-	@Override
-	public String getUrl(List<Coords> waypoints, UriComponentsBuilder url) {
-		log.info("[routes-service] [" + LocalDateTime.now().toString() + "] "
-				+ "Attempting to compose a URL from a list of waypoints.");
-		url.queryParam("waypoints", "");
-
-		return url.toUriString() + waypoints.stream().map(coord -> coord.toString()).collect(Collectors.joining("|"));
 	}
 
 	@Override

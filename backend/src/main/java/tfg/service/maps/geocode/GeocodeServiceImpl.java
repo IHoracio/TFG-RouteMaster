@@ -16,6 +16,7 @@ import tfg.domain.dto.maps.geocode.GeocodeGroup;
 import tfg.domain.dto.maps.geocode.GeocodeGroupAddress;
 import tfg.domain.dto.maps.geocode.GeocodeResultAddress;
 import tfg.domain.dto.maps.routes.Coords;
+import tfg.entity.gasolinera.PlaceDetailsResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -117,6 +118,27 @@ public class GeocodeServiceImpl implements GeocodeService {
 		}
 
 		return municipio;
+	}
+	
+	public Optional<Coords> getCoordinatesFromPlaceId(String placeId) {
+	    String url = UriComponentsBuilder
+	            .fromUriString("https://maps.googleapis.com/maps/api/place/details/json")
+	            .queryParam("place_id", placeId)
+	            .queryParam("fields", "geometry")
+	            .queryParam("key", API_KEY_GOOGLE)
+	            .toUriString();
+
+	    try {
+	        PlaceDetailsResponse response = restTemplate.getForObject(url, PlaceDetailsResponse.class);
+	        
+	        if (response != null && "OK".equals(response.getStatus())) {
+	            var location = response.getResult().getGeometry().getLocation();
+	            return Optional.of(new Coords(location.getLat(), location.getLng()));
+	        }
+	    } catch (Exception e) {
+	        log.error("Error obteniendo coordenadas desde PlaceID: {}", placeId, e);
+	    }
+	    return Optional.empty();
 	}
 
 }
