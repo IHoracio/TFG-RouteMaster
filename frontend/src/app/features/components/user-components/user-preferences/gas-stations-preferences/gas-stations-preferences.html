@@ -1,7 +1,8 @@
 <div class="gas-stations-preferences">
   <div class="form-group">
     <label for="brandSearch">{{ translation.translate('preferences.addBrand') }}</label>
-    <input type="text" [value]="brandSearch()" (input)="setBrandSearch($event)" placeholder="{{ translation.translate('preferences.searchBrand') }}">
+    <input type="text" [value]="brandSearch()" (input)="setBrandSearch($event)"
+      placeholder="{{ translation.translate('preferences.searchBrand') }}">
     @if (showBrandDropdown() && filteredBrands().length > 0) {
     <ul class="dropdown-list">
       @for (brand of filteredBrands(); track $index) {
@@ -15,7 +16,8 @@
     <label>{{ translation.translate('preferences.favoriteBrands') }}</label>
     <ul>
       @for (brand of userPreferencesService.getUserPreferencesSignal()().preferredBrands; track $index) {
-      <li>{{ capitalize(brand) }} <button type="button" class="btn" (click)="removePreferredBrand(brand)">{{ translation.translate('preferences.remove') }}</button></li>
+      <li>{{ capitalize(brand) }} <button type="button" class="btn" (click)="removePreferredBrand(brand)">{{
+          translation.translate('preferences.remove') }}</button></li>
       }
     </ul>
   </div>
@@ -26,22 +28,23 @@
       <span class="info-icon" [title]="translation.translate('preferences.radioKmInfo')">ⓘ</span>
     </div>
     <div class="slider-container">
-      <input id="radioKm" type="range" [value]="userPreferencesService.getUserPreferencesSignal()().radioKm" (input)="setRadioKm($event)" min="1" max="15" step="1">
+      <input id="radioKm" type="range" [value]="userPreferencesService.getUserPreferencesSignal()().radioKm"
+        (input)="setRadioKm($event)" min="1" max="15" step="1">
       <span>{{ userPreferencesService.getUserPreferencesSignal()().radioKm }} km</span>
     </div>
   </div>
 
   <div class="form-group" id="add-gas-stations">
     <label>{{ translation.translate('preferences.addGasStations') }}</label>
-    <input type="text" [value]="searchAddress()" (input)="setSearchAddress($event)" (focus)="setAddressFocus(true)" (blur)="setAddressFocus(false)" placeholder="{{ translation.translate('preferences.searchAddress') }}">
-    @if (isAddressFocused() && filteredMunicipalities().length > 0) {
-    <ul class="dropdown-list">
-      @for (municipality of filteredMunicipalities(); track $index) {
-      <li (mousedown)="setMunicipality(municipality)">{{ capitalize(municipality) }}</li>
-      }
-    </ul>
-    }
-    <button type="button" class="btn" (click)="searchGasStations()" [disabled]="isLoading()">{{ translation.translate('preferences.search') }}</button>
+
+    <app-google-autocomplete [placeholder]="translation.translate('preferences.searchAddress')"
+      (onPlaceSelected)="handleGasStationPlaceSelected($event)">
+    </app-google-autocomplete>
+
+    <button type="button" class="btn" (click)="searchGasStations()" [disabled]="isLoading() || !selectedPlaceForGas()">
+      {{ translation.translate('preferences.search') }}
+    </button>
+
     @if (isLoading()) {
     <span>{{ translation.translate('preferences.loading') }}</span>
     }
@@ -53,41 +56,50 @@
     <ul class="gas-stations-list">
       @for (station of allStations(); track station.idEstacion) {
       @if (isFavorite(station)) {
-      <li class="added-station">{{ station.nombreEstacion }} - {{ station.direccion }} <button type="button" class="btn" (click)="removeFavoriteGasStation(station)">{{ translation.translate('preferences.remove') }}</button></li>
+      <li class="added-station">{{ station.nombreEstacion }} - {{ station.direccion }} <button type="button" class="btn"
+          (click)="removeFavoriteGasStation(station)">{{ translation.translate('preferences.remove') }}</button></li>
       } @else {
-      <li (click)="toggleSelection(station)" [class.selected]="selectedGasStation() === station" class="clickable-station">{{ station.nombreEstacion }} - {{ station.direccion }}</li>
+      <li (click)="toggleSelection(station)" [class.selected]="selectedGasStation() === station"
+        class="clickable-station">{{ station.nombreEstacion }} - {{ station.direccion }}</li>
       }
       }
     </ul>
     <div class="add-favorite-container">
-      <input type="text" [value]="alias()" (input)="setAlias($event)" placeholder="{{ translation.translate('preferences.alias') }}">
-      <button type="button" class="btn" (click)="addSelectedGasStations()" [disabled]="!selectedGasStation() || !alias().trim()">{{ translation.translate('preferences.addSelected') }}</button>
+      <input type="text" [value]="alias()" (input)="setAlias($event)"
+        placeholder="{{ translation.translate('preferences.alias') }}">
+      <button type="button" class="btn" (click)="addSelectedGasStations()"
+        [disabled]="!selectedGasStation() || !alias().trim()">{{ translation.translate('preferences.addSelected')
+        }}</button>
     </div>
   </div>
   } @else if (!isLoading() && hasSearched() && searchResults().length === 0) {
   <div class="form-group">
-    <p>{{ translation.translate('preferences.noGas').replace('[address]', searchAddress()).replace('[km]', userPreferencesService.getUserPreferencesSignal()().radioKm.toString()) }}</p>
+    <p>{{ translation.translate('preferences.noGas').replace('[address]', searchAddress()).replace('[km]',
+      userPreferencesService.getUserPreferencesSignal()().radioKm.toString()) }}</p>
   </div>
   }
 
-  @if (allStations().length <= 50) {
-    <div class="map-container">
-      <app-map-page [showWeather]="false" [showControls]="false" [gasStationsFromInput]="allStations()" [selectedGasStationInput]="selectedGasStation()" [mapType]="userPreferencesService.getUserPreferencesSignal()().mapView"></app-map-page>
-    </div>
-  } @else {
-    <p>{{ translation.translate('preferences.tooMany') }}</p>
-  }
+  @if (allStations().length <= 50) { <div class="map-container">
+    <app-map-page [showWeather]="false" [showControls]="false" [gasStationsFromInput]="allStations()"
+      [selectedGasStationInput]="selectedGasStation()"
+      [mapType]="userPreferencesService.getUserPreferencesSignal()().mapView"></app-map-page>
+</div>
+} @else {
+<p>{{ translation.translate('preferences.tooMany') }}</p>
+}
 
-  <div class="form-group">
-    <label>{{ translation.translate('preferences.favoriteGas') }}</label>
-    <ul>
-      @for (station of userPreferencesService.getFavoriteGasStationsSignal()(); track station.idEstacion) {
-      <li (click)="setSelectedStation(station)" class="clickable-favorite">
-        {{ station.alias }} - {{ station.nombreEstacion }} - {{ station.direccion }}
-        <button type="button" class="btn" (click)="removeFavoriteGasStation(station)">{{ translation.translate('preferences.remove') }}</button>
-        <button type="button" class="btn" (click)="renameFavoriteGasStation(station)">{{ translation.translate('preferences.rename') }}</button>
-      </li>
-      }
-    </ul>
-  </div>
+<div class="form-group">
+  <label>{{ translation.translate('preferences.favoriteGas') }}</label>
+  <ul>
+    @for (station of userPreferencesService.getFavoriteGasStationsSignal()(); track station.idEstacion) {
+    <li (click)="setSelectedStation(station)" class="clickable-favorite">
+      {{ station.alias }} - {{ station.nombreEstacion }} - {{ station.direccion }}
+      <button type="button" class="btn" (click)="removeFavoriteGasStation(station)">{{
+        translation.translate('preferences.remove') }}</button>
+      <button type="button" class="btn" (click)="renameFavoriteGasStation(station)">{{
+        translation.translate('preferences.rename') }}</button>
+    </li>
+    }
+  </ul>
+</div>
 </div>

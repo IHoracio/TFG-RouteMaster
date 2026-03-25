@@ -19,8 +19,8 @@ export class SearchBarFormComponent {
   activeTab = input<string>('destination');
   isFormCollapsed = input<boolean>(false);
   routeFormResponse = input<RouteFormResponse>({
-    origin: '',
-    destination: '',
+    origin: null,
+    destination: null,
     waypoints: [],
     optimizeWaypoints: false,
     optimizeRoute: false,

@@ -5,10 +5,12 @@ import { GasStationSelectionService } from '../../../../../services/user-page/ga
 import { TranslationService } from '../../../../../services/translation.service';
 import { FavouriteGasStation, GasStation } from '../../../../../Dto/gas-station';
 import { MapPageComponent } from '../../../../pages/map-page/map-page.component';
+import { GoogleAutocompleteComponent } from '../../../google-autocomplete/google-autocomplete.component';
+import { PlaceSelection } from '../../../../../Dto/place-selection';
 
 @Component({
   selector: 'app-gas-stations-preferences',
-  imports: [MapPageComponent],
+  imports: [MapPageComponent, GoogleAutocompleteComponent],
   templateUrl: './gas-stations-preferences.html',
   styleUrl: './gas-stations-preferences.css',
 })
@@ -28,6 +30,7 @@ export class GasStationsPreferencesComponent {
   showBrandDropdown = signal<boolean>(false);
   alias = signal<string>('');
   isAddressFocused = signal<boolean>(false);
+  selectedPlaceForGas = signal<PlaceSelection | null>(null);
 
   filteredBrands = computed(() => {
     const search = this.brandSearch().toLowerCase();
@@ -91,24 +94,32 @@ export class GasStationsPreferencesComponent {
     this.searchGasStations();
   }
 
-  searchGasStations(): void {
-    this.searchResults.set([]);
-    if (!this.searchAddress().trim()) return;
-    this.isLoading.set(true);
-    this.hasSearched.set(true);
-    const normalized = this.normalize(this.searchAddress());
-    this.gasStationService.getGasStationFromDirectionInRadius(normalized, this.userPreferencesService.getUserPreferencesSignal()().radioKm || 0).subscribe({
-      next: (results) => {
-        this.searchResults.set(results || []);
-        this.selectedGasStation.set(null);
-        this.isLoading.set(false);
-      },
-      error: () => {
-        alert('Error al buscar gasolineras.');
-        this.isLoading.set(false);
-      }
-    });
-  }
+searchGasStations(): void {
+  const selection = this.selectedPlaceForGas();
+  
+  if (!selection) return;
+
+  this.searchResults.set([]);
+  this.isLoading.set(true);
+  this.hasSearched.set(true);
+
+  const searchIdentifier = "place_id:" + selection.placeId;
+
+  this.gasStationService.getGasStationFromDirectionInRadius(
+    searchIdentifier, 
+    this.userPreferencesService.getUserPreferencesSignal()().radioKm || 0
+  ).subscribe({
+    next: (results) => {
+      this.searchResults.set(results || []);
+      this.selectedGasStation.set(null);
+      this.isLoading.set(false);
+    },
+    error: () => {
+      alert('Error al buscar gasolineras.');
+      this.isLoading.set(false);
+    }
+  });
+}
 
   toggleSelection(station: GasStation): void {
     this.selectedGasStation.set(this.selectedGasStation() === station ? null : station);
@@ -137,6 +148,10 @@ export class GasStationsPreferencesComponent {
         this.selectedGasStation.set(null);
       }
     }
+  }
+
+  handleGasStationPlaceSelected(selection: PlaceSelection) {
+    this.selectedPlaceForGas.set(selection);
   }
 
   isFavorite(station: GasStation): boolean {
