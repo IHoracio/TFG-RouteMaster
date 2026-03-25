@@ -21,6 +21,13 @@ export class SearchBarService {
   ) { }
 
   onSubmit(routeFormResponse: RouteFormResponse): Observable<GasStation[]> {
+    console.log('🚀 Enviando formulario al Backend:', {
+      origin: routeFormResponse.origin,
+      destination: routeFormResponse.destination,
+      waypoints: routeFormResponse.waypoints,
+      optimize: routeFormResponse.optimizeRoute,
+      avoidTolls: routeFormResponse.avoidTolls
+    });
     return this.routeService.getFullRouteData(routeFormResponse).pipe(
       map((data: FullRouteData) => {
         this.giveCoords(data.polylineCoords);

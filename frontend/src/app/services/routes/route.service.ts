@@ -37,22 +37,13 @@ export class RouteService {
   }
 
   getFullRouteData(routeFormResponse: RouteFormResponse): Observable<FullRouteData> {
-    let parameters = new HttpParams()
-      .set('origin', routeFormResponse.origin)
-      .set('destination', routeFormResponse.destination)
-      .set('optimizeWaypoints', routeFormResponse.optimizeWaypoints)
-      .set('optimizeRoute', routeFormResponse.optimizeRoute)
-      .set('language', this.translation.getCurrentLang ? this.translation.getCurrentLang() : 'es')
-      .set('avoidTolls', routeFormResponse.avoidTolls)
-      .set('gasRadius', routeFormResponse.radioKm || 1); 
+    const body = {
+      ...routeFormResponse,
+      language: this.translation.getCurrentLang ? this.translation.getCurrentLang().toLocaleLowerCase() : 'es',
+      gasRadius: routeFormResponse.radioKm || 1
+    };
 
-    if (routeFormResponse.waypoints && routeFormResponse.waypoints.length > 0) {
-      routeFormResponse.waypoints.forEach(wp => {
-        parameters = parameters.append('waypoints', wp); 
-      });
-    }
-
-    return this.http.get<FullRouteData>(`${this.apiUrl}/api/route/fullData`, { params: parameters });
+    return this.http.post<FullRouteData>(`${this.apiUrl}/api/route/fullData`, body);
   }
 
   getGasStationsByCoords(lat: number, lng: number, radio: number = 1): Observable<GasStation[]> {
@@ -63,16 +54,16 @@ export class RouteService {
   }
 
   saveFavouriteRoute(alias: string, routeFormResponse: RouteFormResponse, polylineCoords: Coords[], legCoords: Coords[], lang: string) {
-    
+
     const puntosDTO: any[] = [];
     puntosDTO.push({ type: 'ORIGIN', address: routeFormResponse.origin });
-    
+
     if (routeFormResponse.waypoints && routeFormResponse.waypoints.length > 0) {
       routeFormResponse.waypoints.forEach(wp => {
         puntosDTO.push({ type: 'WAYPOINT', address: wp });
       });
     }
-    
+
     puntosDTO.push({ type: 'DESTINATION', address: routeFormResponse.destination });
 
     const body = {
