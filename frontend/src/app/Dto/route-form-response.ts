@@ -1,7 +1,9 @@
+import { PlaceSelection } from "./place-selection";
+
 export interface RouteFormResponse {
-    origin: string,
-    destination: string,
-    waypoints: string [],
+    origin: PlaceSelection | null;
+    destination: PlaceSelection | null;
+    waypoints: PlaceSelection[];
     optimizeWaypoints: boolean,
     optimizeRoute: boolean,
     avoidTolls: boolean,
