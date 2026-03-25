@@ -80,7 +80,6 @@ export class UserDataService {
         this.userPreferencesService.getLanguages().subscribe(options => this.userPreferencesService.setLanguageOptions(options?.map(p => p.code) || []));
         this.gasStationService.getGasStationBrands().subscribe(options => this.userPreferencesService.setGasStationBrandsOptions(options || []));
         this.userPreferencesService.getMapTypes().subscribe(options => this.userPreferencesService.setMapTypeOptions(options?.map(p => p.code) || []));
-        this.userPreferencesService.getEmissionLabels().subscribe(options => this.userPreferencesService.setEmissionLabelOptions(options?.map(p => p.code) || []));
         this.gasStationService.getMunicipalities().subscribe(municipalities => this.userPreferencesService.setSpainMunicipalities(municipalities?.map(m => m.nombreMunicipio) || []));
     }
 
