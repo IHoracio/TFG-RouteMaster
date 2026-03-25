@@ -136,38 +136,28 @@ public class GasolineraServiceImplTest {
 
     @Test
     void getGasolinerasInRadiusAddress_success_returnsList() {
+        // Preparar los datos
+        String input = "place_id:ChIJPxiTeQLQQw0RVaOLHLpmYV0";
+        String cleanId = "ChIJPxiTeQLQQw0RVaOLHLpmYV0";
         Coords coords = new Coords(40.0, -3.0);
-        when(geocodeService.getCoordinates("Calle Falsa")).thenReturn(Optional.of(coords));
-
+        
         Gasolinera g = new Gasolinera();
         g.setMarca("Repsol");
+        when(geocodeService.getCoordinatesFromPlaceId(cleanId))
+                .thenReturn(Optional.of(coords));
 
         when(restTemplate.getForObject(anyString(), eq(Gasolinera[].class)))
                 .thenReturn(new Gasolinera[]{g});
 
-        List<Gasolinera> result = service.getGasolinerasInRadiusAddress("Calle Falsa", 10L);
+        // Ejecución
+        List<Gasolinera> result = service.getGasolinerasInRadiusPlace(input, 10L);
 
-        assertEquals(1, result.size());
+        // Verificación
+        assertEquals(1, result.size(), "Debería haber devuelto 1 gasolinera");
         assertEquals("Repsol", result.get(0).getMarca());
-    }
-
-    @Test
-    void getGasolinerasInRadiusAddress_noCoords_returnsEmpty() {
-        when(geocodeService.getCoordinates("Unknown")).thenReturn(Optional.empty());
-
-        List<Gasolinera> result = service.getGasolinerasInRadiusAddress("Unknown", 10L);
-
-        assertTrue(result.isEmpty());
-    }
-
-    @Test
-    void getGasolinerasInRadiusAddress_invalidRadius_returnsEmpty() {
-        Coords coords = new Coords(40.0, -3.0);
-        when(geocodeService.getCoordinates("Calle Falsa")).thenReturn(Optional.of(coords));
-
-        List<Gasolinera> result = service.getGasolinerasInRadiusAddress("Calle Falsa", 0L);
-
-        assertTrue(result.isEmpty());
+        
+        // Verificamos que se llamó al método correcto del geocoder
+        verify(geocodeService).getCoordinatesFromPlaceId(cleanId);
     }
     
     @Test

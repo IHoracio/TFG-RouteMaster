@@ -161,13 +161,20 @@ public class GasolineraServiceImpl implements GasolineraService {
 	    } else {
 	        coordsOpt = Optional.empty();
 	    }
+	    
+	    log.info("[gas-service] Cordenadas: {} ", coordsOpt);
 
 	    if (coordsOpt.isEmpty()) {
 	        return new ArrayList<>();
 	    }
 
 	    Coords c = coordsOpt.get();
-	    return getGasolinerasInRadiusCoords(c.getLat(), c.getLng(), radius);
+	    
+	    List<Gasolinera> result = getGasolinerasInRadiusCoords(c.getLat(), c.getLng(), radius);
+	    
+	    log.info("[gas-service] Gasolineras encontradas: {} ", result.toString());
+	    
+	    return result;
 	}
 	
 	@Override
