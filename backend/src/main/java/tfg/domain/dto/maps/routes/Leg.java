@@ -7,7 +7,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.Transient;
 
 public class Leg {
-
+	@Transient
 	private Distance distance;
 
 	@Transient
