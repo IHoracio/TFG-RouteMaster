@@ -12,6 +12,8 @@ public class SavedRouteRequest {
     private List<Coords> polylineCoords;
     private List<Coords> legCoords;
     
+    private String totalDistance;
+    private String totalDuration;
     private Long gasRadius;
     private String language;
 	public String getName() {
@@ -49,6 +51,18 @@ public class SavedRouteRequest {
 	}
 	public void setLanguage(String language) {
 		this.language = language;
+	}
+	public String getTotalDistance() {
+		return totalDistance;
+	}
+	public void setTotalDistance(String totalDistance) {
+		this.totalDistance = totalDistance;
+	}
+	public String getTotalDuration() {
+		return totalDuration;
+	}
+	public void setTotalDuration(String totalDuration) {
+		this.totalDuration = totalDuration;
 	}
 
 }

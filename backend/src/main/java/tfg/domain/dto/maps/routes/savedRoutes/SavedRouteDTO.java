@@ -9,6 +9,10 @@ public class SavedRouteDTO {
 		private String name;
 		
 		private List<PointDTO> points;
+		
+		private String totalDuration;
+		
+		private String totalDistance;
 
 		public String getRouteId() {
 			return routeId;
@@ -32,6 +36,22 @@ public class SavedRouteDTO {
 
 		public void setPoints(List<PointDTO> points) {
 			this.points = points;
+		}
+
+		public String getTotalDuration() {
+			return totalDuration;
+		}
+
+		public void setTotalDuration(String totalDuration) {
+			this.totalDuration = totalDuration;
+		}
+
+		public String getTotalDistance() {
+			return totalDistance;
+		}
+
+		public void setTotalDistance(String totalDistance) {
+			this.totalDistance = totalDistance;
 		}
 		
 }

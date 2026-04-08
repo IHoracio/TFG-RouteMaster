@@ -5,6 +5,8 @@ import java.util.List;
 import tfg.domain.dto.maps.routes.Coords;
 
 public class ShareRouteRequest {
+	private String totalDistance;
+	private String totalDuration;
 	private List<Coords> polylineCoords;
     private List<Coords> legCoords;
     private Long gasRadius;
@@ -32,6 +34,18 @@ public class ShareRouteRequest {
 	}
 	public void setLang(String lang) {
 		this.lang = lang;
+	}
+	public String getTotalDistance() {
+		return totalDistance;
+	}
+	public void setTotalDistance(String totalDistance) {
+		this.totalDistance = totalDistance;
+	}
+	public String getTotalDuration() {
+		return totalDuration;
+	}
+	public void setTotalDuration(String totalDuration) {
+		this.totalDuration = totalDuration;
 	}
 
 }
