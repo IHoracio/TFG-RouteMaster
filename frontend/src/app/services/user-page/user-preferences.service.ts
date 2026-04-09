@@ -23,6 +23,7 @@ export class UserPreferencesService {
   themeOptions = signal<string[]>([]);
   languageOptions = signal<string[]>([]);
   gasStationBrandsOptions = signal<string[]>([]);
+  defaultPreferences = signal<DefaultUserPreferences | null>(null);
 
   private getInitial(key: string, defaultValue: any) {
     const saved = localStorage.getItem(key);
@@ -112,6 +113,7 @@ export class UserPreferencesService {
     this.themeOptions.set([]);
     this.languageOptions.set([]);
     this.gasStationBrandsOptions.set([]);
+    this.defaultPreferences.set(null);
 
     // 2. Limpiar el almacenamiento físico
     localStorage.clear();

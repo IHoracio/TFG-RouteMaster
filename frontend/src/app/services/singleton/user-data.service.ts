@@ -21,6 +21,7 @@ export class UserDataService {
             info: this.userInfoService.getUserInfo(),
             prefs: this.userPrefsService.getUserPreferences(),
             favs: this.userPrefsService.getUserFavouriteGasStations(),
+            defaults: this.userPrefsService.getDefaultPreferences(),
             fuels: this.userPrefsService.getFuelTypes(),
             brands: this.gasService.getGasStationBrands(),
             routes: this.userInfoService.getUserRoutes(),
@@ -33,6 +34,7 @@ export class UserDataService {
                 this.userPrefsService.userPreferences.set(data.prefs); // Aquí podrías usar tu método updateData
                 this.userPrefsService.favoriteGasStations.set(data.favs);
                 this.userPrefsService.fuelOptions.set(data.fuels.map((f: any) => f.code));
+                this.userPrefsService.defaultPreferences.set(data.defaults);
                 this.userPrefsService.gasStationBrandsOptions.set(data.brands);
                 this.userInfoService.setRoutes(data.routes);
                 this.userPrefsService.themeOptions.set(data.themes.map(t => t.code));
