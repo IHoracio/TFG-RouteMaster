@@ -20,6 +20,7 @@ export class UserPreferencesService {
 
   // Catálogos (No necesitan persistencia en localStorage, se cargan al inicio)
   fuelOptions = signal<string[]>([]);
+  mapOptions = signal<string[]>([]);
   themeOptions = signal<string[]>([]);
   languageOptions = signal<string[]>([]);
   gasStationBrandsOptions = signal<string[]>([]);
