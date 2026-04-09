@@ -1,6 +1,6 @@
 import { Injectable, signal } from '@angular/core';
-import esTranslations from '../../assets/i18n/es.json';
-import enTranslations from '../../assets/i18n/en.json';
+import esTranslations from '../../../assets/i18n/es.json';
+import enTranslations from '../../../assets/i18n/en.json';
 
 @Injectable({
   providedIn: 'root'

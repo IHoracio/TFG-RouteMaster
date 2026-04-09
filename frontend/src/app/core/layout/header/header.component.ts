@@ -1,11 +1,11 @@
 import { Component, OnInit, computed, signal, ChangeDetectorRef } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { AuthService } from '../../../services/auth/auth-service.service';
-import { TranslationService } from '../../../services/translation.service';
 import { ThemeService } from '../../../services/singleton/theme.service';
 import { UserPreferencesService } from '../../../services/user-page/user-preferences.service';
 import { AuthGuard } from '../../../guards/auth.guard';
 import { LoginPromptService } from '../../../services/login-prompt/login-prompt.service';
+import { TranslationService } from '../../../services/singleton/translation.service';
 
 @Component({
   selector: 'app-header',

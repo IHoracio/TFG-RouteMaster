@@ -10,8 +10,7 @@ import { WeatherData } from '../../../../../Dto/weather-dtos';
   selector: 'app-weather-overlay-host',
   standalone: true,
   imports: [WeatherOverlayComponent],
-  templateUrl: './weather-overlay-host.component.html',
-  styleUrls: ['./weather-overlay-host.component.css']
+  templateUrl: './weather-overlay-host.component.html'
 })
 export class WeatherOverlayHostComponent {
   weatherRoute = input<WeatherData[] | null>(null);

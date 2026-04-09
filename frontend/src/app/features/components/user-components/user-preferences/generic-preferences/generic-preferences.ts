@@ -1,7 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { UserPreferencesService } from '../../../../../services/user-page/user-preferences.service';
-import { TranslationService } from '../../../../../services/translation.service';
 import { ThemeService } from '../../../../../services/singleton/theme.service';
+import { TranslationService } from '../../../../../services/singleton/translation.service';
 
 @Component({
   selector: 'app-generic-preferences',

@@ -2,8 +2,8 @@ import { Injectable } from '@angular/core';
 import { CanActivate, Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { catchError, map, Observable, of } from 'rxjs';
-import { TranslationService } from '../services/translation.service';
 import { environment } from '../../environments/environment';
+import { TranslationService } from '../services/singleton/translation.service';
 
 @Injectable({
     providedIn: 'root'

@@ -1,15 +1,14 @@
 import { Component, inject } from '@angular/core';
 import { FormsModule, ReactiveFormsModule, FormGroup, FormControl, Validators, FormBuilder } from '@angular/forms';
 import { User } from '../../Dto/user-dtos';
-import { NgIf } from '@angular/common';
 import { UserService } from '../../services/user/user.service';
 import { RouterLink } from "@angular/router";
 import { AuthService } from '../../services/auth/auth-service.service';
-import { TranslationService } from '../../services/translation.service';
+import { TranslationService } from '../../services/singleton/translation.service';
 
 @Component({
   selector: 'app-create-user',
-  imports: [FormsModule, ReactiveFormsModule, NgIf, RouterLink],
+  imports: [FormsModule, ReactiveFormsModule, RouterLink],
   templateUrl: './create-user.component.html',
   styleUrl: './create-user.component.css'
 })

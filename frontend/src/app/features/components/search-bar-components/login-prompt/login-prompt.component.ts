@@ -1,6 +1,6 @@
 import { Component, signal, inject, Input, Output, EventEmitter } from '@angular/core';
 import { Router } from '@angular/router';
-import { TranslationService } from '../../../../services/translation.service';
+import { TranslationService } from '../../../../services/singleton/translation.service';
 
 @Component({
   selector: 'app-login-prompt',

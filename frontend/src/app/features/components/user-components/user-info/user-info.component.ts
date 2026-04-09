@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 import { UserPreferencesService } from '../../../../services/user-page/user-preferences.service';
 import { FavouriteGasStation } from '../../../../Dto/gas-station';
 import { UserInfoService } from '../../../../services/user-page/user-info.service';
-import { TranslationService } from '../../../../services/translation.service';
+import { TranslationService } from '../../../../services/singleton/translation.service';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,

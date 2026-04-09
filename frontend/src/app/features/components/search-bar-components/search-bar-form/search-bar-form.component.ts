@@ -4,9 +4,9 @@ import { NgFor, NgIf } from '@angular/common';
 import { RouteFormResponse } from '../../../../Dto/route-form-response';
 import { FavouriteGasStation } from '../../../../Dto/gas-station';
 import { SavedRouteDto } from '../../../../Dto/user-dtos';
-import { TranslationService } from '../../../../services/translation.service';
 import { GoogleAutocompleteComponent } from '../../google-autocomplete/google-autocomplete.component';
 import { PlaceSelection } from '../../../../Dto/place-selection';
+import { TranslationService } from '../../../../services/singleton/translation.service';
 
 @Component({
   selector: 'app-search-bar-form',

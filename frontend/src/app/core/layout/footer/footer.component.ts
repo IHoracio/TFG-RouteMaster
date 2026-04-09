@@ -1,7 +1,7 @@
 import { DatePipe } from '@angular/common';
 import { Component, inject } from '@angular/core';
-import { TranslationService } from '../../../services/translation.service';
 import { Router } from '@angular/router';
+import { TranslationService } from '../../../services/singleton/translation.service';
 
 @Component({
   selector: 'app-footer',

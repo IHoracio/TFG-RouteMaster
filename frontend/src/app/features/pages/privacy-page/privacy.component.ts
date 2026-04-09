@@ -1,5 +1,5 @@
 import { Component, inject } from '@angular/core';
-import { TranslationService } from '../../../services/translation.service';
+import { TranslationService } from '../../../services/singleton/translation.service';
 
 @Component({
   selector: 'app-privacy',

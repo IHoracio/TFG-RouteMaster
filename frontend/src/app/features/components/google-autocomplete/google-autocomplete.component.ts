@@ -1,7 +1,7 @@
 import { Component, ElementRef, EventEmitter, Input, Output, ViewChild, AfterViewInit, inject, effect, untracked } from '@angular/core';
-import { GoogleMapsLoaderService } from '../../../services/google.maps.loader.service';
-import { TranslationService } from '../../../services/translation.service';
 import { PlaceSelection } from '../../../Dto/place-selection';
+import { GoogleMapsLoaderService } from '../../../services/singleton/google.maps.loader.service';
+import { TranslationService } from '../../../services/singleton/translation.service';
 
 // =============================================================================
 // INTERCEPTOR GLOBAL DE SHADOW DOM

@@ -1,7 +1,7 @@
 import { Component, inject, input, output, ElementRef, Renderer2, AfterViewInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { NgIf } from '@angular/common';
-import { TranslationService } from '../../../../services/translation.service';
+import { TranslationService } from '../../../../services/singleton/translation.service';
 
 @Component({
   selector: 'app-search-bar-filters',

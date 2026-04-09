@@ -12,12 +12,16 @@
         <input class="form-control" type="email" name="email" id="email" formControlName="email"
           [placeholder]="translation.translate('register.emailPlaceholder')">
 
-        <div *ngIf="hasError('email', 'required')">
+        @if (hasError('email', 'required')) {
+        <div>
           <p class="error">{{ translation.translate('register.emailRequired') }}</p>
         </div>
-        <div *ngIf="hasError('email', 'pattern')">
+        }
+        @if (hasError('email', 'pattern')) {
+        <div>
           <p class="error">{{ translation.translate('register.emailPattern') }}</p>
         </div>
+        }
       </div>
 
       <div class="mb-3">
@@ -26,31 +30,40 @@
         <input class="form-control" type="password" name="password" id="password" formControlName="password"
           [placeholder]="translation.translate('register.passwordPlaceholder')">
 
-        <div *ngIf="hasError('password', 'required')">
+        @if (hasError('password', 'required')) {
+        <div>
           <p class="error">{{ translation.translate('register.passwordRequired') }}</p>
         </div>
-
-        <div *ngIf="hasError('password', 'minLength')">
+        }
+        @if (hasError('password', 'minLength')) {
+        <div>
           <p class="error">{{ translation.translate('register.passwordMinLength') }}</p>
         </div>
-        <div *ngIf="hasError('password', 'pattern')">
+        }
+        @if (hasError('password', 'pattern')) {
+        <div>
           <p class="error">{{ translation.translate('register.passwordPattern') }}</p>
         </div>
+        }
       </div>
 
       <div class="mb-3">
         <span class="asterisk">*</span>
         <label for="passwordConfirmation">{{ translation.translate('register.passwordConfirmation') }}</label>
         <input class="form-control" type="password" name="passwordConfirmation" id="passwordConfirmation"
-          formControlName="passwordConfirmation" [placeholder]="translation.translate('register.passwordConfirmationPlaceholder')">
+          formControlName="passwordConfirmation"
+          [placeholder]="translation.translate('register.passwordConfirmationPlaceholder')">
 
-        <div *ngIf="hasError('passwordConfirmation', 'required')">
+        @if (hasError('passwordConfirmation', 'required')) {
+        <div>
           <p class="error">{{ translation.translate('register.passwordConfirmationRequired') }}</p>
         </div>
-
-        <div *ngIf="form.errors?.['passwordMismatch'] && form.get('passwordConfirmation')?.touched">
+        }
+        @if (form.errors?.['passwordMismatch'] && form.get('passwordConfirmation')?.touched) {
+        <div>
           <p class="error">{{ translation.translate('register.passwordMismatch') }}</p>
         </div>
+        }
       </div>
 
       <div class="mb-3">
@@ -59,9 +72,11 @@
         <input class="form-control" type="text" name="name" id="name" formControlName="name"
           [placeholder]="translation.translate('register.namePlaceholder')">
 
-        <div *ngIf="hasError('name', 'required')">
+        @if (hasError('name', 'required')) {
+        <div>
           <p class="error">{{ translation.translate('register.nameRequired') }}</p>
         </div>
+        }
       </div>
 
       <div class="mb-3">
@@ -70,23 +85,30 @@
         <input class="form-control" type="text" name="surname" id="surname" formControlName="surname"
           [placeholder]="translation.translate('register.surnamePlaceholder')">
 
-        <div *ngIf="hasError('surname', 'required')">
+        @if (hasError('surname', 'required')) {
+        <div>
           <p class="error">{{ translation.translate('register.surnameRequired') }}</p>
         </div>
+        }
       </div>
 
-      <div *ngIf="message" class="success">
+      @if (message) {
+      <div class="success">
         {{ message }}
       </div>
+      }
 
-      <div *ngIf="error" class="error">
+      @if (error) {
+      <div class="error">
         {{ error }}
       </div>
+      }
 
       <input class="btn" type="submit" [value]="translation.translate('register.submit')" [disabled]="form.invalid" />
 
       <div class="text-muted">
-        <p>{{ translation.translate('register.alreadyHaveAccount') }} <a routerLink="/login">{{ translation.translate('register.login') }}</a></p>
+        <p>{{ translation.translate('register.alreadyHaveAccount') }} <a routerLink="/login">{{
+            translation.translate('register.login') }}</a></p>
       </div>
     </form>
   </section>

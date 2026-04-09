@@ -1,6 +1,6 @@
 import { Component, inject, input, output } from '@angular/core';
 import { NgClass } from '@angular/common';
-import { TranslationService } from '../../../../services/translation.service';
+import { TranslationService } from '../../../../services/singleton/translation.service';
 
 @Component({
   selector: 'app-search-bar-tabs',

@@ -1,7 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { UserInfoComponent } from '../../components/user-components/user-info/user-info.component';
 import { UserPreferencesComponent } from '../../components/user-components/user-preferences/user-preferences.component';
-import { TranslationService } from '../../../services/translation.service';
+import { TranslationService } from '../../../services/singleton/translation.service';
 
 @Component({
   selector: 'app-user-page',

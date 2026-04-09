@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, input, output, computed, signal, effect, inject } from '@angular/core';
 import { WeatherData } from '../../../../Dto/weather-dtos';
-import { TranslationService } from '../../../../services/translation.service';
+import { TranslationService } from '../../../../services/singleton/translation.service';
 
 @Component({
   selector: 'app-weather-overlay',
