@@ -1,122 +1,38 @@
-import { Injectable, signal } from '@angular/core';
+import { inject, Injectable, signal, WritableSignal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { DefaultUserPreferences, Preferences, ThemeLangPreferences } from '../../Dto/preferences';
-import { Municipalitie } from '../../Dto/municipalities';
-import { GasStation, FavouriteGasStation } from '../../Dto/gas-station';
+import { FavouriteGasStation } from '../../Dto/gas-station';
 import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class UserPreferencesService {
+
   private baseUrl = environment.apiUrl;
+  private http = inject(HttpClient);
 
-  private favoriteGasStationsSignal = signal<FavouriteGasStation[]>([]);
-  private userPreferencesSignal = signal<any>({});
-  private defaultPreferencesSignal = signal<any>(null);
-  private themeLanguageSignal = signal<any>({});
-  private fuelOptionsSignal = signal<string[]>([]);
-  private themeOptionsSignal = signal<string[]>([]);
-  private languageOptionsSignal = signal<string[]>([]);
-  private mapTypeOptionsSignal = signal<string[]>([]);
-  private gasStationBrandsOptionsSignal = signal<string[]>([]);
+  // Signals con valor inicial desde localStorage (si existe)
+  favoriteGasStations = signal<FavouriteGasStation[]>(this.getInitial('favoriteGasStations', []));
+  userPreferences = signal<any>(this.getInitial('userPreferences', {}));
+  themeLanguage = signal<any>(this.getInitial('themeLanguage', {}));
 
-  constructor(private http: HttpClient) {
-    const savedFavStations = localStorage.getItem('favoriteGasStations');
-    if (savedFavStations) {
-      this.favoriteGasStationsSignal.set(JSON.parse(savedFavStations));
-    }
-    const savedPrefs = localStorage.getItem('userPreferences');
-    if (savedPrefs) {
-      this.userPreferencesSignal.set(JSON.parse(savedPrefs));
-    }
-    const savedDefaults = localStorage.getItem('defaultPreferences');
-    if (savedDefaults) {
-      this.defaultPreferencesSignal.set(JSON.parse(savedDefaults));
-    }
-    const savedThemeLang = localStorage.getItem('themeLanguage');
-    if (savedThemeLang) {
-      this.themeLanguageSignal.set(JSON.parse(savedThemeLang));
-    }
-    const savedFuelOptions = localStorage.getItem('fuelOptions');
-    if (savedFuelOptions) {
-      this.fuelOptionsSignal.set(JSON.parse(savedFuelOptions));
-    }
-    const savedThemeOptions = localStorage.getItem('themeOptions');
-    if (savedThemeOptions) {
-      this.themeOptionsSignal.set(JSON.parse(savedThemeOptions));
-    }
-    const savedLanguageOptions = localStorage.getItem('languageOptions');
-    if (savedLanguageOptions) {
-      this.languageOptionsSignal.set(JSON.parse(savedLanguageOptions));
-    }
-    const savedMapTypeOptions = localStorage.getItem('mapTypeOptions');
-    if (savedMapTypeOptions) {
-      this.mapTypeOptionsSignal.set(JSON.parse(savedMapTypeOptions));
-    }
-    const savedGasStationBrandsOptions = localStorage.getItem('gasStationBrandsOptions');
-    if (savedGasStationBrandsOptions) {
-      this.gasStationBrandsOptionsSignal.set(JSON.parse(savedGasStationBrandsOptions));
-    }
+  // Catálogos (No necesitan persistencia en localStorage, se cargan al inicio)
+  fuelOptions = signal<string[]>([]);
+  themeOptions = signal<string[]>([]);
+  languageOptions = signal<string[]>([]);
+  gasStationBrandsOptions = signal<string[]>([]);
+
+  private getInitial(key: string, defaultValue: any) {
+    const saved = localStorage.getItem(key);
+    return saved ? JSON.parse(saved) : defaultValue;
   }
 
-  getFavoriteGasStationsSignal() { return this.favoriteGasStationsSignal; }
-  setFavoriteGasStations(data: FavouriteGasStation[]) { 
-    this.favoriteGasStationsSignal.set(data); 
-    localStorage.setItem('favoriteGasStations', JSON.stringify(data));
-  }
-  updateFavoriteGasStationsSignal(updater: (stations: FavouriteGasStation[]) => FavouriteGasStation[]) {
-    this.favoriteGasStationsSignal.update(updater);
-    localStorage.setItem('favoriteGasStations', JSON.stringify(this.favoriteGasStationsSignal()));
-  }
-
-  getUserPreferencesSignal() { return this.userPreferencesSignal; }
-  setUserPreferences(data: any) { 
-    this.userPreferencesSignal.set(data); 
-    localStorage.setItem('userPreferences', JSON.stringify(data));
-  }
-
-  getDefaultPreferencesSignal() { return this.defaultPreferencesSignal; }
-  setDefaultPreferences(data: any) { 
-    this.defaultPreferencesSignal.set(data); 
-    localStorage.setItem('defaultPreferences', JSON.stringify(data));
-  }
-
-  getThemeLanguageSignal() { return this.themeLanguageSignal; }
-  setThemeLanguage(data: any) { 
-    this.themeLanguageSignal.set(data); 
-    localStorage.setItem('themeLanguage', JSON.stringify(data));
-  }
-
-  getFuelOptionsSignal() { return this.fuelOptionsSignal; }
-  setFuelOptions(data: string[]) { 
-    this.fuelOptionsSignal.set(data); 
-    localStorage.setItem('fuelOptions', JSON.stringify(data));
-  }
-
-  getThemeOptionsSignal() { return this.themeOptionsSignal; }
-  setThemeOptions(data: string[]) { 
-    this.themeOptionsSignal.set(data); 
-    localStorage.setItem('themeOptions', JSON.stringify(data));
-  }
-
-  getLanguageOptionsSignal() { return this.languageOptionsSignal; }
-  setLanguageOptions(data: string[]) { 
-    this.languageOptionsSignal.set(data); 
-    localStorage.setItem('languageOptions', JSON.stringify(data));
-  }
-
-  getMapTypeOptionsSignal() { return this.mapTypeOptionsSignal; }
-  setMapTypeOptions(data: string[]) { 
-    this.mapTypeOptionsSignal.set(data); 
-    localStorage.setItem('mapTypeOptions', JSON.stringify(data));
-  }
-
-  getGasStationBrandsOptionsSignal() { return this.gasStationBrandsOptionsSignal; }
-  setGasStationBrandsOptions(data: string[]) { 
-    this.gasStationBrandsOptionsSignal.set(data); 
-    localStorage.setItem('gasStationBrandsOptions', JSON.stringify(data));
+  // Métodos de actualización: Actualizan el Signal y el Storage
+  updateData<T>(sig: WritableSignal<T>, key: string, data: T) {
+    sig.set(data);
+    localStorage.setItem(key, JSON.stringify(data));
   }
 
   getUserPreferences(): Observable<any> {
@@ -186,4 +102,19 @@ export class UserPreferencesService {
   getLanguages(): Observable<Preferences[]> {
     return this.http.get<Preferences[]>(`${this.baseUrl}/api/preferences/languages`, { withCredentials: true });
   }
+
+  clearUserData() {
+    // 1. Resetear Signals a sus valores iniciales
+    this.userPreferences.set({});
+    this.favoriteGasStations.set([]);
+    this.fuelOptions.set([]);
+    this.themeLanguage.set({});
+    this.themeOptions.set([]);
+    this.languageOptions.set([]);
+    this.gasStationBrandsOptions.set([]);
+
+    // 2. Limpiar el almacenamiento físico
+    localStorage.clear();
+  }
+
 }
