@@ -153,7 +153,8 @@ public class UserServiceImpl implements UserService {
 	    RoutePreferences prefs = new RoutePreferences();
 	    
 	    prefs.setPreferredBrands(List.of());
-        prefs.setRadioKm(1);
+	    prefs.setFuelType(FuelType.ALL);
+        prefs.setRadioKm(2);
         prefs.setMaxPrice(3.0);
         prefs.setMapView(MapViewType.MAP);
         prefs.setAvoidTolls(false);
