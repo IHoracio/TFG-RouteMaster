@@ -1,66 +1,79 @@
 <div class="user-info">
   <h2>{{ translation.translate('userInfo.title') }}</h2>
-  
-    <div class="user-details">
-      <p><strong>{{ translation.translate('userInfo.email') }}</strong> {{ user().email }}</p>
-      <p><strong>{{ translation.translate('userInfo.name') }}</strong> {{ user().name }}</p>
-      <p><strong>{{ translation.translate('userInfo.surname') }}</strong> {{ user().surname }}</p>
-    </div>
-  
+
+  <div class="user-details">
+    <p><strong>{{ translation.translate('userInfo.email') }}</strong> {{ user()?.email }}</p>
+    <p><strong>{{ translation.translate('userInfo.name') }}</strong> {{ user()?.name }}</p>
+    <p><strong>{{ translation.translate('userInfo.surname') }}</strong> {{ user()?.surname }}</p>
+  </div>
+
   <div class="favorites-section">
     <h3>{{ translation.translate('userInfo.favoriteRoutes') }}</h3>
     @if (favoriteRoutes().length > 0) {
-      <ul>
-        @for (route of favoriteRoutes(); track route.routeId) {
-          <li class="route-item" (click)="toggleRouteSelection(route)">
-            <div style="display: flex; justify-content: space-between;">
-              <div>
-                <div>{{ route.name }}</div>
-                <div>{{ translation.translate('userInfo.distance') }} {{ route.distanceKm }} km</div>
-                <div>{{ translation.translate('userInfo.origin') }} {{ getOrigin(route) }}, {{ translation.translate('userInfo.destination') }} {{ getDestination(route) }}</div>
-                @if (route.canShare) {
-                  <button (click)="shareRoute(route)">{{ translation.translate('userInfo.share') }}</button>
-                }
-              </div>
-              @if (selectedRoute() === route.routeId) {
-                <div style="display: flex; flex-direction: column; gap: 5px;">
-                  <button (click)="deleteRoute(route)">{{ translation.translate('userInfo.delete') }}</button>
-                  <button (click)="renameRoute(route)">{{ translation.translate('userInfo.rename') }}</button>
-                </div>
-              }
+    <ul>
+      @for (route of favoriteRoutes(); track route.routeId) {
+      <li class="route-item" [class.active]="selectedRouteId() === route.routeId"
+        (click)="toggleRouteSelection(route.routeId)">
+        <div class="route-header">
+          <div>
+            <div class="route-name"><strong>{{ route.name }}</strong></div>
+            <div class="route-meta">{{ route.distanceKm }} km | {{ route.durationFormatted }}</div>
+            <div class="route-addresses">
+              {{ translation.translate('userInfo.origin') }}: {{ getOrigin(route) }}<br>
+              {{ translation.translate('userInfo.destination') }}: {{ getDestination(route) }}
             </div>
-          </li>
-        }
-      </ul>
+          </div>
+
+          @if (selectedRouteId() === route.routeId) {
+          <div class="actions" (click)="$event.stopPropagation()">
+            <button class="btn-delete" (click)="deleteRoute(route)">{{ translation.translate('userInfo.delete')
+              }}</button>
+            <button class="btn-rename" (click)="renameRoute(route)">{{ translation.translate('userInfo.rename')
+              }}</button>
+          </div>
+          }
+        </div>
+      </li>
+      }
+    </ul>
     } @else {
-      <p>{{ translation.translate('userInfo.noRoutes') }}</p>
+    <p class="empty-msg">{{ translation.translate('userInfo.noRoutes') }}</p>
     }
   </div>
-  
+
   <div class="favorites-section">
     <h3>{{ translation.translate('userInfo.favoriteGas') }}</h3>
     @if (favoriteGasStations().length > 0) {
-      <button (click)="toggleSortByPrice()">{{ sortByPrice() ? translation.translate('userInfo.deactivateSort') : translation.translate('userInfo.activateSort') }}</button>
-      <ul>
-        @for (station of (sortByPrice() ? sortedStations() : favoriteGasStations()); track station.idEstacion) {
-          <li class="gas-station-item" (click)="toggleGasStationSelection(station)">
-            <div>{{ station.alias || translation.translate('userInfo.alias') }} - {{ station.nombreEstacion }} - {{ station.direccion }}</div>
-            @if (selectedGasStations().has(station.idEstacion)) {
-              <div class="gas-station-details">
-                <p><strong>{{ translation.translate('userInfo.brand') }}</strong> {{ station.marca }}</p>
-                <p><strong>{{ translation.translate('userInfo.schedule') }}</strong> {{ station.horario }}</p>
-                <p><strong>{{ translation.translate('userInfo.saleType') }}</strong> {{ getStationType(station.tipoVenta) }}</p>
-                <p><strong>{{ translation.translate('userInfo.gas95') }}</strong> {{ station.Gasolina95 !== null ? station.Gasolina95 + ' €' : translation.translate('userInfo.na') }} ({{ translation.translate('userInfo.average') }} {{ station.Gasolina95_media !== null ? station.Gasolina95_media + ' €' : translation.translate('userInfo.na') }})</p>
-                <p><strong>{{ translation.translate('userInfo.gas98') }}</strong> {{ station.Gasolina98 !== null ? station.Gasolina98 + ' €' : translation.translate('userInfo.na') }} ({{ translation.translate('userInfo.average') }} {{ station.Gasolina98_media !== null ? station.Gasolina98_media + ' €' : translation.translate('userInfo.na') }})</p>
-                <p><strong>{{ translation.translate('userInfo.diesel') }}</strong> {{ station.Diesel !== null ? station.Diesel + ' €' : translation.translate('userInfo.na') }} ({{ translation.translate('userInfo.average') }} {{ station.Diesel_media !== null ? station.Diesel_media + ' €' : translation.translate('userInfo.na') }})</p>
-                <p><strong>{{ translation.translate('userInfo.dieselB') }}</strong> {{ station.DieselB !== null ? station.DieselB + ' €' : translation.translate('userInfo.na') }} ({{ translation.translate('userInfo.average') }} {{ station.DieselB_media !== null ? station.DieselB_media + ' €' : translation.translate('userInfo.na') }})</p>
-              </div>
-            }
-          </li>
+    <button class="btn-sort" (click)="toggleSortByPrice()">
+      {{ sortByPrice() ? translation.translate('userInfo.deactivateSort') :
+      translation.translate('userInfo.activateSort') }}
+    </button>
+
+    <ul>
+      @for (station of sortedStations(); track station.idEstacion) {
+      <li class="gas-station-item" (click)="toggleGasStationSelection(station.idEstacion)">
+        <div class="station-title">
+          {{ station.alias || station.nombreEstacion }} - {{ station.direccion }}
+        </div>
+
+        @if (selectedGasStations().has(station.idEstacion)) {
+        <div class="gas-station-details" (click)="$event.stopPropagation()">
+          <p><strong>{{ translation.translate('userInfo.brand') }}</strong> {{ station.marca }}</p>
+          <p><strong>{{ translation.translate('userInfo.schedule') }}</strong> {{ station.horario }}</p>
+          <p><strong>{{ translation.translate('userInfo.saleType') }}</strong> {{ getStationType(station.tipoVenta) }}
+          </p>
+
+          <div class="prices-grid">
+            <p><strong>95:</strong> {{ station.Gasolina95 ? station.Gasolina95 + ' €' : 'N/A' }}</p>
+            <p><strong>Diesel:</strong> {{ station.Diesel ? station.Diesel + ' €' : 'N/A' }}</p>
+          </div>
+        </div>
         }
-      </ul>
+      </li>
+      }
+    </ul>
     } @else {
-      <p>{{ translation.translate('userInfo.noGas') }}</p>
+    <p class="empty-msg">{{ translation.translate('userInfo.noGas') }}</p>
     }
   </div>
 </div>

@@ -17,90 +17,80 @@ export class UserInfoComponent {
 
   translation = inject(TranslationService);
 
-  private router = inject(Router);
   private userInfoService = inject(UserInfoService);
   private userPreferencesService = inject(UserPreferencesService);
 
-  favoriteRoutes = this.userInfoService.getRoutesSignal();
-
+  // Signals Globales (Lectura)
   user = this.userInfoService.getUserSignal();
-  favoriteGasStations = this.userPreferencesService.getFavoriteGasStationsSignal();
+  favoriteRoutes = this.userInfoService.getRoutesSignal();
+  favoriteGasStations = this.userPreferencesService.favoriteGasStations;
+  userPreferences = this.userPreferencesService.userPreferences;
 
-  selectedRoute = signal<string>('');
+  // Signals de Estado Local
+  selectedRouteId = signal<number | null>(null);
   selectedGasStations = signal<Set<number>>(new Set());
   sortByPrice = signal<boolean>(false);
-  userPreferences = this.userPreferencesService.getUserPreferencesSignal();
 
+  /**
+   * Computed: Ordenación reactiva. 
+   * Se recalcula automáticamente si cambia la lista, el flag de orden o el combustible preferido.
+   */
   sortedStations = computed(() => {
+    const stations = [...this.favoriteGasStations()];
+    if (!this.sortByPrice()) return stations;
+
     const fuel = this.userPreferences().fuelType || 'GASOLINE';
+    // Mapeo de campo de precio según combustible
     const priceField = (fuel === 'GASOLINE' || fuel === 'ALL' || fuel === 'ELECTRIC') ? 'Gasolina95' : 'Diesel';
-    return [...this.favoriteGasStations()].sort((a, b) => (a[priceField] || Infinity) - (b[priceField] || Infinity));
+
+    return stations.sort((a, b) => {
+      const priceA = (a as any)[priceField] ?? Infinity;
+      const priceB = (b as any)[priceField] ?? Infinity;
+      return priceA - priceB;
+    });
   });
 
-  selectStation(station: FavouriteGasStation): void {
-    this.router.navigate(['/user-preferences'], { state: { selectedStation: station } });
+  // --- Gestión de Rutas ---
+
+  toggleRouteSelection(routeId: number): void {
+    this.selectedRouteId.update(id => id === routeId ? null : routeId);
   }
-
-  shareRoute(route: any): void {
-
-  }
-
-  getOrigin(route: any): string {
-    return route.points.find((p: any) => p.type === 'ORIGIN')?.address || this.translation.translate('userInfo.na');
-  }
-
-  getDestination(route: any): string {
-    return route.points.find((p: any) => p.type === 'DESTINATION')?.address || this.translation.translate('userInfo.na');
-  }
-
 
   deleteRoute(route: any): void {
-    if (confirm(`¿Estás seguro de que quieres eliminar la ruta "${route.name}"?`)) {
-      console.log(route.routeId)
+    if (confirm(this.translation.translate('userInfo.confirmDelete') + ` "${route.name}"?`)) {
       this.userInfoService.deleteRoute(route.routeId).subscribe({
         next: () => {
-          this.favoriteRoutes.update(routes => routes.filter(r => r.routeId !== route.routeId));
-          this.selectedRoute.set('');
+          // Actualizamos la señal global (esto actualiza el localStorage automáticamente en el servicio)
+          this.userInfoService.setRoutes(this.favoriteRoutes().filter(r => r.routeId !== route.routeId));
+          this.selectedRouteId.set(null);
         },
-        error: (err) => {
-          console.error('Error eliminando ruta:', err);
-          alert('Error al eliminar la ruta. Inténtalo de nuevo.');
-        }
+        error: (err) => console.error('Error delete:', err)
       });
     }
   }
 
   renameRoute(route: any): void {
-    const newName = prompt('Ingresa el nuevo nombre para la ruta:', route.name);
-    if (newName && newName.trim()) {
+    const newName = prompt(this.translation.translate('userInfo.promptRename'), route.name);
+    if (newName && newName.trim() && newName.trim() !== route.name) {
       this.userInfoService.renameRoute(route.routeId, newName.trim()).subscribe({
         next: () => {
-          this.favoriteRoutes.update(routes => routes.map(r => r.routeId === route.routeId ? { ...r, name: newName.trim() } : r));
+          this.userInfoService.setRoutes(this.favoriteRoutes().map(r =>
+            r.routeId === route.routeId ? { ...r, name: newName.trim() } : r
+          ));
         },
-        error: (err) => {
-          console.error('Error renombrando ruta:', err);
-          alert('Error al renombrar la ruta. Inténtalo de nuevo.');
-        }
+        error: (err) => console.error('Error rename:', err)
       });
     }
   }
 
-  toggleRouteSelection(route: any): void {
-    if (this.selectedRoute() === route.routeId) {
-      this.selectedRoute.set('');
-    } else {
-      this.selectedRoute.set(route.routeId);
-    }
-  }
+  // --- Gestión de Gasolineras ---
 
-  toggleGasStationSelection(station: FavouriteGasStation): void {
+  toggleGasStationSelection(stationId: number): void {
     this.selectedGasStations.update(set => {
-      if (set.has(station.idEstacion)) {
-        set.delete(station.idEstacion);
-      } else {
-        set.add(station.idEstacion);
-      }
-      return new Set(set);
+      const newSet = new Set(set);
+      if (newSet.has(stationId)) newSet.delete(stationId);
+      else newSet.add(stationId);
+      return newSet;
     });
   }
 
@@ -108,11 +98,24 @@ export class UserInfoComponent {
     this.sortByPrice.update(v => !v);
   }
 
+  // --- Helpers ---
+
+  getOrigin(route: any): string {
+    return route.points?.find((p: any) => p.type === 'ORIGIN')?.address || this.translation.translate('userInfo.na');
+  }
+
+  getDestination(route: any): string {
+    return route.points?.find((p: any) => p.type === 'DESTINATION')?.address || this.translation.translate('userInfo.na');
+  }
+
   getStationType(type: string): string {
-    if (type === 'A') return 'Autoservicio';
-    if (type === 'S') return 'Servicio Asistido';
-    if (type === 'P' || type === 'R') return 'Convencional';
-    return type;
+    const types: Record<string, string> = {
+      'A': 'Autoservicio',
+      'S': 'Servicio Asistido',
+      'P': 'Convencional',
+      'R': 'Convencional'
+    };
+    return types[type] || type;
   }
 
 }

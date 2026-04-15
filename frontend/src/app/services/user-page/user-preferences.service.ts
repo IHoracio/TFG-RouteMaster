@@ -13,25 +13,28 @@ export class UserPreferencesService {
   private baseUrl = environment.apiUrl;
   private http = inject(HttpClient);
 
-  // Signals con valor inicial desde localStorage (si existe)
+  // Signals con valor inicial desde localStorage 
   favoriteGasStations = signal<FavouriteGasStation[]>(this.getInitial('favoriteGasStations', []));
   userPreferences = signal<any>(this.getInitial('userPreferences', {}));
-  themeLanguage = signal<any>(this.getInitial('themeLanguage', {}));
+  themeLanguage = signal<ThemeLangPreferences>(this.getInitial('themeLanguage', {}));
 
-  // Catálogos (No necesitan persistencia en localStorage, se cargan al inicio)
-  fuelOptions = signal<string[]>([]);
-  mapOptions = signal<string[]>([]);
-  themeOptions = signal<string[]>([]);
-  languageOptions = signal<string[]>([]);
-  gasStationBrandsOptions = signal<string[]>([]);
-  defaultPreferences = signal<DefaultUserPreferences | null>(null);
+  // --- CATÁLOGOS
+  fuelOptions = signal<string[]>(this.getInitial('fuelOptions', []));
+  mapOptions = signal<string[]>(this.getInitial('mapOptions', []));
+  themeOptions = signal<string[]>(this.getInitial('themeOptions', []));
+  languageOptions = signal<string[]>(this.getInitial('languageOptions', []));
+  gasStationBrandsOptions = signal<string[]>(this.getInitial('gasStationBrandsOptions', []));
+  defaultPreferences = signal<DefaultUserPreferences | null>(this.getInitial('defaultPreferences', null));
 
   private getInitial(key: string, defaultValue: any) {
     const saved = localStorage.getItem(key);
     return saved ? JSON.parse(saved) : defaultValue;
   }
 
-  // Métodos de actualización: Actualizan el Signal y el Storage
+  /**
+   * Método Pro: Actualiza la Signal y el Storage al mismo tiempo.
+   * Úsalo tanto para preferencias como para llenar los catálogos en el initApp.
+   */
   updateData<T>(sig: WritableSignal<T>, key: string, data: T) {
     sig.set(data);
     localStorage.setItem(key, JSON.stringify(data));
@@ -103,21 +106,6 @@ export class UserPreferencesService {
 
   getLanguages(): Observable<Preferences[]> {
     return this.http.get<Preferences[]>(`${this.baseUrl}/api/preferences/languages`, { withCredentials: true });
-  }
-
-  clearUserData() {
-    // 1. Resetear Signals a sus valores iniciales
-    this.userPreferences.set({});
-    this.favoriteGasStations.set([]);
-    this.fuelOptions.set([]);
-    this.themeLanguage.set({});
-    this.themeOptions.set([]);
-    this.languageOptions.set([]);
-    this.gasStationBrandsOptions.set([]);
-    this.defaultPreferences.set(null);
-
-    // 2. Limpiar el almacenamiento físico
-    localStorage.clear();
   }
 
 }

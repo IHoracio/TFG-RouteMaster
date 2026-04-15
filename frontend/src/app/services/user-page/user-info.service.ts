@@ -2,6 +2,7 @@ import { Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
+import { User } from '../../Dto/user-dtos';
 
 @Injectable({
   providedIn: 'root'
@@ -9,7 +10,7 @@ import { environment } from '../../../environments/environment';
 export class UserInfoService {
   private baseUrl = environment.apiUrl;
 
-  private userSignal = signal<any>(this.getInitial('user', {}));
+  private userSignal = signal<User | null>(this.getInitial('user', null));
   private routesSignal = signal<any[]>(this.getInitial('routes', []));
 
   private getInitial(key: string, defaultValue: any) {
@@ -57,13 +58,5 @@ export class UserInfoService {
       withCredentials: true
     });
   }
-
-  clearUserData() {
-    // 1. Resetear Signals a sus valores iniciales
-    this.userSignal.set({});
-    this.routesSignal.set([]);
-
-    // 2. Limpiar el almacenamiento físico
-    localStorage.clear();
-  }
+  
 }

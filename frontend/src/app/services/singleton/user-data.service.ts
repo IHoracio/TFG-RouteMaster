@@ -27,21 +27,36 @@ export class UserDataService {
             brands: this.gasService.getGasStationBrands(),
             routes: this.userInfoService.getUserRoutes(),
             themes: this.userPrefsService.getThemes(),
-            langs: this.userPrefsService.getLanguages()
+            langs: this.userPrefsService.getLanguages(),
+            themeLang: this.userPrefsService.getUserThemeLanguage()
         }).pipe(
             tap(data => {
-                // Distribuimos a los Signals
+                // Para los datos privados
                 this.userInfoService.setUser(data.info);
-                this.userPrefsService.userPreferences.set(data.prefs); // Aquí podrías usar tu método updateData
-                this.userPrefsService.favoriteGasStations.set(data.favs);
-                this.userPrefsService.fuelOptions.set(data.fuels.map((f: any) => f.code));
-                this.userPrefsService.mapOptions.set(data.maps.map((f: any) => f.code));
-                this.userPrefsService.defaultPreferences.set(data.defaults);
-                this.userPrefsService.gasStationBrandsOptions.set(data.brands);
                 this.userInfoService.setRoutes(data.routes);
-                this.userPrefsService.themeOptions.set(data.themes.map(t => t.code));
-                this.userPrefsService.languageOptions.set(data.langs.map(l => l.code));
-                // ... etc
+
+                // Para los catálogos y preferencias
+                // Usamos updateData (o creamos uno similar) para asegurar la persistencia
+                this.userPrefsService.updateData(this.userPrefsService.userPreferences, 'userPreferences', data.prefs);
+                this.userPrefsService.updateData(this.userPrefsService.defaultPreferences, 'defaultPreferences', data.defaults);
+
+                // === THEME + LANGUAGE (lo más importante) ===
+                this.userPrefsService.updateData(this.userPrefsService.themeLanguage, 'themeLanguage', data.themeLang);
+
+                // Para las listas (puedes crear un helper o hacerlo manual)
+                const fuelCodes = data.fuels.map((f: any) => f.code);
+                this.userPrefsService.updateData(this.userPrefsService.fuelOptions, 'fuelOptions', fuelCodes);
+
+                const mapCodes = data.maps.map((f: any) => f.code);
+                this.userPrefsService.updateData(this.userPrefsService.mapOptions, 'mapOptions', mapCodes);
+
+                const themeCodes = data.themes.map((t: any) => t.code);
+                this.userPrefsService.updateData(this.userPrefsService.themeOptions, 'themeOptions', themeCodes);
+
+                const langCodes = data.langs.map((l: any) => l.code);
+                this.userPrefsService.updateData(this.userPrefsService.languageOptions, 'languageOptions', langCodes);
+
+                this.userPrefsService.updateData(this.userPrefsService.gasStationBrandsOptions, 'gasStationBrandsOptions', data.brands);
             }),
             map(() => true),
             catchError(() => of(false)) // Si algo falla, la app sigue pero marcada como "error"

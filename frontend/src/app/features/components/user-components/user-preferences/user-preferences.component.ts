@@ -4,7 +4,6 @@ import { FormsModule } from '@angular/forms';
 import { UserPreferencesService } from '../../../../services/user-page/user-preferences.service';
 import { forkJoin } from 'rxjs';
 import { Router } from '@angular/router';
-import { UserDataService } from '../../../../services/singleton/user-data.service';
 import { GenericPreferencesComponent } from './generic-preferences/generic-preferences';
 import { GasStationsPreferencesComponent } from './gas-stations-preferences/gas-stations-preferences';
 import { VehiclePreferencesComponent } from './vehicle-preferences/vehicle-preferences';
@@ -18,108 +17,68 @@ import { TranslationService } from '../../../../services/singleton/translation.s
 })
 export class UserPreferencesComponent {
   translation = inject(TranslationService);
-  userPreferencesService = inject(UserPreferencesService);
-  userDataService = inject(UserDataService);
+  private userPreferencesService = inject(UserPreferencesService);
   router = inject(Router);
 
-  defaultUserPreferences = this.userPreferencesService.getDefaultPreferencesSignal();
+  userPreferences = this.userPreferencesService.userPreferences;
+  favoriteGasStations = this.userPreferencesService.favoriteGasStations;
+  themeLanguage = this.userPreferencesService.themeLanguage;
+
   activeSection = signal<string | null>(null);
 
-  toggleGeneric(): void {
-    this.activeSection.update(v => v === 'generic' ? null : 'generic');
-  }
-
-  toggleVehicle(): void {
-    this.activeSection.update(v => v === 'vehicle' ? null : 'vehicle');
-  }
-
-  toggleGasStations(): void {
-    this.activeSection.update(v => v === 'gasStations' ? null : 'gasStations');
-  }
-
-  showGeneric(): boolean {
-    return this.activeSection() === 'generic';
-  }
-
-  showVehicle(): boolean {
-    return this.activeSection() === 'vehicle';
-  }
-
-  showGasStations(): boolean {
-    return this.activeSection() === 'gasStations';
+  // Selectores de sección
+  toggleSection(section: string): void {
+    this.activeSection.update(v => v === section ? null : section);
   }
 
   savePreferences(): void {
-    if (!this.defaultUserPreferences()) {
-      alert('Cargando preferencias...');
-      return;
-    }
+    const prefs = this.userPreferences();
+    const themeLang = this.themeLanguage();
 
-    const prefs = this.userPreferencesService.getUserPreferencesSignal()();
-    const themeLang = this.userPreferencesService.getThemeLanguageSignal()();
-
+    // 1. Llamadas al servidor
     const updatePrefs$ = this.userPreferencesService.updateUserPreferences(
       prefs.radioKm, prefs.fuelType, prefs.maxPrice, prefs.mapView, prefs.avoidTolls, prefs.preferredBrands
     );
-
     const updateTheme$ = this.userPreferencesService.updateUserThemeLanguage(themeLang.theme, themeLang.language);
 
-    const newFavorites = this.userPreferencesService.getFavoriteGasStationsSignal()().filter(f => !this.userPreferencesService.getFavoriteGasStationsSignal()().some(orig => orig.idEstacion === f.idEstacion));
-    const updateFavorites$ = newFavorites.map(f => this.userPreferencesService.updateFavouriteGasStations(f.alias, f.idEstacion));
-
-    forkJoin([updatePrefs$, updateTheme$, ...updateFavorites$]).subscribe({
+    // 2. Ejecutar y sincronizar
+    forkJoin([updatePrefs$, updateTheme$]).subscribe({
       next: () => {
-        this.userDataService.updateUserPreferences(prefs);
-        this.userDataService.updateThemeLanguage(themeLang);
-        history.scrollRestoration = 'manual';
+        // Al usar Signals y estar vinculados al localStorage en el servicio, 
+        // solo con que la petición sea exitosa ya estamos tranquilos.
+        // Si el usuario vuelve atrás, los signals ya tienen los valores actuales.
         window.scrollTo(0, 0);
-        this.router.navigate([`/user`]);
+        this.router.navigate(['/user']);
       },
-      error: (err) => {
-        alert('Error saving: ' + (err?.message || 'Unknown'));
-      }
+      error: (err) => alert('Error al guardar: ' + (err?.message || 'Desconocido'))
     });
   }
 
   resetPreferences(): void {
-    if (!this.defaultUserPreferences()) {
-      alert('Cargando...');
+    const defaults = this.userPreferencesService.defaultPreferences();
+
+    if (!defaults) {
+      console.warn('No hay valores por defecto cargados');
       return;
     }
 
-    const defaults = this.defaultUserPreferences();
-    this.userPreferencesService.setUserPreferences({
-      fuelType: defaults.fuelType || 'GASOLINE',
-      emissionType: defaults.emissionType || 'B',
-      maxPrice: defaults.maxPrice || 1.5,
-      mapView: defaults.mapView || 'MAP',
-      avoidTolls: defaults.avoidTolls || false,
-      radioKm: defaults.radioKm || 1,
+    // 1. Aplicamos los valores de la Signal de defaults a la Signal de usuario
+    // Esto actualiza la UI y el LocalStorage inmediatamente
+    this.userPreferencesService.updateData(this.userPreferences, 'userPreferences', {
+      fuelType: defaults.fuelType,
+      maxPrice: defaults.maxPrice,
+      mapView: defaults.mapView,
+      avoidTolls: defaults.avoidTolls,
+      radioKm: defaults.radioKm,
       preferredBrands: defaults.preferredBrands || []
     });
-    this.userPreferencesService.setThemeLanguage({ theme: 'LIGHT', language: 'ES' });
-    this.userPreferencesService.setFavoriteGasStations([]);
 
-    const prefs = this.userPreferencesService.getUserPreferencesSignal()();
-    const themeLang = this.userPreferencesService.getThemeLanguageSignal()();
+    // 2. Persistimos en el servidor
+    this.savePreferences();
+  }
 
-    const updatePrefs$ = this.userPreferencesService.updateUserPreferences(
-      prefs.radioKm, prefs.fuelType, prefs.maxPrice, prefs.mapView, prefs.avoidTolls, prefs.preferredBrands
-    );
-
-    const updateTheme$ = this.userPreferencesService.updateUserThemeLanguage(themeLang.theme, themeLang.language);
-
-    forkJoin([updatePrefs$, updateTheme$]).subscribe({
-      next: () => {
-        this.userDataService.updateUserPreferences(prefs);
-        this.userDataService.updateThemeLanguage(themeLang);
-        history.scrollRestoration = 'manual';
-        window.scrollTo(0, 0);
-        this.router.navigate(['/user-preferences']);
-      },
-      error: (err) => {
-        alert('Error resetting: ' + (err?.message || 'Error desconocido'));
-      }
-    });
+  // Helpers para el HTML
+  isSectionActive(section: string): boolean {
+    return this.activeSection() === section;
   }
 }

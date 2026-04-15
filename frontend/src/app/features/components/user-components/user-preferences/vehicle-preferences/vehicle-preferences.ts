@@ -11,22 +11,39 @@ import { TranslationService } from '../../../../../services/singleton/translatio
   styleUrls: ['./vehicle-preferences.css']
 })
 export class VehiclePreferencesComponent {
-  userPreferencesService = inject(UserPreferencesService);
+  private userPreferencesService = inject(UserPreferencesService);
   translation = inject(TranslationService);
+
+  // Referencias directas a las señales
+  userPreferences = this.userPreferencesService.userPreferences;
+  fuelOptions = this.userPreferencesService.fuelOptions;
 
   setFuelType(event: Event): void {
     const value = (event.target as HTMLSelectElement).value;
-    this.userPreferencesService.setUserPreferences({ ...this.userPreferencesService.getUserPreferencesSignal()(), fuelType: value });
+    this.userPreferencesService.updateData(this.userPreferences, 'userPreferences', {
+      ...this.userPreferences(),
+      fuelType: value
+    });
   }
 
   setMaxPrice(event: Event): void {
     const value = parseFloat((event.target as HTMLInputElement).value) || 0;
-    this.userPreferencesService.setUserPreferences({ ...this.userPreferencesService.getUserPreferencesSignal()(), maxPrice: value });
+    this.updateVehiclePref({ maxPrice: value });
   }
 
   setAvoidTolls(event: Event): void {
     const value = (event.target as HTMLInputElement).checked;
-    this.userPreferencesService.setUserPreferences({ ...this.userPreferencesService.getUserPreferencesSignal()(), avoidTolls: value });
+    this.updateVehiclePref({ avoidTolls: value });
+  }
+
+  /**
+   * Helper privado para evitar repetir la lógica de updateData
+   */
+  private updateVehiclePref(partial: Partial<any>): void {
+    this.userPreferencesService.updateData(this.userPreferences, 'userPreferences', {
+      ...this.userPreferences(),
+      ...partial
+    });
   }
 
 }

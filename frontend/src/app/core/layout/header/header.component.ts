@@ -1,5 +1,5 @@
 import { Component, OnInit, computed, signal, ChangeDetectorRef } from '@angular/core';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../../services/auth/auth-service.service';
 import { ThemeService } from '../../../services/singleton/theme.service';
 import { UserPreferencesService } from '../../../services/user-page/user-preferences.service';
@@ -29,7 +29,8 @@ export class HeaderComponent implements OnInit {
     public theme: ThemeService,
     private authService: AuthService,
     private cdr: ChangeDetectorRef,
-    private loginPromptService: LoginPromptService
+    private loginPromptService: LoginPromptService,
+    private router: Router
   ) { }
 
   ngOnInit() {
@@ -57,11 +58,9 @@ export class HeaderComponent implements OnInit {
   switchTheme() {
     this.theme.toggleTheme();
   }
-  
+
   logout() {
-    this.authService.logout().subscribe(() => {
-      this.authService.sendUserSession(false);
-    });
+    this.router.navigate(['/logout']);
   }
 
   onPersonalAreaClick(event: Event) {
