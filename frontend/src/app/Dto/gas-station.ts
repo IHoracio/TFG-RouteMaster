@@ -1,3 +1,5 @@
+import { PlaceSelection } from "./place-selection";
+
 export interface GasStation {
   idEstacion: number;
   nombreEstacion: string;
@@ -29,4 +31,5 @@ export interface GasStation {
 
 export interface FavouriteGasStation extends GasStation {
   alias: string;
+  placeSelection: PlaceSelection
 }
