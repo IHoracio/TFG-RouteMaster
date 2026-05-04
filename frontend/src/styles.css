@@ -3,11 +3,13 @@
    ======================================== */
 :root {
   --bg-color: #aed1ff;
-  --surface-color: #8abdfa;
+  --surface-color: #b8e7f65c;
   --surface-secondary: #bcdcff;
+  --autocomplete-surface: #8abdfa;
 
   --text-color: #102357;
   --text-secondary: #57687f;
+  --text-off: #041c4e;
 
   --border-color: #64748b;
 
@@ -46,9 +48,11 @@
   --bg-color: #0f172a;
   --surface-color: #1e293b;
   --surface-secondary: #1a2130;
+  --autocomplete-surface: #1e293b;
 
   --text-color: #93c5fd;
   --text-secondary: #64748b;
+  --text-off: #f8faff;
 
   --border-color: #334155;
 
@@ -166,4 +170,23 @@ input:-webkit-autofill:active {
 input:-moz-autofill {
   background-color: var(--surface-secondary) !important;
   color: var(--text-color) !important;
+}
+
+/* --- Estilos para Chrome, Safari, Edge y Opera --- */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  /* Cambia el aspecto general */
+  height: 30px;
+  opacity: 1;
+  background: var(--secondary-color); /* Color de fondo si el navegador lo permite */
+  cursor: pointer;
+  
+  /* Un truco para cambiar el color de la flecha negra por defecto a uno de tu tema */
+  filter: sepia(100%) hue-rotate(190deg) saturate(500%); 
+}
+
+/* --- Estilos para Firefox --- */
+input[type="number"] {
+  -moz-appearance: textfield; /* Firefox a veces requiere ocultarlas para personalizarlas */
+  appearance: textfield;
 }
