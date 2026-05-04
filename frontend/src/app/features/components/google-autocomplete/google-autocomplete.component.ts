@@ -29,7 +29,7 @@ Element.prototype.attachShadow = function (init: ShadowRootInit) {
       
       /* Lista desplegable */
       .dropdown {
-        background-color: var(--surface-color) !important;
+        background-color: var(--autocomplete-surface) !important;
         border: 1px solid var(--border-color) !important;
         border-radius: 0 0 8px 8px !important;
         box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
@@ -40,6 +40,22 @@ Element.prototype.attachShadow = function (init: ShadowRootInit) {
         margin-left: 12px !important;
         display: flex;
         align-items: center;
+        overflow: hidden !important;
+        max-width: 100% !important;
+      }
+
+      /* Icono de marcador: limitar tamaño y evitar desbordamiento */
+      .place-autocomplete-element-place-icon,
+      .place-autocomplete-element-place-icon-marker {
+        flex-shrink: 0 !important;
+        max-width: 24px !important;
+        max-height: 24px !important;
+        width: 24px !important;
+        height: 24px !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        overflow: hidden !important;
       }
 
       /* Textos de predicción */

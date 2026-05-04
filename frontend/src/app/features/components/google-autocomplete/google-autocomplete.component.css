@@ -11,14 +11,3 @@
   display: block;
 }
 
-/* INPUT */
-:host ::ng-deep input {
-  background-color: var(--surface-secondary) !important;
-  color: var(--text-color) !important;
-}
-
-/* Placeholder */
-:host ::ng-deep input::placeholder {
-  color: var(--text-secondary) !important;
-  opacity: 0.7 !important;
-}
