@@ -38,10 +38,15 @@ export class UserDataService {
                 // Para los catálogos y preferencias
                 // Usamos updateData (o creamos uno similar) para asegurar la persistencia
                 this.userPrefsService.updateData(this.userPrefsService.userPreferences, 'userPreferences', data.prefs);
+                this.userPrefsService.updateData(this.userPrefsService.serverUserPreferences, 'userPreferences', data.prefs);
                 this.userPrefsService.updateData(this.userPrefsService.defaultPreferences, 'defaultPreferences', data.defaults);
 
-                // === THEME + LANGUAGE (lo más importante) ===
+                // === THEME + LANGUAGE ===
+                this.userPrefsService.updateData(this.userPrefsService.serverThemeLanguage, 'themeLanguage', data.themeLang);
                 this.userPrefsService.updateData(this.userPrefsService.themeLanguage, 'themeLanguage', data.themeLang);
+
+                // === GASOLINERAS FAVORITAS (Añadido para persistencia) ===
+                this.userPrefsService.updateData(this.userPrefsService.favoriteGasStations, 'favoriteGasStations', data.favs);
 
                 // Para las listas (puedes crear un helper o hacerlo manual)
                 const fuelCodes = data.fuels.map((f: any) => f.code);

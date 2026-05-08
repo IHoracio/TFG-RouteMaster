@@ -10,6 +10,7 @@
   --text-color: #102357;
   --text-secondary: #57687f;
   --text-off: #041c4e;
+  --text-on: #f8faff;
 
   --border-color: #64748b;
 
@@ -53,6 +54,7 @@
   --text-color: #93c5fd;
   --text-secondary: #64748b;
   --text-off: #f8faff;
+  --text-on: #041c4e;
 
   --border-color: #334155;
 

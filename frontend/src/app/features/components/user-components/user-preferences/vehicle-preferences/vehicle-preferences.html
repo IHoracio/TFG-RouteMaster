@@ -11,13 +11,52 @@
     </select>
   </div>
 
-  @if (userPreferences().fuelType !== 'ELECTRIC') {
   <div class="form-group">
     <label for="maxPrice">{{ translation.translate('preferences.maxPrice') }}</label>
     <input id="maxPrice" type="number" [value]="userPreferences().maxPrice" (input)="setMaxPrice($event)" min="0"
       step="0.01">
   </div>
-  }
+
+  <div class="form-group">
+    <label for="brandSearch">{{ translation.translate('preferences.addBrand') }}</label>
+    <input type="text" [value]="brandSearch()" (input)="setBrandSearch($event)"
+      placeholder="{{ translation.translate('preferences.searchBrand') }}">
+
+    @if (showBrandDropdown() && filteredBrands().length > 0) {
+    <ul class="dropdown-list">
+      @for (brand of filteredBrands(); track brand) {
+      <li (click)="addPreferredBrand(brand)">{{ capitalize(brand) }}</li>
+      }
+    </ul>
+    }
+  </div>
+
+  <div class="form-group">
+    <label>{{ translation.translate('preferences.favoriteBrands') }}</label>
+    <ul>
+      @for (brand of userPreferences().preferredBrands; track brand) {
+      <li>
+        {{ capitalize(brand) }}
+        <button type="button" class="btn" (click)="removePreferredBrand(brand)">
+          {{ translation.translate('preferences.remove') }}
+        </button>
+      </li>
+      }
+    </ul>
+  </div>
+
+  <div class="form-group radio-slider">
+    <div class="label-container">
+      <label for="radioKm">{{ translation.translate('preferences.radioKm') }}</label>
+      <span class="info-icon" [title]="translation.translate('preferences.radioKmInfo')">?</span>
+    </div>
+    <div class="slider-container">
+      <input id="radioKm" type="range" [value]="userPreferences().radioKm" (input)="setRadioKm($event)" min="1" max="15"
+        step="1">
+      <span>{{ userPreferences().radioKm }} km</span>
+    </div>
+  </div>
+
 
   <div class="form-group">
     <label for="avoidTolls">{{ translation.translate('preferences.avoidTolls') }}</label>

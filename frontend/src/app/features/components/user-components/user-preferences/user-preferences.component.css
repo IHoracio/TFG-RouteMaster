@@ -12,6 +12,10 @@
   margin-bottom: var(--spacing-md);
 }
 
+.user-preferences h2.secondTitle {
+  margin-top: var(--spacing-md);
+}
+
 .preferences-form {
   display: flex;
   flex-direction: column;
@@ -261,7 +265,7 @@
 .collapsible-header {
   cursor: pointer;
   background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
-  color: white;
+  color: whitesmoke;
   padding: 0.85rem 1rem;
   margin: 0;
   font-size: 1rem;

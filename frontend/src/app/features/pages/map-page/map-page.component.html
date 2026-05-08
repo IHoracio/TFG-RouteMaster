@@ -1,54 +1,76 @@
 <div class="map-wrapper">
   <div id="map" class="map-canvas" [class.is-loading]="!mapReady()" aria-label="Mapa"></div>
   @if (!mapReady()) {
-    <div class="map-loading" aria-hidden="true"></div>
+  <div class="map-loading" aria-hidden="true"></div>
   }
 
   @if (selectedGasStation()) {
   <div class="gas-station-widget" (click)="closeWidget()">
     <div class="widget-content" (click)="$event.stopPropagation()">
       <h3>{{ selectedGasStation()!.nombreEstacion }}</h3>
-      @if (selectedGasStation()!.marca !== translation.translate('userInfo.na')) {
-        <p><strong>{{ translation.translate('userInfo.brand') }}</strong> {{ selectedGasStation()!.marca }}</p>
-      }
-      @if (selectedGasStation()!.horario !== translation.translate('userInfo.na')) {
-        <p><strong>{{ translation.translate('userInfo.schedule') }}</strong> {{ selectedGasStation()!.horario }}</p>
-      }
-      @if (selectedGasStation()!.Gasolina95 !== null) {
-        <p><strong>{{ translation.translate('userInfo.gas95') }}</strong> {{ selectedGasStation()!.Gasolina95 + ' €' }} ({{ translation.translate('userInfo.average') }} {{ selectedGasStation()!.Gasolina95_media !== null ? selectedGasStation()!.Gasolina95_media + ' €' : translation.translate('userInfo.na') }})</p>
-      }
-      @if (selectedGasStation()!.Gasolina98 !== null) {
-        <p><strong>{{ translation.translate('userInfo.gas98') }}</strong> {{ selectedGasStation()!.Gasolina98 + ' €' }} ({{ translation.translate('userInfo.average') }} {{ selectedGasStation()!.Gasolina98_media !== null ? selectedGasStation()!.Gasolina98_media + ' €' : translation.translate('userInfo.na') }})</p>
-      }
-      @if (selectedGasStation()!.Diesel !== null) {
-        <p><strong>{{ translation.translate('userInfo.diesel') }}</strong> {{ selectedGasStation()!.Diesel + ' €' }} ({{ translation.translate('userInfo.average') }} {{ selectedGasStation()!.Diesel_media !== null ? selectedGasStation()!.Diesel_media + ' €' : translation.translate('userInfo.na') }})</p>
-      }
-      @if (selectedGasStation()!.DieselB !== null) {
-        <p><strong>{{ translation.translate('userInfo.dieselB') }}</strong> {{ selectedGasStation()!.DieselB + ' €' }} ({{ translation.translate('userInfo.average') }} {{ selectedGasStation()!.DieselB_media !== null ? selectedGasStation()!.DieselB_media + ' €' : translation.translate('userInfo.na') }})</p>
-      }
+      <div class="selected-station-details">
+        <p [class.strikethrough]="selectedGasStation()!.marca === translation.translate('userInfo.na')">
+          <strong>{{ translation.translate('userInfo.brand') }}</strong>
+          {{ selectedGasStation()!.marca }}
+        </p>
+
+        <p [class.strikethrough]="selectedGasStation()!.horario === translation.translate('userInfo.na')">
+          <strong>{{ translation.translate('userInfo.schedule') }}</strong>
+          {{ selectedGasStation()!.horario }}
+        </p>
+
+        <p>
+          <strong [class.strikethrough]="selectedGasStation()!.Gasolina95 === null">{{ translation.translate('userInfo.gas95') }}</strong>
+          {{ selectedGasStation()!.Gasolina95 ? selectedGasStation()!.Gasolina95 + ' €' : '' }}
+          ({{ translation.translate('userInfo.average') }} {{ selectedGasStation()!.Gasolina95_media !== null ?
+          selectedGasStation()!.Gasolina95_media + ' €' : translation.translate('userInfo.na') }})
+        </p>
+
+        <p>
+          <strong [class.strikethrough]="selectedGasStation()!.Gasolina98 === null">{{ translation.translate('userInfo.gas98') }}</strong>
+          {{ selectedGasStation()!.Gasolina98 ? selectedGasStation()!.Gasolina98 + ' €' : '' }}
+          ({{ translation.translate('userInfo.average') }} {{ selectedGasStation()!.Gasolina98_media !== null ?
+          selectedGasStation()!.Gasolina98_media + ' €' : translation.translate('userInfo.na') }})
+        </p>
+
+        <p>
+          <strong [class.strikethrough]="selectedGasStation()!.Diesel === null">{{ translation.translate('userInfo.diesel') }}</strong>
+          {{ selectedGasStation()!.Diesel ? selectedGasStation()!.Diesel + ' €' : '' }}
+          ({{ translation.translate('userInfo.average') }} {{ selectedGasStation()!.Diesel_media !== null ?
+          selectedGasStation()!.Diesel_media + ' €' : translation.translate('userInfo.na') }})
+        </p>
+
+        <p>
+          <strong [class.strikethrough]="selectedGasStation()!.DieselPremium === null">{{ translation.translate('userInfo.dieselPremium') }}</strong>
+          {{ selectedGasStation()!.DieselPremium ? selectedGasStation()!.DieselPremium + ' €' : '' }}
+          ({{ translation.translate('userInfo.average') }} {{ selectedGasStation()!.DieselPremium_media !== null ?
+          selectedGasStation()!.DieselPremium_media + ' €' : translation.translate('userInfo.na') }})
+        </p>
+
+        <p>
+          <strong [class.strikethrough]="selectedGasStation()!.GLP === null">{{ translation.translate('userInfo.glp') }}</strong>
+          {{ selectedGasStation()!.GLP ? selectedGasStation()!.GLP + ' €' : '' }}
+          ({{ translation.translate('userInfo.average') }} {{ selectedGasStation()!.GLP_media !== null ?
+          selectedGasStation()!.GLP_media + ' €' : translation.translate('userInfo.na') }})
+        </p>
+      </div>
       <button (click)="closeWidget()">Cerrar</button>
     </div>
   </div>
-}
+  }
 
   @if (showWeather() && mapReady()) {
-    @if (showWeatherOverlay()) {
-      <div class="weather-overlay-host__container">
-        <app-weather-overlay
-          [data]="weatherRoute()"
-          [routeCreated]="createdRoute()"
-          (close)="closeWeatherOverlay()">
-        </app-weather-overlay>
-      </div>
-    } @else {
-      <button 
-        class="weather-overlay-toggle" 
-        (click)="openWeatherOverlay()" 
-        [disabled]="!createdRoute()"
-        [attr.aria-label]="translation.translate('weather.title')" 
-        [title]="createdRoute() ? translation.translate('weather.open') : translation.translate('weather.needRoute')">
-        ☁️
-      </button>
-    }
+  @if (showWeatherOverlay()) {
+  <div class="weather-overlay-host__container">
+    <app-weather-overlay [data]="weatherRoute()" [routeCreated]="createdRoute()" (close)="closeWeatherOverlay()">
+    </app-weather-overlay>
+  </div>
+  } @else {
+  <button class="weather-overlay-toggle" (click)="openWeatherOverlay()" [disabled]="!createdRoute()"
+    [attr.aria-label]="translation.translate('weather.title')"
+    [title]="createdRoute() ? translation.translate('weather.open') : translation.translate('weather.needRoute')">
+    ☁️
+  </button>
+  }
   }
 </div>

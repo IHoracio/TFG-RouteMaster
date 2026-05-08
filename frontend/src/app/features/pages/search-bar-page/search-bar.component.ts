@@ -4,15 +4,14 @@ import { MapPageComponent } from '../map-page/map-page.component';
 import { SearchBarService } from '../../../services/search-bar/search-bar.service';
 import { NgClass } from '@angular/common';
 import { RouteService } from '../../../services/routes/route.service';
-import { FavouriteGasStation, GasStation } from '../../../Dto/gas-station';
+import { GasStation } from '../../../Dto/gas-station';
 import { UserInfoService } from '../../../services/user-page/user-info.service';
 import { UserPreferencesService } from '../../../services/user-page/user-preferences.service';
 import { AuthService } from '../../../services/auth/auth-service.service';
-import { AuthGuard } from '../../../guards/auth.guard';
 import { MapCommunicationService } from '../../../services/map/map-communication.service';
 import { LoginPromptComponent } from '../../components/search-bar-components/login-prompt/login-prompt.component';
 import { LoginPromptService } from '../../../services/login-prompt/login-prompt.service';
-import { SavedRouteDto, RoutePreferencesDto, RoutePointDto } from '../../../Dto/user-dtos';
+import { SavedRouteDto } from '../../../Dto/user-dtos';
 import { SearchBarTabsComponent } from '../../components/search-bar-components/search-bar-tabs/search-bar-tabs.component';
 import { SearchBarFiltersComponent } from '../../components/search-bar-components/search-bar-filters/search-bar-filters.component';
 import { SearchBarFormComponent } from '../../components/search-bar-components/search-bar-form/search-bar-form.component';
@@ -22,292 +21,164 @@ import { TranslationService } from '../../../services/singleton/translation.serv
 
 @Component({
   selector: 'app-search-bar',
+  standalone: true,
   imports: [MapPageComponent, NgClass, LoginPromptComponent, SearchBarTabsComponent, SearchBarFiltersComponent, SearchBarFormComponent],
   templateUrl: './search-bar.component.html',
   styleUrl: './search-bar.component.css'
 })
 export class SearchBarComponent implements OnInit {
+  // Inyecciones
+  private searchBarService = inject(SearchBarService);
+  private routeService = inject(RouteService);
+  private authService = inject(AuthService);
+  private mapCommunication = inject(MapCommunicationService);
+  private activatedRoute = inject(ActivatedRoute);
 
+  translation = inject(TranslationService);
+  userInfoService = inject(UserInfoService);
+  userPrefsService = inject(UserPreferencesService);
+  loginPromptService = inject(LoginPromptService);
+
+  // Salidas
   originSelected = output<PlaceSelection>();
   destinationSelected = output<PlaceSelection>();
   waypointSelected = output<{ index: number; selection: PlaceSelection }>();
 
+  // --- SIGNALS DE ESTADO LOCAL
   isLoggedIn = signal<boolean>(false);
-  isFormCollapsed: boolean = false;
-  showShareMessage = signal(false);
-  createdRoute = signal(false);
-  loginPromptService = inject(LoginPromptService);
-
+  isFormCollapsed = signal<boolean>(false);
+  showShareMessage = signal<boolean>(false);
+  createdRoute = signal<boolean>(false);
   allGasStations = signal<GasStation[]>([]);
+
+  // Filtros UI
   filterByBrands = signal<boolean>(false);
   filterByCheapest = signal<boolean>(false);
   filterByMaxPrice = signal<boolean>(false);
 
-  translation = inject(TranslationService);
-  userInfo = inject(UserInfoService);
-  userPreferences = inject(UserPreferencesService);
+  activeTab = signal<string>('destination');
+  selectedSavedRouteId = signal<string | null>(null);
+  routeAlias = signal<string>("");
 
-  favouriteGasStations = signal<FavouriteGasStation[]>([]);
-  savedRoute = signal<SavedRouteDto[]>([]);
-  preferredBrands: string[] = [];
-  fuelType: string = 'ALL';
-  maxPrice: number = 0;
-  radioKm: number = 2;
-  destinationType: string = "";
-  routeAlias: string = "";
-  selectedRouteOption = {
-    origin: null,
-    destination: null
-  };
+  // Mensajes
+  successfulMessage = signal<string>("");
+  errorMessage = signal<string>("");
 
+  // --- REFERENCIAS A SIGNALS GLOBALES (Fuente única de verdad)
+  favoriteGasStations = this.userPrefsService.favoriteGasStations;
+  savedRoutes = this.userInfoService.getRoutesSignal();
+  userPrefs = this.userPrefsService.userPreferences;
+
+  // Modelo de formulario reactivo al estado
   routeFormResponse: RouteFormResponse = {
     origin: null,
     destination: null,
     waypoints: [],
     optimizeWaypoints: false,
     optimizeRoute: false,
-    avoidTolls: false
+    avoidTolls: false,
+    radioKm: 2
   };
 
   waypointTypes: string[] = [];
 
-  destinationTypeOptions: Record<string, string> = {
-    coordinates: "Destino",
-    favouriteGasStations: "Gasolinera favorita",
-    savedRoute: "Ruta guardada"
-  };
-
-  activeTab: string = 'destination';
-  selectedSavedRoute: string | null = null;
-
   @ViewChild('card', { static: true }) card!: ElementRef;
-  @ViewChild('formWrapper') formWrapper!: ElementRef;
 
-  scrollToCard() {
-    if (window.innerWidth >= 768) {
-      const rect = this.card.nativeElement.getBoundingClientRect();
-      const offset = 205;
-      window.scrollTo({
-        top: window.scrollY + rect.top + offset,
-        behavior: 'smooth'
-      });
-    }
-  }
-
-  constructor(private searchBarService: SearchBarService, private routeService: RouteService, private authService: AuthService, private authGuard: AuthGuard, private mapCommunication: MapCommunicationService, private activatedRoute: ActivatedRoute) {
+  constructor() {
+    // Sincronización automática con el mapa cuando cambian las gasolineras filtradas
     effect(() => {
       this.mapCommunication.sendGasStations(this.filteredGasStations());
+    });
+
+    // Efecto para hidratar el formulario cuando las preferencias del usuario cambian (al loguear o resetear)
+    effect(() => {
+      const prefs = this.userPrefs();
+      if (prefs && Object.keys(prefs).length > 0) {
+        this.routeFormResponse.avoidTolls = prefs.avoidTolls ?? false;
+        this.routeFormResponse.radioKm = prefs.radioKm ?? 2;
+      }
     });
   }
 
   ngOnInit(): void {
-    this.authGuard.isLoggedIn().subscribe(logged => {
-      this.authService.sendUserSession(logged);
-    });
-
-    this.activatedRoute.paramMap.subscribe(params => {
-      const token = params.get('token');
-
-      if (token) {
-        this.loadSharedRoute(token);
-      }
-    });
-
+    // Escuchar estado de sesión
     this.authService.getUserSession().subscribe(logged => {
       this.isLoggedIn.set(logged);
-      if (logged) {
-        this.userPreferences.getUserPreferences().subscribe((pref: RoutePreferencesDto) => {
-          this.routeFormResponse.avoidTolls = pref.avoidTolls;
-          this.preferredBrands = pref.preferredBrands;
-          this.fuelType = pref.fuelType;
-          this.maxPrice = pref.maxPrice;
-          this.radioKm = pref.radioKm;
-          this.routeFormResponse.radioKm = pref.radioKm;
-        });
-        this.searchBarService
-          .saveFavouriteGasStations()
-          .subscribe(gas => {
-            const parsedGas = JSON.parse(gas) as FavouriteGasStation[];
-            console.log('Gasolineras parseadas:', parsedGas);
-            this.favouriteGasStations.set(parsedGas);
-          });
-        this.searchBarService
-          .saveSavedRoutes()
-          .subscribe(route => {
-            try {
-              const parsedRoutes = JSON.parse(route) as SavedRouteDto[];
-              this.savedRoute.set(parsedRoutes);
-            } catch (e) {
-            }
-          });
-      } else {
-        this.favouriteGasStations.set([]);
-        this.savedRoute.set([]);
-        this.fuelType = 'ALL';
-        this.maxPrice = 0;
-        this.radioKm = 1;
-        this.routeFormResponse.radioKm = 1;
-      }
+    });
+
+    // Detectar ruta compartida por Token
+    this.activatedRoute.paramMap.subscribe(params => {
+      const token = params.get('token');
+      if (token) this.loadSharedRoute(token);
     });
   }
 
-  setTab(tab: string) {
-    if (tab === 'gas' || tab === 'route') {
-      if (!this.isLoggedIn()) {
-        this.loginPromptService.openLoginPrompt();
-        return;
-      }
-    }
-    this.activeTab = tab;
-  }
-
-  shareRoute() {
-    const polylineCoords = this.mapCommunication?.getPolylineCoords() || [];
-    const legCoords = this.mapCommunication?.getLegCoords() || [];
-    const gasRadius = this.routeFormResponse.radioKm || 1;
-    const lang = this.translation.getCurrentLang ? this.translation.getCurrentLang() : 'es';
-
-    this.routeService.shareRoute(polylineCoords, legCoords, gasRadius, lang).subscribe({
-      next: (resp) => {
-        navigator.clipboard.writeText(resp.url).then(() => {
-          this.showShareMessage.set(true);
-          setTimeout(() => this.showShareMessage.set(false), 2000);
-        });
-      },
-      error: () => {
-        this.showShareMessage.set(true);
-        setTimeout(() => this.showShareMessage.set(false), 2000);
-      }
-    });
-  }
-
-  loadSharedRoute(token: string) {
-    this.routeService.getSharedRoute(token).subscribe({
-      next: (data) => {
-        if (data.polylineCoords && data.polylineCoords.length) {
-          this.mapCommunication.sendRoute(data.polylineCoords);
-        }
-        if (data.legCoords && data.legCoords.length) {
-          this.mapCommunication.sendPoints(data.legCoords);
-        }
-        if (data.gasStations && data.gasStations.length) {
-          this.mapCommunication.sendGasStations(data.gasStations);
-        }
-        if (data.weatherData && data.weatherData.length) {
-          this.mapCommunication.sendWeather(data.weatherData);
-        }
-      },
-      error: (err) => {
-        this.errorMessage = this.translation.translate('search.routeNotFound') || 'No se pudo cargar la ruta compartida.';
-        this.successfulMessage = '';
-        console.error('Error al cargar la ruta compartida:', err);
-      }
-    });
-  }
-  addWaypoint() {
-    // Mantenemos el límite de 5 para no saturar la API (o tu UI)
-    if (this.routeFormResponse.waypoints.length < 5) {
-
-      // Añadimos null o un objeto vacío tipado como PlaceSelection
-      // Usamos 'as any' o 'null' dependiendo de qué tan estricto sea tu linter
-      this.routeFormResponse.waypoints.push(null as any);
-
-      this.waypointTypes.push('text');
-
-    }
-  }
-
-  deleteWaypoint() {
-    this.routeFormResponse.waypoints.pop();
-    this.waypointTypes.pop();
-  }
-
-  savedRouteSelected() {
-    this.routeFormResponse.origin = this.selectedRouteOption.origin;
-    this.routeFormResponse.destination = this.selectedRouteOption.destination;
-  }
-
-  submitted: boolean = false;
-  onSubmit() {
-    this.submitted = true;
-    if (this.activeTab === 'route') {
-      const selected = this.selectedSavedRoute;
-      const route = this.savedRoute().find(r => r.routeId == selected);
-
-      if (route && Array.isArray(route.points)) {
-        // Extraemos los puntos buscando el objeto placeSelection directamente
-        const originPoint = route.points.find(p => p.type === 'ORIGIN')?.placeSelection || null;
-        const destPoint = route.points.find(p => p.type === 'DESTINATION')?.placeSelection || null;
-
-        // Los waypoints se convierten en un array de PlaceSelection en una sola línea
-        const waypoints = route.points
-          .filter(p => p.type === 'WAYPOINT')
-          .map(p => p.placeSelection);
-
-        this.routeFormResponse = {
-          origin: originPoint,
-          destination: destPoint,
-          waypoints: waypoints,
-          optimizeWaypoints: route.optimizeWaypoints ?? false,
-          optimizeRoute: route.optimizeRoute ?? false,
-          avoidTolls: route.avoidTolls ?? false
-        };
-      }
-    }
-    this.searchBarService.onSubmit(this.routeFormResponse).subscribe({
-      next: (gasStations) => {
-        this.allGasStations.set(gasStations);
-        this.createdRoute.set(true);
-      },
-      error: (err) => {
-        console.error('Error en onSubmit:', err);
-      }
-    });
-  }
-
+  // --- LÓGICA DE FILTRADO (Computed)
   filteredGasStations = computed(() => {
     let stations = this.allGasStations();
+    const prefs = this.userPrefs();
+    const fuelType = prefs.fuelType || 'GASOLINE';
+    const fuelKey = (fuelType === 'ALL' || fuelType === 'GASOLINE') ? 'Gasolina95' : 'Diesel';
+
     if (this.isLoggedIn() && this.filterByBrands()) {
-      stations = stations.filter(station =>
-        this.preferredBrands.some(brand => brand.toLowerCase() === station.marca.toLowerCase())
-      );
+      const brands = prefs.preferredBrands || [];
+      stations = stations.filter(s => brands.some((b: string) => b.toLowerCase() === s.marca.toLowerCase()));
     }
+
     if (this.filterByCheapest()) {
-      const fuelKey = (this.fuelType === 'ALL' || this.fuelType === 'GASOLINE') ? 'Gasolina95' : 'Diesel';
       const cheapest = stations.reduce((min, station) => {
         const price = station[fuelKey];
         return price != null && (min.price == null || price < min.price) ? { station, price } : min;
       }, { station: null as GasStation | null, price: null as number | null });
       stations = cheapest.station ? [cheapest.station] : [];
     }
+
     if (this.isLoggedIn() && this.filterByMaxPrice()) {
-      const fuelKey = (this.fuelType === 'ALL' || this.fuelType === 'GASOLINE') ? 'Gasolina95' : 'Diesel';
-      stations = stations.filter(station => {
-        const price = station[fuelKey];
-        return price != null && price <= this.maxPrice;
+      const maxPrice = prefs.maxPrice || 0;
+      stations = stations.filter(s => {
+        const price = s[fuelKey];
+        return price != null && price <= maxPrice;
       });
     }
+
     return stations;
   });
 
-  trackByIndex(index: number) {
-    return index;
+  // --- ACCIONES
+  setTab(tab: string) {
+    if ((tab === 'gas' || tab === 'route') && !this.isLoggedIn()) {
+      this.loginPromptService.openLoginPrompt();
+      return;
+    }
+    this.activeTab.set(tab);
   }
 
-  toggleFilterByBrands() {
-    this.filterByBrands.update(v => !v);
+  onSubmit() {
+    // Si estamos en la pestaña de rutas guardadas, cargamos la configuración de la ruta
+    if (this.activeTab() === 'route' && this.selectedSavedRouteId()) {
+      const route = this.savedRoutes().find(r => r.routeId == this.selectedSavedRouteId());
+      if (route) {
+        this.routeFormResponse = {
+          origin: route.points.find((p: any) => p.type === 'ORIGIN')?.placeSelection || null,
+          destination: route.points.find((p: any) => p.type === 'DESTINATION')?.placeSelection || null,
+          waypoints: route.points.filter((p: any) => p.type === 'WAYPOINT').map((p: any) => p.placeSelection),
+          optimizeWaypoints: route.optimizeWaypoints ?? false,
+          optimizeRoute: route.optimizeRoute ?? false,
+          avoidTolls: route.avoidTolls ?? false,
+          radioKm: route.gasRadius ?? this.userPrefs().radioKm
+        };
+      }
+    }
+
+    this.searchBarService.onSubmit(this.routeFormResponse).subscribe({
+      next: (gasStations) => {
+        this.allGasStations.set(gasStations);
+        this.createdRoute.set(true);
+      },
+      error: (err) => console.error('Error en búsqueda:', err)
+    });
   }
 
-  toggleFilterByCheapest() {
-    this.filterByCheapest.update(v => !v);
-  }
-
-  toggleFilterByMaxPrice() {
-    this.filterByMaxPrice.update(v => !v);
-  }
-
-  successfulMessage: string = "";
-  errorMessage: string = "";
   saveRoute() {
     if (!this.isLoggedIn()) {
       this.loginPromptService.openLoginPrompt();
@@ -316,47 +187,78 @@ export class SearchBarComponent implements OnInit {
       const legCoords = this.mapCommunication?.getLegCoords() || [];
       const lang = this.translation.getCurrentLang ? this.translation.getCurrentLang() : 'es';
 
-      this.searchBarService.saveFavouriteRoute(this.routeAlias, this.routeFormResponse, polylineCoords, legCoords, lang)
+      this.searchBarService.saveFavouriteRoute(this.routeAlias(), this.routeFormResponse, polylineCoords, legCoords, lang)
         .subscribe({
           next: (response) => {
-            this.savedRoute.update(routes => [...routes, response as SavedRouteDto]);
-            this.successfulMessage = this.translation.translate('search.routeSaved') || 'Ruta guardada correctamente';
-            this.errorMessage = "";
-            this.routeAlias = "";
+            // ACTUALIZACIÓN GLOBAL Y PERSISTENTE
+            const currentRoutes = this.userInfoService.getRoutesSignal()();
+            this.userInfoService.setRoutes([...currentRoutes, response as SavedRouteDto]);
+
+            this.successfulMessage.set(this.translation.translate('search.routeSaved') || 'Ruta guardada');
+            this.errorMessage.set("");
+            this.routeAlias.set("");
           },
           error: (err) => {
-            this.errorMessage = this.translation.translate('search.saveError') || 'Error al guardar la ruta';
-            this.successfulMessage = "";
+            this.errorMessage.set(this.translation.translate('search.saveError') || 'Error');
             console.error('Error al guardar ruta:', err);
           },
         });
     }
   }
 
-  toggleFormCollapse() {
-    this.isFormCollapsed = !this.isFormCollapsed;
-    if (this.isFormCollapsed && typeof document !== 'undefined') {
-      const formWrapper = document.querySelector('.form-wrapper') as HTMLElement;
-      if (formWrapper) {
-        formWrapper.scrollTop = 0;
+  shareRoute() {
+    const polylineCoords = this.mapCommunication?.getPolylineCoords() || [];
+    const legCoords = this.mapCommunication?.getLegCoords() || [];
+    const gasRadius = this.routeFormResponse.radioKm || 1;
+    const lang = this.translation.getCurrentLang?.() || 'es';
+
+    this.routeService.shareRoute(polylineCoords, legCoords, gasRadius, lang).subscribe({
+      next: (resp) => {
+        navigator.clipboard.writeText(resp.url).then(() => {
+          this.showShareMessage.set(true);
+          setTimeout(() => this.showShareMessage.set(false), 2000);
+        });
       }
+    });
+  }
+
+  private loadSharedRoute(token: string) {
+    this.routeService.getSharedRoute(token).subscribe({
+      next: (data) => {
+        if (data.polylineCoords) this.mapCommunication.sendRoute(data.polylineCoords);
+        if (data.legCoords) this.mapCommunication.sendPoints(data.legCoords);
+        if (data.gasStations) this.mapCommunication.sendGasStations(data.gasStations);
+        if (data.weatherData) this.mapCommunication.sendWeather(data.weatherData);
+      }
+    });
+  }
+
+  // --- GESTIÓN DE WAYPOINTS
+  addWaypoint() {
+    if (this.routeFormResponse.waypoints.length < 5) {
+      this.routeFormResponse.waypoints.push(null as any);
+      this.waypointTypes.push('text');
     }
   }
 
-  isDesktop(): boolean {
-    return typeof window !== 'undefined' && window.innerWidth >= 768;
+  deleteWaypoint() {
+    this.routeFormResponse.waypoints.pop();
+    this.waypointTypes.pop();
   }
 
-  handleOriginSelected(selection: PlaceSelection) {
-    this.routeFormResponse.origin = selection;
-  }
+  // --- HANDLERS DE UI
+  handleOriginSelected(selection: PlaceSelection) { this.routeFormResponse.origin = selection; }
+  handleDestinationSelected(selection: PlaceSelection) { this.routeFormResponse.destination = selection; }
+  handleWaypointSelected(index: number, selection: PlaceSelection) { this.routeFormResponse.waypoints[index] = selection; }
 
-  handleDestinationSelected(selection: PlaceSelection) {
-    this.routeFormResponse.destination = selection;
-  }
+  toggleFormCollapse() { this.isFormCollapsed.update(v => !v); }
+  toggleFilterByBrands() { this.filterByBrands.update(v => !v); }
+  toggleFilterByCheapest() { this.filterByCheapest.update(v => !v); }
+  toggleFilterByMaxPrice() { this.filterByMaxPrice.update(v => !v); }
 
-  handleWaypointSelected(index: number, selection: PlaceSelection) {
-    this.routeFormResponse.waypoints[index] = selection;
+  scrollToCard() {
+    if (window.innerWidth >= 768) {
+      this.card.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
   }
-
 }

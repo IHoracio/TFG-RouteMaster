@@ -165,7 +165,11 @@
     "fuelOptions": {
         "ALL": "All",
         "GASOLINE": "Gasoline",
+        "GASOLINE_95": "Gasoline 95",
+        "GASOLINE_98": "Gasoline 98",
+        "DIESEL_PREMIUM": "Diesel Premium",
         "DIESEL": "Diesel",
+        "GLP": "GLP",
         "ELECTRIC": "Electric"
     },
     "mapTypeOptions": {
@@ -187,6 +191,7 @@
     },
     "preferences": {
         "title": "User Preferences",
+        "secondTitle": "Favorite Gas Stations",
         "generic": "General Preferences",
         "vehicle": "Vehicle Preferences",
         "gasStations": "Favorite Gas Stations",
@@ -210,7 +215,7 @@
         "selectGas": "Select Gas Station:",
         "alias": "Alias for the gas station",
         "addSelected": "Add Selected",
-        "noGas": "No gas stations exist in [address] within a radius of [km] km",
+        "noGas": "No gas stations exist in [address] within a radius of [km] km, try to elevate the radiusKm in [vehiclePreferences] if posible",
         "tooMany": "Too many gas stations to display on the map. Reduce the Km radius",
         "favoriteGas": "Favorite Gas Stations:",
         "rename": "Rename",
@@ -249,11 +254,17 @@
         "gas95": "Gasoline 95:",
         "gas98": "Gasoline 98:",
         "diesel": "Diesel:",
-        "dieselB": "Diesel B:",
+        "dieselPremium": "Diesel Premium:",
+        "glp": "GLP",
         "average": "Average:",
         "na": "N/A",
         "noGas": "No favorite gas stations.",
-        "createModify": "Create / Modify"
+        "createModify": "Create / Modify",
+        "gasoline": "Gasoline",
+        "activateMaxPrice": "Activate max price filter",
+        "activateBrandFilter": "Activate brand filter",
+        "deactivateMaxPrice": "Dectivate max price filter",
+        "deactivateBrandFilter": "Dectivate brand filter"
     },
     "alertEvents": {
         "Moderate thunderstorm warning": "Moderate thunderstorm warning",

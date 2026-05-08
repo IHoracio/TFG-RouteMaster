@@ -64,12 +64,12 @@
   transform: translateY(0) !important;
 }
 
-::ng-deep .gm-style .gmnoprint > div {
+::ng-deep .gm-style .gmnoprint>div {
   background: transparent !important;
   box-shadow: none !important;
 }
 
-::ng-deep .gm-style .gmnoprint > div > div {
+::ng-deep .gm-style .gmnoprint>div>div {
   background: transparent !important;
 }
 
@@ -82,7 +82,7 @@
   --gas-accent: #2323ff43;
   --gas-accent-strong: var(--primary-color, #6a11cb);
   --gas-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  
+
   position: absolute;
   top: 2px;
   right: 2px;
@@ -92,8 +92,9 @@
   padding: 10px;
   box-shadow: var(--gas-shadow);
   z-index: 1000;
-  width: min(360px, calc(100vw - 32px));
-  max-width: calc(100vw - 32px);
+  width: min(360px, 50%);
+  max-width: 50%;
+  max-height: 100%;
   color: var(--gas-text);
   overflow: hidden;
   display: flex;
@@ -104,6 +105,9 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
+  overflow-y: auto;
+  max-height: 100%;
+  overflow-x: auto;
 }
 
 .widget-content h3 {
@@ -162,7 +166,7 @@
 
 :host button:hover {
   filter: brightness(1.2);
-  transform: translateY(-1px) ;
+  transform: translateY(-1px);
 }
 
 :host button:active {
@@ -248,22 +252,35 @@
   transform: none !important;
 }
 
+/* Estado Tachado */
+.strikethrough {
+  text-decoration: line-through;
+  color: var(--text-off) !important;
+  opacity: 0.5;
+}
+
 /* Gas Station Widget Mobile Styles */
 @media (max-width: 767px) {
   .gas-station-widget {
-    width: min(250px, calc(100vw - 12px));
-    max-width: calc(100vw - 12px);
-    max-height: 85dvh;
+    width: min(250px, 40vw);
+    max-width: 40vw;
+    max-height: 100%;
     padding: 6px;
     top: 6px;
     right: 6px;
   }
-  
+
+  .widget-content {
+    overflow-y: auto;
+    overflow-x: auto;
+    max-height: 100%;
+  }
+
   .widget-content h3 {
     font-size: 14px;
     padding: 10px;
   }
-  
+
   .widget-content p {
     font-size: 13px;
     padding: 10px;

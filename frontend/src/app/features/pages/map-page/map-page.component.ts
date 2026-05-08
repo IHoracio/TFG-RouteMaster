@@ -1,4 +1,4 @@
-import { Component, OnDestroy, signal, input, effect, AfterViewInit, ChangeDetectionStrategy, computed, inject, Inject } from '@angular/core';
+import { Component, OnDestroy, signal, input, effect, AfterViewInit, ChangeDetectionStrategy, computed, inject, Inject, Output, EventEmitter } from '@angular/core';
 import { MarkerClusterer } from '@googlemaps/markerclusterer';
 import { MapCommunicationService } from '../../../services/map/map-communication.service';
 import { environment } from '../../../../environments/environment';
@@ -23,6 +23,7 @@ import { TranslationService } from '../../../services/singleton/translation.serv
   styleUrl: './map-page.component.css'
 })
 export class MapPageComponent implements OnDestroy, AfterViewInit {
+  @Output() closeGasStationPopup = new EventEmitter<void>();
   private static mapsOptionsSet = false;
   private isRecreatingMap = false;
   private mapElement: HTMLElement | null = null;
@@ -73,8 +74,32 @@ export class MapPageComponent implements OnDestroy, AfterViewInit {
 
     effect(() => {
       const selected = this.selectedGasStationInput();
-      if (selected) {
+      if (selected && this.map) {
         this.selectedGasStation.set(selected);
+
+        const lat = Number(selected.latitud);
+        const lng = Number(selected.longitud);
+
+        if (!isNaN(lat) && !isNaN(lng)) {
+          this.map.setCenter({ lat, lng });
+          this.map.setZoom(13);
+
+          google.maps.event.addListenerOnce(this.map, 'idle', () => {
+            // 1. Obtenemos el ancho actual del div del mapa
+            const mapDiv = this.map?.getDiv();
+            if (!mapDiv) return;
+
+            const mapWidth = mapDiv.offsetWidth;
+
+            // 2. Calculamos el desplazamiento como un porcentaje del ancho.
+            // Si el panel tapa el 40% de la derecha, queremos mover el centro
+            // un 20% hacia la derecha para que el marcador quede en el 30% izquierdo.
+            const offsetX = mapWidth * 0.25; // 25% del ancho total
+            const offsetY = 0;
+
+            this.map?.panBy(offsetX, offsetY);
+          });
+        }
       }
     });
 
@@ -373,7 +398,8 @@ export class MapPageComponent implements OnDestroy, AfterViewInit {
       station.Gasolina95 !== null ||
       station.Gasolina98 !== null ||
       station.Diesel !== null ||
-      station.DieselB !== null
+      station.DieselB !== null ||
+      station.GLP !== null
     );
 
     this.gasStationsFromService.set(filteredStations);
@@ -510,6 +536,7 @@ export class MapPageComponent implements OnDestroy, AfterViewInit {
 
   public closeWidget(): void {
     this.selectedGasStation.set(null);
+    this.closeGasStationPopup.emit();
   }
 
   public closeWeatherOverlay(): void {

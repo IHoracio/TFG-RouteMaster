@@ -165,7 +165,11 @@
     "fuelOptions": {
         "ALL": "Todos",
         "GASOLINE": "Gasolina",
+        "GASOLINE_95": "Gasoline 95",
+        "GASOLINE_98": "Gasoline 98",
+        "DIESEL_PREMIUM": "Diésel Premium",
         "DIESEL": "Diésel",
+        "GLP": "GLP",
         "ELECTRIC": "Eléctrico"
     },
     "mapTypeOptions": {
@@ -187,6 +191,7 @@
     },
     "preferences": {
         "title": "Preferencias de Usuario",
+        "secondTitle": "Gasolineras Favoritas",
         "generic": "Preferencias Generales",
         "vehicle": "Preferencias del Vehículo",
         "gasStations": "Gasolineras Favoritas",
@@ -210,7 +215,7 @@
         "selectGas": "Seleccionar Gasolinera:",
         "alias": "Alias para la gasolinera",
         "addSelected": "Añadir Seleccionada",
-        "noGas": "No existen gasolineras en [address] en un radio de [km] km",
+        "noGas": "No existen gasolineras en [address] en un radio de [km] km, intentalo de nuevo aumentando el radioKm en [vehiclePreferences] si es posible",
         "tooMany": "Demasiadas gasolineras para mostrar en el mapa. Reduce el radio Km",
         "favoriteGas": "Gasolineras Favoritas:",
         "rename": "Renombrar",
@@ -248,12 +253,18 @@
         "saleType": "Tipo Venta:",
         "gas95": "Gasolina 95:",
         "gas98": "Gasolina 98:",
-        "diesel": "Diesel:",
-        "dieselB": "Diesel B:",
+        "diesel": "Diésel:",
+        "dieselPremium": "Diésel Premium:",
+        "glp": "GLP",
         "average": "Media:",
         "na": "N/A",
         "noGas": "No hay gasolineras favoritas.",
-        "createModify": "Crear / Modificar"
+        "createModify": "Crear / Modificar",
+        "gasoline": "Gasolina",
+        "activateMaxPrice": "Activar filtro por precio maximo",
+        "activateBrandFilter": "Activar filtro por marca",
+        "deactivateMaxPrice": "Desactivar filtro por precio maximo",
+        "deactivateBrandFilter": "Desctivar filtro por marca"
     },
     "alertEvents": {
         "Moderate thunderstorm warning": "Aviso de tormenta moderada",

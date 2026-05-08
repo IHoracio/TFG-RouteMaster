@@ -6,7 +6,7 @@
       {{ translation.translate('preferences.generic') }}
     </h3>
     @if (isSectionActive('generic')) {
-      <app-generic-preferences></app-generic-preferences>
+    <app-generic-preferences></app-generic-preferences>
     }
   </div>
 
@@ -15,21 +15,23 @@
       {{ translation.translate('preferences.vehicle') }}
     </h3>
     @if (isSectionActive('vehicle')) {
-      <app-vehicle-preferences></app-vehicle-preferences>
-    }
-  </div>
-
-  <div class="collapsible">
-    <h3 (click)="toggleSection('gasStations')">
-      {{ translation.translate('preferences.gasStations') }}
-    </h3>
-    @if (isSectionActive('gasStations')) {
-      <app-gas-stations-preferences></app-gas-stations-preferences>
+    <app-vehicle-preferences></app-vehicle-preferences>
     }
   </div>
 
   <div class="buttons">
     <button type="button" (click)="savePreferences()">{{ translation.translate('preferences.save') }}</button>
     <button type="button" (click)="resetPreferences()">{{ translation.translate('preferences.reset') }}</button>
+  </div>
+
+  <h2 class="secondTitle">{{ translation.translate('preferences.secondTitle') }}</h2>
+
+  <div class="collapsible">
+    <h3 (click)="toggleSection('gasStations')">
+      {{ translation.translate('preferences.gasStations') }}
+    </h3>
+    @if (isSectionActive('gasStations')) {
+    <app-gas-stations-preferences></app-gas-stations-preferences>
+    }
   </div>
 </div>

@@ -1,35 +1,65 @@
 <div class="container">
   <section class="card" #card>
     <h2>{{ translation.translate('search.title') }}</h2>
-    <app-search-bar-tabs [activeTab]="activeTab" (tabChange)="setTab($event)"></app-search-bar-tabs>
+    
+    <app-search-bar-tabs 
+      [activeTab]="activeTab()" 
+      (tabChange)="setTab($event)">
+    </app-search-bar-tabs>
+
     <div class="filters-map">
-      <app-search-bar-filters [isLoggedIn]="isLoggedIn()" [filterByCheapest]="filterByCheapest()"
-        [filterByBrands]="filterByBrands()" [filterByMaxPrice]="filterByMaxPrice()" [routeAlias]="routeAlias"
-        [createdRoute]="createdRoute()" [successfulMessage]="successfulMessage" [errorMessage]="errorMessage"
-        [showShareMessage]="showShareMessage()" (toggleFilterByCheapest)="toggleFilterByCheapest()"
-        (toggleFilterByBrands)="toggleFilterByBrands()" (toggleFilterByMaxPrice)="toggleFilterByMaxPrice()"
-        (routeAliasChange)="routeAlias = $event" (saveRoute)="saveRoute()" (shareRoute)="shareRoute()">
+      <app-search-bar-filters 
+        [isLoggedIn]="isLoggedIn()" 
+        [filterByCheapest]="filterByCheapest()"
+        [filterByBrands]="filterByBrands()" 
+        [filterByMaxPrice]="filterByMaxPrice()" 
+        [routeAlias]="routeAlias()"
+        [createdRoute]="createdRoute()" 
+        [successfulMessage]="successfulMessage()" 
+        [errorMessage]="errorMessage()"
+        [showShareMessage]="showShareMessage()" 
+        (toggleFilterByCheapest)="toggleFilterByCheapest()"
+        (toggleFilterByBrands)="toggleFilterByBrands()" 
+        (toggleFilterByMaxPrice)="toggleFilterByMaxPrice()"
+        (routeAliasChange)="routeAlias.set($event)" 
+        (saveRoute)="saveRoute()" 
+        (shareRoute)="shareRoute()">
       </app-search-bar-filters>
     </div>
-    <div class="form-map" [ngClass]="{ 'collapsed': isFormCollapsed }">
+
+    <div class="form-map" [ngClass]="{ 'collapsed': isFormCollapsed() }">
       <div class="form-wrapper" #formWrapper>
-        <app-search-bar-form [activeTab]="activeTab" [isFormCollapsed]="isFormCollapsed"
-          [routeFormResponse]="routeFormResponse" [waypointTypes]="waypointTypes"
-          [favouriteGasStations]="favouriteGasStations()" [savedRoute]="savedRoute()"
-          [selectedSavedRoute]="selectedSavedRoute" [isLoggedIn]="isLoggedIn()"
-          [successfulMessage]="successfulMessage" [errorMessage]="errorMessage"
-          (selectedSavedRouteChange)="selectedSavedRoute = $event" (toggleFormCollapse)="toggleFormCollapse()"
-          (addWaypoint)="addWaypoint()" (deleteWaypoint)="deleteWaypoint()" (searchSubmit)="onSubmit()"
+        <app-search-bar-form 
+          [activeTab]="activeTab()" 
+          [isFormCollapsed]="isFormCollapsed()"
+          [routeFormResponse]="routeFormResponse" 
+          [waypointTypes]="waypointTypes"
+          [favouriteGasStations]="favoriteGasStations()" 
+          [savedRoute]="savedRoutes()"
+          [selectedSavedRoute]="selectedSavedRouteId()" 
+          [isLoggedIn]="isLoggedIn()"
+          [successfulMessage]="successfulMessage()" 
+          [errorMessage]="errorMessage()"
+          (selectedSavedRouteChange)="selectedSavedRouteId.set($event)" 
+          (toggleFormCollapse)="toggleFormCollapse()"
+          (addWaypoint)="addWaypoint()" 
+          (deleteWaypoint)="deleteWaypoint()" 
+          (searchSubmit)="onSubmit()"
           (originFocus)="scrollToCard()"
           (originSelected)="handleOriginSelected($event)"
           (destinationSelected)="handleDestinationSelected($event)"
           (waypointSelected)="handleWaypointSelected($event.index, $event.selection)">
         </app-search-bar-form>
       </div>
+
       <div class="map-wrapper">
         <app-map-page></app-map-page>
       </div>
     </div>
-    <app-login-prompt [show]="loginPromptService.showLoginPrompt()" (close)="loginPromptService.closeLoginPrompt()"></app-login-prompt>
-</section>
+
+    <app-login-prompt 
+      [show]="loginPromptService.showLoginPrompt()" 
+      (close)="loginPromptService.closeLoginPrompt()">
+    </app-login-prompt>
+  </section>
 </div>

@@ -44,10 +44,22 @@
   <div class="favorites-section">
     <h3>{{ translation.translate('userInfo.favoriteGas') }}</h3>
     @if (favoriteGasStations().length > 0) {
-    <button class="btn-sort" (click)="toggleSortByPrice()">
-      {{ sortByPrice() ? translation.translate('userInfo.deactivateSort') :
-      translation.translate('userInfo.activateSort') }}
-    </button>
+    <div class="filter-controls">
+      <button class="btn-sort" (click)="toggleSortByPrice()" [class.active]="sortByPrice()">
+        {{ sortByPrice() ? translation.translate('userInfo.deactivateSort') :
+        translation.translate('userInfo.activateSort') }}
+      </button>
+
+      <button class="btn-sort" (click)="toggleMaxPriceFilter()" [class.active]="filterByMaxPrice()">
+        {{ filterByMaxPrice() ? translation.translate('userInfo.deactivateMaxPrice') :
+        translation.translate('userInfo.activateMaxPrice') }}
+      </button>
+
+      <button class="btn-sort" (click)="toggleBrandFilter()" [class.active]="filterByBrand()">
+        {{ filterByBrand() ? translation.translate('userInfo.deactivateBrandFilter') :
+        translation.translate('userInfo.activateBrandFilter') }}
+      </button>
+    </div>
 
     <ul>
       @for (station of sortedStations(); track station.idEstacion) {
@@ -58,14 +70,60 @@
 
         @if (selectedGasStations().has(station.idEstacion)) {
         <div class="gas-station-details" (click)="$event.stopPropagation()">
-          <p><strong>{{ translation.translate('userInfo.brand') }}</strong> {{ station.marca }}</p>
-          <p><strong>{{ translation.translate('userInfo.schedule') }}</strong> {{ station.horario }}</p>
-          <p><strong>{{ translation.translate('userInfo.saleType') }}</strong> {{ getStationType(station.tipoVenta) }}
-          </p>
+          <div class="general-info">
+            <p><strong>{{ translation.translate('userInfo.brand') }}</strong> {{ station.marca }}</p>
+            <p><strong>{{ translation.translate('userInfo.schedule') }}</strong> {{ station.horario }}</p>
+            <p><strong>{{ translation.translate('userInfo.saleType') }}</strong> {{ getStationType(station.tipoVenta)
+              }}</p>
+          </div>
 
           <div class="prices-grid">
-            <p><strong>95:</strong> {{ station.Gasolina95 ? station.Gasolina95 + ' €' : 'N/A' }}</p>
-            <p><strong>Diesel:</strong> {{ station.Diesel ? station.Diesel + ' €' : 'N/A' }}</p>
+            <p>
+              <strong [class.strikethrough]="!station.Gasolina95">{{translation.translate('userInfo.gasoline')}}
+                95:</strong>
+              {{ station.Gasolina95 ? station.Gasolina95 + ' €' : '' }}
+              <span class="average-text">
+                ({{ translation.translate('userInfo.average') }} {{ station.Gasolina95_media ? station.Gasolina95_media
+                + ' €' : translation.translate('userInfo.na') }})
+              </span>
+            </p>
+
+            <p>
+              <strong [class.strikethrough]="!station.Gasolina98">{{translation.translate('userInfo.gasoline')}}
+                98:</strong>
+              {{ station.Gasolina98 ? station.Gasolina98 + ' €' : '' }}
+              <span class="average-text">
+                ({{ translation.translate('userInfo.average') }} {{ station.Gasolina98_media ? station.Gasolina98_media
+                + ' €' : translation.translate('userInfo.na') }})
+              </span>
+            </p>
+
+            <p>
+              <strong [class.strikethrough]="!station.Diesel">Diesel:</strong>
+              {{ station.Diesel ? station.Diesel + ' €' : '' }}
+              <span class="average-text">
+                ({{ translation.translate('userInfo.average') }} {{ station.Diesel_media ? station.Diesel_media + ' €'
+                : translation.translate('userInfo.na') }})
+              </span>
+            </p>
+
+            <p>
+              <strong [class.strikethrough]="!station.DieselPremium">Diesel Premium:</strong>
+              {{ station.DieselPremium ? station.DieselPremium + ' €' : '' }}
+              <span class="average-text">
+                ({{ translation.translate('userInfo.average') }} {{ station.DieselPremium_media ?
+                station.DieselPremium_media + ' €' : translation.translate('userInfo.na') }})
+              </span>
+            </p>
+
+            <p>
+              <strong [class.strikethrough]="!station.GLP">GLP:</strong>
+              {{ station.GLP ? station.GLP + ' €' : '' }}
+              <span class="average-text">
+                ({{ translation.translate('userInfo.average') }} {{ station.GLP_media ? station.GLP_media + ' €' :
+                translation.translate('userInfo.na') }})
+              </span>
+            </p>
           </div>
         </div>
         }

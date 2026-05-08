@@ -80,3 +80,158 @@
 .form-group input[type="checkbox"]:hover {
   border-color: var(--color-primary);
 }
+
+/* Si quieres que aparezcan solo al pasar el ratón (hover) */
+.form-group input[type="number"]::-webkit-inner-spin-button {
+  opacity: 0;
+}
+
+/* Si quieres que aparezcan solo al pasar el ratón (hover) */
+.form-group:hover input[type="number"]::-webkit-inner-spin-button {
+  opacity: 1;
+}
+
+.slider-container input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  background: var(--surface-secondary);
+  cursor: pointer;
+}
+
+.info-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 15px;
+  height: 15px;
+  margin-left: 0.5rem;
+  background-color: var(--primary-color);
+  color: white;
+  border-radius: 50%;
+  font-size: 12px;
+  font-weight: bold;
+  cursor: help;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.info-icon:hover {
+  background-color: var(--primary-color-dark);
+  transform: scale(1.1);
+}
+
+
+/* Contenedor del grupo */
+.form-group ul {
+  list-style: none;
+  padding: 0;
+  margin: var(--spacing-sm) 0;
+  display: flex;
+  flex-wrap: wrap; /* Para que los chips pasen a la siguiente línea si no caben */
+  gap: var(--spacing-sm);
+}
+
+.form-group li {
+  display: inline-flex;
+  align-items: center;
+  background-color: var(--surface-secondary);
+  color: var(--text-color);
+  padding: 4px 10px;
+  border-radius: 20px; /* Forma de píldora */
+  border: 1px solid var(--border-color);
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  gap: 2rem;
+}
+
+.form-group li:hover {
+  border-color: var(--secondary-color);
+  transform: translateY(-1px);
+  cursor: pointer;
+}
+
+.dropdown-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  max-height: 120px;
+  overflow-y: auto;
+  background-color: var(--surface-secondary);
+  color: var(--text-color);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.dropdown-list li {
+  padding: 8px;
+  cursor: pointer;
+  border-bottom: 1px solid #eee;
+  color: inherit;
+  transition: background-color 0.2s;
+}
+
+.dropdown-list li:hover {
+  background: rgba(0, 123, 255, 0.1);
+}
+
+.dropdown-list li:last-child {
+  border-bottom: none;
+}
+
+.btn {
+  /* Espaciado y Dimensiones */
+  padding: var(--button-padding);
+  margin: var(--spacing-xs) 0; /* Margen vertical para que no se pegue a otros elementos */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  
+  /* Colores y Tipografía */
+  background: var(--secondary-color);
+  color: white;
+  font-family: var(--font-family);
+  font-weight: 500;
+  text-decoration: none;
+  
+  /* Bordes y Forma */
+  border: 1px solid rgba(255, 255, 255, 0.1); /* Borde casi invisible para dar definición */
+  border-radius: 6px; /* Un poco más redondeado para un look moderno */
+  
+  /* Efectos y Sombras */
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  
+  /* Evitar selección de texto */
+  user-select: none;
+}
+
+.btn:hover {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  transform: translateY(-1px); /* Pequeño salto hacia arriba */
+}
+
+/* Espaciado entre botones adyacentes */
+.btn + .btn {
+  margin-left: var(--spacing-sm);
+}
+
+@media (max-width: 600px) {
+  .form-group ul {
+    gap: 8px;
+  }
+  .form-group li {
+    flex-direction: column;
+    align-items: flex-start;
+    min-width: 120px;
+    max-width: 100%;
+    word-break: break-word;
+    gap: 0.5rem;
+    font-size: 1rem;
+    padding: 8px 10px;
+  }
+}

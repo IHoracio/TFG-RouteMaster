@@ -1,5 +1,8 @@
+/* ==========================================================================
+   1. CONTENEDOR PRINCIPAL
+   ========================================================================== */
 .user-info {
-  background: linear-gradient(to left, var(--header-footer-gradient-start), var(--header-footer-gradient-end));
+  background: var(--surface-color);
   padding: var(--spacing-lg);
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
@@ -12,11 +15,15 @@
   margin-bottom: var(--spacing-md);
 }
 
+/* Detalles del Usuario (Email, Nombre...) */
 .user-details p {
   margin: 8px 0;
   color: inherit;
 }
 
+/* ==========================================================================
+   2. SECCIONES DE FAVORITOS (Común)
+   ========================================================================== */
 .favorites-section {
   margin-top: var(--spacing-lg);
 }
@@ -26,6 +33,7 @@
   color: var(--primary-color);
 }
 
+/* Contenedor de la lista de gasolineras */
 .favorites-section ul {
   list-style: none;
   padding: 0;
@@ -38,40 +46,141 @@
   border-radius: 6px;
   background: var(--surface-secondary);
   margin-bottom: var(--spacing-sm);
-}
-
-.favorites-section button {
-  padding: 6px 10px;
-  background: var(--primary-color);
-  color: white;
-  border: none;
-  border-radius: 6px;
   cursor: pointer;
-  transition: background-color 0.2s ease, transform 0.2s ease;
+  transition: all 0.2s ease;
 }
 
-.favorites-section button:hover {
-  background: var(--secondary-color);
-  transform: scale(1.02);
-}
-
-.route-item,
-.gas-station-item {
-  cursor: pointer;
-  transition: background-color 0.2s ease, border-color 0.2s ease;
-}
-
-.route-item:hover,
-.gas-station-item:hover {
+.favorites-section li:hover {
   background-color: rgba(0, 123, 255, 0.08);
   border-color: var(--primary-color);
 }
 
+.empty-msg {
+  color: var(--text-off);
+  font-style: italic;
+  padding: 10px;
+}
+
+/* ==========================================================================
+   3. CONTROLES DE FILTRADO Y ORDENACIÓN
+   ========================================================================== */
+.filter-controls {
+  display: flex;
+  flex-direction: column; /* Botones uno debajo de otro */
+  gap: 8px;
+  margin-bottom: var(--spacing-md);
+}
+
+.btn-sort {
+  padding: 8px 12px;
+  background: transparent;
+  color: var(--secondary-color);
+  border: 1px solid var(--secondary-color);
+  border-radius: 6px;
+  cursor: pointer;
+  text-align: left; /* Alineado a la izquierda para el formato lista */
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+.btn-sort:hover {
+  background: rgba(var(--secondary-color-rgb, 0, 0, 0), 0.1);
+  transform: translateX(4px);
+}
+
+.btn-sort.active {
+  background: var(--secondary-color);
+  color: white;
+}
+
+/* ==========================================================================
+   4. DETALLES DE GASOLINERA (Expandido)
+   ========================================================================== */
 .gas-station-details {
   margin-top: 10px;
-  padding: 10px;
-  background-color: rgba(255, 255, 255, 0.6);
+  padding: 15px;
+  background-color: var(--surface-color);
   border: 1px solid var(--border-color);
   border-radius: 6px;
   color: inherit;
 }
+
+.general-info p {
+  color: var(--text-color);
+  margin: 4px 0;
+}
+
+.general-info p strong {
+  color: var(--secondary-color);
+}
+
+/* Cuadrícula de Precios */
+.prices-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 12px;
+  border-top: 1px solid var(--border-color);
+  padding-top: 10px;
+}
+
+.prices-grid p {
+  color: var(--text-color);
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  margin: 0;
+}
+
+.prices-grid strong {
+  color: var(--secondary-color);
+  font-weight: 700;
+  margin-right: 6px;
+}
+
+.average-text {
+  color: var(--text-color);
+  opacity: 0.6;
+  margin-left: 8px;
+  font-size: 0.9em;
+}
+
+/* Estado Tachado */
+.strikethrough {
+  text-decoration: line-through;
+  color: var(--text-off) !important;
+  opacity: 0.5;
+}
+
+/* ==========================================================================
+   5. RUTAS FAVORITAS (Específicos)
+   ========================================================================== */
+.route-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.route-name {
+  font-size: 1.1em;
+  margin-bottom: 4px;
+}
+
+.route-meta {
+  font-size: 0.9em;
+  color: var(--text-off);
+}
+
+.route-addresses {
+  font-size: 0.85em;
+  margin-top: 5px;
+}
+
+.actions button {
+  margin-left: 8px;
+  font-size: 12px;
+  /* Reutiliza el estilo base de botones que tenías antes si lo prefieres */
+}
+
+.btn-delete { background-color: #dc3545 !important; color: white; }
+.btn-rename { background-color: var(--primary-color) !important; color: white; }

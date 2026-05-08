@@ -24,7 +24,6 @@ export class GasStationsPreferencesComponent {
   searchResults = signal<GasStation[]>([]);
   isLoading = signal<boolean>(false);
   hasSearched = signal<boolean>(false);
-  brandSearch = signal<string>('');
   alias = signal<string>('');
   selectedPlaceForGas = signal<PlaceSelection | null>(null);
 
@@ -41,15 +40,6 @@ export class GasStationsPreferencesComponent {
     this.gasStationSelectionService.selectedStation.set(val);
   }
 
-  // Computed: Lógica reactiva de marcas
-  showBrandDropdown = computed(() => this.brandSearch().length > 0);
-
-  filteredBrands = computed(() => {
-    const search = this.brandSearch().toLowerCase();
-    const allBrands = this.userPreferencesService.gasStationBrandsOptions();
-    return allBrands.filter(b => b.toLowerCase().includes(search)).slice(0, 4);
-  });
-
   // Computed: Combinación de favoritos y resultados para el mapa
   allStations = computed(() => {
     const favorites = this.favoriteGasStations();
@@ -62,39 +52,7 @@ export class GasStationsPreferencesComponent {
       .slice(0, 50);
   });
 
-  // --- Métodos de Marcas ---
-  setBrandSearch(event: Event): void {
-    this.brandSearch.set((event.target as HTMLInputElement).value);
-  }
-
-  addPreferredBrand(brand: string): void {
-    const currentPrefs = this.userPreferences();
-    if (!currentPrefs.preferredBrands.includes(brand)) {
-      this.userPreferencesService.updateData(this.userPreferences, 'userPreferences', {
-        ...currentPrefs,
-        preferredBrands: [...currentPrefs.preferredBrands, brand]
-      });
-    }
-    this.brandSearch.set('');
-  }
-
-  removePreferredBrand(brand: string): void {
-    const currentPrefs = this.userPreferences();
-    this.userPreferencesService.updateData(this.userPreferences, 'userPreferences', {
-      ...currentPrefs,
-      preferredBrands: currentPrefs.preferredBrands.filter((b: string) => b !== brand)
-    });
-  }
-
   // --- Métodos de Búsqueda ---
-  setRadioKm(event: Event): void {
-    const value = parseInt((event.target as HTMLInputElement).value, 10);
-    this.userPreferencesService.updateData(this.userPreferences, 'userPreferences', {
-      ...this.userPreferences(),
-      radioKm: value
-    });
-  }
-
   searchGasStations(): void {
     const selection = this.selectedPlaceForGas();
     if (!selection) return;
@@ -132,14 +90,33 @@ export class GasStationsPreferencesComponent {
         alert('La gasolinera o el alias ya están en tus favoritos.');
         return;
       }
-      const favorite: FavouriteGasStation = { ...station, alias: aliasVal };
-      this.userPreferencesService.updateData(
-        this.favoriteGasStations,
-        'favoriteGasStations',
-        [...this.favoriteGasStations(), favorite]
-      );
-      this.alias.set('');
-      this.selectedGasStation = null;
+
+      // 1. Preparamos el objeto completo cumpliendo con la interfaz FavouriteGasStation
+      const favorite: FavouriteGasStation = {
+        ...station,
+        alias: aliasVal,
+        placeSelection: this.createPlaceSelectionFromGasStation(station)
+      };
+
+      // 2. Enviamos el objeto completo al backend (RequestBody)
+      this.userPreferencesService.updateFavouriteGasStations(favorite).subscribe({
+        next: () => {
+          // 3. Si el servidor responde OK, actualizamos señales y LocalStorage
+          this.userPreferencesService.updateData(
+            this.favoriteGasStations,
+            'favoriteGasStations',
+            [...this.favoriteGasStations(), favorite]
+          );
+
+          // 4. Limpieza de UI
+          this.alias.set('');
+          this.selectedGasStation = null;
+        },
+        error: (err) => {
+          console.error('Error al guardar en el servidor:', err);
+          alert('No se pudo guardar la gasolinera en favoritos.');
+        }
+      });
     }
   }
 
@@ -148,26 +125,34 @@ export class GasStationsPreferencesComponent {
   }
 
   removeFavoriteGasStation(stationId: number): void {
-    this.userPreferencesService.updateData(
-      this.favoriteGasStations,
-      'favoriteGasStations',
-      this.favoriteGasStations().filter(s => s.idEstacion !== stationId)
-    );
+    const station = this.favoriteGasStations().find(s => s.idEstacion === stationId);
+    if (!station) return;
+
+    this.userPreferencesService.deleteFavouriteGasStations(station.alias).subscribe({
+      next: () => {
+        this.userPreferencesService.updateData(
+          this.favoriteGasStations,
+          'favoriteGasStations',
+          this.favoriteGasStations().filter(s => s.idEstacion !== stationId)
+        );
+      }
+    });
   }
 
   renameFavoriteGasStation(station: FavouriteGasStation): void {
     const newAlias = prompt('Nuevo alias:', station.alias);
     if (newAlias && newAlias.trim() !== station.alias) {
       const aliasTrimmed = newAlias.trim();
-      if (this.favoriteGasStations().some(f => f.alias === aliasTrimmed)) {
-        alert('Ese alias ya existe.');
-        return;
-      }
-      this.userPreferencesService.updateData(
-        this.favoriteGasStations,
-        'favoriteGasStations',
-        this.favoriteGasStations().map(s => s.idEstacion === station.idEstacion ? { ...s, alias: aliasTrimmed } : s)
-      );
+
+      this.userPreferencesService.renameFavouriteGasStations(station.alias, aliasTrimmed).subscribe({
+        next: () => {
+          this.userPreferencesService.updateData(
+            this.favoriteGasStations,
+            'favoriteGasStations',
+            this.favoriteGasStations().map(s => s.idEstacion === station.idEstacion ? { ...s, alias: aliasTrimmed } : s)
+          );
+        }
+      });
     }
   }
 
@@ -176,8 +161,17 @@ export class GasStationsPreferencesComponent {
   }
 
   // Helpers UI
-  capitalize(str: string): string {
-    return str ? str.charAt(0).toUpperCase() + str.slice(1).toLowerCase() : '';
+  private createPlaceSelectionFromGasStation(station: GasStation): PlaceSelection {
+    return {
+      address: station.direccion,
+      // Inventamos un placeId o usamos uno que identifique que viene de nuestra DB
+      placeId: `INTERNAL_${station.idEstacion}`,
+      coords: {
+        lat: station.latitud,
+        lng: station.longitud
+      },
+      name: station.nombreEstacion
+    };
   }
 
 }

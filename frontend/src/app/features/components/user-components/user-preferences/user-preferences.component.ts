@@ -2,12 +2,13 @@ import { Component, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { UserPreferencesService } from '../../../../services/user-page/user-preferences.service';
-import { forkJoin } from 'rxjs';
+import { catchError, EMPTY, exhaustMap, filter, forkJoin, Observable, Subject, tap } from 'rxjs';
 import { Router } from '@angular/router';
 import { GenericPreferencesComponent } from './generic-preferences/generic-preferences';
 import { GasStationsPreferencesComponent } from './gas-stations-preferences/gas-stations-preferences';
 import { VehiclePreferencesComponent } from './vehicle-preferences/vehicle-preferences';
 import { TranslationService } from '../../../../services/singleton/translation.service';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-user-preferences',
@@ -26,12 +27,35 @@ export class UserPreferencesComponent {
 
   activeSection = signal<string | null>(null);
 
+  // 1. Definimos el disparador
+  private readonly saveTrigger = new Subject<void>();
+
+  // 2. Exponemos el estado para el HTML
+  readonly canSave = this.userPreferencesService.hasChanges;
+
+  constructor() {
+    // Solo inicializamos el "escuchador"
+    this.initSaveSubscription();
+  }
+
+  /**
+   * Configura la tubería (pipeline) de guardado.
+   * Se separa para no ensuciar el constructor.
+   */
+  private initSaveSubscription(): void {
+    this.saveTrigger.pipe(
+      filter(() => this.userPreferencesService.hasChanges()), // Solo si hay cambios
+      exhaustMap(() => this.savePreferencesInServer()),   // Ejecuta el proceso
+      takeUntilDestroyed()                             // Autolimpiable
+    ).subscribe();
+  }
+
   // Selectores de sección
   toggleSection(section: string): void {
     this.activeSection.update(v => v === section ? null : section);
   }
 
-  savePreferences(): void {
+  private savePreferencesInServer(): Observable<any> {
     const prefs = this.userPreferences();
     const themeLang = this.themeLanguage();
 
@@ -42,20 +66,33 @@ export class UserPreferencesComponent {
     const updateTheme$ = this.userPreferencesService.updateUserThemeLanguage(themeLang.theme, themeLang.language);
 
     // 2. Ejecutar y sincronizar
-    forkJoin([updatePrefs$, updateTheme$]).subscribe({
-      next: () => {
-        // Al usar Signals y estar vinculados al localStorage en el servicio, 
-        // solo con que la petición sea exitosa ya estamos tranquilos.
-        // Si el usuario vuelve atrás, los signals ya tienen los valores actuales.
+    return forkJoin([updatePrefs$, updateTheme$]).pipe(
+      tap(() => {
+        // Sincronizamos las señales de "servidor" con las actuales tras el éxito
+        this.userPreferencesService.serverUserPreferences.set({ ...this.userPreferences() });
+        this.userPreferencesService.serverThemeLanguage.set({ ...this.themeLanguage() });
+
         window.scrollTo(0, 0);
         this.router.navigate(['/user']);
-      },
-      error: (err) => alert('Error al guardar: ' + (err?.message || 'Desconocido'))
-    });
+      }),
+      catchError((err) => {
+        alert('Error al guardar: ' + (err?.message || 'Desconocido'));
+        // Retornamos EMPTY para que el flujo no muera y el usuario pueda reintentar
+        return EMPTY;
+      })
+    );
+  }
+
+  /**
+   * Dispara el flujo de guardado
+   */
+  savePreferences(): void {
+    this.saveTrigger.next();
   }
 
   resetPreferences(): void {
     const defaults = this.userPreferencesService.defaultPreferences();
+    const prefs = this.userPreferences();
 
     if (!defaults) {
       console.warn('No hay valores por defecto cargados');
@@ -70,11 +107,11 @@ export class UserPreferencesComponent {
       mapView: defaults.mapView,
       avoidTolls: defaults.avoidTolls,
       radioKm: defaults.radioKm,
-      preferredBrands: defaults.preferredBrands || []
+      preferredBrands: prefs.preferredBrands
     });
 
     // 2. Persistimos en el servidor
-    this.savePreferences();
+    this.saveTrigger.next();
   }
 
   // Helpers para el HTML

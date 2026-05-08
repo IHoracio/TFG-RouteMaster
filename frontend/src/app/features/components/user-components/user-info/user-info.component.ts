@@ -5,6 +5,8 @@ import { UserPreferencesService } from '../../../../services/user-page/user-pref
 import { FavouriteGasStation } from '../../../../Dto/gas-station';
 import { UserInfoService } from '../../../../services/user-page/user-info.service';
 import { TranslationService } from '../../../../services/singleton/translation.service';
+import { GasStationService } from '../../../../services/user-page/gas-station/gas-station.service';
+import { catchError, forkJoin, of } from 'rxjs';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -19,6 +21,7 @@ export class UserInfoComponent {
 
   private userInfoService = inject(UserInfoService);
   private userPreferencesService = inject(UserPreferencesService);
+  private gasStationService = inject(GasStationService);
 
   // Signals Globales (Lectura)
   user = this.userInfoService.getUserSignal();
@@ -30,25 +33,107 @@ export class UserInfoComponent {
   selectedRouteId = signal<number | null>(null);
   selectedGasStations = signal<Set<number>>(new Set());
   sortByPrice = signal<boolean>(false);
+  filterByMaxPrice = signal<boolean>(false);
+  filterByBrand = signal<boolean>(false);
+
+  ngOnInit(): void {
+    this.refreshFavoritePrices();
+  }
+
+  private refreshFavoritePrices(): void {
+    const currentFavorites = this.favoriteGasStations();
+
+    if (currentFavorites.length === 0) return;
+
+    // 1. Creamos un array de observables (peticiones)
+    const requests = currentFavorites.map(station =>
+      this.gasStationService.getGasStation(station.idEstacion).pipe(
+        // Si una gasolinera falla, devolvemos null para no romper el forkJoin
+        catchError(err => {
+          console.error(`Error cargando precio de ${station.idEstacion}`, err);
+          return of(null);
+        })
+      )
+    );
+
+    // 2. Ejecutamos todas en paralelo
+    forkJoin(requests).subscribe(freshDataArray => {
+      const updatedStations = currentFavorites.map((oldStation, index) => {
+        const freshData = freshDataArray[index];
+
+        if (!freshData) return oldStation; // Si falló la carga, mantenemos lo que había
+
+        // 3. Fusionamos los datos frescos (precios) con el alias y placeSelection
+        return {
+          ...oldStation, // Mantenemos Alias y PlaceSelection
+          ...freshData,  // Sobreescribimos con precios y datos actualizados de la API
+        } as FavouriteGasStation;
+      });
+
+      // 4. Actualizamos la señal global (y por tanto el LocalStorage)
+      this.userPreferencesService.updateData(
+        this.userPreferencesService.favoriteGasStations,
+        'favoriteGasStations',
+        updatedStations
+      );
+    });
+  }
 
   /**
-   * Computed: Ordenación reactiva. 
-   * Se recalcula automáticamente si cambia la lista, el flag de orden o el combustible preferido.
-   */
+     * Computed: Lista final procesada.
+     * Consumimos las señales centralizadas del servicio según los interruptores locales.
+     */
   sortedStations = computed(() => {
-    const stations = [...this.favoriteGasStations()];
-    if (!this.sortByPrice()) return stations;
+    // 1. ¿Qué base usamos? ¿La ordenada por precio o la normal?
+    let stations = this.sortByPrice()
+      ? [...this.userPreferencesService.sortedFavoritesByPrice()]
+      : [...this.favoriteGasStations()];
 
-    const fuel = this.userPreferences().fuelType || 'GASOLINE';
-    // Mapeo de campo de precio según combustible
-    const priceField = (fuel === 'GASOLINE' || fuel === 'ALL' || fuel === 'ELECTRIC') ? 'Gasolina95' : 'Diesel';
+    // 2. ¿Filtramos por marca? Si el botón está activo, usamos la lógica del servicio
+    if (this.filterByBrand()) {
+      const preferredBrands = this.userPreferences().preferredBrands || [];
+      if (preferredBrands.length > 0) {
+        // Aquí es donde el servicio hace el trabajo
+        stations = stations.filter(s =>
+          preferredBrands.some((b: string) => b.toUpperCase().trim() === s.marca?.toUpperCase().trim())
+        );
+      }
+    }
 
-    return stations.sort((a, b) => {
-      const priceA = (a as any)[priceField] ?? Infinity;
-      const priceB = (b as any)[priceField] ?? Infinity;
-      return priceA - priceB;
-    });
+    // 3. ¿Filtramos por precio máximo
+    if (this.filterByMaxPrice()) {
+      const maxPrice = this.userPreferences().maxPrice;
+      const fuel = this.userPreferences().fuelType || 'ALL';
+      const priceField = this.getPriceField(fuel);
+
+      if (maxPrice > 0) {
+        stations = stations.filter(s => {
+          const price = (s as any)[priceField];
+          return price !== null && price <= maxPrice;
+        });
+      }
+    }
+
+    return stations;
   });
+
+  // Métodos para los botones
+  toggleMaxPriceFilter(): void {
+    this.filterByMaxPrice.update(v => !v);
+  }
+
+  toggleBrandFilter(): void {
+    this.filterByBrand.update(v => !v);
+  }
+
+  // Helper privado para el mapeo (puedes moverlo a una constante si prefieres)
+  private getPriceField(fuel: string): string {
+    const map: any = {
+      'ALL': 'Gasolina95', 'GASOLINE_95': 'Gasolina95', 'GASOLINE_98': 'Gasolina98',
+      'DIESEL': 'Diesel', 'DIESEL_PREMIUM': 'DieselPremium', 'GLP': 'GLP'
+    };
+    return map[fuel] || 'Gasolina95';
+  }
 
   // --- Gestión de Rutas ---
 
