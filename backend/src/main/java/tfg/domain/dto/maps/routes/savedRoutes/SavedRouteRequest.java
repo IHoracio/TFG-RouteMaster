@@ -8,10 +8,8 @@ public class SavedRouteRequest {
 	
 	private String name;
     private List<PointDTO> puntosDTO;
-    
     private List<Coords> polylineCoords;
     private List<Coords> legCoords;
-    
     private String totalDistance;
     private String totalDuration;
     private Long gasRadius;

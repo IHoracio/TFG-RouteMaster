@@ -18,7 +18,7 @@ import { SearchBarFormComponent } from '../../components/search-bar-components/s
 import { ActivatedRoute } from '@angular/router';
 import { PlaceSelection } from '../../../Dto/place-selection';
 import { TranslationService } from '../../../services/singleton/translation.service';
-import { FullRouteData } from '../../../Dto/full-route-data';
+import { FullRouteData, PointDTO } from '../../../Dto/full-route-data';
 
 @Component({
   selector: 'app-search-bar',
@@ -217,7 +217,7 @@ export class SearchBarComponent implements OnInit {
       const lang = this.translation.getCurrentLang ? this.translation.getCurrentLang() : 'es';
       const totalDistance = this.mapCommunication.getTotalDistance() || '0 Km';
       const totalDuration = this.mapCommunication.getTotalDuration() || '0 mins';
-      
+
 
       this.searchBarService.saveFavouriteRoute(this.routeAlias(), this.routeFormResponse, polylineCoords, legCoords, lang, totalDistance, totalDuration)
         .subscribe({
@@ -246,7 +246,33 @@ export class SearchBarComponent implements OnInit {
     const gasRadius = this.routeFormResponse.radioKm || 1;
     const lang = this.translation.getCurrentLang?.() || 'es';
 
-    this.routeService.shareRoute(totalDistance, totalDUration, polylineCoords, legCoords, gasRadius, lang).subscribe({
+    // 1. Construir la lista estructurada de puntos para el Backend
+    const pointDTO: PointDTO[] = [];
+
+    if (this.routeFormResponse.origin) {
+      pointDTO.push({
+        type: 'ORIGIN',
+        placeSelection: this.routeFormResponse.origin
+      });
+    }
+
+    if (this.routeFormResponse.waypoints && this.routeFormResponse.waypoints.length > 0) {
+      this.routeFormResponse.waypoints.forEach(wp => {
+        pointDTO.push({
+          type: 'WAYPOINT',
+          placeSelection: wp
+        });
+      });
+    }
+
+    if (this.routeFormResponse.destination) {
+      pointDTO.push({
+        type: 'DESTINATION',
+        placeSelection: this.routeFormResponse.destination
+      });
+    }
+
+    this.routeService.shareRoute(totalDistance, totalDUration, pointDTO, polylineCoords, legCoords, gasRadius, lang).subscribe({
       next: (resp) => {
         navigator.clipboard.writeText(resp.url).then(() => {
           this.showShareMessage.set(true);
@@ -259,11 +285,45 @@ export class SearchBarComponent implements OnInit {
   private loadSharedRoute(token: string) {
     this.routeService.getSharedRoute(token).subscribe({
       next: (data) => {
+        // 1. Enviar datos geométricos y de entorno al mapa
         if (data.polylineCoords) this.mapCommunication.sendRoute(data.polylineCoords);
         if (data.legCoords) this.mapCommunication.sendPoints(data.legCoords);
         if (data.gasStations) this.mapCommunication.sendGasStations(data.gasStations);
         if (data.weatherData) this.mapCommunication.sendWeather(data.weatherData);
-      }
+
+        // Hidratamos distancia y duración en el mapa para que se vean los datos de la ruta
+        if (data.totalDistance) this.mapCommunication.sendTotalDistance(data.totalDistance);
+        if (data.totalDuration) this.mapCommunication.sendTotalDuration(data.totalDuration);
+
+        // 2. Extraer y procesar los puntos semánticos del DTO
+        const puntos = data.pointDTO || [];
+        const origin = puntos.find(p => p.type === 'ORIGIN')?.placeSelection || null;
+        const destination = puntos.find(p => p.type === 'DESTINATION')?.placeSelection || null;
+        const waypoints = puntos.filter(p => p.type === 'WAYPOINT').map(p => p.placeSelection);
+
+        this.waypointTypes = waypoints.map(() => 'text');
+
+        // 3. Asignar los datos al objeto del formulario (aunque la UI no los pinte en 'destination')
+        // Se quedan guardados en memoria para cuando el usuario pulse 'Guardar Favorita'
+        this.routeFormResponse = {
+          origin: origin,
+          destination: destination,
+          waypoints: [...waypoints],
+          optimizeWaypoints: this.routeFormResponse.optimizeWaypoints,
+          optimizeRoute: this.routeFormResponse.optimizeRoute,
+          avoidTolls: this.routeFormResponse.avoidTolls,
+          radioKm: this.routeFormResponse.radioKm
+        };
+
+        // 4. Activar estados de renderizado de gasolineras
+        this.allGasStations.set(data.gasStations || []);
+        this.createdRoute.set(true);
+
+        // 5. TRUCO DE LA PESTAÑA: Forzar el cambio al tab 'route' 
+        // Oculta el formulario manual y muestra directamente las opciones de rutas guardadas/favoritas
+        this.activeTab.set('route');
+      },
+      error: (err) => console.error('Error al cargar ruta compartida:', err)
     });
   }
 

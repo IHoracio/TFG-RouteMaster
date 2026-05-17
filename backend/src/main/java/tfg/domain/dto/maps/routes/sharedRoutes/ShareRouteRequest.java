@@ -3,10 +3,12 @@ package tfg.domain.dto.maps.routes.sharedRoutes;
 import java.util.List;
 
 import tfg.domain.dto.maps.routes.Coords;
+import tfg.domain.dto.maps.routes.savedRoutes.PointDTO;
 
 public class ShareRouteRequest {
 	private String totalDistance;
 	private String totalDuration;
+	private List<PointDTO> puntosDTO;
 	private List<Coords> polylineCoords;
     private List<Coords> legCoords;
     private Long gasRadius;
@@ -46,6 +48,12 @@ public class ShareRouteRequest {
 	}
 	public void setTotalDuration(String totalDuration) {
 		this.totalDuration = totalDuration;
+	}
+	public List<PointDTO> getPuntosDTO() {
+		return puntosDTO;
+	}
+	public void setPuntosDTO(List<PointDTO> puntosDTO) {
+		this.puntosDTO = puntosDTO;
 	}
 
 }

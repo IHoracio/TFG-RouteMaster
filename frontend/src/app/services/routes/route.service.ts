@@ -3,7 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { RouteFormResponse } from '../../Dto/route-form-response';
 import { GasStation } from '../../Dto/gas-station';
-import { FullRouteData } from '../../Dto/full-route-data';
+import { FullRouteData, PointDTO } from '../../Dto/full-route-data';
 import { environment } from '../../../environments/environment';
 import { Coords } from '../../Dto/maps-dtos';
 import { TranslationService } from '../singleton/translation.service';
@@ -20,6 +20,7 @@ export class RouteService {
   shareRoute(
     totalDistance: string,
     totalDuration: string,
+    pointDTO: PointDTO[],
     polylineCoords: Coords[],
     legCoords: Coords[],
     gasRadius: number,
@@ -28,6 +29,7 @@ export class RouteService {
     const body = {
       totalDistance,
       totalDuration,
+      puntosDTO: pointDTO,
       polylineCoords,
       legCoords,
       gasRadius,

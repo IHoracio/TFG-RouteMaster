@@ -29,6 +29,7 @@ import tfg.domain.dto.maps.routes.Leg;
 import tfg.domain.dto.maps.routes.RouteGroup;
 import tfg.domain.dto.maps.routes.Step;
 import tfg.domain.dto.maps.routes.autocomplete.PlaceSelection;
+import tfg.domain.dto.maps.routes.savedRoutes.PointDTO;
 import tfg.domain.dto.weather.EstadoCielo;
 import tfg.domain.dto.weather.HourlyWeather;
 import tfg.domain.dto.weather.Weather;
@@ -77,10 +78,30 @@ public class RoutesServiceImpl implements RoutesService {
 	    }
 	    
 		RouteGroup routeGroup = routeGroupOpt.get();
+		
+		// 1. Construir la lista de PointDTO dinámicamente a partir de los parámetros del formulario
+	    List<PointDTO> puntosDTO = new ArrayList<>();
+	    
+	    if (origin != null) {
+	        puntosDTO.add(new PointDTO("ORIGIN", origin));
+	    }
+	    
+	    if (waypoints != null) {
+	        for (PlaceSelection wp : waypoints) {
+	            if (wp != null) {
+	                puntosDTO.add(new PointDTO("WAYPOINT", wp));
+	            }
+	        }
+	    }
+	    
+	    if (destination != null) {
+	        puntosDTO.add(new PointDTO("DESTINATION", destination));
+	    }
 		        
 		        return Optional.of(new FullRouteData(
 		        	getTotalLegsDistance(routeGroup),
 		        	getTotalLegsDuration(routeGroup),
+		        	puntosDTO,
 		            extractRoutePolylinePoints(routeGroup),
 		            getLegCoords(routeGroup),
 		            getGasStationsCoordsForRoute(routeGroup, gasRadius),

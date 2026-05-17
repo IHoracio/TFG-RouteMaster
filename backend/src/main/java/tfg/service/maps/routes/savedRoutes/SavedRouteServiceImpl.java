@@ -114,6 +114,16 @@ public class SavedRouteServiceImpl implements SavedRouteService {
             List<Coords> legCoords = objectMapper.readValue(
                     route.getLegCoordsJson(), new TypeReference<List<Coords>>() {}
             );
+            
+         // Mapear correctamente de List<Point> (Entidad) a List<PointDTO> (DTO)
+            List<PointDTO> puntosDTO = Optional.ofNullable(route.getPuntos())
+                    .orElse(List.of())
+                    .stream()
+                    .map(point -> new PointDTO(
+                            point.getType().name(), // Convierte el Enum (ORIGIN, etc) a String
+                            point.getPlaceSelection() // Pasa el record PlaceSelection tal cual
+                    ))
+                    .toList();
 
             // Datos frescos
             List<Gasolinera> freshGasStations = gasolineraService
@@ -126,6 +136,7 @@ public class SavedRouteServiceImpl implements SavedRouteService {
             FullRouteData fullData = new FullRouteData(
                     route.getTotalDistance(),
                     route.getTotalDuration(),
+                    puntosDTO,
                     polylineCoords,
                     legCoords,
                     freshGasStations,

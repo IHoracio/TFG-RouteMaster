@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import tfg.domain.dto.maps.routes.Coords;
 import tfg.domain.dto.maps.routes.CoordsWithWeather;
 import tfg.domain.dto.maps.routes.FullRouteData;
+import tfg.domain.dto.maps.routes.savedRoutes.PointDTO;
 import tfg.domain.dto.maps.routes.sharedRoutes.ShareRouteRequest;
 import tfg.entity.gasolinera.Gasolinera;
 import tfg.entity.maps.routes.SharedRoute;
@@ -51,11 +52,13 @@ public class SharedRouteServiceImpl implements SharedRouteService {
             // Convertir listas a JSON
             String polylineJson = objectMapper.writeValueAsString(request.getPolylineCoords());
             String legsJson = objectMapper.writeValueAsString(request.getLegCoords());
+            String puntosJson = objectMapper.writeValueAsString(request.getPuntosDTO());
 
             SharedRoute sharedRoute = new SharedRoute(
                     token,
                     polylineJson,
                     legsJson,
+                    puntosJson,
                     request.getTotalDistance(),
                     request.getTotalDuration(),
                     request.getGasRadius(),
@@ -96,6 +99,10 @@ public class SharedRouteServiceImpl implements SharedRouteService {
             List<Coords> legCoords = objectMapper.readValue(
                     params.getLegCoordsJson(), new TypeReference<List<Coords>>() {}
             );
+            
+            List<PointDTO> puntosDTO = objectMapper.readValue(
+                    params.getPuntosJson(), new TypeReference<List<PointDTO>>() {}
+            );
 
             // Datos frescos (se recalculan en cada consulta)
             List<Gasolinera> freshGasStations = gasolineraService
@@ -107,6 +114,7 @@ public class SharedRouteServiceImpl implements SharedRouteService {
             FullRouteData fullData = new FullRouteData(
                     params.getTotalDistance(),
                     params.getTotalDuration(),
+                    puntosDTO,
                     polylineCoords,
                     legCoords,
                     freshGasStations,

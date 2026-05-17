@@ -2,20 +2,24 @@ package tfg.domain.dto.maps.routes;
 
 import java.util.List;
 
+import tfg.domain.dto.maps.routes.savedRoutes.PointDTO;
 import tfg.entity.gasolinera.Gasolinera;
 
 public class FullRouteData {
 	private String totalDistance;
 	private String totalDuration;
+	private List<PointDTO> puntosDTO;
     private List<Coords> polylineCoords;
     private List<Coords> legCoords;
     private List<Gasolinera> gasStations;
     private List<CoordsWithWeather> weatherData;
-	public FullRouteData(String totalDistance, String totalDuration, List<Coords> polylineCoords,
-			List<Coords> legCoords, List<Gasolinera> gasStations, List<CoordsWithWeather> weatherData) {
+	public FullRouteData(String totalDistance, String totalDuration, List<PointDTO> puntosDTO,
+			List<Coords> polylineCoords, List<Coords> legCoords, List<Gasolinera> gasStations,
+			List<CoordsWithWeather> weatherData) {
 		super();
 		this.totalDistance = totalDistance;
 		this.totalDuration = totalDuration;
+		this.puntosDTO = puntosDTO;
 		this.polylineCoords = polylineCoords;
 		this.legCoords = legCoords;
 		this.gasStations = gasStations;
@@ -56,6 +60,12 @@ public class FullRouteData {
 	}
 	public void setWeatherData(List<CoordsWithWeather> weatherData) {
 		this.weatherData = weatherData;
+	}
+	public List<PointDTO> getPuntosDTO() {
+		return puntosDTO;
+	}
+	public void setPuntosDTO(List<PointDTO> puntosDTO) {
+		this.puntosDTO = puntosDTO;
 	}
 
 }
