@@ -41,6 +41,10 @@ export class MapPageComponent implements OnDestroy, AfterViewInit {
   protected mapReady = signal<boolean>(false);
   protected showWeatherOverlay = signal<boolean>(false);
 
+  private totalDistance: string = '';
+  private totalDuration: string = '';
+  private routeInfoWindow?: google.maps.InfoWindow;
+
   protected selectedGasStation = signal<GasStation | null>(null);
   private selectedMarker: google.maps.marker.AdvancedMarkerElement | null = null;
 
@@ -130,6 +134,14 @@ export class MapPageComponent implements OnDestroy, AfterViewInit {
     this.teardownMap();
   }
 
+  public setTotalDistance(distance: string): void {
+    this.totalDistance = distance;
+  }
+
+  public setTotalDuration(duration: string): void {
+    this.totalDuration = duration;
+  }
+
   private async initMap(): Promise<void> {
     this.mapReady.set(false);
     this.mapElement = document.getElementById('map') as HTMLElement | null;
@@ -153,16 +165,18 @@ export class MapPageComponent implements OnDestroy, AfterViewInit {
       zoom: 6,
       disableDefaultUI: true,
       zoomControl: true,
-      mapId: isSatelliteType ? environment.defaultMapId : environment.styledMapId,
+      ...(isSatelliteType ? {mapId: environment.defaultMapId} : { mapId: environment.styledMapId }),
+      mapTypeId: mapTypeId,
       colorScheme: !isSatelliteType && this.themeService.selectedTheme() === 'DARK'
         ? google.maps.ColorScheme.DARK
-        : google.maps.ColorScheme.LIGHT,
-      mapTypeId: mapTypeId,
+        : google.maps.ColorScheme.LIGHT
     };
 
     if (!this.mapElement) return;
 
     this.map = new Map(this.mapElement, mapOptions);
+
+     this.map.setMapTypeId(mapTypeId);
 
     // Configuración del Clusterer con el nuevo requisito (mínimo 5)
     this.markerClusterer = new MarkerClusterer({
@@ -180,6 +194,8 @@ export class MapPageComponent implements OnDestroy, AfterViewInit {
     if (this.isRecreatingMap) return;
     this.isRecreatingMap = true;
     try {
+      // Antes de destruir el mapa viejo, guardamos los datos importantes
+      const currentMapTypeId = this.map?.getMapTypeId() ?? this.getMapTypeId();
       const center = this.map?.getCenter() ?? null;
       const zoom = this.map?.getZoom() ?? null;
       const routePath = this.routePolyline?.getPath()?.getArray()?.map(point => ({
@@ -193,11 +209,14 @@ export class MapPageComponent implements OnDestroy, AfterViewInit {
       this.teardownMap();
       await this.initMap();
 
-      if (this.map && center) {
-        this.map.setCenter(center);
-      }
-      if (this.map && typeof zoom === 'number') {
-        this.map.setZoom(zoom);
+      if (this.map) {
+        this.map.setMapTypeId(currentMapTypeId);
+        if (center) {
+          this.map.setCenter(center);
+        }
+        if (typeof zoom === 'number') {
+          this.map.setZoom(zoom);
+        }
       }
       if (routePath && routePath.length) {
         this.drawRoute(routePath);
@@ -247,6 +266,7 @@ export class MapPageComponent implements OnDestroy, AfterViewInit {
 
   private getMapTypeId(): google.maps.MapTypeId {
     const type = this.mapType();
+    console.log("mapType signal = "+this.mapType());
     return this.getMapTypeIdFromRaw(type);
   }
 
@@ -254,8 +274,7 @@ export class MapPageComponent implements OnDestroy, AfterViewInit {
     switch (type) {
       case 'MAP': return google.maps.MapTypeId.ROADMAP;
       case 'MAP_RELIEF': return google.maps.MapTypeId.TERRAIN;
-      case 'SATELLITE': return google.maps.MapTypeId.SATELLITE;
-      case 'SATELLITE_LABELS': return google.maps.MapTypeId.HYBRID;
+      case 'SATELLITE': return google.maps.MapTypeId.HYBRID;
       default: return google.maps.MapTypeId.ROADMAP;
     }
   }
@@ -300,8 +319,11 @@ export class MapPageComponent implements OnDestroy, AfterViewInit {
         geodesic: true,
         strokeColor: '#4285F4',
         strokeOpacity: 0.85,
-        strokeWeight: 5,
+        strokeWeight: 6,
         map: this.map
+      });
+      this.routePolyline.addListener('click', (e: google.maps.PolyMouseEvent) => {
+        this.showRouteInfo(e.latLng);
       });
     } else {
       this.routePolyline.setMap(this.map);
@@ -313,12 +335,63 @@ export class MapPageComponent implements OnDestroy, AfterViewInit {
     this.map.fitBounds(bounds, { top: 50, right: 50, bottom: 50, left: 50 });
   }
 
+  private showRouteInfo(position: google.maps.LatLng | null): void {
+    if (!position || !this.map) return;
+
+    if (this.routeInfoWindow) {
+      this.routeInfoWindow.close();
+    }
+
+    // Extraemos las traducciones (ajusta las claves si son distintas en tu JSON)
+    const title = this.translation.translate('route.summary') || 'Resumen de la ruta';
+    const distLabel = this.translation.translate('route.distance') || 'Distancia';
+    const durLabel = this.translation.translate('route.duration') || 'Duración';
+
+    const content = `
+    <div style="
+      background-color: var(--surface-color); 
+      color: var(--text-color); 
+      padding: 12px; 
+      border-radius: 8px;
+      font-family: var(--font-family);
+      min-width: 150px;
+      border: 1px solid var(--border-color);
+    ">
+      <h3 style="
+        margin: 0 0 8px 0; 
+        font-size: 14px; 
+        color: var(--primary-color);
+        border-bottom: 1px solid var(--border-color);
+        padding-bottom: 4px;
+      ">${title}</h3>
+      
+      <p style="margin: 4px 0; font-size: 13px; color: var(--text-color);">
+        <b style="color: var(--secondary-color);">${distLabel}:</b> ${this.totalDistance}
+      </p>
+      
+      <p style="margin: 4px 0; font-size: 13px; color: var(--text-color);">
+        <b style="color: var(--secondary-color);">${durLabel}:</b> ${this.totalDuration}
+      </p>
+    </div>
+  `;
+
+    this.routeInfoWindow = new google.maps.InfoWindow({
+      content: content,
+      position: position
+    });
+
+    this.routeInfoWindow.open(this.map);
+  }
+
   public clearRoute(): void {
     if (this.routePolyline) {
+      google.maps.event.clearInstanceListeners(this.routePolyline);
       this.routePolyline.setMap(null);
       this.routePolyline = undefined;
     }
     this.routePathCache = null;
+    this.totalDistance = '';
+    this.totalDuration = '';
 
     if (this.waypoints && this.waypoints.length) {
       this.waypoints.forEach(wp => {
@@ -406,7 +479,6 @@ export class MapPageComponent implements OnDestroy, AfterViewInit {
   }
 
   private updateMarkers(): void {
-    console.log("updateMarkers")
     const stations = [...this.gasStationsFromInput(), ...this.gasStationsFromService()];
     this.clearGasStations();
 

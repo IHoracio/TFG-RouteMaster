@@ -35,9 +35,15 @@ export class UserInfoComponent {
   sortByPrice = signal<boolean>(false);
   filterByMaxPrice = signal<boolean>(false);
   filterByBrand = signal<boolean>(false);
+  activeSection = signal<string | null>(null);
 
   ngOnInit(): void {
     this.refreshFavoritePrices();
+  }
+
+  // Selectores de sección
+  toggleSection(section: string): void {
+    this.activeSection.update(v => v === section ? null : section);
   }
 
   private refreshFavoritePrices(): void {
@@ -185,12 +191,30 @@ export class UserInfoComponent {
 
   // --- Helpers ---
 
+  // Comprueba si la ruta tiene paradas intermedias
+  hasWaypoints(route: any): boolean {
+    return route.points?.some((p: any) => p.type === 'WAYPOINT');
+  }
+
+  // Ahora devuelve un array de strings en lugar de un solo string
+  getWaypoints(route: any): string[] {
+    if (!route.points) return [];
+
+    return route.points
+      .filter((p: any) => p.type === 'WAYPOINT')
+      .map((p: any) => p.placeSelection?.address || this.translation.translate('userInfo.na'));
+  }
+
   getOrigin(route: any): string {
-    return route.points?.find((p: any) => p.type === 'ORIGIN')?.address || this.translation.translate('userInfo.na');
+    // Añadimos el "?" después de placeSelection por seguridad
+    return route.points?.find((p: any) => p.type === 'ORIGIN')?.placeSelection?.address
+      || this.translation.translate('userInfo.na');
   }
 
   getDestination(route: any): string {
-    return route.points?.find((p: any) => p.type === 'DESTINATION')?.address || this.translation.translate('userInfo.na');
+    // Añadimos el "?" después de placeSelection por seguridad
+    return route.points?.find((p: any) => p.type === 'DESTINATION')?.placeSelection?.address
+      || this.translation.translate('userInfo.na');
   }
 
   getStationType(type: string): string {
@@ -201,6 +225,10 @@ export class UserInfoComponent {
       'R': 'Convencional'
     };
     return types[type] || type;
+  }
+
+  isSectionActive(section: string): boolean {
+    return this.activeSection() === section;
   }
 
 }

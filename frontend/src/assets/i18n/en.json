@@ -92,6 +92,11 @@
         "noRouteSelected": "No route selected",
         "noFavoriteGas": "You dont have favourite gas stations"
     },
+    "route": {
+        "summary": "Summary of the route",
+        "distance": "Distance",
+        "duration": "Duration"
+    },
     "fuelTypes": {
         "GASOLINE": "Gasoline",
         "DIESEL": "Diesel",
@@ -194,7 +199,7 @@
         "secondTitle": "Favorite Gas Stations",
         "generic": "General Preferences",
         "vehicle": "Vehicle Preferences",
-        "gasStations": "Favorite Gas Stations",
+        "gasStations": "Modify favorite Gas Stations",
         "fuelType": "Fuel Type:",
         "addBrand": "Add Favorite Gas Station Brand:",
         "searchBrand": "Search brand",
@@ -237,8 +242,8 @@
         "surname": "Surname:",
         "favoriteRoutes": "Favorite Routes",
         "distance": "Distance:",
-        "origin": "Origin:",
-        "destination": "Destination:",
+        "origin": "Origin",
+        "destination": "Destination",
         "share": "Share",
         "delete": "Delete",
         "rename": "Rename",
@@ -264,7 +269,8 @@
         "activateMaxPrice": "Activate max price filter",
         "activateBrandFilter": "Activate brand filter",
         "deactivateMaxPrice": "Dectivate max price filter",
-        "deactivateBrandFilter": "Dectivate brand filter"
+        "deactivateBrandFilter": "Dectivate brand filter",
+        "waypoints": "Waypoints"
     },
     "alertEvents": {
         "Moderate thunderstorm warning": "Moderate thunderstorm warning",

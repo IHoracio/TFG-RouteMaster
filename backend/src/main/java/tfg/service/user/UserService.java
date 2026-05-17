@@ -3,6 +3,7 @@ package tfg.service.user;
 import java.util.List;
 import java.util.Optional;
 
+import tfg.domain.dto.gasolineras.FavouriteGasStationRequest;
 import tfg.domain.dto.gasolineras.UserSavedGasStationDto;
 import tfg.domain.dto.user.UserBasicInfoDTO;
 import tfg.domain.dto.user.UserDTO;
@@ -29,7 +30,7 @@ public interface UserService {
 
 	List<UserSavedGasStationDto> getSavedGasStations(String email);
 
-	Optional<String> saveGasStation(String email, String alias, Long idEstacion);
+	Optional<String> saveGasStation(String email, FavouriteGasStationRequest dto);
 
 	boolean renameGasStation(String email, String oldAlias, String newAlias);
 

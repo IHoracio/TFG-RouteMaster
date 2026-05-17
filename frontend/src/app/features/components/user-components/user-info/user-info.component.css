@@ -2,7 +2,7 @@
    1. CONTENEDOR PRINCIPAL
    ========================================================================== */
 .user-info {
-  background: var(--surface-color);
+  background: linear-gradient(to left, var(--surface-color), var(--header-footer-gradient-end));
   padding: var(--spacing-lg);
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
@@ -17,7 +17,7 @@
 
 /* Detalles del Usuario (Email, Nombre...) */
 .user-details p {
-  margin: 8px 0;
+  margin: 7px 0;
   color: inherit;
 }
 
@@ -26,11 +26,6 @@
    ========================================================================== */
 .favorites-section {
   margin-top: var(--spacing-lg);
-}
-
-.favorites-section h3 {
-  margin-bottom: var(--spacing-sm);
-  color: var(--primary-color);
 }
 
 /* Contenedor de la lista de gasolineras */
@@ -176,11 +171,24 @@
   margin-top: 5px;
 }
 
+.route-waypoints {
+  font-size: 0.85em;
+  margin: 2px 0;
+  padding-left: 10px;
+  border-left: 2px solid var(--border-color);
+}
+
 .actions button {
   margin-left: 8px;
   font-size: 12px;
   /* Reutiliza el estilo base de botones que tenías antes si lo prefieres */
 }
 
-.btn-delete { background-color: #dc3545 !important; color: white; }
-.btn-rename { background-color: var(--primary-color) !important; color: white; }
+
+/* Espaciado vertical para strong que actúan como título o encabezado */
+.route-addresses > strong,
+.prices-grid p > strong {
+  display: block;
+  margin: 0.5em 0;
+  font-weight: bold;
+}

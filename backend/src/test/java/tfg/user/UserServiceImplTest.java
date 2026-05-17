@@ -17,7 +17,10 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import tfg.domain.dto.gasolineras.FavouriteGasStationRequest;
 import tfg.domain.dto.gasolineras.UserSavedGasStationDto;
+import tfg.domain.dto.maps.routes.Coords;
+import tfg.domain.dto.maps.routes.autocomplete.PlaceSelection;
 import tfg.domain.dto.user.UserBasicInfoDTO;
 import tfg.domain.dto.user.UserDTO;
 import tfg.domain.dto.user.UserResponseDTO;
@@ -246,19 +249,45 @@ class UserServiceImplTest {
 
     @Test
     void saveGasStation_externalGasolinera_foundAndSaved() {
+        // 1. Preparar datos de entrada
+        String email = "u@mail.com";
+        Long idEstacion = 1L;
+        
+        // Creamos el DTO que ahora requiere el método
+        FavouriteGasStationRequest dto = new FavouriteGasStationRequest();
+        dto.setAlias("Home");
+        dto.setIdEstacion(idEstacion);
+        dto.setNombreEstacion("Gasolinera Centro");
+        // Simulamos el PlaceSelection (usando el Record que definiste)
+        PlaceSelection ps = new PlaceSelection("id123", "Calle Falsa 123", "Gasolinera Centro", new Coords(40.0, -3.0));
+        dto.setPlaceSelection(ps);
+
         User user = new User();
         user.setSavedGasStations(new ArrayList<>());
+        
         Gasolinera gas = new Gasolinera();
-        gas.setIdEstacion(1L);
+        gas.setIdEstacion(idEstacion);
 
-        when(userRepository.findByEmail("u@mail.com")).thenReturn(Optional.of(user));
-        when(gasolineraRepository.findByIdEstacion(1L)).thenReturn(Optional.empty());
-        when(gasolineraService.getGasolineraForId(1L)).thenReturn(Optional.of(gas));
+        // 2. Definir comportamiento de los mocks
+        when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
+        when(gasolineraRepository.findByIdEstacion(idEstacion)).thenReturn(Optional.empty());
+        when(gasolineraService.getGasolineraForId(idEstacion)).thenReturn(Optional.of(gas));
 
-        Optional<String> result = userService.saveGasStation("u@mail.com", "Home", 1L);
+        // 3. Ejecutar el método con el nuevo DTO
+        Optional<String> result = userService.saveGasStation(email, dto);
 
-        assertTrue(result.isEmpty());
+        // 4. Verificaciones
+        assertTrue(result.isEmpty(), "El resultado debería ser vacío (éxito)");
+        assertEquals(1, user.getSavedGasStations().size());
+        assertEquals("Home", user.getSavedGasStations().get(0).getAlias());
+        
+        // Verificar que los datos de ubicación se guardaron en la entidad
+        UserSavedGasStation savedEntity = user.getSavedGasStations().get(0);
+        assertEquals("id123", savedEntity.getGooglePlaceId());
+        assertEquals(40.0, savedEntity.getSelectedLat());
+
         verify(gasolineraRepository).save(gas);
+        verify(userRepository).save(user);
     }
     
     @Test

@@ -26,6 +26,8 @@ export class SearchBarService {
         this.giveCoords(data.polylineCoords);
         this.giveWaypointCoords(data.legCoords);
         this.giveWeatherCoords(data.weatherData);
+        this.giveTotalDistance(data.totalDistance);
+        this.giveTotalDuration(data.totalDuration);
         return data.gasStations; // Retornamos esto para la UI
       })
     );
@@ -43,8 +45,8 @@ export class SearchBarService {
     return this.userService.receiveSavedRoutes();
   }
 
-  saveFavouriteRoute(alias: string, routeFormResponse: RouteFormResponse, polylineCoords: Coords[], legCoords: Coords[], lang: string) {
-    return this.routeService.saveFavouriteRoute(alias, routeFormResponse, polylineCoords, legCoords, lang);
+  saveFavouriteRoute(alias: string, routeFormResponse: RouteFormResponse, polylineCoords: Coords[], legCoords: Coords[], lang: string, totalDistance: string, totalDuration: string) {
+    return this.routeService.saveFavouriteRoute(alias, routeFormResponse, polylineCoords, legCoords, lang, totalDistance, totalDuration);
   }
 
   giveCoords(coords: Coords[]) {
@@ -61,5 +63,13 @@ export class SearchBarService {
 
   giveWeatherCoords(weather: WeatherData[]) {
     this.mapCommunication.sendWeather(weather);
+  }
+
+  giveTotalDistance(distance: string) {
+    this.mapCommunication.sendTotalDistance(distance);
+  }
+
+  giveTotalDuration(duration: string) {
+    this.mapCommunication.sendTotalDuration(duration);
   }
 }

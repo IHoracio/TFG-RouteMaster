@@ -14,6 +14,10 @@ public class SharedRoute {
 
     @Column(columnDefinition = "LONGTEXT")
     private String legCoordsJson;
+    
+    private String totalDistance;
+    
+    private String totalDuration;
 
     private Long gasRadius;
     
@@ -21,13 +25,19 @@ public class SharedRoute {
 
     public SharedRoute() {}
 
-    public SharedRoute(String token, String polylineCoordsJson, String legCoordsJson, Long gasRadius, String lang) {
-        this.token = token;
-        this.polylineCoordsJson = polylineCoordsJson;
-        this.legCoordsJson = legCoordsJson;
-        this.gasRadius = gasRadius;
-        this.lang = lang;
-    }
+	public SharedRoute(String token, String polylineCoordsJson, String legCoordsJson, String totalDistance,
+			String totalDuration, Long gasRadius, String lang) {
+		super();
+		this.token = token;
+		this.polylineCoordsJson = polylineCoordsJson;
+		this.legCoordsJson = legCoordsJson;
+		this.totalDistance = totalDistance;
+		this.totalDuration = totalDuration;
+		this.gasRadius = gasRadius;
+		this.lang = lang;
+	}
+
+
 
 	public String getToken() {
 		return token;
@@ -67,6 +77,22 @@ public class SharedRoute {
 
 	public void setLang(String lang) {
 		this.lang = lang;
+	}
+
+	public String getTotalDistance() {
+		return totalDistance;
+	}
+
+	public void setTotalDistance(String totalDistance) {
+		this.totalDistance = totalDistance;
+	}
+
+	public String getTotalDuration() {
+		return totalDuration;
+	}
+
+	public void setTotalDuration(String totalDuration) {
+		this.totalDuration = totalDuration;
 	}
 
 }

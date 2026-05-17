@@ -18,12 +18,16 @@ export class RouteService {
   constructor(private http: HttpClient) { }
 
   shareRoute(
+    totalDistance: string,
+    totalDuration: string,
     polylineCoords: Coords[],
     legCoords: Coords[],
     gasRadius: number,
     lang: string
   ): Observable<{ url: string }> {
     const body = {
+      totalDistance,
+      totalDuration,
       polylineCoords,
       legCoords,
       gasRadius,
@@ -53,28 +57,62 @@ export class RouteService {
     });
   }
 
-  saveFavouriteRoute(alias: string, routeFormResponse: RouteFormResponse, polylineCoords: Coords[], legCoords: Coords[], lang: string) {
+saveFavouriteRoute(
+  alias: string,
+  routeFormResponse: RouteFormResponse,
+  polylineCoords: Coords[],
+  legCoords: Coords[],
+  lang: string,
+  totalDistance: string,
+  totalDuration: string
+) {
+  const puntosDTO: any[] = [];
 
-    const puntosDTO: any[] = [];
-    puntosDTO.push({ type: 'ORIGIN', address: routeFormResponse.origin });
+  // CAMBIO CLAVE: Enviamos 'placeSelection' en lugar de 'address'
+  // y pasamos el objeto completo (routeFormResponse.origin ya es de tipo PlaceSelection)
+  puntosDTO.push({ 
+    type: 'ORIGIN', 
+    placeSelection: routeFormResponse.origin 
+  });
 
-    if (routeFormResponse.waypoints && routeFormResponse.waypoints.length > 0) {
-      routeFormResponse.waypoints.forEach(wp => {
-        puntosDTO.push({ type: 'WAYPOINT', address: wp });
-      });
-    }
+  if (routeFormResponse.waypoints && routeFormResponse.waypoints.length > 0) {
+    routeFormResponse.waypoints.forEach(wp => {
+      if (wp) { // Validamos que el waypoint no sea null
+        puntosDTO.push({ 
+          type: 'WAYPOINT', 
+          placeSelection: wp 
+        });
+      }
+    });
+  }
 
-    puntosDTO.push({ type: 'DESTINATION', address: routeFormResponse.destination });
+  puntosDTO.push({ 
+    type: 'DESTINATION', 
+    placeSelection: routeFormResponse.destination 
+  });
 
-    const body = {
-      name: alias,
-      puntosDTO: puntosDTO,
-      polylineCoords: polylineCoords,
-      legCoords: legCoords,
-      gasRadius: routeFormResponse.radioKm || 1,
-      language: lang
-    };
+  const body = {
+    name: alias,
+    puntosDTO: puntosDTO,
+    polylineCoords: polylineCoords,
+    legCoords: legCoords,
+    gasRadius: routeFormResponse.radioKm || 1,
+    language: lang,
+    totalDistance: totalDistance,
+    totalDuration: totalDuration
+  };
 
-    return this.http.post(`${this.apiUrl}/api/savedRoute/save`, body, { withCredentials: true });
+  return this.http.post(`${this.apiUrl}/api/savedRoute/save`, body, { withCredentials: true });
+}
+
+  /**
+ * Llama al backend para ejecutar (recuperar trazado y datos) una ruta guardada
+ * @param routeId El UUID de la ruta guardada
+ */
+  executeSavedRoute(routeId: string): Observable<FullRouteData> {
+    return this.http.get<FullRouteData>(
+      `${this.apiUrl}/api/savedRoute/execute/${routeId}`,
+      { withCredentials: true }
+    );
   }
 }

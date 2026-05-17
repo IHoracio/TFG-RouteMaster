@@ -259,6 +259,31 @@
   opacity: 0.5;
 }
 
+/* Tarjeta resumen */
+
+/* Estilos para el contenedor interno del InfoWindow de Google */
+.gm-style .gm-style-iw-c {
+  background-color: var(--surface-color) !important;
+  color: var(--text-color) !important;
+  box-shadow: var(--header-shadow) !important; /* Usamos tu sombra temática */
+  border: 1px solid var(--border-color);
+}
+
+/* Estilos para la "flechita" inferior del InfoWindow */
+.gm-style .gm-style-iw-tc::after {
+  background-color: var(--surface-color) !important;
+}
+
+/* El botón de cerrar (la X) */
+.gm-style .gm-style-iw-t .gm-ui-hover-effect {
+  top: 4px !important;
+  right: 4px !important;
+}
+
+.gm-style .gm-style-iw-t .gm-ui-hover-effect > span {
+  background-color: var(--text-color) !important; /* Hace que la X cambie de color */
+}
+
 /* Gas Station Widget Mobile Styles */
 @media (max-width: 767px) {
   .gas-station-widget {

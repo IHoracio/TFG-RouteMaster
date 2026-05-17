@@ -18,6 +18,7 @@ import { SearchBarFormComponent } from '../../components/search-bar-components/s
 import { ActivatedRoute } from '@angular/router';
 import { PlaceSelection } from '../../../Dto/place-selection';
 import { TranslationService } from '../../../services/singleton/translation.service';
+import { FullRouteData } from '../../../Dto/full-route-data';
 
 @Component({
   selector: 'app-search-bar',
@@ -115,10 +116,21 @@ export class SearchBarComponent implements OnInit {
 
   // --- LÓGICA DE FILTRADO (Computed)
   filteredGasStations = computed(() => {
+
     let stations = this.allGasStations();
     const prefs = this.userPrefs();
+
+    const fuelPriceMap: Record<string, string> = {
+      'ALL': 'Gasolina95',
+      'GASOLINE_95': 'Gasolina95',
+      'GASOLINE_98': 'Gasolina98',
+      'DIESEL': 'Diesel',
+      'DIESEL_PREMIUM': 'DieselPremium',
+      'GLP': 'GLP'
+    };
+
     const fuelType = prefs.fuelType || 'GASOLINE';
-    const fuelKey = (fuelType === 'ALL' || fuelType === 'GASOLINE') ? 'Gasolina95' : 'Diesel';
+    const fuelKey = fuelPriceMap[fuelType] || 'Gasolina95';
 
     if (this.isLoggedIn() && this.filterByBrands()) {
       const brands = prefs.preferredBrands || [];
@@ -127,7 +139,7 @@ export class SearchBarComponent implements OnInit {
 
     if (this.filterByCheapest()) {
       const cheapest = stations.reduce((min, station) => {
-        const price = station[fuelKey];
+        const price = (station as any)[fuelKey];
         return price != null && (min.price == null || price < min.price) ? { station, price } : min;
       }, { station: null as GasStation | null, price: null as number | null });
       stations = cheapest.station ? [cheapest.station] : [];
@@ -136,7 +148,7 @@ export class SearchBarComponent implements OnInit {
     if (this.isLoggedIn() && this.filterByMaxPrice()) {
       const maxPrice = prefs.maxPrice || 0;
       stations = stations.filter(s => {
-        const price = s[fuelKey];
+        const price = (s as any)[fuelKey];
         return price != null && price <= maxPrice;
       });
     }
@@ -153,30 +165,47 @@ export class SearchBarComponent implements OnInit {
     this.activeTab.set(tab);
   }
 
-  onSubmit() {
-    // Si estamos en la pestaña de rutas guardadas, cargamos la configuración de la ruta
-    if (this.activeTab() === 'route' && this.selectedSavedRouteId()) {
-      const route = this.savedRoutes().find(r => r.routeId == this.selectedSavedRouteId());
-      if (route) {
-        this.routeFormResponse = {
-          origin: route.points.find((p: any) => p.type === 'ORIGIN')?.placeSelection || null,
-          destination: route.points.find((p: any) => p.type === 'DESTINATION')?.placeSelection || null,
-          waypoints: route.points.filter((p: any) => p.type === 'WAYPOINT').map((p: any) => p.placeSelection),
-          optimizeWaypoints: route.optimizeWaypoints ?? false,
-          optimizeRoute: route.optimizeRoute ?? false,
-          avoidTolls: route.avoidTolls ?? false,
-          radioKm: route.gasRadius ?? this.userPrefs().radioKm
-        };
-      }
-    }
+  // En el componente de tu SearchBar
 
-    this.searchBarService.onSubmit(this.routeFormResponse).subscribe({
-      next: (gasStations) => {
-        this.allGasStations.set(gasStations);
-        this.createdRoute.set(true);
-      },
-      error: (err) => console.error('Error en búsqueda:', err)
-    });
+  onSubmit() {
+    const routeId = this.selectedSavedRouteId();
+
+    // CASO A: Ejecutar una ruta guardada previamente
+    if (this.activeTab() === 'route' && routeId) {
+
+      this.routeService.executeSavedRoute(routeId).subscribe({
+        next: (fullData: FullRouteData) => {
+          // 1. Enviamos los datos al mapa mediante el servicio de comunicación
+          this.mapCommunication.sendRoute(fullData.polylineCoords);
+          this.mapCommunication.sendPoints(fullData.legCoords);
+          this.mapCommunication.sendGasStations(fullData.gasStations);
+          this.mapCommunication.sendWeather(fullData.weatherData || []);
+
+          // 2. Actualizamos distancia y duración (para que el InfoWindow y otros los vean)
+          this.mapCommunication.sendTotalDistance(fullData.totalDistance);
+          this.mapCommunication.sendTotalDuration(fullData.totalDuration);
+
+          // 3. Estado de la UI
+          this.allGasStations.set(fullData.gasStations);
+          this.createdRoute.set(true);
+        },
+        error: (err) => {
+          this.errorMessage.set(this.translation.translate('search.loadError') || 'Error al cargar ruta');
+          console.error('Error al ejecutar ruta guardada:', err);
+        }
+      });
+
+    }
+    // CASO B: Búsqueda fresca (Origen y Destino manuales)
+    else {
+      this.searchBarService.onSubmit(this.routeFormResponse).subscribe({
+        next: (gasStations) => {
+          this.allGasStations.set(gasStations);
+          this.createdRoute.set(true);
+        },
+        error: (err) => console.error('Error en búsqueda fresca:', err)
+      });
+    }
   }
 
   saveRoute() {
@@ -186,8 +215,11 @@ export class SearchBarComponent implements OnInit {
       const polylineCoords = this.mapCommunication?.getPolylineCoords() || [];
       const legCoords = this.mapCommunication?.getLegCoords() || [];
       const lang = this.translation.getCurrentLang ? this.translation.getCurrentLang() : 'es';
+      const totalDistance = this.mapCommunication.getTotalDistance() || '0 Km';
+      const totalDuration = this.mapCommunication.getTotalDuration() || '0 mins';
+      
 
-      this.searchBarService.saveFavouriteRoute(this.routeAlias(), this.routeFormResponse, polylineCoords, legCoords, lang)
+      this.searchBarService.saveFavouriteRoute(this.routeAlias(), this.routeFormResponse, polylineCoords, legCoords, lang, totalDistance, totalDuration)
         .subscribe({
           next: (response) => {
             // ACTUALIZACIÓN GLOBAL Y PERSISTENTE
@@ -207,12 +239,14 @@ export class SearchBarComponent implements OnInit {
   }
 
   shareRoute() {
+    const totalDistance = this.mapCommunication?.getTotalDistance() || '0 km';
+    const totalDUration = this.mapCommunication?.getTotalDuration() || '0 mins';
     const polylineCoords = this.mapCommunication?.getPolylineCoords() || [];
     const legCoords = this.mapCommunication?.getLegCoords() || [];
     const gasRadius = this.routeFormResponse.radioKm || 1;
     const lang = this.translation.getCurrentLang?.() || 'es';
 
-    this.routeService.shareRoute(polylineCoords, legCoords, gasRadius, lang).subscribe({
+    this.routeService.shareRoute(totalDistance, totalDUration, polylineCoords, legCoords, gasRadius, lang).subscribe({
       next: (resp) => {
         navigator.clipboard.writeText(resp.url).then(() => {
           this.showShareMessage.set(true);
@@ -247,9 +281,17 @@ export class SearchBarComponent implements OnInit {
   }
 
   // --- HANDLERS DE UI
-  handleOriginSelected(selection: PlaceSelection) { this.routeFormResponse.origin = selection; }
-  handleDestinationSelected(selection: PlaceSelection) { this.routeFormResponse.destination = selection; }
-  handleWaypointSelected(index: number, selection: PlaceSelection) { this.routeFormResponse.waypoints[index] = selection; }
+  handleOriginSelected(selection: PlaceSelection) {
+    this.routeFormResponse.origin = selection;
+  }
+
+  handleDestinationSelected(selection: PlaceSelection) {
+    this.routeFormResponse.destination = selection;
+  }
+
+  handleWaypointSelected(index: number, selection: PlaceSelection) {
+    this.routeFormResponse.waypoints[index] = selection;
+  }
 
   toggleFormCollapse() { this.isFormCollapsed.update(v => !v); }
   toggleFilterByBrands() { this.filterByBrands.update(v => !v); }

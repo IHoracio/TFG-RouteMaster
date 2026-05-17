@@ -164,8 +164,8 @@ export class GasStationsPreferencesComponent {
   private createPlaceSelectionFromGasStation(station: GasStation): PlaceSelection {
     return {
       address: station.direccion,
-      // Inventamos un placeId o usamos uno que identifique que viene de nuestra DB
-      placeId: `INTERNAL_${station.idEstacion}`,
+      // Lo dejamos como null para que google utilice las cordenadas
+      placeId: null,
       coords: {
         lat: station.latitud,
         lng: station.longitud

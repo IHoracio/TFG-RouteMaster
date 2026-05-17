@@ -9,6 +9,7 @@ import { GasStationsPreferencesComponent } from './gas-stations-preferences/gas-
 import { VehiclePreferencesComponent } from './vehicle-preferences/vehicle-preferences';
 import { TranslationService } from '../../../../services/singleton/translation.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { ThemeService } from '../../../../services/singleton/theme.service';
 
 @Component({
   selector: 'app-user-preferences',
@@ -18,6 +19,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 })
 export class UserPreferencesComponent {
   translation = inject(TranslationService);
+  theme = inject(ThemeService);
   private userPreferencesService = inject(UserPreferencesService);
   router = inject(Router);
 
@@ -29,9 +31,6 @@ export class UserPreferencesComponent {
 
   // 1. Definimos el disparador
   private readonly saveTrigger = new Subject<void>();
-
-  // 2. Exponemos el estado para el HTML
-  readonly canSave = this.userPreferencesService.hasChanges;
 
   constructor() {
     // Solo inicializamos el "escuchador"
@@ -72,6 +71,9 @@ export class UserPreferencesComponent {
         this.userPreferencesService.serverUserPreferences.set({ ...this.userPreferences() });
         this.userPreferencesService.serverThemeLanguage.set({ ...this.themeLanguage() });
 
+        this.translation.setLanguage(themeLang.language);
+        this.theme.setTheme(themeLang.theme);
+
         window.scrollTo(0, 0);
         this.router.navigate(['/user']);
       }),
@@ -108,6 +110,11 @@ export class UserPreferencesComponent {
       avoidTolls: defaults.avoidTolls,
       radioKm: defaults.radioKm,
       preferredBrands: prefs.preferredBrands
+    });
+
+    this.userPreferencesService.updateData(this.themeLanguage, 'themeLanguage', {
+      theme: 'LIGHT',
+      language: 'ES'
     });
 
     // 2. Persistimos en el servidor

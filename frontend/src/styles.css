@@ -3,7 +3,7 @@
    ======================================== */
 :root {
   --bg-color: #aed1ff;
-  --surface-color: #b8e7f65c;
+  --surface-color: #ceebf5;
   --surface-secondary: #bcdcff;
   --autocomplete-surface: #8abdfa;
 
@@ -191,4 +191,118 @@ input[type="number"]::-webkit-outer-spin-button {
 input[type="number"] {
   -moz-appearance: textfield; /* Firefox a veces requiere ocultarlas para personalizarlas */
   appearance: textfield;
+}
+
+/* ========================================
+   9. Estilos globales mapa google
+   ======================================== */
+
+/* Estilos para el contenedor interno del InfoWindow de Google */
+.gm-style .gm-style-iw-c {
+  background-color: var(--surface-color) !important;
+  color: var(--text-color) !important;
+  box-shadow: var(--header-shadow) !important; /* Usamos tu sombra temática */
+  border: 1px solid var(--border-color);
+}
+
+/* Estilos para la "flechita" inferior del InfoWindow */
+.gm-style .gm-style-iw-tc::after {
+  background-color: var(--surface-color) !important;
+}
+
+/* El botón de cerrar (la X) */
+.gm-style .gm-style-iw-t .gm-ui-hover-effect {
+  top: 4px !important;
+  right: 4px !important;
+}
+
+.gm-style .gm-style-iw-t .gm-ui-hover-effect > span {
+  background-color: var(--text-color) !important; /* Hace que la X cambie de color */
+}
+
+/* ========================================
+   10. Estilos globales botones
+   ======================================== */
+
+.btn {
+  /* Espaciado y Dimensiones */
+  padding: var(--button-padding);
+  margin: var(--spacing-xs) 0; /* Margen vertical para que no se pegue a otros elementos */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  
+  /* Colores y Tipografía */
+  background: var(--secondary-color);
+  color: white;
+  font-family: var(--font-family);
+  font-weight: 500;
+  text-decoration: none;
+  
+  /* Bordes y Forma */
+  border: 1px solid rgba(255, 255, 255, 0.1); /* Borde casi invisible para dar definición */
+  border-radius: 6px; /* Un poco más redondeado para un look moderno */
+  
+  /* Efectos y Sombras */
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  
+  /* Evitar selección de texto */
+  user-select: none;
+}
+
+.btn-delete { background-color: #dc3545 !important; }
+
+/* --- Estados de Interacción --- */
+
+.btn:hover {
+  background-color: var(--primary-color);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  transform: translateY(-1px); /* Pequeño salto hacia arriba */
+}
+
+/* Espaciado entre botones adyacentes */
+.btn + .btn {
+  margin-left: var(--spacing-sm);
+}
+
+/* ========================================
+   11. Estilos globales de los contenedores colapsables del area personal
+   ======================================== */
+
+.collapsible {
+  margin-bottom: 10px;
+  border-radius: 6px;
+  overflow: hidden;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+.collapsible h3,
+.collapsible-header {
+  cursor: pointer;
+  background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+  color: whitesmoke;
+  padding: 0.85rem 1rem;
+  margin: 0;
+  font-size: 1rem;
+  transition: background-color 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.collapsible h3:hover,
+.collapsible-header:hover {
+  background: linear-gradient(to right, var(--secondary-color), var(--primary-color));
+}
+
+.collapsible-header svg {
+  display: block;
+}
+
+.collapsible > div {
+  background: transparent;
+  padding: 0;
 }

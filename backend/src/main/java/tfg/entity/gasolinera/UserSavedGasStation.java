@@ -22,6 +22,18 @@ public class UserSavedGasStation {
 
 	@Column(nullable = false)
 	private String alias;
+	
+	@Column
+    private String googlePlaceId;
+
+    @Column
+    private String selectedAddress;
+
+    @Column
+    private Double selectedLat;
+
+    @Column
+    private Double selectedLng;
 
 	@ManyToOne
 	@JsonBackReference("user-gasStations")
@@ -52,6 +64,46 @@ public class UserSavedGasStation {
 
 	public void setGasolinera(Gasolinera gasolinera) {
 		this.gasolinera = gasolinera;
+	}
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public String getGooglePlaceId() {
+		return googlePlaceId;
+	}
+
+	public void setGooglePlaceId(String googlePlaceId) {
+		this.googlePlaceId = googlePlaceId;
+	}
+
+	public String getSelectedAddress() {
+		return selectedAddress;
+	}
+
+	public void setSelectedAddress(String selectedAddress) {
+		this.selectedAddress = selectedAddress;
+	}
+
+	public Double getSelectedLat() {
+		return selectedLat;
+	}
+
+	public void setSelectedLat(Double selectedLat) {
+		this.selectedLat = selectedLat;
+	}
+
+	public Double getSelectedLng() {
+		return selectedLng;
+	}
+
+	public void setSelectedLng(Double selectedLng) {
+		this.selectedLng = selectedLng;
 	}
 
 }

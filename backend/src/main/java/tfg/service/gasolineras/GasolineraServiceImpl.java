@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 import tfg.controller.maps.routes.savedRoutes.SavedRouteController;
@@ -52,28 +53,35 @@ public class GasolineraServiceImpl implements GasolineraService {
     GasolineraServiceImpl() {
     }
 
-	@Override
-	@Cacheable(value = "gasolinera_id", cacheManager = "gasCacheManager")
-	public Optional<Gasolinera> getGasolineraForId(Long idEstacion) {
-		log.info("[gas-service] [" + LocalDateTime.now().toString() + "] Attempting to retrieve gas station with ID: "
-				+ idEstacion + ".");
+    @Override
+    @Cacheable(value = "gasolinera_id", cacheManager = "gasCacheManager")
+    public Optional<Gasolinera> getGasolineraForId(Long idEstacion) {
+        log.info("[gas-service] [" + LocalDateTime.now().toString() + "] Attempting to retrieve gas station with ID: " + idEstacion + ".");
 
-		Gasolinera retrieved = null;
-		try {
-			retrieved = restTemplate.getForObject(API_URL + "detalles/" + idEstacion, Gasolinera.class);
-		} catch (HttpClientErrorException.NotFound e) {
-			log.warn("[gas-service] [" + LocalDateTime.now().toString() + "] " + "No gas station was found for ID "
-					+ idEstacion + ".");
-		}
+        Gasolinera retrieved = null;
+        try {
+            retrieved = restTemplate.getForObject(API_URL + "detalles/" + idEstacion, Gasolinera.class);
+        } 
+        // Captura errores específicos de HTTP (404, 400, 500 del servidor externo)
+        catch (HttpStatusCodeException e) {
+            log.warn("[gas-service] Error HTTP externo para ID " + idEstacion + ": " + e.getStatusCode());
+        }
+        // Captura errores de RED (Timeouts, DNS, Conexión rechazada) <- AQUÍ ESTÁ EL FALLO DE HOY
+        catch (org.springframework.web.client.ResourceAccessException e) {
+            log.error("[gas-service] TIMEOUT o Error de conexión con la API externa para ID: " + idEstacion);
+        }
+        // Captura cualquier otro error inesperado
+        catch (Exception e) {
+            log.error("[gas-service] Error inesperado al consultar ID: " + idEstacion, e);
+        }
 
-		if (Objects.nonNull(retrieved)) {
-			log.info("[gas-service] [" + LocalDateTime.now().toString()
-					+ "] Succesfully retrieved gas station with ID: " + idEstacion + ".");
-			return Optional.of(retrieved);
-		} else {
-			return Optional.empty();
-		}
-	}
+        if (Objects.nonNull(retrieved)) {
+            log.info("[gas-service] Succesfully retrieved gas station with ID: " + idEstacion + ".");
+            return Optional.of(retrieved);
+        } else {
+            return Optional.empty();
+        }
+    }
 
 	@Override
 	@Cacheable(value = "getGasStationsForMunStr", cacheManager = "gasCacheManager")

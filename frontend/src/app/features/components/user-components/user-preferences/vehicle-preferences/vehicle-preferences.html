@@ -37,7 +37,7 @@
       @for (brand of userPreferences().preferredBrands; track brand) {
       <li>
         {{ capitalize(brand) }}
-        <button type="button" class="btn" (click)="removePreferredBrand(brand)">
+        <button type="button" class="btn btn-delete" (click)="removePreferredBrand(brand)">
           {{ translation.translate('preferences.remove') }}
         </button>
       </li>

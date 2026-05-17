@@ -109,11 +109,12 @@
         @if (activeTab() === "gas") {
             <p class="collapsible-content">
                 <select class="collapsible-content" name="gasStation" id="gasStation"
-                    [(ngModel)]="routeFormResponse().destination" required>
+                    [(ngModel)]="routeFormResponse().destination"
+                    required>
                     <option [ngValue]="null">{{ translation.translate('search.chooseGas') }}</option>
                     @if (isLoggedIn()) {
                         @for (gasStation of favouriteGasStations(); track gasStation.idEstacion) {
-                            <option [ngValue]="{ address: gasStation.direccion, placeId: 'gas_' + gasStation.idEstacion }">
+                            <option [ngValue]="gasStation.placeSelection">
                                 {{ gasStation.alias }} &mdash; {{ gasStation.marca }}
                             </option>
                         }

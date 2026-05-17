@@ -2,30 +2,15 @@ package tfg.domain.dto.gasolineras;
 
 import tfg.domain.dto.maps.routes.autocomplete.PlaceSelection;
 
-public class UserSavedGasStationDto {
-
-	private String alias;
+public class FavouriteGasStationRequest {
+    private String alias;
     private Long idEstacion;
     private String nombreEstacion;
     private String marca;
-	private String direccion;
-	private PlaceSelection placeSelection;
-    
-    public UserSavedGasStationDto() {}
-    
-	public UserSavedGasStationDto(String alias, Long idEstacion, String nombreEstacion, String marca, String direccion,
-			PlaceSelection placeSelection) {
-		super();
-		this.alias = alias;
-		this.idEstacion = idEstacion;
-		this.nombreEstacion = nombreEstacion;
-		this.marca = marca;
-		this.direccion = direccion;
-		this.placeSelection = placeSelection;
-	}
-
-
-
+    private Double latitud;
+    private Double longitud;
+    private String direccion;
+    private PlaceSelection placeSelection;
 	public String getAlias() {
 		return alias;
 	}
@@ -50,21 +35,29 @@ public class UserSavedGasStationDto {
 	public void setMarca(String marca) {
 		this.marca = marca;
 	}
-
+	public Double getLatitud() {
+		return latitud;
+	}
+	public void setLatitud(Double latitud) {
+		this.latitud = latitud;
+	}
+	public Double getLongitud() {
+		return longitud;
+	}
+	public void setLongitud(Double longitud) {
+		this.longitud = longitud;
+	}
 	public String getDireccion() {
 		return direccion;
 	}
-
 	public void setDireccion(String direccion) {
 		this.direccion = direccion;
 	}
-
 	public PlaceSelection getPlaceSelection() {
 		return placeSelection;
 	}
-
 	public void setPlaceSelection(PlaceSelection placeSelection) {
 		this.placeSelection = placeSelection;
 	}
-    
+
 }

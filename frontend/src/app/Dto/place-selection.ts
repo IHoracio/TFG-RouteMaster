@@ -1,7 +1,7 @@
 export interface PlaceSelection {
   /** ID único de Google Maps para el lugar. 
    * Es lo que debes enviar al Backend para usar en la Directions API. */
-  placeId: string;
+  placeId: string | null;
 
   /** Dirección completa y formateada (ej: "Calle Mayor 1, Madrid, España").
    * Útil para mostrar en etiquetas o resúmenes de usuario. */

@@ -1,19 +1,13 @@
 package tfg.service.maps.routes.savedRoutes;
 
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
-
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import tfg.domain.dto.maps.routes.Coords;
 import tfg.domain.dto.maps.routes.CoordsWithWeather;
 import tfg.domain.dto.maps.routes.FullRouteData;
@@ -29,6 +23,10 @@ import tfg.repository.UserRepository;
 import tfg.service.gasolineras.GasolineraService;
 import tfg.service.weather.WeatherService;
 
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
+
 @Service
 public class SavedRouteServiceImpl implements SavedRouteService {
 
@@ -36,11 +34,10 @@ public class SavedRouteServiceImpl implements SavedRouteService {
 
     @Autowired
     private UserRepository userRepository;
-    
+
     @Autowired
     private SavedRouteRepository repository;
 
-    // Nuevas dependencias para las coordenadas y los servicios en vivo
     @Autowired
     private ObjectMapper objectMapper;
 
@@ -53,22 +50,27 @@ public class SavedRouteServiceImpl implements SavedRouteService {
     @Override
     @Transactional
     public SavedRouteDTO saveRoute(SavedRouteRequest request, User user) {
+
         SavedRoute route = new SavedRoute();
         route.setName(request.getName());
         route.setUser(user);
         route.setLanguage(request.getLanguage());
         route.setGasRadius(request.getGasRadius());
-        
-        // Transformar las coordenadas a JSON
+
+        // === NUEVOS CAMPOS ===
+        route.setTotalDistance(request.getTotalDistance());
+        route.setTotalDuration(request.getTotalDuration());
+
+        // Transformar coordenadas a JSON
         try {
             route.setPolylineCoordsJson(objectMapper.writeValueAsString(request.getPolylineCoords()));
             route.setLegCoordsJson(objectMapper.writeValueAsString(request.getLegCoords()));
         } catch (JsonProcessingException e) {
-            log.error("Error al convertir coordenadas a JSON", e);
+            log.error("Error al convertir coordenadas a JSON para ruta: {}", request.getName(), e);
             throw new RuntimeException("Error al guardar la ruta", e);
         }
 
-        // Mapear los puntos visuales (Origen, Destino...)
+        // Mapear puntos (Origen, Destino, Waypoints...)
         List<Point> puntos = request.getPuntosDTO().stream().map(dto -> {
             Point point = new Point();
             point.setPlaceSelection(dto.getPlaceSelection());
@@ -81,118 +83,126 @@ public class SavedRouteServiceImpl implements SavedRouteService {
 
         SavedRoute saved = repository.save(route);
 
-        log.info("[route-save-service] [{}] Successfully saved route with name: {}.", LocalDateTime.now(), request.getName());
+        log.info("[route-save-service] [{}] Ruta guardada correctamente: '{}' | Dist: {} | Dur: {}",
+                LocalDateTime.now(), request.getName(), request.getTotalDistance(), request.getTotalDuration());
+
         return mapToDTO(saved);
     }
 
     // ==========================================================
-    // MÉTODO ESTRELLA: Ejecutar la ruta guardada
+    // EJECUTAR RUTA GUARDADA (con distancia y duración)
     // ==========================================================
     @Override
     public Optional<FullRouteData> executeRoute(String routeId) {
-        log.info("[route-save-service] [{}] Attempting to execute saved route with ID: {}", LocalDateTime.now(), routeId);
-        Optional<SavedRoute> routeOpt = repository.findByRouteId(routeId);
+        log.info("[route-save-service] [{}] Intentando ejecutar ruta guardada con ID: {}", 
+                LocalDateTime.now(), routeId);
 
+        Optional<SavedRoute> routeOpt = repository.findByRouteId(routeId);
         if (routeOpt.isEmpty()) {
+            log.warn("Ruta no encontrada con ID: {}", routeId);
             return Optional.empty();
         }
 
         SavedRoute route = routeOpt.get();
 
         try {
-            // 1. Leer las coordenadas desde MySQL
+            // Leer coordenadas guardadas
             List<Coords> polylineCoords = objectMapper.readValue(
                     route.getPolylineCoordsJson(), new TypeReference<List<Coords>>() {}
             );
+
             List<Coords> legCoords = objectMapper.readValue(
                     route.getLegCoordsJson(), new TypeReference<List<Coords>>() {}
             );
 
-            // 2. Usar el que se guardó por defecto
-            Long radiusToUse = route.getGasRadius();
+            // Datos frescos
+            List<Gasolinera> freshGasStations = gasolineraService
+                    .findGasStationsNearRoute(polylineCoords, route.getGasRadius());
 
-            // 3. Recuperar Gasolina y Tiempo "frescos"
-            List<Gasolinera> freshGasStations = gasolineraService.findGasStationsNearRoute(polylineCoords, radiusToUse);
-            List<CoordsWithWeather> freshWeather = weatherService.getWeatherForLegs(legCoords, route.getLanguage());
+            List<CoordsWithWeather> freshWeather = weatherService
+                    .getWeatherForLegs(legCoords, route.getLanguage());
 
-            FullRouteData fullData = new FullRouteData(polylineCoords, legCoords, freshGasStations, freshWeather);
+            // Crear FullRouteData con los nuevos campos
+            FullRouteData fullData = new FullRouteData(
+                    route.getTotalDistance(),
+                    route.getTotalDuration(),
+                    polylineCoords,
+                    legCoords,
+                    freshGasStations,
+                    freshWeather
+            );
+
             return Optional.of(fullData);
 
         } catch (JsonProcessingException e) {
-            log.error("[route-save-service] Error reading coordinates for route ID: {}", routeId, e);
-            throw new RuntimeException("Error al leer las coordenadas guardadas", e);
+            log.error("[route-save-service] Error al leer coordenadas de la ruta ID: {}", routeId, e);
+            throw new RuntimeException("Error al leer los datos de la ruta guardada", e);
         }
     }
 
     @Override
     @Transactional
     public void deleteRoute(String routeId, User user) {
-        log.info("[route-save-service] [{}] Attempting to delete saved route with ID: {} for user: {}", 
-                LocalDateTime.now(), routeId, user.getEmail());
-        
-        Optional<SavedRoute> route = repository.findByRouteId(routeId);
-        
-        if (route.isEmpty()) {
-            log.error("Couldn't find route with ID: {}", routeId);
+        Optional<SavedRoute> routeOpt = repository.findByRouteId(routeId);
+
+        if (routeOpt.isEmpty()) {
+            log.error("No se encontró la ruta con ID: {}", routeId);
             return;
         }
 
-        if (!route.get().getUser().getId().equals(user.getId())) {
-            log.error("The user {} tried to delete the route with ID: {} which isn't theirs.", user.getEmail(), routeId);
+        SavedRoute route = routeOpt.get();
+
+        if (!route.getUser().getId().equals(user.getId())) {
+            log.error("Usuario {} intentó eliminar una ruta que no le pertenece: {}", 
+                    user.getEmail(), routeId);
             return;
         }
 
-        repository.delete(route.get());
+        repository.delete(route);
+        log.info("[route-save-service] Ruta eliminada correctamente: {}", routeId);
     }
 
     @Override
     public Optional<SavedRouteDTO> getSavedRoute(String routeId) {
-        log.info("[route-save-service] [{}] Attempting to retrieve saved route with ID: {}", LocalDateTime.now(), routeId);
-        Optional<SavedRoute> route = repository.findByRouteId(routeId);
-        
-        if (route.isPresent()) {
-            return Optional.of(mapToDTO(route.get()));
-        } else {
-            log.warn("Couldn't retrieve a saved route for ID: {}", routeId);
-            return Optional.empty();
-        }
+        Optional<SavedRoute> routeOpt = repository.findByRouteId(routeId);
+        return routeOpt.map(this::mapToDTO);
     }
-    
+
     @Override
     public Optional<List<SavedRouteDTO>> getAllSavedRoutes(String email) {
-        log.info("[route-save-service] [{}] Attempting to retrieve all saved routes for user: {}", LocalDateTime.now(), email);
-        Optional<User> user = userRepository.findByEmail(email);
-
-        if (user.isPresent()) {
-            List<SavedRouteDTO> routes = user.get().getSavedRoutes().stream()
-                    .map(this::mapToDTO)
-                    .toList();
-            log.info("Retrieved {} saved routes for user: {}", routes.size(), email);
-            return Optional.of(routes);
-        } else {
-            log.warn("Couldn't retrieve saved routes because user was not found: {}", email);
+        Optional<User> userOpt = userRepository.findByEmail(email);
+        if (userOpt.isEmpty()) {
+            log.warn("Usuario no encontrado: {}", email);
             return Optional.empty();
         }
+
+        List<SavedRouteDTO> routes = userOpt.get().getSavedRoutes().stream()
+                .map(this::mapToDTO)
+                .toList();
+
+        return Optional.of(routes);
     }
 
     @Override
     @Transactional
     public SavedRouteDTO renameRoute(String name, SavedRouteDTO savedRoute) {
-        SavedRoute route = repository.findByRouteId(savedRoute.getRouteId()).orElseThrow();
+        SavedRoute route = repository.findByRouteId(savedRoute.getRouteId())
+                .orElseThrow(() -> new RuntimeException("Ruta no encontrada"));
+
         route.setName(name);
-        
         repository.save(route);
 
-        log.info("[route-save-service] [{}] Successfully renamed route with ID {} to: {}", 
-                LocalDateTime.now(), route.getRouteId(), name);
+        log.info("[route-save-service] Ruta renombrada a: {}", name);
         return mapToDTO(route);
     }
 
-    // Método helper para no repetir código de mapeo
+    // ====================== HELPER ======================
     private SavedRouteDTO mapToDTO(SavedRoute route) {
         SavedRouteDTO dto = new SavedRouteDTO();
         dto.setRouteId(route.getRouteId());
         dto.setName(route.getName());
+        dto.setTotalDistance(route.getTotalDistance());
+        dto.setTotalDuration(route.getTotalDuration());
 
         dto.setPoints(route.getPuntos().stream().map(p -> {
             PointDTO pdto = new PointDTO();

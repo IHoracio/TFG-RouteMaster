@@ -11,7 +11,7 @@ import { TranslationService } from '../../../../services/singleton/translation.s
 @Component({
   selector: 'app-search-bar-form',
   standalone: true,
-  imports: [FormsModule, NgFor, NgIf, GoogleAutocompleteComponent],
+  imports: [FormsModule, GoogleAutocompleteComponent],
   templateUrl: './search-bar-form.component.html',
   styleUrl: './search-bar-form.component.css'
 })

@@ -32,6 +32,8 @@ export interface UserPreferencesDto {
 }
 export interface SavedRouteDto {
   routeId: string;
+  totalDuration: string,
+  totalDistance: string,
   name: string;
   points: RoutePointDto[];
   user: string;

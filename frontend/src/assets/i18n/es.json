@@ -92,6 +92,11 @@
         "noRouteSelected": "No se ha seleccionado ninguna ruta",
         "noFavoriteGas": "No tienes gasolineras favoritas"
     },
+    "route": {
+        "summary": "Resumen de la ruta",
+        "distance": "Distancia",
+        "duration": "Duración"
+    },
     "fuelTypes": {
         "GASOLINE": "Gasolina",
         "DIESEL": "Diésel",
@@ -194,7 +199,7 @@
         "secondTitle": "Gasolineras Favoritas",
         "generic": "Preferencias Generales",
         "vehicle": "Preferencias del Vehículo",
-        "gasStations": "Gasolineras Favoritas",
+        "gasStations": "Modificar gasolineras Favoritas",
         "fuelType": "Tipo de Combustible:",
         "addBrand": "Añadir Marca de Gasolinera Favorita:",
         "searchBrand": "Buscar marca",
@@ -237,8 +242,8 @@
         "surname": "Apellido:",
         "favoriteRoutes": "Rutas Favoritas",
         "distance": "Distancia:",
-        "origin": "Origen:",
-        "destination": "Destino:",
+        "origin": "Origen",
+        "destination": "Destino",
         "share": "Compartir",
         "delete": "Eliminar",
         "rename": "Renombrar",
@@ -264,7 +269,8 @@
         "activateMaxPrice": "Activar filtro por precio maximo",
         "activateBrandFilter": "Activar filtro por marca",
         "deactivateMaxPrice": "Desactivar filtro por precio maximo",
-        "deactivateBrandFilter": "Desctivar filtro por marca"
+        "deactivateBrandFilter": "Desctivar filtro por marca",
+        "waypoints": "Puntos intermedios"
     },
     "alertEvents": {
         "Moderate thunderstorm warning": "Aviso de tormenta moderada",

@@ -86,7 +86,7 @@
             [class.selected]="selectedGasStation?.idEstacion === station.idEstacion">
           <strong>{{ station.alias }}</strong>  {{ station.nombreEstacion }}
           <div class="fav-buttons">
-            <button type="button" class="btn" (click)="removeFavoriteGasStation(station.idEstacion); $event.stopPropagation()">
+            <button type="button" class="btn btn-delete" (click)="removeFavoriteGasStation(station.idEstacion); $event.stopPropagation()">
               {{ translation.translate('preferences.remove') }}
             </button>
             <button type="button" class="btn" (click)="renameFavoriteGasStation(station); $event.stopPropagation()">

@@ -36,6 +36,12 @@ public class SavedRoute {
 	@OrderBy("id ASC")
 	@JsonManagedReference("route-puntos")
 	private List<Point> puntos;
+	
+	@Column(name = "total_distance", nullable = false)
+    private String totalDistance;
+
+    @Column(name = "total_duration", nullable = false)
+    private String totalDuration;
 
 	@ManyToOne
 	@JsonBackReference("user-routes")
@@ -123,6 +129,22 @@ public class SavedRoute {
 
 	public void setLanguage(String language) {
 		this.language = language;
+	}
+
+	public String getTotalDistance() {
+		return totalDistance;
+	}
+
+	public void setTotalDistance(String totalDistance) {
+		this.totalDistance = totalDistance;
+	}
+
+	public String getTotalDuration() {
+		return totalDuration;
+	}
+
+	public void setTotalDuration(String totalDuration) {
+		this.totalDuration = totalDuration;
 	}
 
 	@PrePersist

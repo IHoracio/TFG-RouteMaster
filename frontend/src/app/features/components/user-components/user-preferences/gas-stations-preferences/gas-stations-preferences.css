@@ -173,48 +173,6 @@ li.clickable-favorite.selected {
   flex: 1;
 }
 
-.btn {
-  /* Espaciado y Dimensiones */
-  padding: var(--button-padding);
-  margin: var(--spacing-xs) 0; /* Margen vertical para que no se pegue a otros elementos */
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  
-  /* Colores y Tipografía */
-  background: var(--secondary-color);
-  color: white;
-  font-family: var(--font-family);
-  font-weight: 500;
-  text-decoration: none;
-  
-  /* Bordes y Forma */
-  border: 1px solid rgba(255, 255, 255, 0.1); /* Borde casi invisible para dar definición */
-  border-radius: 6px; /* Un poco más redondeado para un look moderno */
-  
-  /* Efectos y Sombras */
-  cursor: pointer;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-  
-  /* Evitar selección de texto */
-  user-select: none;
-}
-
-/* --- Estados de Interacción --- */
-
-.btn:hover {
-  background-color: var(--primary-color);
-  border-color: var(--primary-color);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-  transform: translateY(-1px); /* Pequeño salto hacia arriba */
-}
-
-/* Espaciado entre botones adyacentes */
-.btn + .btn {
-  margin-left: var(--spacing-sm);
-}
-
 /* Espaciado entre botones dentro de fav-buttons */
 .fav-buttons {
   display: flex;

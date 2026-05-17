@@ -18,7 +18,7 @@ export class LogoutComponent implements OnInit {
     });
   }
 
-  private performFullCleanup() {
+  performFullCleanup() {
     // 1. Limpieza de datos (Síncrono)
     this.authService.sendUserSession(false);
     localStorage.clear();

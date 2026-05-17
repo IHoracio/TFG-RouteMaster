@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,8 +23,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
+import tfg.domain.dto.gasolineras.FavouriteGasStationRequest;
 import tfg.domain.dto.gasolineras.UserSavedGasStationDto;
-import tfg.domain.dto.maps.routes.PreferredBrandsDTO;
 import tfg.domain.dto.user.UserBasicInfoDTO;
 import tfg.domain.dto.user.UserDTO;
 import tfg.domain.dto.user.UserResponseDTO;
@@ -138,7 +139,7 @@ public class UserController {
 	@PutMapping("/preferences/update")
 	public ResponseEntity<Void> updatePreferences(
 			HttpServletRequest request,
-			@RequestBody PreferredBrandsDTO brandsDto,
+			@RequestBody List<String> preferredBrands,
 			@RequestParam int radioKm,
 			@RequestParam FuelType fuelType,
 			@RequestParam double maxPrice,
@@ -153,7 +154,7 @@ public class UserController {
 		}
 		service.updateRoutePreferences(
 				userOpt.get(),
-				brandsDto.preferredBrands,
+				preferredBrands,
 				radioKm,
 				fuelType,
 				maxPrice,
@@ -316,11 +317,10 @@ public class UserController {
 	@PutMapping("/favouriteStations")
 	public ResponseEntity<Void> saveGasStation(
 			HttpServletRequest request,
-			@RequestParam String alias,
-			@RequestParam Long idEstacion) {
+			@RequestBody FavouriteGasStationRequest dto) {
 
 		String email = cookieService.getCookieValue(request, "sesionActiva").get();
-		Optional<String> opValue = service.saveGasStation(email, alias, idEstacion);
+		Optional<String> opValue = service.saveGasStation(email, dto);
 		if (opValue.isPresent()) {
 			return ResponseEntity.notFound().build();
 		}
@@ -388,7 +388,12 @@ public class UserController {
 	@GetMapping("/favouriteStations")
 	public ResponseEntity<List<UserSavedGasStationDto>> getSavedGasStations(
 			HttpServletRequest request) {
-		String email = cookieService.getCookieValue(request, "sesionActiva").get();
+		Optional<String> emailOpt = cookieService.getCookieValue(request, "sesionActiva");
+		if (emailOpt.isEmpty()) {
+		    log.warn("Intento de acceso sin cookie de sesión activa");
+		    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+		}
+		String email = emailOpt.get();
 		return ResponseEntity.ok(service.getSavedGasStations(email));
 	}
 

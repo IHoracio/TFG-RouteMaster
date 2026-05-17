@@ -4,8 +4,8 @@ import { WeatherData } from "./weather-dtos";
 
 
 export interface FullRouteData {
-  totalDistance: String;
-  totalDuration: String;
+  totalDistance: string;
+  totalDuration: string;
   polylineCoords: Coords[];
   legCoords: Coords[];
   gasStations: GasStation[];

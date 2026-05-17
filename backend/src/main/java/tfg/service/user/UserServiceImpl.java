@@ -11,7 +11,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import tfg.domain.dto.gasolineras.FavouriteGasStationRequest;
 import tfg.domain.dto.gasolineras.UserSavedGasStationDto;
+import tfg.domain.dto.maps.routes.Coords;
+import tfg.domain.dto.maps.routes.autocomplete.PlaceSelection;
 import tfg.domain.dto.user.UserBasicInfoDTO;
 import tfg.domain.dto.user.UserDTO;
 import tfg.domain.dto.user.UserResponseDTO;
@@ -261,76 +264,110 @@ public class UserServiceImpl implements UserService {
 	}
 	
 	@Override
-	@Transactional
+	@Transactional(readOnly = true)
 	public List<UserSavedGasStationDto> getSavedGasStations(String email) {
-        log.info("[user-service] [" + LocalDateTime.now().toString() + "] "
-                + "Attempting to retrieve saved gas stations for user: " + email);
-        
-		return userRepository.findByEmail(email)
+	    log.info("[user-service] [" + LocalDateTime.now().toString() + "] "
+	            + "Attempting to retrieve saved gas stations for user: " + email);
+	    
+	    return userRepository.findByEmail(email)
 	            .map(user -> user.getSavedGasStations().stream()
-	                    .map(sg -> {
-	                        Gasolinera g = sg.getGasolinera();
-	                        return new UserSavedGasStationDto(
-	                                sg.getAlias(),
-	                                g.getIdEstacion(),
-	                                g.getNombreEstacion(),
-	                                g.getMarca(),
-	                                g.getDireccion()
-	                        );
-	                    })
+	                    .map(this::mapToDto) // Usamos el método de mapeo dedicado
 	                    .toList()
 	            )
 	            .orElse(List.of());
 	}
+
+	/**
+	 * Mapea la entidad de base de datos al DTO que espera el Frontend,
+	 * reconstruyendo el objeto PlaceSelection necesario para las rutas.
+	 */
+	private UserSavedGasStationDto mapToDto(UserSavedGasStation sg) {
+	    Gasolinera g = sg.getGasolinera();
+	    
+	    // 1. Reconstruimos el objeto Coords
+	    Coords coords = new Coords(
+	        sg.getSelectedLat() != null ? sg.getSelectedLat() : g.getLatitud(),
+	        sg.getSelectedLng() != null ? sg.getSelectedLng() : g.getLongitud()
+	    );
+
+	    // 2. Reconstruimos el PlaceSelection (Record)
+	    PlaceSelection ps = new PlaceSelection(
+	    	sg.getGooglePlaceId(),
+	        sg.getSelectedAddress() != null ? sg.getSelectedAddress() : g.getDireccion(),
+	        g.getNombreEstacion(),
+	        coords
+	    );
+
+	    // 3. Creamos el DTO de salida
+	    return new UserSavedGasStationDto(
+	            sg.getAlias(),
+	            g.getIdEstacion(),
+	            g.getNombreEstacion(),
+	            g.getMarca(),
+	            g.getDireccion(),
+	            ps
+	    );
+	}
 	
 	@Override
 	@Transactional
-	public Optional<String> saveGasStation(String email, String alias, Long idEstacion) {
+	public Optional<String> saveGasStation(String email, FavouriteGasStationRequest dto) {
 		log.info("[user-service] [" + LocalDateTime.now().toString() + "] "
-                + "Attempting to save gas station with id " + idEstacion
-                + " for user: " + email);
+	            + "Attempting to save gas station with id " + dto.getIdEstacion()
+	            + " and alias '" + dto.getAlias() + "' for user: " + email);
+		// 1. Buscar al usuario
 	    Optional<User> user = userRepository.findByEmail(email);
 	    if (user.isEmpty()) {
-	    	log.warn("[user-service] [" + LocalDateTime.now().toString() + "] "
-                    + "No user found with email: " + email);
+	        log.warn("[user-service] [" + LocalDateTime.now().toString() + "] "
+	                + "No user found with email: " + email);
 	        return Optional.of("Usuario no encontrado");
 	    }
 	    
-	    Optional<Gasolinera> gasolinera = gasolineraRepository.findByIdEstacion(idEstacion);
+	 // 2. Buscar la gasolinera (primero en local, luego externa si hace falta)
+	    Optional<Gasolinera> gasolinera = gasolineraRepository.findByIdEstacion(dto.getIdEstacion());
 	    
 	    if (gasolinera.isEmpty()) {
-	    	log.info("[user-service] [" + LocalDateTime.now().toString() + "] "
-                    + "Gas station not found locally, attempting external retrieval for id: "
-                    + idEstacion);
-	        gasolinera = gasolineraService.getGasolineraForId(idEstacion);
+	        log.info("[user-service] [" + LocalDateTime.now().toString() + "] "
+	                + "Gas station not found locally, attempting external retrieval for id: "
+	                + dto.getIdEstacion());
+	        gasolinera = gasolineraService.getGasolineraForId(dto.getIdEstacion());
 	        gasolinera.ifPresent(gasolineraRepository::save);
 	    }
 	    
 	    if (gasolinera.isEmpty()) {
-	    	log.error("[user-service] [" + LocalDateTime.now().toString() + "] "
-                    + "Gas station could not be found for id: " + idEstacion);
+	        log.error("[user-service] [" + LocalDateTime.now().toString() + "] "
+	                + "Gas station could not be found for id: " + dto.getIdEstacion());
 	        return Optional.of("Gasolinera no encontrada");
 	    }
 	    
 	    boolean exists = user.get().getSavedGasStations().stream()
-	        .anyMatch(g -> g.getAlias().equalsIgnoreCase(alias));
+	        .anyMatch(g -> g.getAlias().equalsIgnoreCase(dto.getAlias()));
 
 	    if (exists) {
-	    	log.warn("[user-service] [" + LocalDateTime.now().toString() + "] "
-                    + "Alias already exists for user " + email + ": " + alias);
+	        log.warn("[user-service] [" + LocalDateTime.now().toString() + "] "
+	                + "Alias already exists for user " + email + ": " + dto.getAlias());
 	        return Optional.of("Alias ya existente");
 	    }
 
+	 // 4. Crear la entidad de relación
 	    UserSavedGasStation saved = new UserSavedGasStation();
-	    saved.setAlias(alias);
+	    saved.setAlias(dto.getAlias());
 	    saved.setUser(user.get());
 	    saved.setGasolinera(gasolinera.get());
 
+	    // Mapeamos los datos de PlaceSelection del DTO a la Entidad
+	    if (dto.getPlaceSelection() != null) {
+	        saved.setGooglePlaceId(dto.getPlaceSelection().placeId());
+	        saved.setSelectedAddress(dto.getPlaceSelection().address());
+	        
+	        if (dto.getPlaceSelection().coords() != null) {
+	            saved.setSelectedLat(dto.getPlaceSelection().coords().getLat());
+	            saved.setSelectedLng(dto.getPlaceSelection().coords().getLng());
+	        }
+	    }
+
 	    user.get().getSavedGasStations().add(saved);
 	    userRepository.save(user.get());
-	    
-	    log.info("[user-service] [" + LocalDateTime.now().toString() + "] "
-                + "Gas station successfully saved for user: " + email);
 	    
 	    return Optional.empty();
 	}

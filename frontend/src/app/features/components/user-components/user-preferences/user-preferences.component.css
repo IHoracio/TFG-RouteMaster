@@ -1,5 +1,5 @@
 .user-preferences {
-  background: linear-gradient(to left, var(--header-footer-gradient-start), var(--header-footer-gradient-end));
+  background: linear-gradient(to left, var(--header-footer-gradient-end), var(--surface-color));
   padding: var(--spacing-lg);
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
@@ -120,28 +120,22 @@
   background: rgba(0, 123, 255, 0.1);
 }
 
+/* Contenedor de los botones */
 .buttons {
   display: flex;
-  align-items: center;
   justify-content: center;
-  gap: 10px;
-  margin-top: 20px;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
 }
 
-.buttons button {
-  padding: 10px 15px;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 14px;
-  background: var(--primary-color);
-  color: white;
-  transition: background-color 0.2s ease, transform 0.2s ease;
-}
-
-.buttons button:hover {
-  background: var(--secondary-color);
-  transform: scale(1.02);
+/* Responsive: apilar botones si colapsan */
+@media (max-width: 400px) {
+  .buttons {
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+  }
 }
 
 .clickable-station {
@@ -251,40 +245,4 @@
 
 .clickable-favorite:hover {
   background-color: rgba(240, 240, 240, 0.5);
-}
-
-.collapsible {
-  margin-bottom: 10px;
-  border-radius: 6px;
-  overflow: hidden;
-  border: 1px solid var(--border-color);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
-}
-
-.collapsible h3,
-.collapsible-header {
-  cursor: pointer;
-  background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
-  color: whitesmoke;
-  padding: 0.85rem 1rem;
-  margin: 0;
-  font-size: 1rem;
-  transition: background-color 0.2s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.collapsible h3:hover,
-.collapsible-header:hover {
-  background: linear-gradient(to right, var(--secondary-color), var(--primary-color));
-}
-
-.collapsible-header svg {
-  display: block;
-}
-
-.collapsible > div {
-  background: transparent;
-  padding: 0;
 }

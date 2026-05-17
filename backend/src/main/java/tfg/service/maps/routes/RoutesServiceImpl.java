@@ -68,7 +68,7 @@ public class RoutesServiceImpl implements RoutesService {
 	public Optional<FullRouteData> getFullRouteData(PlaceSelection origin, PlaceSelection destination, List<PlaceSelection> waypoints,
             boolean optimizeWaypoints, boolean optimizeRoute, String language, 
             boolean avoidTolls, Long gasRadius) {
-
+		
 	    Optional<RouteGroup> routeGroupOpt = getDirections(origin, destination, waypoints, optimizeWaypoints, 
 	                                                        optimizeRoute, language, avoidTolls);
 	    
@@ -79,6 +79,8 @@ public class RoutesServiceImpl implements RoutesService {
 		RouteGroup routeGroup = routeGroupOpt.get();
 		        
 		        return Optional.of(new FullRouteData(
+		        	getTotalLegsDistance(routeGroup),
+		        	getTotalLegsDuration(routeGroup),
 		            extractRoutePolylinePoints(routeGroup),
 		            getLegCoords(routeGroup),
 		            getGasStationsCoordsForRoute(routeGroup, gasRadius),
@@ -86,6 +88,56 @@ public class RoutesServiceImpl implements RoutesService {
 		        ));
 	}
 	
+	private String getTotalLegsDistance(RouteGroup routeGroup) {
+	    if (routeGroup == null || 
+	        routeGroup.getRoutes() == null || 
+	        routeGroup.getRoutes().isEmpty()) {
+	        log.warn("[routes-service] No se pudo calcular distancia total: routeGroup vacío");
+	        return "0 km";
+	    }
+
+	    long totalMeters = routeGroup.getRoutes().get(0).getLegs().stream()
+	            .mapToLong(leg -> leg.getDistance() != null ? leg.getDistance().getValue() : 0)
+	            .sum();
+
+	    // Convertir a km y formatear como Google
+	    double totalKm = totalMeters / 1000.0;
+	    
+	    if (totalKm >= 100) {
+	        return String.format("%.0f km", totalKm);           // 245 km
+	    } else if (totalKm >= 10) {
+	        return String.format("%.1f km", totalKm);           // 45.5 km
+	    } else {
+	        return String.format("%.2f km", totalKm);           // 8.75 km
+	    }
+	}
+
+	private String getTotalLegsDuration(RouteGroup routeGroup) {
+	    if (routeGroup == null || 
+	        routeGroup.getRoutes() == null || 
+	        routeGroup.getRoutes().isEmpty()) {
+	        log.warn("[routes-service] No se pudo calcular duración total: routeGroup vacío");
+	        return "0 min";
+	    }
+
+	    long totalSeconds = routeGroup.getRoutes().get(0).getLegs().stream()
+	            .mapToLong(leg -> leg.getDuration() != null ? leg.getDuration().getValue() : 0)
+	            .sum();
+
+	    long hours = totalSeconds / 3600;
+	    long minutes = (totalSeconds % 3600) / 60;
+
+	    if (hours > 0) {
+	        if (minutes > 0) {
+	            return String.format("%d h %d min", hours, minutes);
+	        } else {
+	            return String.format("%d h", hours);
+	        }
+	    } else {
+	        return String.format("%d min", minutes);
+	    }
+	}
+
 	@Override
 	public Optional<RouteGroup> getDirections(PlaceSelection origin, PlaceSelection destination, List<PlaceSelection> waypoints,
 	        boolean optimizeWaypoints, boolean optimizeRoute, String language, boolean avoidTolls) {
@@ -100,53 +152,60 @@ public class RoutesServiceImpl implements RoutesService {
 	            destination.name() != null ? destination.name() : destination.address(),
 	            waypoints.size());
 
+	    // --- MEJORA: Formateo dinámico de Origen y Destino ---
+	    String formattedOrigin = formatLocation(origin);
+	    String formattedDestination = formatLocation(destination);
+	    
+	    log.debug("[routes-service] Ubicaciones formateadas para Google API -> Origin: {}, Destination: {}", 
+	            formattedOrigin, formattedDestination);
+
 	    UriComponentsBuilder urlBuilder = UriComponentsBuilder
 	            .fromUriString(API_URL)
 	            .queryParam("mode", MODE)
 	            .queryParam("language", language)
 	            .queryParam("key", API_KEY_GOOGLE)
-	            .queryParam("origin", "place_id:" + origin.placeId());
+	            .queryParam("origin", formattedOrigin); // Usamos el valor formateado
 	    
 	    if (avoidTolls) {
 	        urlBuilder.queryParam("avoid", AVOID_TOLLS);
 	        log.debug("[routes-service] Evitando peajes activado.");
 	    }
 	    
-	    // Lógica de destino y optimización
-	    String destPlaceId = "place_id:" + destination.placeId();
 	    if (optimizeRoute) {
-	        urlBuilder.queryParam("destination", "place_id:" + origin.placeId());
+	        // Para rutas circulares (Round Trip), el destino es el origen
+	        urlBuilder.queryParam("destination", formattedOrigin);
 	        log.debug("[routes-service] Optimización de ruta completa activa (Round Trip).");
 	    } else {
-	        urlBuilder.queryParam("destination", destPlaceId);
+	        urlBuilder.queryParam("destination", formattedDestination); // Usamos el valor formateado
 	    }
 
-	    // Manejo de Waypoints
+	    // --- MEJORA: Manejo de Waypoints con formateo dinámico ---
 	    StringBuilder waypointsValue = new StringBuilder();
 	    if (optimizeWaypoints || optimizeRoute) {
 	        waypointsValue.append(OPTIMIZE);
 	    }
 	    
-	    // Extraemos los IDs con prefijo
 	    List<String> wpIdentifiers = waypoints.stream()
 	            .filter(java.util.Objects::nonNull)
-	            .map(wp -> "place_id:" + wp.placeId())
+	            .map(this::formatLocation) // Aplicamos la misma lógica a los waypoints
 	            .collect(Collectors.toList());
 	    
 	    if (optimizeRoute) {
-	        wpIdentifiers.add(destPlaceId);
+	        wpIdentifiers.add(formattedDestination);
 	    }
 	    
 	    if (!wpIdentifiers.isEmpty()) {
 	        waypointsValue.append(String.join("|", wpIdentifiers));
 	        urlBuilder.queryParam("waypoints", waypointsValue.toString());
-	        log.debug("[routes-service] Waypoints procesados: {}", wpIdentifiers);
+	        log.debug("[routes-service] Waypoints procesados para URL: {}", waypointsValue);
 	    }
 	    
 	    String finalUrl = urlBuilder.build().toUriString();
 
 	    try {
 	        long startTime = System.currentTimeMillis();
+	        log.debug("[routes-service] Llamando a Google Maps con URL: {}", finalUrl);
+	        
 	        RouteGroup response = restTemplate.getForObject(finalUrl, RouteGroup.class);
 	        long duration = System.currentTimeMillis() - startTime;
 
@@ -154,19 +213,44 @@ public class RoutesServiceImpl implements RoutesService {
 	            if (optimizeRoute) {
 	                response = deleteLastLeg(response);
 	            }
-	            log.info("[routes-service] Ruta calculada exitosamente en {}ms. Origen: {} -> Destino: {}", 
-	                    duration, origin.address(), destination.address());
+	            log.info("[routes-service] Ruta calculada exitosamente en {}ms.", duration);
 	            return Optional.of(response);
 	        } else {
 	            String status = (response != null) ? response.getStatus() : "NULL_RESPONSE";
-	            log.error("[routes-service] Google Maps retornó un status de error: {}. URL consultada: {}", status, finalUrl);
+	            log.error("[routes-service] Google Maps retornó un status de error: {}. Cuerpo: {}", status, response);
 	            return Optional.empty();
 	        }
 
 	    } catch (Exception e) {
-	        log.error("[routes-service] Excepción crítica al llamar a Google Maps API: {}", e.getMessage(), e);
+	        log.error("[routes-service] Excepción crítica al llamar a Google Maps API: {}", e.getMessage());
 	        return Optional.empty();
 	    }
+	}
+
+	/**
+	 * Método auxiliar para formatear la ubicación.
+	 * Prioriza el Place ID si existe y es válido. 
+	 * Si no, usa Coordenadas (lat,lng).
+	 * Si no, usa la dirección textual.
+	 */
+	private String formatLocation(PlaceSelection location) {
+	    if (location == null) return "";
+
+	    // 1. Validar Place ID (Que no sea nulo, ni vacío, ni el literal "null")
+	    String pid = location.placeId();
+	    if (pid != null && !pid.trim().isEmpty() && !pid.equalsIgnoreCase("null")) {
+	        return "place_id:" + pid;
+	    }
+
+	    // 2. Si no hay Place ID, usar Coordenadas (Formato: lat,lng)
+	    if (location.coords() != null) {
+	        log.debug("[routes-service] Usando coordenadas como fallback para: {}", location.name());
+	        return location.coords().getLat() + "," + location.coords().getLng();
+	    }
+
+	    // 3. Último recurso: Dirección textual
+	    log.warn("[routes-service] No se encontró Place ID ni Coordenadas, usando address: {}", location.address());
+	    return location.address();
 	}
 
 	private RouteGroup deleteLastLeg(RouteGroup response) {

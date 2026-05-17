@@ -2,8 +2,11 @@ package tfg.enums;
 
 public enum FuelType {
 	ALL("ALL"),
-    GASOLINE("GASOLINE"),
-    DIESEL("DIESEL");
+    GASOLINE_95("GASOLINE_95"),
+    GASOLINE_98("GASOLINE_98"),
+    DIESEL_PREMIUM("DIESEL_PREMIUM"),
+    DIESEL("DIESEL"),
+    GLP("GLP");
 	
 	private final String displayName;
 	

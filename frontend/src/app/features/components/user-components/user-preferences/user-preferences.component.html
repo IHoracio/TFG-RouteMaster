@@ -20,11 +20,13 @@
   </div>
 
   <div class="buttons">
-    <button type="button" (click)="savePreferences()">{{ translation.translate('preferences.save') }}</button>
-    <button type="button" (click)="resetPreferences()">{{ translation.translate('preferences.reset') }}</button>
+    <button class="btn" type="button" (click)="savePreferences()">{{ translation.translate('preferences.save')
+      }}</button>
+    <button class="btn btn-delete" type="button" (click)="resetPreferences()">{{
+      translation.translate('preferences.reset') }}</button>
   </div>
 
-  <h2 class="secondTitle">{{ translation.translate('preferences.secondTitle') }}</h2>
+  <h2 class="secondTitle"></h2>
 
   <div class="collapsible">
     <h3 (click)="toggleSection('gasStations')">

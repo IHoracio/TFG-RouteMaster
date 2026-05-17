@@ -12,6 +12,8 @@ export class MapCommunicationService {
   private mapPageInstance: MapPageComponent | null = null;
   private polylineCoords: Coords[] = [];
   private legCoords: Coords[] = [];
+  private totalDistance: string = '0 Km';
+  private totalDuration: string = '0 mins'
 
   registerMapPage(instance: MapPageComponent): boolean {
     if (this.mapPageInstance && this.mapPageInstance !== instance) {
@@ -52,10 +54,22 @@ export class MapCommunicationService {
     this.mapPageInstance?.setWeatherData(data);
   }
 
+  sendTotalDistance(distance: string): void {
+    this.totalDistance = distance;
+    this.mapPageInstance?.setTotalDistance(distance);
+  }
+
+  sendTotalDuration(duration: string): void {
+    this.totalDuration = duration;
+    this.mapPageInstance?.setTotalDuration(duration);
+  }
+
   clearRoute(): void {
     this.mapPageInstance?.clearRoute();
     this.legCoords = [];
     this.polylineCoords = [];
+    this.totalDistance = '0 Km';
+    this.totalDuration = '0 mins'
   }
 
   getPolylineCoords(): Coords[] {
@@ -64,6 +78,14 @@ export class MapCommunicationService {
 
   getLegCoords(): Coords[] {
     return this.legCoords;
+  }
+
+  getTotalDistance(): string {
+    return this.totalDistance;
+  }
+
+  getTotalDuration(): string {
+    return this.totalDuration;
   }
 
 }
