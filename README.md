@@ -25,17 +25,20 @@ La motivación surge de la necesidad de soluciones digitales para movilidad sost
 2. **Moverte al diectorio creado**: `cd TFG-RouteMaster`
 
 3. **Backend (Spring Boot)**:
-   - Configura MySQL local o AWS RDS.
-   - Ejecuta: `mvn spring-boot:run`
+   - Configura MySQL local o AWS RDS. (No es necesario cread la BD y sus tablas, ya que spring boot se puede encargar de hacerlo)
+   - Muevete al backend `cd backend`
+   - Ejecuta: `mvn spring-boot:run` (Intalar maven si no lo tienes)
 
 4. **Frontend (Angular)**:
-   - Instala dependencias: `npm install`
+   - Instala dependencias: `npm install` (Instalar node.js si no lo tienes)
    - Ejecuta: `ng serve`
    - Abre en `http://localhost:4200`
 
 5. **APIs**: Obtén claves de Google, Openweathermap y configúralas en `backend/src/main/resources/application.properties` dentro del backend y `frontend/src/environments/environment.ts` en el frontend.
    
    Tienes de ejemplo el `backend/src/main/resources/application-example.txt` y `frontend/src/environments/environment-example.txt`
+
+6. (Opcional) Si en ademas de ejecutarlo en local, quieres tenerlo desplegado com yo lo hize, en el backlog tienes toda la documentacion correspondiente para realizarlo.
 
 ## Uso
 - (Opcional) Regístrate y configura preferencias de vehículo.
