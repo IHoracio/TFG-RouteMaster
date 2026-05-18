@@ -66,7 +66,7 @@ public class SharedRouteServiceImplTest {
 
     @Test
     void getSharedRouteData_existingToken_ok() throws Exception {
-        SharedRoute sharedRoute = new SharedRoute("uuid-123", "[]", "[]", "", "", 5L, "es");
+        SharedRoute sharedRoute = new SharedRoute("uuid-123", "[]", "[]", "[]", "", "", 5L, "es");
 
         when(sharedRouteRepository.findById("uuid-123")).thenReturn(Optional.of(sharedRoute));
         when(objectMapper.readValue(anyString(), any(com.fasterxml.jackson.core.type.TypeReference.class))).thenReturn(new ArrayList<>());
