@@ -7,14 +7,14 @@ import { WeatherData } from "./weather-dtos";
 export interface FullRouteData {
   totalDistance: string;
   totalDuration: string;
-  pointDTO: PointDTO[];
+  puntosDTO: PuntosDTO[];
   polylineCoords: Coords[];
   legCoords: Coords[];
   gasStations: GasStation[];
   weatherData: WeatherData[];
 }
 
-export interface PointDTO {
+export interface PuntosDTO {
   type: 'ORIGIN' | 'WAYPOINT' | 'DESTINATION';
   placeSelection: PlaceSelection;
 }

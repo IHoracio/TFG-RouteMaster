@@ -18,7 +18,7 @@ import { SearchBarFormComponent } from '../../components/search-bar-components/s
 import { ActivatedRoute } from '@angular/router';
 import { PlaceSelection } from '../../../Dto/place-selection';
 import { TranslationService } from '../../../services/singleton/translation.service';
-import { FullRouteData, PointDTO } from '../../../Dto/full-route-data';
+import { FullRouteData, PuntosDTO } from '../../../Dto/full-route-data';
 
 @Component({
   selector: 'app-search-bar',
@@ -247,10 +247,10 @@ export class SearchBarComponent implements OnInit {
     const lang = this.translation.getCurrentLang?.() || 'es';
 
     // 1. Construir la lista estructurada de puntos para el Backend
-    const pointDTO: PointDTO[] = [];
+    const puntosDTO: PuntosDTO[] = [];
 
     if (this.routeFormResponse.origin) {
-      pointDTO.push({
+      puntosDTO.push({
         type: 'ORIGIN',
         placeSelection: this.routeFormResponse.origin
       });
@@ -258,7 +258,7 @@ export class SearchBarComponent implements OnInit {
 
     if (this.routeFormResponse.waypoints && this.routeFormResponse.waypoints.length > 0) {
       this.routeFormResponse.waypoints.forEach(wp => {
-        pointDTO.push({
+        puntosDTO.push({
           type: 'WAYPOINT',
           placeSelection: wp
         });
@@ -266,13 +266,13 @@ export class SearchBarComponent implements OnInit {
     }
 
     if (this.routeFormResponse.destination) {
-      pointDTO.push({
+      puntosDTO.push({
         type: 'DESTINATION',
         placeSelection: this.routeFormResponse.destination
       });
     }
 
-    this.routeService.shareRoute(totalDistance, totalDUration, pointDTO, polylineCoords, legCoords, gasRadius, lang).subscribe({
+    this.routeService.shareRoute(totalDistance, totalDUration, puntosDTO, polylineCoords, legCoords, gasRadius, lang).subscribe({
       next: (resp) => {
         navigator.clipboard.writeText(resp.url).then(() => {
           this.showShareMessage.set(true);
@@ -296,7 +296,7 @@ export class SearchBarComponent implements OnInit {
         if (data.totalDuration) this.mapCommunication.sendTotalDuration(data.totalDuration);
 
         // 2. Extraer y procesar los puntos semánticos del DTO
-        const puntos = data.pointDTO || [];
+        const puntos = data.puntosDTO || [];
         const origin = puntos.find(p => p.type === 'ORIGIN')?.placeSelection || null;
         const destination = puntos.find(p => p.type === 'DESTINATION')?.placeSelection || null;
         const waypoints = puntos.filter(p => p.type === 'WAYPOINT').map(p => p.placeSelection);
