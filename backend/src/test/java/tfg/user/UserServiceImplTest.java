@@ -234,6 +234,8 @@ class UserServiceImplTest {
         gas.setIdEstacion(1L);
         gas.setNombreEstacion("Station");
         gas.setMarca("REPSOL");
+        gas.setLatitud(40.4167);
+        gas.setLongitud(-3.7037);
 
         UserSavedGasStation sg = new UserSavedGasStation();
         sg.setAlias("Home");
@@ -328,9 +330,13 @@ class UserServiceImplTest {
         
         Gasolinera gas1 = new Gasolinera();
         gas1.setIdEstacion(1L);
+        gas1.setLatitud(40.4167);
+        gas1.setLongitud(-3.7037);
 
         Gasolinera gas2 = new Gasolinera();
         gas2.setIdEstacion(2L);
+        gas2.setLatitud(41.3851);
+        gas2.setLongitud(2.1734);
 
         UserSavedGasStation gs1 = new UserSavedGasStation();
         gs1.setAlias("Casa");
@@ -360,6 +366,7 @@ class UserServiceImplTest {
         
         Gasolinera gas1 = new Gasolinera();
         gas1.setIdEstacion(1L);
+        
 
         UserSavedGasStation usg = new UserSavedGasStation();
         usg.setAlias("Casa");
@@ -379,6 +386,8 @@ class UserServiceImplTest {
 
         Gasolinera gas = new Gasolinera();
         gas.setIdEstacion(1L);
+        gas.setLatitud(40.4167);
+        gas.setLongitud(-3.7037);
 
         UserSavedGasStation savedGS = new UserSavedGasStation();
         savedGS.setAlias("Casa");
