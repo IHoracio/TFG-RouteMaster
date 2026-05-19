@@ -68,6 +68,11 @@ label {
     outline: none;
 }
 
+.form-control::placeholder {
+    color: var(--text-secondary);
+    opacity: 1;
+}
+
 .btn,
 .btn-custom {
     margin-top: 16px;
