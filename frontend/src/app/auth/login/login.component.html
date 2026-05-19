@@ -8,7 +8,8 @@
             <div>
                 <span class="asterisk">*</span>
                 <label for="user">{{ translation.translate('login.user') }}</label>
-                <input class="form-control" type="text" name="user" id="user" formControlName="user">
+                <input class="form-control" type="text" name="user" id="user" formControlName="user"
+                [placeholder]="translation.translate('register.emailPlaceholder')">
 
                 <!--Error messages-->
                 @if (hasError('user', 'required')) {
@@ -27,7 +28,8 @@
             <div>
                 <span class="asterisk">*</span>
                 <label for="password">{{ translation.translate('login.password') }}</label>
-                <input class="form-control" type="password" name="password" id="password" formControlName="password">
+                <input class="form-control" type="password" name="password" id="password" formControlName="password"
+                [placeholder]="translation.translate('login.password')">
 
                 <!--Error messages-->
                 @if (hasError('password', 'required')) {

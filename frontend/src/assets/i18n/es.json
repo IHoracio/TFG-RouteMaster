@@ -131,18 +131,18 @@
     },
     "login": {
         "title": "Inicio de Sesión",
-        "user": "Introduzca el nombre de usuario.",
+        "user": "Introduzca el nombre de usuario",
         "userRequired": "El nombre de usuario es obligatorio",
-        "userPattern": "El formato es incorrecto.",
-        "password": "Introduzca la contraseña.",
-        "passwordRequired": "La contraseña es obligatoria.",
-        "passwordMinLength": "La contraseña debe tener mínimo 8 caracteres.",
-        "passwordPattern": "La contraseña debe tener al menos 8 carácteres, un número, una mayuscula, una minúscula y un símbolo.",
+        "userPattern": "El formato es incorrecto",
+        "password": "Introduzca la contraseña",
+        "passwordRequired": "La contraseña es obligatoria",
+        "passwordMinLength": "La contraseña debe tener mínimo 8 caracteres",
+        "passwordPattern": "La contraseña debe tener al menos 8 carácteres, un número, una mayuscula, una minúscula y un símbolo",
         "submit": "Iniciar sesión",
         "noAccount": "¿Todavía no te has registrado?",
         "register": "Crea una cuenta",
-        "success": "Login exitoso.",
-        "error": "Ha ocurrido un error con los datos introducidos."
+        "success": "Login exitoso",
+        "error": "Ha ocurrido un error con los datos introducidos"
     },
     "weather": {
         "title": "Información meteorológica de la ruta",
