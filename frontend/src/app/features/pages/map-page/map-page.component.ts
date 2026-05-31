@@ -482,10 +482,6 @@ export class MapPageComponent implements OnDestroy, AfterViewInit {
     const stations = [...this.gasStationsFromInput(), ...this.gasStationsFromService()];
     this.clearGasStations();
 
-    if (stations.length > 100) {
-      console.warn('Limiting gas stations to 100 to prevent performance issues');
-      stations.splice(100);
-    }
 
     if (stations.length > 0 && this.map) {
       let hasValid = false;
