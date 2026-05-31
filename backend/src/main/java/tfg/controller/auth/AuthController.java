@@ -49,15 +49,19 @@ public class AuthController {
 			description = "Creates a new user account"
 			)
 	@ApiResponses({
-		@ApiResponse(responseCode = "201", description = "User created", content = @Content(mediaType = "application/json", schema = @Schema(implementation = String.class))),
-		@ApiResponse(responseCode = "400", description = "Invalid input or user exists", content = @Content)
+		@ApiResponse(responseCode = "201", description = "User created"),
+		@ApiResponse(responseCode = "400", description = "Invalid input"),
+		@ApiResponse(responseCode = "409", description = "User already exists")
 	})
 	public ResponseEntity<Void> register(@RequestBody UserDTO userDTO) {
 		Optional<User> created = userService.createUser(userDTO);
+		
 		if (created.isPresent()) {
 			return ResponseEntity.status(HttpStatus.CREATED).build();
 		}
-		return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+		
+		// Si el servicio devuelve empty es porque el usuario ya existe
+		return ResponseEntity.status(HttpStatus.CONFLICT).build();
 	}
 
 	@PostMapping("/login")
