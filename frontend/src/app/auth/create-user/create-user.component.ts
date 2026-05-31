@@ -47,7 +47,7 @@ export class CreateUserComponent {
       surname: ['', [
         Validators.required
       ]]
-    }, {validator: this.passwordMatchValidator})
+    }, { validator: this.passwordMatchValidator })
   }
 
   get email() { return this.form.get('email'); }
@@ -64,34 +64,52 @@ export class CreateUserComponent {
     }
     return null;
   }
-  
+
   hasError(controlName: string, errorName: string) {
-        return (
-            this.form.get(controlName)?.hasError(errorName) &&
-            this.form.get(controlName)?.touched
-        );
+    return (
+      this.form.get(controlName)?.hasError(errorName) &&
+      this.form.get(controlName)?.touched
+    );
   }
   message: string = "";
   error: string = "";
   onSubmit() {
-    if(this.form.valid){
+    if (this.form.valid) {
       this.user.email = this.email?.value;
       this.user.password = this.password?.value;
-      this.user.passwordConfirmation = this.passwordConfirmation?.value
+      this.user.passwordConfirmation = this.passwordConfirmation?.value;
       this.user.name = this.name?.value;
       this.user.surname = this.surname?.value;
 
-      console.log(this.user)
+      console.log(this.user);
+
       this.authService.saveUser(this.user).subscribe({
         next: () => {
-          this.message = "Usuario creado con éxito."
+          // Usamos también la traducción para el mensaje de éxito
+          this.message = this.translation.translate('register.successMessage');
           this.error = "";
-      }, error: ()=>{
-          this.error = "Ha occurido un error con los datos introducidos."
-          this.message = ""
-      }});
-    } else{
-      console.log("El formulario tiene errores.")
+          this.form.reset(); // Opcional: limpia el formulario al tener éxito
+        },
+        error: (err) => {
+          this.message = "";
+
+          // Evaluamos el código de estado HTTP que devuelve el backend
+          switch (err.status) {
+            case 400:
+              this.error = this.translation.translate('register.errorBadRequest');
+              break;
+            case 409:
+              this.error = this.translation.translate('register.errorUserExists');
+              break;
+            default:
+              // Para cualquier otra cosa (como un error 500 o si el servidor está caído)
+              this.error = this.translation.translate('register.errorGeneric');
+              break;
+          }
+        }
+      });
+    } else {
+      console.log("El formulario tiene errores.");
     }
-   }
+  }
 }
