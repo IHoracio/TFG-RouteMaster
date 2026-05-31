@@ -55,7 +55,18 @@ export class LoginComponent {
     this.userLogin.password = this.password?.value;
 
     this.authService.loginUser(this.userLogin).subscribe({
-      next: () => {
+      next: (response: any) => {
+        // Limpiamos errores previos si los hubiera
+        this.error = "";
+
+        // Si el backend devuelve 204, significa que ya tenía la sesión iniciada
+        if (response && response.status === 204) {
+          this.error = this.translation.translate('login.errorAlreadyLoggedIn');
+          // Aquí decides si quieres redirigir igualmente o dejarlo en la pantalla con el aviso
+          return;
+        }
+
+        // Si es un 200 OK, procedemos con el inicio de sesión normal
         // 1. Marcamos la sesión como activa
         this.authService.sendUserSession(true);
 
@@ -65,14 +76,25 @@ export class LoginComponent {
             if (success) {
               this.router.navigate(['/']);
             } else {
-              this.error = "Sesión iniciada, pero hubo un problema al cargar tus datos.";
+              this.error = this.translation.translate('login.errorLoadingData');
             }
           },
-          error: () => this.error = "Error crítico al sincronizar tu cuenta."
+          error: () => this.error = this.translation.translate('login.errorSyncCritical')
         });
       },
-      error: () => {
-        this.error = "Usuario o contraseña incorrectos.";
+      error: (err) => {
+        // Aquí manejamos los errores HTTP (400, 401, etc.)
+        switch (err.status) {
+          case 400:
+            this.error = this.translation.translate('login.errorMissingCredentials');
+            break;
+          case 401:
+            this.error = this.translation.translate('login.errorInvalidCredentials');
+            break;
+          default:
+            this.error = this.translation.translate('login.errorGeneric');
+            break;
+        }
       }
     });
   }
