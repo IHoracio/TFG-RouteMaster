@@ -1,5 +1,5 @@
 .error {
-    color: var(--text-secondary);
+    color: var(--text-color);
     font-weight: 600;
 }
 
@@ -10,7 +10,7 @@
 }
 
 .success {
-    color: var(--color-success);
+    color: var(--text-color);
     font-weight: 600;
 }
 
@@ -106,6 +106,10 @@ label {
 .text-muted a {
     color: var(--primary-color);
     text-decoration: none;
+}
+
+.text-muted p {
+    color: var(--text-color);
 }
 
 .text-muted a:hover {
