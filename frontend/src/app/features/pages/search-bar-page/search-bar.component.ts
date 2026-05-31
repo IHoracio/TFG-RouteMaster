@@ -19,11 +19,12 @@ import { ActivatedRoute } from '@angular/router';
 import { PlaceSelection } from '../../../Dto/place-selection';
 import { TranslationService } from '../../../services/singleton/translation.service';
 import { FullRouteData, PuntosDTO } from '../../../Dto/full-route-data';
+import { LoadingSpinnerComponent } from '../../../shared/loading-spinner/loading-spinner.component';
 
 @Component({
   selector: 'app-search-bar',
   standalone: true,
-  imports: [MapPageComponent, NgClass, LoginPromptComponent, SearchBarTabsComponent, SearchBarFiltersComponent, SearchBarFormComponent],
+  imports: [MapPageComponent, NgClass, LoginPromptComponent, SearchBarTabsComponent, SearchBarFiltersComponent, SearchBarFormComponent, LoadingSpinnerComponent],
   templateUrl: './search-bar.component.html',
   styleUrl: './search-bar.component.css'
 })
@@ -51,6 +52,7 @@ export class SearchBarComponent implements OnInit {
   showShareMessage = signal<boolean>(false);
   createdRoute = signal<boolean>(false);
   allGasStations = signal<GasStation[]>([]);
+  isLoading = signal<boolean>(false);
 
   // Filtros UI
   filterByBrands = signal<boolean>(false);
@@ -170,6 +172,8 @@ export class SearchBarComponent implements OnInit {
   onSubmit() {
     const routeId = this.selectedSavedRouteId();
 
+    this.isLoading.set(true);
+
     // CASO A: Ejecutar una ruta guardada previamente
     if (this.activeTab() === 'route' && routeId) {
 
@@ -188,10 +192,12 @@ export class SearchBarComponent implements OnInit {
           // 3. Estado de la UI
           this.allGasStations.set(fullData.gasStations);
           this.createdRoute.set(true);
+          this.isLoading.set(false);
         },
         error: (err) => {
           this.errorMessage.set(this.translation.translate('search.loadError') || 'Error al cargar ruta');
           console.error('Error al ejecutar ruta guardada:', err);
+          this.isLoading.set(false);
         }
       });
 
@@ -202,8 +208,12 @@ export class SearchBarComponent implements OnInit {
         next: (gasStations) => {
           this.allGasStations.set(gasStations);
           this.createdRoute.set(true);
+          this.isLoading.set(false);
         },
-        error: (err) => console.error('Error en búsqueda fresca:', err)
+        error: (err) => {
+          console.error('Error en búsqueda fresca:', err);
+          this.isLoading.set(false);
+        } 
       });
     }
   }

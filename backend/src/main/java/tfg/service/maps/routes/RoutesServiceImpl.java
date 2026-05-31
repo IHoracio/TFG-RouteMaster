@@ -421,8 +421,7 @@ public class RoutesServiceImpl implements RoutesService {
         if (meters <= 100_000) return 8;
         return 14;
     }
-	private List<Coords> getSampledRoutePoints(RouteGroup routeGroup) {
-
+	private List<Coords> getSampledRoutePoints(RouteGroup routeGroup, Long radius) {
 	    List<Coords> allPoints = extractRoutePolylinePoints(routeGroup);
 
 	    if (allPoints.isEmpty()) {
@@ -430,16 +429,25 @@ public class RoutesServiceImpl implements RoutesService {
 	        return List.of();
 	    }
 
+	    // 1. Obtener la distancia total de la ruta en metros
 	    long totalMeters = routeGroup.getRoutes().get(0).getLegs().stream()
 	            .mapToLong(leg -> leg.getDistance().getValue())
 	            .sum();
 
-	    int maxCalls = calculateMaxCalls(totalMeters);
+	    // 2. Calcular la distancia media aproximada entre cada punto de la polyline
+	    double averageMetersPerPoint = (double) totalMeters / allPoints.size();
 
-	    int step = Math.max(
-	            1,
-	            (int) Math.ceil((double) allPoints.size() / maxCalls)
-	    );
+	    // 3. Queremos un punto cada "X" metros. Una buena regla es usar el radio de búsqueda.
+	    // Si tu radio viene en metros (ej. 3000), saltar cada 'radius' asegura solapamiento de los círculos.
+	    // Metemos un valor por defecto (ej. 5000 metros) si el radio es absurdamente pequeño.
+	    long desiredDistanceStepInMeters = Math.max(6000, radius * 2); 
+
+	    // 4. Traducir esa distancia en cuántos puntos de la lista nos tenemos que saltar
+	    int step = (int) Math.max(1, Math.round(desiredDistanceStepInMeters / averageMetersPerPoint));
+
+	    log.info("[routes-service] Total meters: " + totalMeters + 
+	             " | Points: " + allPoints.size() + 
+	             " | Calculated step: " + step + " points.");
 
 	    return IntStream.range(0, allPoints.size())
 	            .filter(i -> i % step == 0 || i == allPoints.size() - 1)
@@ -452,7 +460,7 @@ public class RoutesServiceImpl implements RoutesService {
 		log.info("[routes-service] [" + LocalDateTime.now().toString() + "] "
 				+ "Attempting to extract coordinates for all gas stations in the route's radius: " 
 				+ radius + ".");
-		List<Coords> sampledRoutePoints = getSampledRoutePoints(routeGroup);
+		List<Coords> sampledRoutePoints = getSampledRoutePoints(routeGroup, radius);
 
 	    if (sampledRoutePoints.isEmpty()) {
 	        return List.of();
