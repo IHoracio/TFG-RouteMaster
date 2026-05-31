@@ -1,4 +1,4 @@
-import { Component, inject, signal, OnInit, computed, effect, ViewChild, ElementRef, output } from '@angular/core';
+import { Component, inject, signal, OnInit, computed, effect, ViewChild, ElementRef, output, viewChild } from '@angular/core';
 import { RouteFormResponse } from '../../../Dto/route-form-response';
 import { MapPageComponent } from '../map-page/map-page.component';
 import { SearchBarService } from '../../../services/search-bar/search-bar.service';
@@ -71,6 +71,7 @@ export class SearchBarComponent implements OnInit {
   favoriteGasStations = this.userPrefsService.favoriteGasStations;
   savedRoutes = this.userInfoService.getRoutesSignal();
   userPrefs = this.userPrefsService.userPreferences;
+  filtersComponent = viewChild(SearchBarFiltersComponent);
 
   // Modelo de formulario reactivo al estado
   routeFormResponse: RouteFormResponse = {
@@ -165,6 +166,7 @@ export class SearchBarComponent implements OnInit {
       return;
     }
     this.activeTab.set(tab);
+    this.filtersComponent()?.closeAllFilters();
   }
 
   // En el componente de tu SearchBar
@@ -332,6 +334,7 @@ export class SearchBarComponent implements OnInit {
         // 5. TRUCO DE LA PESTAÑA: Forzar el cambio al tab 'route' 
         // Oculta el formulario manual y muestra directamente las opciones de rutas guardadas/favoritas
         this.activeTab.set('route');
+        this.filtersComponent()?.closeAllFilters();
       },
       error: (err) => console.error('Error al cargar ruta compartida:', err)
     });

@@ -2,7 +2,9 @@
     "auth": {
         "login": "Login",
         "logout": "Logout",
-        "loginRequired": "You must log in to access this feature."
+        "loginRequired": "You must log in to access this feature.",
+        "sessionExpiredTitle": "Session Expired",
+        "sessionExpiredMessage": "Your session has expired due to inactivity or security. Please log in again to continue saving or managing your routes."
     },
     "common": {
         "close": "Close"
@@ -136,8 +138,8 @@
     },
     "login": {
         "title": "Login",
-        "user": "Enter the username.",
-        "userRequired": "Username is required",
+        "user": "Enter the user email",
+        "userRequired": "Emailis required",
         "userPattern": "The format is incorrect",
         "password": "Enter the password",
         "passwordRequired": "Password is required.",
