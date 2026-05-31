@@ -90,7 +90,8 @@
         "searchRoute": "You need to create a route",
         "selectRoute": "Saved Route",
         "noRouteSelected": "No route selected",
-        "noFavoriteGas": "You dont have favourite gas stations"
+        "noFavoriteGas": "You dont have favourite gas stations",
+        "loading": "Loading Route..."
     },
     "route": {
         "summary": "Summary of the route",
