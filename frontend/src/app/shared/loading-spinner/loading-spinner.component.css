@@ -1,0 +1,44 @@
+/* Contenedor flotante adaptado al tema global */
+    .loading-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      /* Usamos la superficie del tema y le aplicamos opacidad para el efecto traslúcido */
+      background-color: var(--surface-color);
+      opacity: 0.85; 
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: var(--spacing-md);
+      z-index: 9999;
+      border-radius: inherit; /* Hereda el redondeado exacto del contenedor padre */
+    }
+
+    /* El círculo giratorio utilizando tu paleta corporativa */
+    .spinner-wheel {
+      width: 50px;
+      height: 50px;
+      /* Borde de fondo sutil usando la variable de bordes globales */
+      border: 5px solid var(--border-color);
+      /* La parte que gira utiliza el color primario dinámico (azul en claro, azul brillante en oscuro) */
+      border-top-color: var(--primary-color);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    /* Texto informativo con tipografía y color del tema */
+    .spinner-text {
+      font-family: var(--font-family);
+      font-weight: 500;
+      color: var(--text-color);
+      font-size: 1.1rem;
+      margin: 0;
+    }
+
+    /* Animación nativa de rotación */
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
