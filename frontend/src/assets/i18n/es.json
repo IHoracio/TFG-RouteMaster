@@ -127,7 +127,11 @@
         "surnameRequired": "El nombre es obligatorio.",
         "submit": "Crear cuenta",
         "alreadyHaveAccount": "¿Ya tienes una cuenta?",
-        "login": "Inicia sesión"
+        "login": "Inicia sesión",
+        "successMessage": "Usuario creado con éxito.",
+        "errorBadRequest": "Los datos introducidos no tienen un formato válido.",
+        "errorUserExists": "El correo electrónico ya está registrado en el sistema.",
+        "errorGeneric": "Ha ocurrido un error inesperado en el servidor. Inténtalo de nuevo más tarde."
     },
     "login": {
         "title": "Inicio de Sesión",
@@ -142,7 +146,13 @@
         "noAccount": "¿Todavía no te has registrado?",
         "register": "Crea una cuenta",
         "success": "Login exitoso",
-        "error": "Ha ocurrido un error con los datos introducidos"
+        "error": "Ha ocurrido un error con los datos introducidos",
+        "errorAlreadyLoggedIn": "Ya tienes una sesión activa con este usuario en este navegador.",
+        "errorLoadingData": "Sesión iniciada, pero hubo un problema al cargar tus datos.",
+        "errorSyncCritical": "Error crítico al sincronizar tu cuenta.",
+        "errorMissingCredentials": "Por favor, introduce todos los campos requeridos.",
+        "errorInvalidCredentials": "Usuario o contraseña incorrectos.",
+        "errorGeneric": "Ha ocurrido un error inesperado en el servidor. Inténtalo de nuevo más tarde."
     },
     "weather": {
         "title": "Información meteorológica de la ruta",

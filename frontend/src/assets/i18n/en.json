@@ -127,7 +127,11 @@
         "surnameRequired": "Surname is required.",
         "submit": "Create account",
         "alreadyHaveAccount": "Already have an account?",
-        "login": "Log in"
+        "login": "Log in",
+        "successMessage": "User successfully created.",
+        "errorBadRequest": "The data provided is invalid or has an incorrect format.",
+        "errorUserExists": "This email address is already registered in our system.",
+        "errorGeneric": "An unexpected server error occurred. Please try again later."
     },
     "login": {
         "title": "Login",
@@ -142,7 +146,13 @@
         "noAccount": "Not registered yet?",
         "register": "Create an account",
         "success": "Login successful.",
-        "error": "An error occurred with the entered data."
+        "error": "An error occurred with the entered data.",
+        "errorAlreadyLoggedIn": "You already have an active session with this user in this browser.",
+        "errorLoadingData": "Logged in successfully, but there was an issue loading your data.",
+        "errorSyncCritical": "Critical error synchronizing your account.",
+        "errorMissingCredentials": "Please fill in all the required fields.",
+        "errorInvalidCredentials": "Invalid username or password.",
+        "errorGeneric": "An unexpected server error occurred. Please try again later."
     },
     "weather": {
         "title": "Route weather information",
