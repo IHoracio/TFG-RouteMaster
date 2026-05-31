@@ -2,7 +2,9 @@
     "auth": {
         "login": "Iniciar Sesión",
         "logout": "Cerrar Sesión",
-        "loginRequired": "Debes iniciar sesión para acceder a esta función."
+        "loginRequired": "Debes iniciar sesión para acceder a esta función.",
+        "sessionExpiredTitle": "Sesión Expirada",
+        "sessionExpiredMessage": "Tu sesión ha caducado por inactividad o seguridad. Por favor, inicia sesión de nuevo para continuar guardando o gestionando tus rutas."
     },
     "common": {
         "close": "Cerrar"
@@ -136,8 +138,8 @@
     },
     "login": {
         "title": "Inicio de Sesión",
-        "user": "Introduzca el nombre de usuario",
-        "userRequired": "El nombre de usuario es obligatorio",
+        "user": "Introduzca el correo de usuario",
+        "userRequired": "El correo es obligatorio",
         "userPattern": "El formato es incorrecto",
         "password": "Introduzca la contraseña",
         "passwordRequired": "La contraseña es obligatoria",

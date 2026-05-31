@@ -1,4 +1,4 @@
-import { Component, inject, input, output, ElementRef, Renderer2, AfterViewInit } from '@angular/core';
+import { Component, inject, input, output, ElementRef, Renderer2, AfterViewInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { NgIf } from '@angular/common';
 import { TranslationService } from '../../../../services/singleton/translation.service';
@@ -28,6 +28,9 @@ export class SearchBarFiltersComponent implements AfterViewInit {
   shareRoute = output<void>();
   routeAliasChange = output<string>();
 
+  isGasFiltersOpen = signal<boolean>(false);
+  isSaveRouteOpen = signal<boolean>(false);
+
   translation = inject(TranslationService);
   private el = inject(ElementRef);
   private renderer = inject(Renderer2);
@@ -49,5 +52,26 @@ export class SearchBarFiltersComponent implements AfterViewInit {
 
   onRouteAliasChange(value: string) {
     this.routeAliasChange.emit(value);
+  }
+
+  toggleGasFilters() {
+    this.isGasFiltersOpen.update(value => !value);
+    if (this.isGasFiltersOpen()) {
+      this.isSaveRouteOpen.set(false); // Cierra el otro de forma reactiva
+    }
+  }
+
+  toggleSaveRoute() {
+    if (this.createdRoute()) {
+      this.isSaveRouteOpen.update(value => !value);
+      if (this.isSaveRouteOpen()) {
+        this.isGasFiltersOpen.set(false); // Cierra el otro de forma reactiva
+      }
+    }
+  }
+
+  public closeAllFilters() {
+    this.isGasFiltersOpen.set(false);
+    this.isSaveRouteOpen.set(false);
   }
 }
