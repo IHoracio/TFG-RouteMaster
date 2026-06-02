@@ -25,9 +25,11 @@
       <ul class="gas-stations-list">
         @for (station of searchResults(); track station.idEstacion) {
           @if (isFavorite(station.idEstacion)) {
-            <li class="added-station">
+            <li (click)="selectedGasStation = station" 
+                [class.selected]="selectedGasStation?.idEstacion === station.idEstacion"
+                class="clickable-station">
               {{ station.nombreEstacion }} - {{ station.direccion }} 
-              <button type="button" class="btn" (click)="removeFavoriteGasStation(station.idEstacion)">
+              <button type="button" class="btn btn-delete" (click)="removeFavoriteGasStation(station.idEstacion)">
                 {{ translation.translate('preferences.remove') }}
               </button>
             </li>

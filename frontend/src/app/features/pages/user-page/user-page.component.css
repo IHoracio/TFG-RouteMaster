@@ -28,19 +28,24 @@
 }
 
 /* ========================================
-   USER-PAGE - Mobile
+   USER-PAGE - Tablets - Portatiles pequeños
    ======================================== */
-@media (max-width: 768px) {
-  .user-page h1 {
-    margin-top: -6rem;
-  }
-
+@media (max-width: 1120px) {
   .user-page {
-    margin-top: 5rem;
+    margin-top: 6rem;
   }
 
   .user-content {
     grid-template-columns: 1fr;
+  }
+}
+
+/* ========================================
+   USER-PAGE - Mobile
+   ======================================== */
+@media (max-width: 768px) {
+  .user-page h1 {
+    margin-top: -7rem;
   }
 }
 

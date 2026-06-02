@@ -181,73 +181,101 @@ export class GoogleAutocompleteComponent implements AfterViewInit {
    * - Al montar el componente (ngAfterViewInit)
    * - Cuando cambia el idioma (effect)
    */
-  private async initAutocomplete() {
+private async initAutocomplete() {
+  try {
+    // Cargamos la librería de Places de Google
+    const placesLib = await this.mapsLoader.getPlacesLibrary() as any;
+    const { PlaceAutocompleteElement } = placesLib;
 
-    try {
-      // Cargamos la librería de Places de Google
-      const placesLib = await this.mapsLoader.getPlacesLibrary() as any;
-      const { PlaceAutocompleteElement } = placesLib;
-
-      // Normalizamos los códigos de región (evitamos errores de Google)
-      let regionCodes: string[] = [];
-      if (Array.isArray(this.country)) {
-        regionCodes = this.country
-          .map(code => (code || '').trim().toLowerCase())
-          .filter(code => code.length === 2 && /^[a-z]{2}$/.test(code));
-      } else if (typeof this.country === 'string') {
-        const trimmed = this.country.trim().toLowerCase();
-        if (trimmed.length === 2 && /^[a-z]{2}$/.test(trimmed)) {
-          regionCodes = [trimmed];
-        }
+    // Normalizamos los códigos de región
+    let regionCodes: string[] = [];
+    if (Array.isArray(this.country)) {
+      regionCodes = this.country
+        .map(code => (code || '').trim().toLowerCase())
+        .filter(code => code.length === 2 && /^[a-z]{2}$/.test(code));
+    } else if (typeof this.country === 'string') {
+      const trimmed = this.country.trim().toLowerCase();
+      if (trimmed.length === 2 && /^[a-z]{2}$/.test(trimmed)) {
+        regionCodes = [trimmed];
       }
-      if (regionCodes.length === 0) {
-        regionCodes = ['es'];
-      }
-
-      // Creamos la instancia del widget
-      const autocomplete = new PlaceAutocompleteElement({
-        includedRegionCodes: regionCodes,
-      });
-
-      // Configuramos idioma y placeholder
-      autocomplete.setAttribute('lang', this.translation.getCurrentLang());
-      autocomplete.setAttribute('placeholder', this.placeholder);
-
-      // Limpiamos el contenedor e insertamos el widget
-      const containerEl = this.container.nativeElement;
-      containerEl.innerHTML = '';
-      containerEl.appendChild(autocomplete);
-
-      // Añadimos el listener del evento de selección
-      autocomplete.addEventListener('gmp-select', async (event: any) => {
-
-        const { placePrediction } = event;
-        if (!placePrediction) {
-          console.warn('[Autocomplete] No se encontró placePrediction en el evento');
-          return;
-        }
-
-        try {
-          // Convertimos la predicción en un objeto Place completo
-          const place = placePrediction.toPlace();
-
-          // Pedimos los campos adicionales que necesitamos
-          await place.fetchFields({
-            fields: ['id', 'formattedAddress', 'displayName']
-          });
-
-          // Emitimos el evento hacia el componente padre
-          this.onPlaceSelected.emit({
-            placeId: place.id || '',
-            address: place.formattedAddress || '',
-            name: place.displayName || '',
-          });
-        } catch (err) {
-          console.error('[Autocomplete] Error al procesar selección:', err);
-        }
-      });
-    } catch (error) {
-      console.error('[Autocomplete] Error crítico en initAutocomplete:', error);
     }
+    if (regionCodes.length === 0) {
+      regionCodes = ['es'];
+    }
+
+    // Creamos la instancia del widget
+    const autocomplete = new PlaceAutocompleteElement({
+      includedRegionCodes: regionCodes,
+    });
+
+    // Configuramos idioma y placeholder
+    autocomplete.setAttribute('lang', this.translation.getCurrentLang());
+    autocomplete.setAttribute('placeholder', this.placeholder);
+
+    // Limpiamos el contenedor e insertamos el widget
+    const containerEl = this.container.nativeElement;
+    containerEl.innerHTML = '';
+    containerEl.appendChild(autocomplete);
+
+    // =============================================================================
+    // LÓGICA PARA NAVEGACIÓN CON TABULADOR (PC)
+    // =============================================================================
+    // Esperamos un microtask para asegurarnos de que el Shadow DOM se ha renderizado
+    setTimeout(() => {
+      const shadowRoot = autocomplete.shadowRoot;
+      if (shadowRoot) {
+        const inputEl = shadowRoot.querySelector('input');
+        
+        if (inputEl) {
+          inputEl.addEventListener('keydown', (e: KeyboardEvent) => {
+            // Buscamos si la lista desplegable está visible (comprobando si hay elementos li)
+            const hasPredictions = !!shadowRoot.querySelector('.dropdown ul li');
+
+            if (e.key === 'Tab' && hasPredictions) {
+              // Cancelamos la acción por defecto del Tabulador (que sería irse a la 'X')
+              e.preventDefault(); 
+
+              // Simulamos la pulsación de la flecha hacia abajo
+              const arrowDownEvent = new KeyboardEvent('keydown', {
+                key: 'ArrowDown',
+                keyCode: 40,
+                code: 'ArrowDown',
+                bubbles: true,
+                cancelable: true
+              });
+              inputEl.dispatchEvent(arrowDownEvent);
+            }
+          });
+        }
+      }
+    }, 50);
+    // =============================================================================
+
+    // Añadimos el listener del evento de selección (Tu código original intacto)
+    autocomplete.addEventListener('gmp-select', async (event: any) => {
+      const { placePrediction } = event;
+      if (!placePrediction) {
+        console.warn('[Autocomplete] No se encontró placePrediction en el evento');
+        return;
+      }
+
+      try {
+        const place = placePrediction.toPlace();
+        await place.fetchFields({
+          fields: ['id', 'formattedAddress', 'displayName']
+        });
+
+        this.onPlaceSelected.emit({
+          placeId: place.id || '',
+          address: place.formattedAddress || '',
+          name: place.displayName || '',
+        });
+      } catch (err) {
+        console.error('[Autocomplete] Error al procesar selección:', err);
+      }
+    });
+  } catch (error) {
+    console.error('[Autocomplete] Error crítico en initAutocomplete:', error);
   }
+}
 }

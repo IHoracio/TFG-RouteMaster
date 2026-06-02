@@ -87,6 +87,7 @@ export class SearchBarComponent implements OnInit {
   waypointTypes: string[] = [];
 
   @ViewChild('card', { static: true }) card!: ElementRef;
+  @ViewChild('mapWrapper', { static: false }) mapWrapper!: ElementRef<HTMLDivElement>;
 
   constructor() {
     // Sincronización automática con el mapa cuando cambian las gasolineras filtradas
@@ -175,6 +176,7 @@ export class SearchBarComponent implements OnInit {
     const routeId = this.selectedSavedRouteId();
 
     this.isLoading.set(true);
+    this.scrollToMap();
 
     // CASO A: Ejecutar una ruta guardada previamente
     if (this.activeTab() === 'route' && routeId) {
@@ -215,7 +217,7 @@ export class SearchBarComponent implements OnInit {
         error: (err) => {
           console.error('Error en búsqueda fresca:', err);
           this.isLoading.set(false);
-        } 
+        }
       });
     }
   }
@@ -375,5 +377,31 @@ export class SearchBarComponent implements OnInit {
     if (window.innerWidth >= 768) {
       this.card.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
+  }
+
+  scrollToMap() {
+    // Aseguramos que la referencia al elemento existe en el DOM
+    if (!this.mapWrapper) return;
+
+    const width = window.innerWidth;
+
+    // Pequeño timeout para que Angular termine de ocultar el spinner de carga si fuera necesario
+    setTimeout(() => {
+      if (width < 768) {
+        // COMPORTAMIENTO MÓVIL: El mapa suele estar abajo y ocupar pantallas verticales (vh).
+        // Hacemos scroll para que el inicio superior del mapa se alinee perfectamente arriba de la pantalla.
+        this.mapWrapper.nativeElement.scrollIntoView({
+          behavior: 'smooth',
+          block: 'nearest'
+        });
+      } else {
+        // COMPORTAMIENTO PC: El mapa suele estar en paralelo al lado del formulario.
+        // Hacemos scroll de tipo 'nearest' o centrado para reajustar sutilmente la vista si la pantalla es baja.
+        this.mapWrapper.nativeElement.scrollIntoView({
+          behavior: 'smooth',
+          block: 'nearest'
+        });
+      }
+    }, 100);
   }
 }

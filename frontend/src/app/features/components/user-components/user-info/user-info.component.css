@@ -21,11 +21,16 @@
   color: inherit;
 }
 
+.user-details p:last-child {
+  margin-bottom: 1.5rem;
+}
+
 /* ==========================================================================
    2. SECCIONES DE FAVORITOS (Común)
    ========================================================================== */
-.favorites-section {
-  margin-top: var(--spacing-lg);
+
+.favorites-section:last-child {
+  margin-bottom: 1.5rem;
 }
 
 /* Contenedor de la lista de gasolineras */

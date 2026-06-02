@@ -27,6 +27,11 @@ export class MapPageComponent implements OnDestroy, AfterViewInit {
   private static mapsOptionsSet = false;
   private isRecreatingMap = false;
   private mapElement: HTMLElement | null = null;
+  isMobileVersion = signal<boolean>(window.innerWidth < 768);
+
+  private panIntervalId: number | null = null;
+  private currentDirection: string = '';
+  private panSpeed = 8;
 
   public map?: google.maps.Map;
   private routePolyline?: google.maps.Polyline;
@@ -165,18 +170,19 @@ export class MapPageComponent implements OnDestroy, AfterViewInit {
       zoom: 6,
       disableDefaultUI: true,
       zoomControl: true,
-      ...(isSatelliteType ? {mapId: environment.defaultMapId} : { mapId: environment.styledMapId }),
+      ...(isSatelliteType ? { mapId: environment.defaultMapId } : { mapId: environment.styledMapId }),
       mapTypeId: mapTypeId,
       colorScheme: !isSatelliteType && this.themeService.selectedTheme() === 'DARK'
         ? google.maps.ColorScheme.DARK
-        : google.maps.ColorScheme.LIGHT
+        : google.maps.ColorScheme.LIGHT,
+      gestureHandling: this.isMobileVersion() ? 'greedy' : 'auto'
     };
 
     if (!this.mapElement) return;
 
     this.map = new Map(this.mapElement, mapOptions);
 
-     this.map.setMapTypeId(mapTypeId);
+    this.map.setMapTypeId(mapTypeId);
 
     // Configuración del Clusterer con el nuevo requisito (mínimo 5)
     this.markerClusterer = new MarkerClusterer({
@@ -266,7 +272,7 @@ export class MapPageComponent implements OnDestroy, AfterViewInit {
 
   private getMapTypeId(): google.maps.MapTypeId {
     const type = this.mapType();
-    console.log("mapType signal = "+this.mapType());
+    console.log("mapType signal = " + this.mapType());
     return this.getMapTypeIdFromRaw(type);
   }
 
