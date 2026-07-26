@@ -1,0 +1,64 @@
+services:
+  # 1. CONTENEDOR DE BASE DE DATOS
+  mysql-db:
+    image: mysql:8.0
+    container_name: routemaster-db
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: routemaster_db
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+
+  # 2. CONTENEDOR DEL BACKEND
+  backend:
+    build:
+      context: ./backend
+    container_name: routemaster-backend
+    restart: unless-stopped
+    env_file:
+      - /opt/routemaster/backend.env
+    ports:
+      - "8080:8080"
+      - "8443:8443"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-db:3306/routemaster_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+      - SPRING_DATASOURCE_USERNAME=${DB_USER}
+      - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD}
+    depends_on:
+      - mysql-db
+    volumes:
+      - /opt/routemaster/keystore:/opt/routemaster/keystore:ro
+
+  # 3. CONTENEDOR DEL FRONTEND
+  frontend:
+    build:
+      context: ./frontend
+    container_name: routemaster-frontend
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+
+  # 4. CONTENEDOR DE INTEGRACIÓN CONTINUA (Jenkins)
+  jenkins:
+    image: jenkins/jenkins:lts
+    container_name: routemaster-jenkins
+    restart: unless-stopped
+    group_add:
+      - "131"
+    ports:
+      - "8081:8080"
+      - "50000:50000"
+    volumes:
+      - /var/jenkins_home:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /opt/routemaster:/opt/routemaster
+
+volumes:
+  mysql-data:
