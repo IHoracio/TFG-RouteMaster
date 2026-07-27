@@ -1,14 +1,16 @@
 FROM jenkins/jenkins:lts
 USER root
 
-# 1. Install base dependencies and certificates
+# 1. Install base dependencies
 RUN apt-get update && apt-get install -y ca-certificates curl gnupg docker.io
 
-# 2. Install Node.js 24.x (The correct version for Angular 22)
+# 2. Install Node.js 24.x and ensure it's linked globally for all users
 RUN curl -fsSL https://deb.nodesource.com/setup_24.x | bash - \
-    && apt-get install -y nodejs
+    && apt-get install -y nodejs \
+    && ln -s /usr/bin/node /usr/local/bin/node \
+    && ln -s /usr/bin/npm /usr/local/bin/npm
 
-# 3. Install Docker Compose (Fixed the cut-off path)
+# 3. Install Docker Compose
 RUN mkdir -p /usr/libexec/docker/cli-plugins \
     && curl -fsSL "https://github.com/docker/compose/releases/latest/download/docker-compose-linux-$(uname -m)" -o /usr/libexec/docker/cli-plugins/docker-compose \
     && chmod +x /usr/libexec/docker/cli-plugins/docker-compose
