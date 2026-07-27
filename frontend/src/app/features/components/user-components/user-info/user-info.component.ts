@@ -1,5 +1,5 @@
 import { Component, signal, inject, computed, ChangeDetectionStrategy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { Router } from '@angular/router';
 import { UserPreferencesService } from '../../../../services/user-page/user-preferences.service';
 import { FavouriteGasStation } from '../../../../Dto/gas-station';
@@ -11,7 +11,7 @@ import { catchError, forkJoin, of } from 'rxjs';
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-user-info',
-  imports: [CommonModule],
+  imports: [],
   templateUrl: './user-info.component.html',
   styleUrls: ['./user-info.component.css']
 })

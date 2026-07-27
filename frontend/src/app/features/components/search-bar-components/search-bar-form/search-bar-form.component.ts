@@ -1,6 +1,6 @@
 import { Component, inject, input, output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { NgFor, NgIf } from '@angular/common';
+
 import { RouteFormResponse } from '../../../../Dto/route-form-response';
 import { FavouriteGasStation } from '../../../../Dto/gas-station';
 import { SavedRouteDto } from '../../../../Dto/user-dtos';

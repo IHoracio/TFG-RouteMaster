@@ -1,5 +1,5 @@
 import { Component, signal, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
 import { UserPreferencesService } from '../../../../services/user-page/user-preferences.service';
 import { catchError, EMPTY, exhaustMap, filter, forkJoin, Observable, Subject, tap } from 'rxjs';
@@ -13,7 +13,7 @@ import { ThemeService } from '../../../../services/singleton/theme.service';
 
 @Component({
   selector: 'app-user-preferences',
-  imports: [CommonModule, FormsModule, GenericPreferencesComponent, GasStationsPreferencesComponent, VehiclePreferencesComponent],
+  imports: [FormsModule, GenericPreferencesComponent, GasStationsPreferencesComponent, VehiclePreferencesComponent],
   templateUrl: './user-preferences.component.html',
   styleUrls: ['./user-preferences.component.css']
 })

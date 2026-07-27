@@ -3,7 +3,7 @@ import { MarkerClusterer } from '@googlemaps/markerclusterer';
 import { MapCommunicationService } from '../../../services/map/map-communication.service';
 import { environment } from '../../../../environments/environment';
 import { Coords } from '../../../Dto/maps-dtos';
-import { CommonModule } from '@angular/common';
+
 import { WeatherData } from '../../../Dto/weather-dtos';
 import { GasStation } from '../../../Dto/gas-station';
 import { UserPreferencesService } from '../../../services/user-page/user-preferences.service';
@@ -18,7 +18,7 @@ import { TranslationService } from '../../../services/singleton/translation.serv
   changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-map-page',
   standalone: true,
-  imports: [CommonModule, WeatherOverlayComponent],
+  imports: [WeatherOverlayComponent],
   templateUrl: './map-page.component.html',
   styleUrl: './map-page.component.css'
 })

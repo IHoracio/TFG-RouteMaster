@@ -1,12 +1,12 @@
 import { Component, computed, inject, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
 import { UserPreferencesService } from '../../../../../services/user-page/user-preferences.service';
 import { TranslationService } from '../../../../../services/singleton/translation.service';
 
 @Component({
   selector: 'app-vehicle-preferences',
-  imports: [CommonModule, FormsModule],
+  imports: [FormsModule],
   templateUrl: './vehicle-preferences.html',
   styleUrls: ['./vehicle-preferences.css']
 })
