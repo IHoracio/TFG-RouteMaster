@@ -13,6 +13,6 @@ FROM nginxinc/nginx-unprivileged:alpine
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 # Unprivileged images use port 8080 by default
-COPY --from=build /app/dist/browser /usr/share/nginx/html
+COPY --from=build /app/dist/angular/browser /usr/share/nginx/html
 
 EXPOSE 8080
