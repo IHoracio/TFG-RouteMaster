@@ -2,7 +2,6 @@ pipeline {
     agent any
 
     environment {
-        // Secure credentials extracted from Jenkins vault
         GOOGLE_KEY = credentials('google-api-key')
         OPENWEATHER_KEY = credentials('openweather-api-key')
         COOKIE_AUTH_SECRET_KEY = credentials('auth-secret-key')
@@ -15,18 +14,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                // Pull latest source code from repository
                 git branch: 'main', url: 'https://github.com/IHoracio/TFG-RouteMaster.git'
-            }
-        }
-
-        stage('Build Backend') {
-            steps {
-                dir('backend') {
-                    // Compile Spring Boot JAR with Maven wrapper
-                    sh 'chmod +x ./mvnw'
-                    sh './mvnw clean package -DskipTests'
-                }
             }
         }
 
@@ -35,7 +23,7 @@ pipeline {
                 sh '''
                     set -euo pipefail
 
-                    # 1. Create a dynamic .env file using Jenkins secure credentials
+                    # 1. Create dynamic .env file
                     echo "Generating dynamic .env file with secure credentials..."
                     cat <<EOF > .env
 DATABASE_URL=${DATABASE_URL}
@@ -49,25 +37,22 @@ OPENWEATHER_KEY=${OPENWEATHER_KEY}
 COOKIE_AUTH_SECRET_KEY=${COOKIE_AUTH_SECRET_KEY}
 EOF
 
-                    # 2. Deploy and build EVERYTHING inside containers via Docker Compose
-                    # This forces Docker to use Node 24 inside the frontend Dockerfile automatically!
+                    # 2. Build and start backend & frontend natively via Docker containers
                     docker compose up -d --build
 
-                    # 3. Security cleanup: Delete the .env file so secrets are not left on disk
+                    # 3. Security cleanup
                     rm .env
 
-                    # Wait for Spring Boot to boot up and connect to DB
+                    # Wait for Spring Boot to boot up
                     echo "Waiting for backend to start and connect to database..."
                     sleep 15
 
-                    # Check if the container is running
                     if [ "$(docker inspect -f '{{.State.Running}}' routemaster-backend)" != "true" ]; then
                         echo "ERROR: Backend container stopped unexpectedly."
                         docker logs routemaster-backend
                         exit 1
                     fi
 
-                    # Verify database connection in logs
                     if docker logs routemaster-backend 2>&1 | grep -E -i "Communications link failure|SQLException|Access denied|Connection refused"; then
                         echo "ERROR: Database connection failed!"
                         docker logs --tail=100 routemaster-backend
