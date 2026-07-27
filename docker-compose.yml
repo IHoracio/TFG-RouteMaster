@@ -21,7 +21,7 @@ services:
     container_name: routemaster-backend
     restart: unless-stopped
     env_file:
-      - /opt/routemaster/backend.env
+      - .env
     ports:
       - "8080:8080"
     environment:

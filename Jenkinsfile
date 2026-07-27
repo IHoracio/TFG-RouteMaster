@@ -2,13 +2,14 @@ pipeline {
     agent any
 
     environment {
-        // Secure credentials from Jenkins
+        // Secure credentials extracted from Jenkins vault
         GOOGLE_KEY = credentials('google-api-key')
         OPENWEATHER_KEY = credentials('openweather-api-key')
         COOKIE_AUTH_SECRET_KEY = credentials('auth-secret-key')
         DATABASE_URL = credentials('database-url')
-        DATABASE_USER = credentials('database-user')
-        DATABASE_PASSWD = credentials('database-passwd')
+        DB_USER = credentials('database-user')
+        DB_PASSWORD = credentials('database-passwd')
+        CLOUDFLARE_TOKEN = credentials('cloudflare-token') 
     }
 
     stages {
@@ -19,7 +20,7 @@ pipeline {
             }
         }
 
-        stage('Test & Build Backend (JAR)') {
+        stage('Test & Build Backend') {
             steps {
                 dir('backend') {
                     // Run tests and compile Spring Boot JAR with Maven
@@ -38,7 +39,7 @@ pipeline {
                     // Run frontend unit tests
                     sh 'npx ng test --watch=false --browsers=ChromeHeadless'
 
-                    // Inject environment variables into production config for Docker to build
+                    // Inject environment variables into production config for Docker build
                     sh '''
                         set -euo pipefail
                         envsubst < src/environments/environment.prod.ts > src/environments/environment.prod.ts.tmp
@@ -48,20 +49,36 @@ pipeline {
             }
         }
 
-        stage('Deploy with Docker Compose') {
+        stage('Deploy via Docker Compose') {
             steps {
                 sh '''
                     set -euo pipefail
 
-                    # Let Docker Compose build the images (using your Dockerfiles) and recreate the containers
-                    # We specify 'backend' and 'frontend' to avoid touching mysql or jenkins if they are in the same compose file
+                    # 1. Create a dynamic .env file using Jenkins secure credentials
+                    echo "Generating dynamic .env file with secure credentials..."
+                    cat <<EOF > .env
+DATABASE_URL=${DATABASE_URL}
+DB_USER=${DB_USER}
+DB_PASSWORD=${DB_PASSWORD}
+DB_ROOT_PASSWORD=${DB_PASSWORD}
+CLOUDFLARE_TOKEN=${CLOUDFLARE_TOKEN}
+SPRING_PROFILES_ACTIVE=prod
+GOOGLE_KEY=${GOOGLE_KEY}
+OPENWEATHER_KEY=${OPENWEATHER_KEY}
+COOKIE_AUTH_SECRET_KEY=${COOKIE_AUTH_SECRET_KEY}
+EOF
+
+                    # 2. Deploy using Docker Compose (it will read the generated .env file)
                     docker compose up -d --build backend frontend
+
+                    # 3. Security cleanup: Delete the .env file so secrets are not left on disk
+                    rm .env
 
                     # Wait for Spring Boot to boot up and connect to DB
                     echo "Waiting for backend to start and connect to database..."
                     sleep 15
 
-                    # Check if the container is running (using the name from your docker ps)
+                    # Check if the container is running
                     if [ "$(docker inspect -f '{{.State.Running}}' routemaster-backend)" != "true" ]; then
                         echo "ERROR: Backend container stopped unexpectedly."
                         docker logs routemaster-backend
