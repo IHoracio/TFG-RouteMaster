@@ -1,4 +1,4 @@
-import { Component, inject, input, output, ElementRef, Renderer2, AfterViewInit, signal } from '@angular/core';
+import { Component, inject, input, output, ElementRef, Renderer2, AfterViewInit, signal, ChangeDetectionStrategy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
 import { TranslationService } from '../../../../services/singleton/translation.service';
@@ -8,6 +8,7 @@ import { TranslationService } from '../../../../services/singleton/translation.s
   standalone: true,
   imports: [FormsModule],
   templateUrl: './search-bar-filters.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './search-bar-filters.component.css'
 })
 export class SearchBarFiltersComponent implements AfterViewInit {

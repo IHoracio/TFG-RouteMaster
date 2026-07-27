@@ -1,4 +1,4 @@
-import { Component, inject, input, output } from '@angular/core';
+import { Component, inject, input, output, ChangeDetectionStrategy } from '@angular/core';
 import { NgClass } from '@angular/common';
 import { TranslationService } from '../../../../services/singleton/translation.service';
 
@@ -7,6 +7,7 @@ import { TranslationService } from '../../../../services/singleton/translation.s
   standalone: true,
   imports: [NgClass],
   templateUrl: './search-bar-tabs.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './search-bar-tabs.component.css'
 })
 export class SearchBarTabsComponent {

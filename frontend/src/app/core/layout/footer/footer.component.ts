@@ -1,5 +1,5 @@
 import { DatePipe } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { Router } from '@angular/router';
 import { TranslationService } from '../../../services/singleton/translation.service';
 
@@ -7,6 +7,7 @@ import { TranslationService } from '../../../services/singleton/translation.serv
   selector: 'app-footer',
   imports: [DatePipe],
   templateUrl: './footer.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './footer.component.css'
 })
 export class FooterComponent {

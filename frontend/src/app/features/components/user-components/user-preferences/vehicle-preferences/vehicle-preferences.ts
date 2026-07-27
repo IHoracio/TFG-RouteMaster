@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 
 import { FormsModule } from '@angular/forms';
 import { UserPreferencesService } from '../../../../../services/user-page/user-preferences.service';
@@ -8,6 +8,7 @@ import { TranslationService } from '../../../../../services/singleton/translatio
   selector: 'app-vehicle-preferences',
   imports: [FormsModule],
   templateUrl: './vehicle-preferences.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./vehicle-preferences.css']
 })
 export class VehiclePreferencesComponent {

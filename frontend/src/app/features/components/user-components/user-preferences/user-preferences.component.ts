@@ -1,4 +1,4 @@
-import { Component, signal, inject } from '@angular/core';
+import { Component, signal, inject, ChangeDetectionStrategy } from '@angular/core';
 
 import { FormsModule } from '@angular/forms';
 import { UserPreferencesService } from '../../../../services/user-page/user-preferences.service';
@@ -15,6 +15,7 @@ import { ThemeService } from '../../../../services/singleton/theme.service';
   selector: 'app-user-preferences',
   imports: [FormsModule, GenericPreferencesComponent, GasStationsPreferencesComponent, VehiclePreferencesComponent],
   templateUrl: './user-preferences.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./user-preferences.component.css']
 })
 export class UserPreferencesComponent {

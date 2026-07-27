@@ -1,4 +1,4 @@
-import { Component, ElementRef, EventEmitter, Input, Output, ViewChild, AfterViewInit, inject, effect, untracked } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, Output, ViewChild, AfterViewInit, inject, effect, untracked, ChangeDetectionStrategy } from '@angular/core';
 import { PlaceSelection } from '../../../Dto/place-selection';
 import { GoogleMapsLoaderService } from '../../../services/singleton/google.maps.loader.service';
 import { TranslationService } from '../../../services/singleton/translation.service';
@@ -136,6 +136,7 @@ Element.prototype.attachShadow = function (init: ShadowRootInit) {
   selector: 'app-google-autocomplete',
   standalone: true,
   templateUrl: './google-autocomplete.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./google-autocomplete.component.css']
 })
 export class GoogleAutocompleteComponent implements AfterViewInit {

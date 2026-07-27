@@ -1,4 +1,4 @@
-import { Component, inject, input, output } from '@angular/core';
+import { Component, inject, input, output, ChangeDetectionStrategy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
 import { RouteFormResponse } from '../../../../Dto/route-form-response';
@@ -13,6 +13,7 @@ import { TranslationService } from '../../../../services/singleton/translation.s
   standalone: true,
   imports: [FormsModule, GoogleAutocompleteComponent],
   templateUrl: './search-bar-form.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './search-bar-form.component.css'
 })
 export class SearchBarFormComponent {

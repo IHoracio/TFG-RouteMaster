@@ -1,4 +1,4 @@
-import { Component, OnInit, computed, signal, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, computed, signal, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../../services/auth/auth-service.service';
 import { ThemeService } from '../../../services/singleton/theme.service';
@@ -11,6 +11,7 @@ import { TranslationService } from '../../../services/singleton/translation.serv
   selector: 'app-header',
   imports: [RouterModule],
   templateUrl: './header.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './header.component.css'
 })
 export class HeaderComponent implements OnInit {

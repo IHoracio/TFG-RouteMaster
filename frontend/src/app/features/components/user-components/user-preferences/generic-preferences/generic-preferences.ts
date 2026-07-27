@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { UserPreferencesService } from '../../../../../services/user-page/user-preferences.service';
 import { ThemeService } from '../../../../../services/singleton/theme.service';
 import { TranslationService } from '../../../../../services/singleton/translation.service';
@@ -7,6 +7,7 @@ import { TranslationService } from '../../../../../services/singleton/translatio
   selector: 'app-generic-preferences',
   imports: [],
   templateUrl: './generic-preferences.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './generic-preferences.css',
 })
 export class GenericPreferencesComponent {

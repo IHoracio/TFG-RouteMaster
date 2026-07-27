@@ -1,4 +1,4 @@
-import { Component, inject, signal, OnInit, computed, effect, ViewChild, ElementRef, output, viewChild } from '@angular/core';
+import { Component, inject, signal, OnInit, computed, effect, ViewChild, ElementRef, output, viewChild, ChangeDetectionStrategy } from '@angular/core';
 import { RouteFormResponse } from '../../../Dto/route-form-response';
 import { MapPageComponent } from '../map-page/map-page.component';
 import { SearchBarService } from '../../../services/search-bar/search-bar.service';
@@ -26,6 +26,7 @@ import { LoadingSpinnerComponent } from '../../../shared/loading-spinner/loading
   standalone: true,
   imports: [MapPageComponent, NgClass, LoginPromptComponent, SearchBarTabsComponent, SearchBarFiltersComponent, SearchBarFormComponent, LoadingSpinnerComponent],
   templateUrl: './search-bar.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './search-bar.component.css'
 })
 export class SearchBarComponent implements OnInit {

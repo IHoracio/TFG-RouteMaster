@@ -1,4 +1,4 @@
-import { Component, computed, effect, inject, signal } from '@angular/core';
+import { Component, computed, effect, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import { UserPreferencesService } from '../../../../../services/user-page/user-preferences.service';
 import { GasStationService } from '../../../../../services/user-page/gas-station/gas-station.service';
 import { GasStationSelectionService } from '../../../../../services/user-page/gas-station-selection/gas-station-selection.service';
@@ -12,6 +12,7 @@ import { TranslationService } from '../../../../../services/singleton/translatio
   selector: 'app-gas-stations-preferences',
   imports: [MapPageComponent, GoogleAutocompleteComponent],
   templateUrl: './gas-stations-preferences.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './gas-stations-preferences.css',
 })
 export class GasStationsPreferencesComponent {

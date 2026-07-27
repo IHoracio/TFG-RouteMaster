@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { UserInfoComponent } from '../../components/user-components/user-info/user-info.component';
 import { UserPreferencesComponent } from '../../components/user-components/user-preferences/user-preferences.component';
 import { TranslationService } from '../../../services/singleton/translation.service';
@@ -7,6 +7,7 @@ import { TranslationService } from '../../../services/singleton/translation.serv
   selector: 'app-user-page',
   imports: [UserInfoComponent, UserPreferencesComponent],
   templateUrl: './user-page.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './user-page.component.css'
 })
 export class UserPageComponent {

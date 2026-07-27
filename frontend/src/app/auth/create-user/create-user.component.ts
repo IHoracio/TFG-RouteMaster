@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { FormsModule, ReactiveFormsModule, FormGroup, FormControl, Validators, FormBuilder } from '@angular/forms';
 import { User } from '../../Dto/user-dtos';
 import { UserService } from '../../services/user/user.service';
@@ -10,6 +10,7 @@ import { TranslationService } from '../../services/singleton/translation.service
   selector: 'app-create-user',
   imports: [FormsModule, ReactiveFormsModule, RouterLink],
   templateUrl: './create-user.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './create-user.component.css'
 })
 export class CreateUserComponent {
