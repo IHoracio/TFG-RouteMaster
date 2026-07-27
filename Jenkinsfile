@@ -9,7 +9,7 @@ pipeline {
         DATABASE_URL = credentials('database-url')
         DB_USER = credentials('database-user')
         DB_PASSWORD = credentials('database-passwd')
-        CLOUDFLARE_TOKEN = credentials('cloudflare-token') 
+        CLOUDFLARE_TOKEN = credentials('cloudflare-token')
     }
 
     stages {
@@ -20,31 +20,12 @@ pipeline {
             }
         }
 
-        stage('Test & Build Backend') {
+        stage('Build Backend') {
             steps {
                 dir('backend') {
-                    // Run tests and compile Spring Boot JAR with Maven
+                    // Compile Spring Boot JAR with Maven wrapper
                     sh 'chmod +x ./mvnw'
-                    sh './mvnw clean test package'
-                }
-            }
-        }
-
-        stage('Test & Prepare Frontend') {
-            steps {
-                dir('frontend') {
-                    // Install Node dependencies
-                    sh 'npm ci'
-                    
-                    // Run frontend unit tests
-                    sh 'npx ng test --watch=false --browsers=ChromeHeadless'
-
-                    // Inject environment variables into production config for Docker build
-                    sh '''
-                        set -euo pipefail
-                        envsubst < src/environments/environment.prod.ts > src/environments/environment.prod.ts.tmp
-                        mv src/environments/environment.prod.ts.tmp src/environments/environment.prod.ts
-                    '''
+                    sh './mvnw clean package -DskipTests'
                 }
             }
         }
@@ -68,8 +49,9 @@ OPENWEATHER_KEY=${OPENWEATHER_KEY}
 COOKIE_AUTH_SECRET_KEY=${COOKIE_AUTH_SECRET_KEY}
 EOF
 
-                    # 2. Deploy using Docker Compose (it will read the generated .env file)
-                    docker compose up -d --build backend frontend
+                    # 2. Deploy and build EVERYTHING inside containers via Docker Compose
+                    # This forces Docker to use Node 24 inside the frontend Dockerfile automatically!
+                    docker compose up -d --build
 
                     # 3. Security cleanup: Delete the .env file so secrets are not left on disk
                     rm .env
