@@ -1,0 +1,14 @@
+FROM jenkins/jenkins:lts
+USER root
+
+# Install Node.js (required to build Angular frontend)
+RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
+    && apt-get install -y nodejs
+
+# Install Docker CLI and manually download the latest Docker Compose plugin
+RUN apt-get update && apt-get install -y docker.io curl \
+    && mkdir -p /usr/libexec/docker/cli-plugins \
+    && curl -fsSL "https://github.com/docker/compose/releases/latest/download/docker-compose-linux-$(uname -m)" -o /usr/libexec/docker/cli-plugins/docker-compose \
+    && chmod +x /usr/libexec/docker/cli-plugins/docker-compose
+
+USER jenkins
