@@ -32,8 +32,8 @@ OPENWEATHER_KEY=${OPENWEATHER_KEY}
 COOKIE_AUTH_SECRET_KEY=${COOKIE_AUTH_SECRET_KEY}
 EOF
 
-                    # Build and start only application services (DB is expected to be already running)
-                    docker compose up -d --build backend frontend
+                    # Build and start only backend + frontend (skip dependencies)
+                    docker compose up -d --build --no-deps backend frontend
 
                     rm -f .env
 
