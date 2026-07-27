@@ -2,105 +2,106 @@ pipeline {
     agent any
 
     environment {
-        // AWS
-        AWS_REGION = 'us-east-1'
-        S3_BUCKET = 'route-master-frontend'
-        CLOUDFRONT_DIST_ID = 'E27QH8YNNPVJHF'
-
-        // SpringBoot
-        JAR_NAME = 'routemaster-0.0.1-SNAPSHOT.jar'
-        SPRING_LOG = 'spring.log'
-
-        // Credentials
+        // Secure credentials extracted from Jenkins vault
         GOOGLE_KEY = credentials('google-api-key')
         OPENWEATHER_KEY = credentials('openweather-api-key')
         COOKIE_AUTH_SECRET_KEY = credentials('auth-secret-key')
-        SSL_KEYSTORE_PASSWD = credentials('ssl-keystore-passwd')
         DATABASE_URL = credentials('database-url')
-        DATABASE_USER = credentials('database-user')
-        DATABASE_PASSWD = credentials('database-passwd')
+        DB_USER = credentials('database-user')
+        DB_PASSWORD = credentials('database-passwd')
+        CLOUDFLARE_TOKEN = credentials('cloudflare-token') 
     }
 
     stages {
         stage('Checkout') {
             steps {
+                // Pull latest source code from repository
                 git branch: 'main', url: 'https://github.com/IHoracio/TFG-RouteMaster.git'
             }
         }
 
-        stage('Build Backend') {
+        stage('Test & Build Backend') {
             steps {
                 dir('backend') {
+                    // Run tests and compile Spring Boot JAR with Maven
                     sh 'chmod +x ./mvnw'
-                    sh './mvnw clean package'
+                    sh './mvnw clean test package'
                 }
             }
         }
 
-        stage('Deploy Backend (separate container)') {
-            steps {
-                withCredentials([file(credentialsId: 'ssl-keystore-p12', variable: 'KEYSTORE_FILE')]) {
-                    sh '''
-                        set -euo pipefail
-
-                        HOST_DIR="/opt/routemaster"
-
-                        # Copy jar to host-mounted directory
-                        cp "backend/target/${JAR_NAME}" "${HOST_DIR}/app.jar"
-
-                        # Copy keystore to host-mounted directory
-                        mkdir -p "${HOST_DIR}/keystore"
-                        cp "$KEYSTORE_FILE" "${HOST_DIR}/keystore/keystore.p12"
-                        chmod 600 "${HOST_DIR}/keystore/keystore.p12" || true
-
-                        # Backend container on the host via docker.sock
-                        docker rm -f routemaster-backend || true
-
-                        docker run -d --name routemaster-backend \
-                          --restart unless-stopped \
-                          --env-file "${HOST_DIR}/backend.env" \
-                          -p 8443:8443 \
-                          -v "${HOST_DIR}/app.jar:/opt/routemaster/app.jar:ro" \
-                          -v "${HOST_DIR}/keystore:/opt/routemaster/keystore:ro" \
-                          -v "${HOST_DIR}/logs:/opt/routemaster/logs" \
-                          eclipse-temurin:21-jre \
-                          java -jar /opt/routemaster/app.jar
-
-                        docker ps | grep routemaster-backend
-                        docker logs --tail=50 routemaster-backend || true
-                    '''
-                }
-            }
-        }
-
-        stage('Build Frontend') {
+        stage('Test & Prepare Frontend') {
             steps {
                 dir('frontend') {
+                    // Install Node dependencies
                     sh 'npm ci'
+                    
+                    // Run frontend unit tests
+                    sh 'npx ng test --watch=false --browsers=ChromeHeadless'
 
+                    // Inject environment variables into production config for Docker build
                     sh '''
                         set -euo pipefail
                         envsubst < src/environments/environment.prod.ts > src/environments/environment.prod.ts.tmp
                         mv src/environments/environment.prod.ts.tmp src/environments/environment.prod.ts
                     '''
-
-                    sh 'npx ng build --configuration=production'
                 }
             }
         }
 
-        stage('Deploy Frontend') {
+        stage('Deploy via Docker Compose') {
             steps {
-                sh 'aws s3 sync frontend/dist/angular/browser/ s3://${S3_BUCKET}/ --delete'
-                sh 'aws cloudfront create-invalidation --distribution-id ${CLOUDFRONT_DIST_ID} --paths "/*"'
+                sh '''
+                    set -euo pipefail
+
+                    # 1. Create a dynamic .env file using Jenkins secure credentials
+                    echo "Generating dynamic .env file with secure credentials..."
+                    cat <<EOF > .env
+DATABASE_URL=${DATABASE_URL}
+DB_USER=${DB_USER}
+DB_PASSWORD=${DB_PASSWORD}
+DB_ROOT_PASSWORD=${DB_PASSWORD}
+CLOUDFLARE_TOKEN=${CLOUDFLARE_TOKEN}
+SPRING_PROFILES_ACTIVE=prod
+GOOGLE_KEY=${GOOGLE_KEY}
+OPENWEATHER_KEY=${OPENWEATHER_KEY}
+COOKIE_AUTH_SECRET_KEY=${COOKIE_AUTH_SECRET_KEY}
+EOF
+
+                    # 2. Deploy using Docker Compose (it will read the generated .env file)
+                    docker compose up -d --build backend frontend
+
+                    # 3. Security cleanup: Delete the .env file so secrets are not left on disk
+                    rm .env
+
+                    # Wait for Spring Boot to boot up and connect to DB
+                    echo "Waiting for backend to start and connect to database..."
+                    sleep 15
+
+                    # Check if the container is running
+                    if [ "$(docker inspect -f '{{.State.Running}}' routemaster-backend)" != "true" ]; then
+                        echo "ERROR: Backend container stopped unexpectedly."
+                        docker logs routemaster-backend
+                        exit 1
+                    fi
+
+                    # Verify database connection in logs
+                    if docker logs routemaster-backend 2>&1 | grep -E -i "Communications link failure|SQLException|Access denied|Connection refused"; then
+                        echo "ERROR: Database connection failed!"
+                        docker logs --tail=100 routemaster-backend
+                        exit 1
+                    else
+                        echo "SUCCESS: Backend is running and database connection is healthy!"
+                    fi
+                '''
             }
         }
     }
 
     post {
-        success { echo 'CI/CD exitoso!' }
+        success { echo 'Pipeline completed successfully with Docker Compose!' }
         failure {
-            echo 'CI/CD fallido.'
+            echo 'Pipeline failed. Checking backend logs...'
             sh 'docker logs --tail=200 routemaster-backend || true'
         }
     }
