@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { GasStationsPreferences } from './gas-stations-preferences';
+import { GasStationsPreferencesComponent } from './gas-stations-preferences';
 
-describe('GasStationsPreferences', () => {
-  let component: GasStationsPreferences;
-  let fixture: ComponentFixture<GasStationsPreferences>;
+describe('GasStationsPreferencesComponent', () => {
+  let component: GasStationsPreferencesComponent;
+  let fixture: ComponentFixture<GasStationsPreferencesComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [GasStationsPreferences]
+      imports: [GasStationsPreferencesComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(GasStationsPreferences);
+    fixture = TestBed.createComponent(GasStationsPreferencesComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

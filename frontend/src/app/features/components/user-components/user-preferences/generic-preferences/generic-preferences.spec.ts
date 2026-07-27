@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { GenericPreferences } from './generic-preferences';
+import { GenericPreferencesComponent } from './generic-preferences';
 
-describe('GenericPreferences', () => {
-  let component: GenericPreferences;
-  let fixture: ComponentFixture<GenericPreferences>;
+describe('GenericPreferencesComponent', () => {
+  let component: GenericPreferencesComponent;
+  let fixture: ComponentFixture<GenericPreferencesComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [GenericPreferences]
+      imports: [GenericPreferencesComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(GenericPreferences);
+    fixture = TestBed.createComponent(GenericPreferencesComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
