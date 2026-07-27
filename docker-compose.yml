@@ -1,5 +1,5 @@
 services:
-  # 1. CONTENEDOR DE BASE DE DATOS
+  # 1. DATABASE CONTAINER
   mysql-db:
     image: mysql:8.0
     container_name: routemaster-db
@@ -14,7 +14,7 @@ services:
     volumes:
       - mysql-data:/var/lib/mysql
 
-  # 2. CONTENEDOR DEL BACKEND
+  # 2. BACKEND CONTAINER
   backend:
     build:
       context: ./backend
@@ -24,17 +24,14 @@ services:
       - /opt/routemaster/backend.env
     ports:
       - "8080:8080"
-      - "8443:8443"
     environment:
       - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-db:3306/routemaster_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
       - SPRING_DATASOURCE_USERNAME=${DB_USER}
       - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD}
     depends_on:
       - mysql-db
-    volumes:
-      - /opt/routemaster/keystore:/opt/routemaster/keystore:ro
 
-  # 3. CONTENEDOR DEL FRONTEND
+  # 3. FRONTEND CONTAINER
   frontend:
     build:
       context: ./frontend
@@ -45,7 +42,7 @@ services:
     depends_on:
       - backend
 
-  # 4. CONTENEDOR DE INTEGRACIÓN CONTINUA (Jenkins)
+  # 4. CONTINUOUS INTEGRATION CONTAINER (Jenkins)
   jenkins:
     image: jenkins/jenkins:lts
     container_name: routemaster-jenkins
