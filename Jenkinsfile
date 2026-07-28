@@ -1,4 +1,22 @@
-stage('Deploy via Docker Compose') {
+pipeline {
+    agent any
+    environment {
+        GOOGLE_KEY = credentials('google-api-key')
+        OPENWEATHER_KEY = credentials('openweather-api-key')
+        COOKIE_AUTH_SECRET_KEY = credentials('auth-secret-key')
+        DATABASE_URL = credentials('database-url')
+        DB_USER = credentials('database-user')
+        DB_PASSWORD = credentials('database-passwd')
+        CLOUDFLARE_TOKEN = credentials('cloudflare-token')
+    }
+    stages {
+        stage('Checkout') {
+            steps {
+                git branch: 'main', url: 'https://github.com/IHoracio/TFG-RouteMaster.git'
+            }
+        }
+        
+        stage('Deploy via Docker Compose') {
             steps {
                 sh '''
                     set -euo pipefail
@@ -42,3 +60,14 @@ EOF
                 '''
             }
         }
+    }
+    post {
+        success {
+            echo 'Pipeline completed successfully!'
+        }
+        failure {
+            echo 'Pipeline failed. Checking backend logs...'
+            sh 'docker logs --tail=200 routemaster-backend || true'
+        }
+    }
+}
