@@ -1,21 +1,4 @@
-pipeline {
-    agent any
-    environment {
-        GOOGLE_KEY = credentials('google-api-key')
-        OPENWEATHER_KEY = credentials('openweather-api-key')
-        COOKIE_AUTH_SECRET_KEY = credentials('auth-secret-key')
-        DATABASE_URL = credentials('database-url')
-        DB_USER = credentials('database-user')
-        DB_PASSWORD = credentials('database-passwd')
-        CLOUDFLARE_TOKEN = credentials('cloudflare-token')
-    }
-    stages {
-        stage('Checkout') {
-            steps {
-                git branch: 'main', url: 'https://github.com/IHoracio/TFG-RouteMaster.git'
-            }
-        }
-        stage('Deploy via Docker Compose') {
+stage('Deploy via Docker Compose') {
             steps {
                 sh '''
                     set -euo pipefail
@@ -31,9 +14,12 @@ GOOGLE_KEY=${GOOGLE_KEY}
 OPENWEATHER_KEY=${OPENWEATHER_KEY}
 COOKIE_AUTH_SECRET_KEY=${COOKIE_AUTH_SECRET_KEY}
 EOF
+                    
+                    # 1. Eliminamos los contenedores explícitamente para evitar conflictos de nombres
+                    docker rm -f routemaster-backend routemaster-frontend || true
 
-                    # Build and start only backend + frontend (skip dependencies)
-                    docker compose up -d --build --no-deps backend frontend
+                    # 2. Usamos el flag "-p tfg-routemaster" para mantener la misma red y stack original
+                    docker compose -p tfg-routemaster up -d --build --no-deps backend frontend
 
                     rm -f .env
 
@@ -56,14 +42,3 @@ EOF
                 '''
             }
         }
-    }
-    post {
-        success {
-            echo 'Pipeline completed successfully!'
-        }
-        failure {
-            echo 'Pipeline failed. Checking backend logs...'
-            sh 'docker logs --tail=200 routemaster-backend || true'
-        }
-    }
-}
