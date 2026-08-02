@@ -120,7 +120,7 @@ EOF
 
         // -------------------------------------------------------------------------
         // STAGE 5: DEPLOYMENT (CD)
-        // Builds the new Docker images and deploys them alongside the Cloudflare Tunnel.
+        // Builds the new Docker images and deploys them.
         // It injects environment variables temporarily and performs runtime health checks.
         // -------------------------------------------------------------------------
         stage('Deploy via Docker Compose') {
@@ -141,11 +141,11 @@ OPENWEATHER_KEY=${OPENWEATHER_KEY}
 COOKIE_AUTH_SECRET_KEY=${COOKIE_AUTH_SECRET_KEY}
 EOF
                     
-                    # 1. Explicitly remove old backend, frontend, and tunnel containers to avoid naming conflicts
-                    docker rm -f routemaster-backend routemaster-frontend cloudflared-tunnel || true
+                    # 1. Explicitly remove ONLY backend and frontend. (Keep Jenkins and the tunnel alive and connected).
+                    docker rm -f routemaster-backend routemaster-frontend || true
 
-                    # 2. Deploy backend, frontend, and the new Cloudflare tunnel on the same Docker network
-                    docker compose -p tfg-routemaster up -d --build --no-deps backend frontend cloudflared
+                    # 2. Deploy ONLY backend and frontend. The existing tunnel will automatically route traffic to their new IPs.
+                    docker compose -p tfg-routemaster up -d --build --no-deps backend frontend
 
                     # Remove the .env file immediately for security reasons
                     rm -f .env
