@@ -1,7 +1,7 @@
 // Declarative Pipeline for RouteMaster CI/CD
 pipeline {
     agent any
-    
+
     // -------------------------------------------------------------------------
     // ENVIRONMENT VARIABLES
     // Securely inject API keys, database credentials, and Cloudflare tokens
@@ -16,7 +16,7 @@ pipeline {
         DB_PASSWORD = credentials('database-passwd')
         CLOUDFLARE_TOKEN = credentials('cloudflare-token')
     }
-    
+
     stages {
         // -------------------------------------------------------------------------
         // STAGE 1: CHECKOUT
@@ -27,7 +27,7 @@ pipeline {
                 git branch: 'main', url: 'https://github.com/IHoracio/TFG-RouteMaster.git'
             }
         }
-        
+
         // -------------------------------------------------------------------------
         // STAGE 2: DATABASE HEALTH CHECK
         // Fails fast if the database container is down or credentials are wrong.
@@ -37,13 +37,13 @@ pipeline {
             steps {
                 sh '''
                     echo "Checking if MySQL database is up and running..."
-                    
+
                     # Use mysqladmin inside the existing DB container to ping the database
                     if ! docker exec routemaster-db mysqladmin ping -u"${DB_USER}" -p"${DB_PASSWORD}" --silent; then
                         echo "ERROR: Database is not responding or credentials are incorrect."
                         exit 1
                     fi
-                    
+
                     echo "SUCCESS: Database connection verified."
                 '''
             }
@@ -58,7 +58,7 @@ pipeline {
             steps {
                 sh '''
                     echo "Running Spring Boot tests..."
-                    
+
                     # Spin up a temporary Maven container, mount the backend code, and run tests
                     docker run --rm \
                         -v "${WORKSPACE}/backend:/app" \
@@ -80,7 +80,7 @@ pipeline {
             steps {
                 sh '''
                     echo "Running Angular tests..."
-                    
+
                     # 1. Create a temporary script in the frontend folder with the exact execution steps
                     cat << 'EOF' > frontend/run-tests.sh
 #!/bin/sh
@@ -101,7 +101,7 @@ export CHROME_BIN=/usr/bin/chromium-wrapper
 npm ci
 npx ng test --watch=false --browsers=ChromeHeadless
 EOF
-                    
+
                     # 2. Grant execution permissions to the temporary script
                     chmod +x frontend/run-tests.sh
 
@@ -111,7 +111,7 @@ EOF
                         -w /app \
                         node:24-alpine \
                         /app/run-tests.sh
-                        
+
                     # 4. Clean up the temporary script to leave no trace
                     rm frontend/run-tests.sh
                 '''
@@ -140,7 +140,7 @@ GOOGLE_KEY=${GOOGLE_KEY}
 OPENWEATHER_KEY=${OPENWEATHER_KEY}
 COOKIE_AUTH_SECRET_KEY=${COOKIE_AUTH_SECRET_KEY}
 EOF
-                    
+
                     # 1. Explicitly remove ONLY backend and frontend. (Keep Jenkins and the tunnel alive and connected).
                     docker rm -f routemaster-backend routemaster-frontend || true
 
@@ -172,7 +172,7 @@ EOF
             }
         }
     }
-    
+
     // -------------------------------------------------------------------------
     // POST ACTIONS
     // Executes logic based on the final status of the pipeline (Success/Failure).
