@@ -64,9 +64,7 @@ services:
     image: cloudflare/cloudflared:latest
     container_name: cloudflared-tunnel
     restart: unless-stopped
-    command: cloudflared --no-autoupdate tunnel run
-    environment:
-      - TUNNEL_TOKEN=${CLOUDFLARE_TOKEN}
+    command: tunnel --no-autoupdate run --token ${CLOUDFLARE_TOKEN}
     depends_on:
       - frontend
       - backend

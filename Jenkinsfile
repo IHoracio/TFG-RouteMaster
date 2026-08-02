@@ -144,8 +144,8 @@ EOF
                     # 1. Explicitly remove ONLY backend and frontend. (Keep Jenkins and the tunnel alive and connected).
                     docker rm -f routemaster-backend routemaster-frontend || true
 
-                    # 2. Deploy ONLY backend and frontend. The existing tunnel will automatically route traffic to their new IPs.
-                    docker compose -p tfg-routemaster up -d --build --no-deps backend frontend
+                    # 2. Deploy ONLY backend and frontend using the clean project name 'routemaster'
+                    docker compose -p routemaster up -d --build --no-deps backend frontend
 
                     # Remove the .env file immediately for security reasons
                     rm -f .env
