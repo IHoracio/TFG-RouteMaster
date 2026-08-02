@@ -42,7 +42,7 @@ services:
     depends_on:
       - backend
 
-# 4. CONTINUOUS INTEGRATION CONTAINER (Jenkins)
+  # 4. CONTINUOUS INTEGRATION CONTAINER (Jenkins)
   jenkins:
     build:
       context: .
@@ -58,5 +58,19 @@ services:
       - /var/jenkins_home:/var/jenkins_home
       - /var/run/docker.sock:/var/run/docker.sock
       - /opt/routemaster:/opt/routemaster
+
+  # 5. CLOUDFLARE TUNNEL (El puente con internet)
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: cloudflared-tunnel
+    restart: unless-stopped
+    command: cloudflared --no-autoupdate tunnel run
+    environment:
+      - TUNNEL_TOKEN=${CLOUDFLARE_TOKEN}
+    depends_on:
+      - frontend
+      - backend
+      - jenkins
+
 volumes:
   mysql-data:

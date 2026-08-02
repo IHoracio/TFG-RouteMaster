@@ -16,6 +16,46 @@ pipeline {
             }
         }
         
+        stage('Check Database Connection') {
+            steps {
+                sh '''
+                    echo "Comprobando que la base de datos MySQL está operativa..."
+                    if ! docker exec routemaster-db mysqladmin ping -u"${DB_USER}" -p"${DB_PASSWORD}" --silent; then
+                        echo "ERROR: La base de datos no está respondiendo o las credenciales son incorrectas."
+                        exit 1
+                    fi
+                    echo "SUCCESS: Conexión a la base de datos verificada."
+                '''
+            }
+        }
+
+        stage('Backend Tests (Spring Boot)') {
+            steps {
+                sh '''
+                    echo "Ejecutando tests de Spring Boot..."
+                    docker run --rm \
+                        -v "${WORKSPACE}/backend:/app" \
+                        -v maven-cache:/root/.m2 \
+                        -w /app \
+                        maven:3.9.6-eclipse-temurin-21-alpine \
+                        mvn test
+                '''
+            }
+        }
+
+        stage('Frontend Tests (Angular)') {
+            steps {
+                sh '''
+                    echo "Ejecutando tests de Angular..."
+                    docker run --rm \
+                        -v "${WORKSPACE}/frontend:/app" \
+                        -w /app \
+                        node:24-alpine \
+                        sh -c "apk add --no-cache chromium && export CHROME_BIN=/usr/bin/chromium-browser && npm ci && npx ng test --watch=false --browsers=ChromeHeadless"
+                '''
+            }
+        }
+
         stage('Deploy via Docker Compose') {
             steps {
                 sh '''
@@ -33,11 +73,11 @@ OPENWEATHER_KEY=${OPENWEATHER_KEY}
 COOKIE_AUTH_SECRET_KEY=${COOKIE_AUTH_SECRET_KEY}
 EOF
                     
-                    # 1. Eliminamos los contenedores explícitamente para evitar conflictos de nombres
-                    docker rm -f routemaster-backend routemaster-frontend || true
+                    # 1. Eliminamos backend, frontend y el TUNEL VIEJO para evitar conflictos
+                    docker rm -f routemaster-backend routemaster-frontend cloudflared-tunnel || true
 
-                    # 2. Usamos el flag "-p tfg-routemaster" para mantener la misma red y stack original
-                    docker compose -p tfg-routemaster up -d --build --no-deps backend frontend
+                    # 2. Desplegamos backend, frontend y el NUEVO TUNEL en la misma red
+                    docker compose -p tfg-routemaster up -d --build --no-deps backend frontend cloudflared
 
                     rm -f .env
 
