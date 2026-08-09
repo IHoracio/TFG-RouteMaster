@@ -109,11 +109,8 @@ OPENWEATHER_KEY=${OPENWEATHER_KEY}
 COOKIE_AUTH_SECRET_KEY=${COOKIE_AUTH_SECRET_KEY}
 EOF
 
-                    # 1. Eliminamos SOLAMENTE backend y frontend
-                    docker rm -f routemaster-backend routemaster-frontend || true
-
-                    # 2. Desplegamos usando el nombre limpio del proyecto
-                    docker compose -p routemaster up -d --build --no-deps backend frontend
+                    # Desplegamos y actualizamos de forma limpia respetando la red unificada
+                    docker compose up -d --build --no-deps backend frontend
 
                     rm -f .env
 
@@ -155,11 +152,11 @@ EOF
     // -------------------------------------------------------------------------
     // POST ACTIONS
     // -------------------------------------------------------------------------
-   post {
+    post {
         success {
             echo 'Pipeline completed successfully! Tests passed and deployment is live.'
             echo 'Restarting Cloudflare tunnel...'
-            sh 'docker compose -p routemaster restart cloudflared || true'
+            sh 'docker compose restart cloudflared || true'
         }
         failure {
             echo 'Pipeline failed. Printing backend logs...'
