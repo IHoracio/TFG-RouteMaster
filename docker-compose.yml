@@ -21,7 +21,7 @@ services:
       - routemaster-net
     env_file: .env
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-db:3306/routemaster_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+      - SPRING_DATASOURCE_URL=jdbc:mysql://routemaster-db:3306/routemaster_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
     depends_on:
       - mysql-db
 
