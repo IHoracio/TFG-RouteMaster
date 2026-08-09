@@ -44,6 +44,8 @@ services:
     restart: unless-stopped
     networks:
       - routemaster-net
+    group_add:
+      - "${DOCKER_GID}"
     ports:
       - "8081:8080"
       - "50000:50000"
