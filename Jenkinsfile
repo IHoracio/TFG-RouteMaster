@@ -155,14 +155,14 @@ EOF
     // -------------------------------------------------------------------------
     // POST ACTIONS
     // -------------------------------------------------------------------------
-    post {
+   post {
         success {
             echo 'Pipeline completed successfully! Tests passed and deployment is live.'
-            echo 'Restarting Cloudflare tunnel to flush DNS cache...'
-            sh 'docker restart cloudflared-tunnel || true'
+            echo 'Restarting Cloudflare tunnel...'
+            sh 'docker compose -p routemaster restart cloudflared || true'
         }
         failure {
-            echo 'Pipeline failed. Printing the last 200 lines of backend logs for debugging...'
+            echo 'Pipeline failed. Printing backend logs...'
             sh 'docker logs --tail=200 routemaster-backend || true'
         }
     }
