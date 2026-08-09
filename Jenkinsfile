@@ -109,10 +109,8 @@ OPENWEATHER_KEY=${OPENWEATHER_KEY}
 COOKIE_AUTH_SECRET_KEY=${COOKIE_AUTH_SECRET_KEY}
 EOF
 
-                    # Desplegamos y actualizamos de forma limpia respetando la red unificada
-                    docker compose up -d --build --no-deps backend frontend
-
-                    rm -f .env
+                    # Desplegamos y actualizamos de forma limpia usando los nuevos nombres de servicio
+                    docker compose up -d --build --no-deps routemaster-backend routemaster-frontend
 
                     echo "Waiting for MySQL database to be truly ready..."
                     counter=0
