@@ -1,5 +1,5 @@
 services:
-  mysql-db:
+  routemaster-mysql-db:
     image: mysql:8.0
     container_name: routemaster-db
     restart: unless-stopped
@@ -23,7 +23,7 @@ services:
     environment:
       - SPRING_DATASOURCE_URL=jdbc:mysql://routemaster-db:3306/routemaster_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
     depends_on:
-      - mysql-db
+      - routemaster-mysql-db
 
   routemaster-frontend:
     build: ./frontend

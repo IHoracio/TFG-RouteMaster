@@ -110,7 +110,7 @@ COOKIE_AUTH_SECRET_KEY=${COOKIE_AUTH_SECRET_KEY}
 EOF
 
                     # Desplegamos y actualizamos de forma limpia usando los nuevos nombres de servicio
-                    docker compose up -d --build --no-deps routemaster-backend routemaster-frontend
+                    docker compose up -d --build --no-deps routemaster-backend routemaster-frontend routemaster-bd
 
                     echo "Waiting for MySQL database to be truly ready..."
                     counter=0
