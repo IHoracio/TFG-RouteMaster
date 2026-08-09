@@ -4,6 +4,8 @@ services:
     image: mysql:8.0
     container_name: routemaster-db
     restart: unless-stopped
+    networks:
+      - routemaster-net
     environment:
       MYSQL_DATABASE: routemaster_db
       MYSQL_USER: ${DB_USER}
@@ -20,6 +22,8 @@ services:
       context: ./backend
     container_name: routemaster-backend
     restart: unless-stopped
+    networks:
+      - routemaster-net
     env_file:
       - .env
     ports:
@@ -37,6 +41,8 @@ services:
       context: ./frontend
     container_name: routemaster-frontend
     restart: unless-stopped
+    networks:
+      - routemaster-net
     ports:
       - "80:8080"
     depends_on:
@@ -49,6 +55,8 @@ services:
       dockerfile: Dockerfile.jenkins
     container_name: routemaster-jenkins
     restart: unless-stopped
+    networks:
+      - routemaster-net
     group_add:
       - "131"
     ports:
@@ -59,16 +67,22 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - /opt/routemaster:/opt/routemaster
 
-  # 5. CLOUDFLARE TUNNEL (El puente con internet)
+  # 5. CLOUDFLARE TUNNEL
   cloudflared:
     image: cloudflare/cloudflared:latest
     container_name: cloudflared-tunnel
     restart: unless-stopped
+    networks:
+      - routemaster-net
     command: tunnel --no-autoupdate run --token ${CLOUDFLARE_TOKEN}
     depends_on:
       - frontend
       - backend
       - jenkins
+
+networks:
+  routemaster-net:
+    driver: bridge
 
 volumes:
   mysql-data:
