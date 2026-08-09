@@ -26,23 +26,7 @@ pipeline {
         }
 
         // -------------------------------------------------------------------------
-        // STAGE 2: DATABASE HEALTH CHECK
-        // -------------------------------------------------------------------------
-        stage('Check Database Connection') {
-            steps {
-                sh '''
-                    echo "Checking if MySQL database is up and running..."
-                    if ! docker exec routemaster-db mysqladmin ping -u"${DB_USER}" -p"${DB_PASSWORD}" --silent; then
-                        echo "ERROR: Database is not responding or credentials are incorrect."
-                        exit 1
-                    fi
-                    echo "SUCCESS: Database connection verified."
-                '''
-            }
-        }
-
-        // -------------------------------------------------------------------------
-        // STAGE 3: BACKEND TESTS
+        // STAGE 2: BACKEND TESTS
         // -------------------------------------------------------------------------
         stage('Backend Tests (Spring Boot)') {
             steps {
@@ -59,7 +43,7 @@ pipeline {
         }
 
         // -------------------------------------------------------------------------
-        // STAGE 4: FRONTEND TESTS
+        // STAGE 3: FRONTEND TESTS
         // -------------------------------------------------------------------------
         stage('Frontend Tests (Angular)') {
             steps {
@@ -90,7 +74,7 @@ EOF
         }
 
         // -------------------------------------------------------------------------
-        // STAGE 5: DEPLOYMENT (CD)
+        // STAGE 4: DEPLOYMENT (CD)
         // -------------------------------------------------------------------------
         stage('Deploy via Docker Compose') {
             steps {
@@ -109,8 +93,8 @@ OPENWEATHER_KEY=${OPENWEATHER_KEY}
 COOKIE_AUTH_SECRET_KEY=${COOKIE_AUTH_SECRET_KEY}
 EOF
 
-                    # Desplegamos y actualizamos de forma limpia usando los nuevos nombres de servicio
-                    docker compose up -d --build --no-deps routemaster-backend routemaster-frontend routemaster-bd
+                    # ¡Usando DB! (Para coincidir con el nombre de tu contenedor y servicio)
+                    docker compose up -d --build --no-deps routemaster-db routemaster-backend routemaster-frontend
 
                     echo "Waiting for MySQL database to be truly ready..."
                     counter=0
@@ -123,11 +107,14 @@ EOF
                         sleep 2
                     done
 
-                    echo "Database is ready! Restarting backend to ensure a clean connection..."
+                    echo "Ping successful! Waiting 10 seconds for MySQL to open TCP connections..."
+                    sleep 10
+
+                    echo "Database is fully ready! Restarting backend to ensure a clean connection..."
                     docker restart routemaster-backend
 
                     echo "Waiting for backend to initialize..."
-                    sleep 10
+                    sleep 15
 
                     if [ "$(docker inspect -f '{{.State.Running}}' routemaster-backend)" != "true" ]; then
                         echo "ERROR: Backend container stopped unexpectedly."
@@ -142,6 +129,22 @@ EOF
                     else
                         echo "SUCCESS: Backend is running and database connection is healthy!"
                     fi
+                '''
+            }
+        }
+
+        // -------------------------------------------------------------------------
+        // STAGE 5: DATABASE HEALTH CHECK (Reubicado dentro de 'stages')
+        // -------------------------------------------------------------------------
+        stage('Check Database Connection') {
+            steps {
+                sh '''
+                    echo "Checking if MySQL database is up and running..."
+                    if ! docker exec routemaster-db mysqladmin ping -u"${DB_USER}" -p"${DB_PASSWORD}" --silent; then
+                        echo "ERROR: Database is not responding or credentials are incorrect."
+                        exit 1
+                    fi
+                    echo "SUCCESS: Database connection verified (again!)."
                 '''
             }
         }
