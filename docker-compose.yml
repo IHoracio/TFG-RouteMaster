@@ -1,5 +1,4 @@
 services:
-  # 1. DATABASE CONTAINER
   mysql-db:
     image: mysql:8.0
     container_name: routemaster-db
@@ -11,34 +10,23 @@ services:
       MYSQL_USER: ${DB_USER}
       MYSQL_PASSWORD: ${DB_PASSWORD}
       MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
-    ports:
-      - "3306:3306"
     volumes:
       - mysql-data:/var/lib/mysql
 
-  # 2. BACKEND CONTAINER
   backend:
-    build:
-      context: ./backend
+    build: ./backend
     container_name: routemaster-backend
     restart: unless-stopped
     networks:
       - routemaster-net
-    env_file:
-      - .env
-    ports:
-      - "8080:8080"
+    env_file: .env
     environment:
       - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-db:3306/routemaster_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
-      - SPRING_DATASOURCE_USERNAME=${DB_USER}
-      - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD}
     depends_on:
       - mysql-db
 
-  # 3. FRONTEND CONTAINER
   frontend:
-    build:
-      context: ./frontend
+    build: ./frontend
     container_name: routemaster-frontend
     restart: unless-stopped
     networks:
@@ -48,7 +36,6 @@ services:
     depends_on:
       - backend
 
-  # 4. CONTINUOUS INTEGRATION CONTAINER (Jenkins)
   jenkins:
     build:
       context: .
@@ -57,8 +44,6 @@ services:
     restart: unless-stopped
     networks:
       - routemaster-net
-    group_add:
-      - "131"
     ports:
       - "8081:8080"
       - "50000:50000"
@@ -67,7 +52,6 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - /opt/routemaster:/opt/routemaster
 
-  # 5. CLOUDFLARE TUNNEL
   cloudflared:
     image: cloudflare/cloudflared:latest
     container_name: cloudflared-tunnel
