@@ -65,7 +65,7 @@ pipeline {
             steps {
                 sh '''
                     echo "Running Angular tests..."
-                    
+
                     cat << 'EOF' > frontend/run-tests.sh
 #!/bin/sh
 set -e
@@ -77,7 +77,7 @@ export CHROME_BIN=/usr/bin/chromium-wrapper
 npm ci
 npx ng test --watch=false --browsers=ChromeHeadless
 EOF
-                    
+
                     chmod +x frontend/run-tests.sh
                     docker run --rm \
                         -v "${WORKSPACE}/frontend:/app" \
@@ -117,8 +117,22 @@ EOF
 
                     rm -f .env
 
-                    echo "Waiting for backend to start..."
-                    sleep 15
+                    echo "Waiting for MySQL database to be truly ready..."
+                    counter=0
+                    until docker exec routemaster-db mysqladmin ping -u"${DB_USER}" -p"${DB_PASSWORD}" --silent; do
+                        counter=$((counter+1))
+                        if [ $counter -gt 30 ]; then
+                            echo "ERROR: Database did not wake up in time."
+                            exit 1
+                        fi
+                        sleep 2
+                    done
+
+                    echo "Database is ready! Restarting backend to ensure a clean connection..."
+                    docker restart routemaster-backend
+
+                    echo "Waiting for backend to initialize..."
+                    sleep 10
 
                     if [ "$(docker inspect -f '{{.State.Running}}' routemaster-backend)" != "true" ]; then
                         echo "ERROR: Backend container stopped unexpectedly."
