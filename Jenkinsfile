@@ -93,7 +93,8 @@ OPENWEATHER_KEY=${OPENWEATHER_KEY}
 COOKIE_AUTH_SECRET_KEY=${COOKIE_AUTH_SECRET_KEY}
 EOF
 
-                    # ¡Usando DB! (Para coincidir con el nombre de tu contenedor y servicio)
+                    
+                    docker rm -f routemaster-db routemaster-backend routemaster-frontend || true
                     docker compose up -d --build --no-deps routemaster-db routemaster-backend routemaster-frontend
 
                     echo "Waiting for MySQL database to be truly ready..."
