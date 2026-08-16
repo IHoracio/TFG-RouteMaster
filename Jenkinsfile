@@ -81,6 +81,9 @@ EOF
                 sh '''
                     set -euo pipefail
 
+		    CLEAN_USER=$(echo -n "${DB_USER}" | tr -d '\r\n ')
+                    CLEAN_PASS=$(echo -n "${DB_PASSWORD}" | tr -d '\r\n ')
+
                     cat <<EOF > .env
 DATABASE_URL=${DATABASE_URL}
 DB_USER=${DB_USER}
