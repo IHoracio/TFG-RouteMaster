@@ -1,17 +1,18 @@
 #!/bin/sh
 set -e
 
-# Si GOOGLE_KEY está definida, reemplaza ${GOOGLE_KEY} en archivos .html y .js
+# If GOOGLE_KEY is set in the environment, replace the literal ${GOOGLE_KEY}
+# placeholder in any .html and .js files with the runtime value.
+# This allows injecting the API key at container start without rebuilding the image.
 if [ -n "${GOOGLE_KEY:-}" ]; then
   echo "Replacing \${GOOGLE_KEY} with runtime GOOGLE_KEY in static files..."
-  # Recorrer archivos .html y .js y reemplazar el placeholder literal ${GOOGLE_KEY}
   find /usr/share/nginx/html -type f \( -name '*.html' -o -name '*.js' \) -print0 | while IFS= read -r -d '' file; do
-    # usar perl para reemplazo multi-linea y que soporte caracteres especiales en la key
+    # Use perl for robust multi-line replacement and to handle special characters in the key
     perl -0777 -pe 's/\$\{GOOGLE_KEY\}/$ENV{GOOGLE_KEY}/g' -i "$file" || true
   done
 else
   echo "GOOGLE_KEY not set — skipping replacement of \${GOOGLE_KEY} in static files."
 fi
 
-# Ejecutar el comando por defecto (nginx)
+# Execute the container's CMD (nginx) with the current user (nginx)
 exec "$@"
