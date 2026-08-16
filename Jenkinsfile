@@ -1,4 +1,4 @@
-// Declarative Pipeline for RouteMaster CI/CD (mejorado)
+// Declarative Pipeline for RouteMaster CI/CD (mejorado y limpio)
 pipeline {
     agent any
 
@@ -13,6 +13,7 @@ pipeline {
         DB_USER = credentials('database-user')
         DB_PASSWORD = credentials('database-passwd')
         CLOUDFLARE_TOKEN = credentials('cloudflare-token')
+        // DOCKER_GID puede no estar definido en algunos agentes; dejaremos que el shell haga el fallback
     }
 
     stages {
@@ -81,6 +82,9 @@ EOF
                 sh '''
                     set -euo pipefail
 
+                    # Evitar warning si DOCKER_GID no está definido
+                    export DOCKER_GID=${DOCKER_GID:-}
+
                     # Limpia credenciales de caracteres problemáticos
                     CLEAN_USER=$(printf '%s' "${DB_USER}" | tr -d '\r\n ')
                     CLEAN_PASS=$(printf '%s' "${DB_PASSWORD}" | tr -d '\r\n ')
@@ -99,15 +103,38 @@ OPENWEATHER_KEY=${OPENWEATHER_KEY}
 COOKIE_AUTH_SECRET_KEY=${COOKIE_AUTH_SECRET_KEY}
 EOF
 
+                    # Protege el fichero .env
+                    chmod 600 .env || true
+
                     # Remove any running service containers from previous runs (ignore errors)
                     docker rm -f routemaster-db routemaster-backend routemaster-frontend || true
 
-                    # Levanta/reconstruye los servicios necesarios (no usar --no-deps)
+                    # Levanta/reconstruye los servicios necesarios
                     docker compose up -d --build routemaster-db routemaster-backend routemaster-frontend
 
                     echo "Waiting for MySQL database to be truly ready (using app user)..."
                     counter=0
-                    until docker exec routemaster-db mysqladmin ping -u"${CLEAN_USER}" -p"${CLEAN_PASS}" --silent; do
+                    while true; do
+                        # crear un archivo temporal seguro con credenciales y copiarlo al contenedor
+                        TMP_CNF="$(mktemp)"
+                        cat > "${TMP_CNF}" <<CNF
+[client]
+user=${CLEAN_USER}
+password=${CLEAN_PASS}
+CNF
+                        chmod 600 "${TMP_CNF}"
+
+                        docker cp "${TMP_CNF}" routemaster-db:/tmp/mysql.cnf || true
+                        rm -f "${TMP_CNF}" || true
+
+                        if docker exec routemaster-db mysqladmin --defaults-file=/tmp/mysql.cnf ping --silent 2>/dev/null; then
+                            # limpiar dentro del contenedor
+                            docker exec routemaster-db rm -f /tmp/mysql.cnf || true
+                            break
+                        fi
+
+                        # limpiar y reintentar
+                        docker exec routemaster-db rm -f /tmp/mysql.cnf || true
                         counter=$((counter+1))
                         if [ $counter -gt 60 ]; then
                             echo "ERROR: Database did not wake up in time."
@@ -122,10 +149,6 @@ EOF
 
                     echo "Database is fully ready! Restarting backend to ensure a clean connection..."
                     docker restart routemaster-backend
-
-                    # Optional: show SPRING envs inside backend for debugging
-                    echo "SPRING-related env vars inside backend (for debug):"
-                    docker exec routemaster-backend printenv | grep -iE 'SPRING_DATASOURCE|DB_|MYSQL' || true
 
                     echo "Waiting for backend to initialize..."
                     sleep 15
@@ -143,6 +166,9 @@ EOF
                     else
                         echo "SUCCESS: Backend is running and database connection is healthy!"
                     fi
+
+                    # Limpia .env para no dejar secretos en disco del agente
+                    rm -f .env || true
                 '''
             }
         }
@@ -156,11 +182,27 @@ EOF
                     echo "Checking if MySQL database is up and running..."
                     CLEAN_USER=$(printf '%s' "${DB_USER}" | tr -d '\r\n ')
                     CLEAN_PASS=$(printf '%s' "${DB_PASSWORD}" | tr -d '\r\n ')
-                    if ! docker exec routemaster-db mysqladmin ping -u"${CLEAN_USER}" -p"${CLEAN_PASS}" --silent; then
+
+                    # Usar el mismo mecanismo seguro con defaults-file
+                    TMP_CNF="$(mktemp)"
+                    cat > "${TMP_CNF}" <<CNF
+[client]
+user=${CLEAN_USER}
+password=${CLEAN_PASS}
+CNF
+                    chmod 600 "${TMP_CNF}"
+                    docker cp "${TMP_CNF}" routemaster-db:/tmp/mysql.cnf || true
+                    rm -f "${TMP_CNF}" || true
+
+                    if ! docker exec routemaster-db mysqladmin --defaults-file=/tmp/mysql.cnf ping --silent; then
                         echo "ERROR: Database is not responding or credentials are incorrect."
                         docker logs --tail=200 routemaster-db || true
+                        docker exec routemaster-db rm -f /tmp/mysql.cnf || true
                         exit 1
                     fi
+
+                    # limpiar
+                    docker exec routemaster-db rm -f /tmp/mysql.cnf || true
                     echo "SUCCESS: Database connection verified (again!)."
                 '''
             }
