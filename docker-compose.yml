@@ -33,6 +33,7 @@ services:
     restart: unless-stopped
     networks:
       - routemaster-net
+    env_file: .env
     ports:
       - "80:8080"
     depends_on:
