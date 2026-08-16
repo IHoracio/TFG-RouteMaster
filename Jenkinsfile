@@ -1,4 +1,4 @@
-// Declarative Pipeline for RouteMaster CI/CD
+// Declarative Pipeline for RouteMaster CI/CD (mejorado)
 pipeline {
     agent any
 
@@ -81,14 +81,17 @@ EOF
                 sh '''
                     set -euo pipefail
 
-		    CLEAN_USER=$(echo -n "${DB_USER}" | tr -d '\r\n ')
-                    CLEAN_PASS=$(echo -n "${DB_PASSWORD}" | tr -d '\r\n ')
+                    # Limpia credenciales de caracteres problemáticos
+                    CLEAN_USER=$(printf '%s' "${DB_USER}" | tr -d '\r\n ')
+                    CLEAN_PASS=$(printf '%s' "${DB_PASSWORD}" | tr -d '\r\n ')
+                    CLEAN_ROOT=$(printf '%s' "${DB_PASSWORD}" | tr -d '\r\n ')
 
+                    echo "Writing .env with cleaned credentials..."
                     cat <<EOF > .env
 DATABASE_URL=${DATABASE_URL}
-DB_USER=${DB_USER}
-DB_PASSWORD=${DB_PASSWORD}
-DB_ROOT_PASSWORD=${DB_PASSWORD}
+DB_USER=${CLEAN_USER}
+DB_PASSWORD=${CLEAN_PASS}
+DB_ROOT_PASSWORD=${CLEAN_ROOT}
 CLOUDFLARE_TOKEN=${CLOUDFLARE_TOKEN}
 SPRING_PROFILES_ACTIVE=prod
 GOOGLE_KEY=${GOOGLE_KEY}
@@ -96,16 +99,19 @@ OPENWEATHER_KEY=${OPENWEATHER_KEY}
 COOKIE_AUTH_SECRET_KEY=${COOKIE_AUTH_SECRET_KEY}
 EOF
 
-                    
+                    # Remove any running service containers from previous runs (ignore errors)
                     docker rm -f routemaster-db routemaster-backend routemaster-frontend || true
-                    docker compose up -d --build --no-deps routemaster-db routemaster-backend routemaster-frontend
 
-                    echo "Waiting for MySQL database to be truly ready..."
+                    # Levanta/reconstruye los servicios necesarios (no usar --no-deps)
+                    docker compose up -d --build routemaster-db routemaster-backend routemaster-frontend
+
+                    echo "Waiting for MySQL database to be truly ready (using app user)..."
                     counter=0
-                    until docker exec routemaster-db mysqladmin ping -u"${DB_USER}" -p"${DB_PASSWORD}" --silent; do
+                    until docker exec routemaster-db mysqladmin ping -u"${CLEAN_USER}" -p"${CLEAN_PASS}" --silent; do
                         counter=$((counter+1))
-                        if [ $counter -gt 30 ]; then
+                        if [ $counter -gt 60 ]; then
                             echo "ERROR: Database did not wake up in time."
+                            docker logs --tail=200 routemaster-db || true
                             exit 1
                         fi
                         sleep 2
@@ -117,18 +123,22 @@ EOF
                     echo "Database is fully ready! Restarting backend to ensure a clean connection..."
                     docker restart routemaster-backend
 
+                    # Optional: show SPRING envs inside backend for debugging
+                    echo "SPRING-related env vars inside backend (for debug):"
+                    docker exec routemaster-backend printenv | grep -iE 'SPRING_DATASOURCE|DB_|MYSQL' || true
+
                     echo "Waiting for backend to initialize..."
                     sleep 15
 
                     if [ "$(docker inspect -f '{{.State.Running}}' routemaster-backend)" != "true" ]; then
                         echo "ERROR: Backend container stopped unexpectedly."
-                        docker logs routemaster-backend
+                        docker logs --tail=200 routemaster-backend || true
                         exit 1
                     fi
 
                     if docker logs routemaster-backend 2>&1 | grep -E -i "Communications link failure|SQLException|Access denied|Connection refused"; then
                         echo "ERROR: Database connection failed during runtime!"
-                        docker logs --tail=100 routemaster-backend
+                        docker logs --tail=200 routemaster-backend || true
                         exit 1
                     else
                         echo "SUCCESS: Backend is running and database connection is healthy!"
@@ -138,14 +148,17 @@ EOF
         }
 
         // -------------------------------------------------------------------------
-        // STAGE 5: DATABASE HEALTH CHECK (Reubicado dentro de 'stages')
+        // STAGE 5: DATABASE HEALTH CHECK
         // -------------------------------------------------------------------------
         stage('Check Database Connection') {
             steps {
                 sh '''
                     echo "Checking if MySQL database is up and running..."
-                    if ! docker exec routemaster-db mysqladmin ping -u"${DB_USER}" -p"${DB_PASSWORD}" --silent; then
+                    CLEAN_USER=$(printf '%s' "${DB_USER}" | tr -d '\r\n ')
+                    CLEAN_PASS=$(printf '%s' "${DB_PASSWORD}" | tr -d '\r\n ')
+                    if ! docker exec routemaster-db mysqladmin ping -u"${CLEAN_USER}" -p"${CLEAN_PASS}" --silent; then
                         echo "ERROR: Database is not responding or credentials are incorrect."
+                        docker logs --tail=200 routemaster-db || true
                         exit 1
                     fi
                     echo "SUCCESS: Database connection verified (again!)."
