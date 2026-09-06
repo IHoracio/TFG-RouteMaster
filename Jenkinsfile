@@ -1,8 +1,3 @@
-<<<<<<< HEAD
-// Declarative Pipeline for RouteMaster CI/CD (mejorado y limpio)
-=======
-// Declarative Pipeline for RouteMaster CI/CD (Improved)
->>>>>>> 49729be (Jenkinsfile sed usage)
 pipeline {
     agent any
 
