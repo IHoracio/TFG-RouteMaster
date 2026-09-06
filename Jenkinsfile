@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 // Declarative Pipeline for RouteMaster CI/CD (mejorado y limpio)
+=======
+// Declarative Pipeline for RouteMaster CI/CD (Improved)
+>>>>>>> 49729be (Jenkinsfile sed usage)
 pipeline {
     agent any
 
@@ -6,7 +10,10 @@ pipeline {
     // ENVIRONMENT VARIABLES
     // -------------------------------------------------------------------------
     environment {
+        // Backend keys
         GOOGLE_KEY = credentials('google-api-key')
+        // Frontend key (Make sure to create this credential in Jenkins!)
+        GOOGLE_KEY_FRONTEND = credentials('google-api-key-frontend') 
         OPENWEATHER_KEY = credentials('openweather-api-key')
         COOKIE_AUTH_SECRET_KEY = credentials('auth-secret-key')
         DATABASE_URL = credentials('database-url')
@@ -27,7 +34,21 @@ pipeline {
         }
 
         // -------------------------------------------------------------------------
-        // STAGE 2: BACKEND TESTS
+        // STAGE 2: PREPARE FRONTEND ENVIRONMENT
+        // -------------------------------------------------------------------------
+        stage('Inject Frontend Secrets') {
+            steps {
+                sh '''
+                    echo "Injecting Google Maps API Key into Angular environment.prod.ts..."
+                    # We use sed to replace the placeholder with the actual Jenkins credential
+                    # The backslash (\\) escapes the $ so sed looks for the literal string '${GOOGLE_KEY_FRONTEND}'
+                    sed -i "s|\\\${GOOGLE_KEY_FRONTEND}|${GOOGLE_KEY_FRONTEND}|g" frontend/src/environments/environment.prod.ts
+                '''
+            }
+        }
+
+        // -------------------------------------------------------------------------
+        // STAGE 3: BACKEND TESTS
         // -------------------------------------------------------------------------
         stage('Backend Tests (Spring Boot)') {
             steps {
@@ -44,7 +65,7 @@ pipeline {
         }
 
         // -------------------------------------------------------------------------
-        // STAGE 3: FRONTEND TESTS
+        // STAGE 4: FRONTEND TESTS
         // -------------------------------------------------------------------------
         stage('Frontend Tests (Angular)') {
             steps {
@@ -75,22 +96,26 @@ EOF
         }
 
         // -------------------------------------------------------------------------
-        // STAGE 4: DEPLOYMENT (CD)
+        // STAGE 5: DEPLOYMENT (CD)
         // -------------------------------------------------------------------------
         stage('Deploy via Docker Compose') {
             steps {
                 sh '''
                     set -euo pipefail
 
+<<<<<<< HEAD
                     # Evitar warning si DOCKER_GID no está definido
                     export DOCKER_GID=${DOCKER_GID:-}
 
                     # Limpia credenciales de caracteres problemáticos
+=======
+                    # Clean credentials from carriage returns or spaces
+>>>>>>> 49729be (Jenkinsfile sed usage)
                     CLEAN_USER=$(printf '%s' "${DB_USER}" | tr -d '\r\n ')
                     CLEAN_PASS=$(printf '%s' "${DB_PASSWORD}" | tr -d '\r\n ')
                     CLEAN_ROOT=$(printf '%s' "${DB_PASSWORD}" | tr -d '\r\n ')
 
-                    echo "Writing .env with cleaned credentials..."
+                    echo "Writing .env with cleaned credentials for the backend..."
                     cat <<EOF > .env
 DATABASE_URL=${DATABASE_URL}
 DB_USER=${CLEAN_USER}
@@ -109,7 +134,13 @@ EOF
                     # Remove any running service containers from previous runs (ignore errors)
                     docker rm -f routemaster-db routemaster-backend routemaster-frontend || true
 
+<<<<<<< HEAD
                     # Levanta/reconstruye los servicios necesarios
+=======
+                    # Build and start services
+                    # If you face caching issues (like the perl apk add getting stuck), you can add --no-cache to the build command:
+                    # docker compose build --no-cache routemaster-frontend
+>>>>>>> 49729be (Jenkinsfile sed usage)
                     docker compose up -d --build routemaster-db routemaster-backend routemaster-frontend
 
                     echo "Waiting for MySQL database to be truly ready (using app user)..."
@@ -174,7 +205,7 @@ CNF
         }
 
         // -------------------------------------------------------------------------
-        // STAGE 5: DATABASE HEALTH CHECK
+        // STAGE 6: DATABASE HEALTH CHECK
         // -------------------------------------------------------------------------
         stage('Check Database Connection') {
             steps {
