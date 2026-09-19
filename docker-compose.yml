@@ -19,6 +19,8 @@ services:
     restart: unless-stopped
     networks:
       - routemaster-net
+    ports:
+      - "8080:8080"
     env_file: .env
     environment:
       - SPRING_DATASOURCE_URL=jdbc:mysql://routemaster-db:3306/routemaster_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
