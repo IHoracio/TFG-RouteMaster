@@ -16,8 +16,15 @@ La motivación surge de la necesidad de soluciones digitales para movilidad sost
 ## Tecnologías Utilizadas
 - **Backend**: Spring Boot (Java), JPA, MySQL/RDS, H2 for Tests Database.
 - **Frontend**: Angular (TypeScript), RxJS, Google Maps API.
-- **Despliegue**: AWS (EC2, S3, CLAUDFRONT, RDS).
+- **Despliegue**: Docker, Jenkins, VPS, Cloudflare
 - **Herramientas**: Git, GitHub, Maven, Node.js.
+
+## Arquitectura de Despliegue (Self-Hosted)
+El proyecto utiliza una infraestructura alojada de forma independiente:
+- Host Principal (Mini PC): Ejecuta los contenedores Docker (Frontend, Backend, Base de Datos y Jenkins).
+- Nodo de Acceso (VPS en Alemania): Actúa como proxy inverso con Caddy, gestionando las peticiones HTTPS públicas y sirviendo los certificados SSL.
+- Red Segura: El VPS y el Mini PC se comunican a través de una red privada virtual cifrada (Tailscale), evitando exponer los puertos del servidor local directamente a internet y esquivando bloqueos perimetrales.
+- Gestión DNS (Cloudflare): Administración de dominios y resolución DNS. El tráfico se dirige estratégicamente hacia el VPS mediante registros A para eludir posibles bloqueos de ISP en España.
 
 ## Instalación y Configuración
 1. **Clona el repositorio**: `git clone https://github.com/IHoracio/TFG-RouteMaster.git`
