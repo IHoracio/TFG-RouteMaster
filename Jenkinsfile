@@ -5,9 +5,7 @@ pipeline {
     // ENVIRONMENT VARIABLES
     // -------------------------------------------------------------------------
     environment {
-        // Backend keys
         GOOGLE_KEY = credentials('google-api-key')
-        // Frontend key (Make sure to create this credential in Jenkins!)
         GOOGLE_KEY_FRONTEND = credentials('google-api-key-frontend')
         OPENWEATHER_KEY = credentials('openweather-api-key')
         COOKIE_AUTH_SECRET_KEY = credentials('auth-secret-key')
@@ -47,7 +45,9 @@ pipeline {
             steps {
                 sh '''
                     echo "Running Spring Boot tests..."
+                    # Remove --dns and use --network host for direct internet access
                     docker run --rm \
+                        --network host \
                         -v "${WORKSPACE}/backend:/app" \
                         -v maven-cache:/root/.m2 \
                         -w /app \
@@ -57,49 +57,50 @@ pipeline {
             }
         }
 
-// -------------------------------------------------------------------------
+        // -------------------------------------------------------------------------
         // STAGE 4: FRONTEND TESTS
         // -------------------------------------------------------------------------
         stage('Frontend Tests (Angular)') {
             steps {
                 sh '''
-                    echo "Haciendo pull explícito de Node para ver el progreso..."
+                    echo "Explicitly pulling Node image to track progress..."
                     docker pull node:24-alpine
 
                     echo "Running Angular tests..."
 
                     cat << 'EOF' > frontend/run-tests.sh
 #!/bin/sh
-# set -ex hace que Jenkins imprima cada comando que ejecuta. Así sabremos dónde se para.
+# set -ex makes Jenkins print every executed command. This helps trace where it hangs.
 set -ex
 
-echo "=== Instalando Chromium y dependencias de sistema ==="
+echo "=== Installing Chromium and system dependencies ==="
 apk add --no-cache chromium nss freetype harfbuzz ca-certificates ttf-freefont
 
-echo "=== Configurando wrapper de Chromium ==="
+echo "=== Configuring Chromium wrapper ==="
 echo '#!/bin/sh' > /usr/bin/chromium-wrapper
-# Es CRÍTICO añadir --disable-dev-shm-usage para que Chrome no se congele dentro de Docker
+# It is CRITICAL to add --disable-dev-shm-usage so Chrome doesn't freeze inside Docker
 echo 'exec /usr/bin/chromium-browser --no-sandbox --disable-gpu --disable-dev-shm-usage "$@"' >> /usr/bin/chromium-wrapper
 chmod +x /usr/bin/chromium-wrapper
 export CHROME_BIN=/usr/bin/chromium-wrapper
 
-echo "=== Instalando paquetes de NPM ==="
+echo "=== Installing NPM packages ==="
 npm ci
 
-echo "=== Lanzando tests de Angular ==="
+echo "=== Running Angular tests ==="
 npx ng test --watch=false --browsers=ChromeHeadless
 EOF
 
                     chmod +x frontend/run-tests.sh
-                    
-                    # Añadimos --network routemaster-net para evitar problemas de DNS de Docker
+
+                    # Remove --network routemaster-net and --dns. 
+                    # Use --network host so the container directly uses the host machine's network and DNS.
                     docker run --rm \
-                        --network routemaster-net \
+                        --network host \
                         -v "${WORKSPACE}/frontend:/app" \
                         -w /app \
                         node:24-alpine \
                         /app/run-tests.sh
-                        
+
                     rm frontend/run-tests.sh
                 '''
             }
@@ -135,7 +136,7 @@ EOF
                     docker rm -f routemaster-db routemaster-backend routemaster-frontend || true
 
                     echo "Building Docker images without cache to avoid apk hang issues..."
-                    # Separamos el build del arranque. Aplicamos --no-cache solo a los contenedores que lo necesitan.
+                    # Separate the build from the startup. Apply --no-cache only to the containers that need it.
                     docker compose build --no-cache routemaster-backend routemaster-frontend
 
                     echo "Starting application containers..."
@@ -211,11 +212,11 @@ EOF
         failure {
             echo 'Pipeline failed. Printing backend logs...'
             sh 'docker logs --tail=200 routemaster-backend || true'
-            echo 'Limpiando contenedores para evitar borrarlos manualmente...'
+            echo 'Cleaning up containers to avoid manual deletion...'
             sh 'docker rm -f routemaster-db routemaster-backend routemaster-frontend || true'
         }
         aborted {
-            echo 'Pipeline cancelada manualmente. Limpiando contenedores...'
+            echo 'Pipeline manually aborted. Cleaning up containers...'
             sh 'docker rm -f routemaster-db routemaster-backend routemaster-frontend || true'
         }
     }
